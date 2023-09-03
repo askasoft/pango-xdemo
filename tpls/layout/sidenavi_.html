@@ -1,0 +1,25 @@
+{{define "sidenavi"}}
+<div id="navi_sites" class="panel panel-info card">
+	<div class="panel-heading card-header bg-info text-white">
+		<i class="fa fa-globe"></i> <span>{{T .Locale "menu.menu"}}</span>
+	</div>
+	<div class="panel-body card-body">
+		<ul class="nav nav-stacked flex-column">
+			{{template "navitems" .}}
+		</ul>
+	</div>
+</div>
+
+{{if .LoginUser}}
+<div id="navi_user" class="panel panel-info card">
+	<div class="panel-heading card-header bg-primary text-white">
+		<i class="fa fa-user"></i> <span>Users</span>
+	</div>
+	<div class="panel-body card-body">
+		<ul class="nav nav-stacked flex-column">
+		</ul>
+	</div>
+</div><!-- end of navi_user -->
+{{end}}
+
+{{end}}

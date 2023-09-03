@@ -1,0 +1,45 @@
+run:
+  timeout: 5m
+  skip-dirs: 
+   - z
+   - app/clsoap
+
+linters:
+  enable:
+    - asciicheck
+    - depguard
+    - dogsled
+    - durationcheck
+    - errcheck
+    - errorlint
+    - exportloopref
+    - gofmt
+    - goimports
+    - misspell
+    - nilerr
+    - nolintlint
+    - revive
+    - wastedassign
+
+issues:
+  exclude-rules:
+    - linters:
+        - structcheck
+        - unused
+      text: "`data` is unused"
+    - linters:
+        - staticcheck
+      text: "SA1019:"
+    - linters:
+        - revive
+      text: "var-naming:"
+    - linters:
+        - revive
+      text: "exported:"
+    - path: _test\.go
+      linters: # security is not make sense in tests
+        - wastedassign
+        - staticcheck
+        - errcheck
+        - errorlint
+        - gosec

@@ -1,0 +1,9 @@
+._*
+.#*
+/.vscode
+/conf/env.ini
+/logs
+/xdemo
+/*.exe
+/resource.syso
+/versioninfo.json

@@ -1,0 +1,18 @@
+{{define "scripts"}}
+{{if eq .CFG.app.debug "true"}}
+<script src="{{.Base}}/static/jquery/jquery-2.2.4.js?r={{.REV}}" type="text/javascript"></script>
+<script src="{{.Base}}/static/bootstrap3/js/bootstrap.js?r={{.REV}}" type="text/javascript"></script>
+<script src="{{.Base}}/static/corejs/corejs.js?r={{.REV}}" type="text/javascript"></script>
+<script src="{{.Base}}/static/plugins/js/plugins.js?r={{.REV}}" type="text/javascript"></script>
+<script src="{{.Base}}/assets/main.js?r={{.REV}}" type="text/javascript"></script>
+{{else}}
+<script src="{{.Base}}/static/jquery/jquery-2.2.4.min.js?r={{.REV}}" type="text/javascript"></script>
+<script src="{{.Base}}/static/bootstrap3/js/bootstrap.min.js?r={{.REV}}" type="text/javascript"></script>
+<script src="{{.Base}}/static/corejs/corejs.min.js?r={{.REV}}" type="text/javascript"></script>
+<script src="{{.Base}}/static/plugins/js/plugins.min.js?r={{.REV}}" type="text/javascript"></script>
+<script src="{{.Base}}/assets/main.js?r={{.REV}}" type="text/javascript"></script>
+{{end}}
+{{range $s := .Ctx.Attrs.scripts}}
+<script src="{{$.Base}}/assets/{{$s}}?r={{$.REV}}" type="text/javascript"></script>
+{{end}}
+{{end}}

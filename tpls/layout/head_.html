@@ -1,0 +1,14 @@
+{{define "head"}}
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta property="s:base" content="{{.Base}}"/>
+<meta property="s:static" content="{{.Base}}/static"/>
+<meta property="s:token" content="{{.Token}}"/>
+<link rel="shortcut icon" href="{{.Base}}/favicon.ico"/>
+<link href="{{.Base}}/static/bootstrap3/css/bootstrap.min.css?r={{.REV}}" rel="stylesheet" type="text/css"/>
+<link href="{{.Base}}/static/fontawesome4/css/font-awesome.min.css?r={{.REV}}" rel="stylesheet" type="text/css"/>
+<link href="{{.Base}}/static/plugins/css/plugins.min.css?r={{.REV}}" rel="stylesheet" type="text/css"/>
+<link href="{{.Base}}/assets/main.css?r={{.REV}}" rel="stylesheet" type="text/css"/>
+{{range $s := .Ctx.Attrs.styles}}
+<link href="{{$.Base}}/assets/{{$s}}?r={{$.REV}}" rel="stylesheet" type="text/css"/>
+{{end}}
+{{end}}

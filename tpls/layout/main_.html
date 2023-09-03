@@ -1,0 +1,41 @@
+{{define "main_header"}}
+<!DOCTYPE html>
+<html>
+<head>
+<title>{{T .Locale "title"}}</title>
+{{template "head" .}}
+</head>
+
+<body>
+	
+<div id="main">
+	{{template "header" .}}
+
+	<div class="container">
+	{{if .Ctx.Attrs.sidenavi}}
+		<div class="row">
+			<div id="content" class="col-md-9 col-sm-11">
+	{{else}}
+		<div id="content">
+	{{end}}
+{{end}}
+
+{{define "main_footer"}}
+	{{if .Ctx.Attrs.sidenavi}}
+			</div>
+			<div id="sidenavi" class="col-md-3 col-sm-1 ui-sidenavi">
+				{{template "sidenavi" .}}
+			</div>
+		</div>
+	{{else}}
+		</div>
+	{{end}}
+	</div>
+
+	{{template "footer" .}}
+</div>
+
+{{template "scripts" .}}
+</body>
+</html>
+{{end}}
