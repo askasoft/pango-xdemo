@@ -340,6 +340,7 @@ func initRouter() {
 	app.XLL = xmw.NewLocalizer()
 	app.XTP = xmw.NewTokenProtector(app.INI.GetString("app", "secret", "~ pango  xdemo ~"))
 	app.XRH = xmw.NewResponseHeader(nil)
+	app.XAC = xmw.NewOriginAccessController()
 
 	configMiddleware()
 
@@ -358,6 +359,7 @@ func configMiddleware() {
 	}
 
 	app.XTP.CookiePath = sec.GetString("prefix", "/")
+	app.XAC.SetOrigins(str.Fields(sec.GetString("accessControlAllowOrigin"))...)
 
 	configResponseHeader()
 	configAccessLogger()
@@ -427,6 +429,7 @@ func configRouter() {
 	r.Use(xin.Recovery())
 	r.Use(app.XLL.Handler())
 	r.Use(app.XRH.Handler())
+	r.Use(app.XAC.Handler())
 
 	xtph := app.XTP.Handler()
 

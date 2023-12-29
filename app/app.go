@@ -86,6 +86,9 @@ var (
 	// XRH global xin response header middleware
 	XRH *xmw.ResponseHeader
 
+	// XAC global xin origin access controller middleware
+	XAC *xmw.OriginAccessController
+
 	// XHT global xin html templates
 	XHT render.HTMLTemplates
 
