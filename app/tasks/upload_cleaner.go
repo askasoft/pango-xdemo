@@ -1,8 +1,6 @@
 package tasks
 
 import (
-	"errors"
-	"io"
 	"os"
 	"path/filepath"
 	"time"
@@ -17,22 +15,25 @@ func CleanUploadFiles() {
 	dir := app.GetUploadPath()
 	due := time.Now().Add(-1 * app.INI.GetDuration("upload", "expires", time.Hour*8))
 
-	if err := fsu.DirExists(dir); err == nil {
-		cleanOutdatedFiles(log, dir, due)
+	if err := fsu.DirExists(dir); err != nil {
+		log.Error("DirExists(%s) failed: %v", dir, err)
+		return
 	}
+
+	cleanOutdatedFiles(log, dir, due)
 }
 
 func cleanOutdatedFiles(log log.Logger, dir string, due time.Time) {
 	f, err := os.Open(dir)
 	if err != nil {
-		log.Errorf("Failed to Open(%q): %v", dir, err)
+		log.Errorf("Open(%s) failed: %v", dir, err)
 		return
 	}
 	defer f.Close()
 
 	des, err := f.ReadDir(-1)
 	if err != nil {
-		log.Error("Failed to ReadDir(%q): %v", dir, err)
+		log.Error("ReadDir(%s) failed: %v", dir, err)
 		return
 	}
 
@@ -41,33 +42,28 @@ func cleanOutdatedFiles(log log.Logger, dir string, due time.Time) {
 
 		if de.IsDir() {
 			cleanOutdatedFiles(log, path, due)
-			if err := DirIsEmpty(path); err == nil {
+			if err := fsu.DirIsEmpty(path); err != nil {
+				log.Errorf("DirIsEmpty(%s) failed: %v", path, err)
+			} else {
 				if err := os.Remove(path); err != nil {
-					log.Errorf("Failed to Remove(%q): %v", path, err)
+					log.Errorf("Remove(%s) failed: %v", path, err)
+				} else {
+					log.Debugf("Remove(%s) OK", path)
 				}
 			}
 			continue
 		}
 
-		fi, err := de.Info()
-		if err == nil && fi.ModTime().Before(due) {
-			if err := os.Remove(path); err != nil {
-				log.Errorf("Failed to Remove(%q): %v", path, err)
+		if fi, err := de.Info(); err != nil {
+			log.Errorf("DirEntry(%s).Info() failed: %v", path, err)
+		} else {
+			if fi.ModTime().Before(due) {
+				if err := os.Remove(path); err != nil {
+					log.Errorf("Remove(%s) failed: %v", path, err)
+				} else {
+					log.Debugf("Remove(%s) OK", path)
+				}
 			}
 		}
 	}
-}
-
-func DirIsEmpty(dir string) error {
-	f, err := os.Open(dir)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-
-	_, err = f.Readdirnames(1)
-	if errors.Is(err, io.EOF) {
-		return nil
-	}
-	return err // Either not empty or error, suits both cases
 }
