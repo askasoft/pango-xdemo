@@ -82,7 +82,7 @@ CREATE DATABASE xdemo CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 GRANT ALL PRIVILEGES ON xdemo.* TO 'xdemo'@'%';
 ```
 
-### init mysql database
+### init postgresql database
 ```sql
 CREATE USER xdemo PASSWORD 'xdemo';
 CREATE DATABASE xdemo WITH OWNER=xdemo ENCODING='UTF-8';

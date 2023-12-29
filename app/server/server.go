@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	golog "log"
@@ -332,7 +333,7 @@ func newHTMLTemplates() render.HTMLTemplates {
 func initRouter() {
 	app.XIN = xin.New()
 
-	app.XAL = xmw.DefaultAccessLogger(app.XIN)
+	app.XAL = xmw.NewAccessLogger(nil)
 	app.XRL = xmw.NewRequestLimiter(0)
 	app.XHD = xmw.DefaultHTTPDumper(app.XIN)
 	app.XHZ = xmw.DefaultHTTPGziper()
@@ -348,18 +349,67 @@ func initRouter() {
 func configMiddleware() {
 	sec := app.INI.Section("server")
 
-	app.XAL.SetFormat(sec.GetString("accessLogFormat", xmw.AccessLogTextFormat))
-	app.XAL.Disable(!sec.GetBool("accessLog"))
 	app.XRL.MaxBodySize = sec.GetSize("httpMaxRequestBodySize", 8<<20)
 	app.XHD.Disable(!sec.GetBool("httpDump"))
 	app.XHZ.Disable(!sec.GetBool("httpGzip"))
 
-	locs := app.INI.GetString("app", "locales")
-	if locs != "" {
+	if locs := app.INI.GetString("app", "locales"); locs != "" {
 		app.XLL.Locales = str.SplitAny(locs, ",; ")
 	}
 
 	app.XTP.CookiePath = sec.GetString("prefix", "/")
+
+	configResponseHeader()
+	configAccessLogger()
+}
+
+func configResponseHeader() {
+	sec := app.INI.Section("server")
+
+	hm := map[string]string{}
+	hh := sec.GetString("httpHeader")
+	if hh == "" {
+		app.XRH.Header = hm
+	} else {
+		err := json.Unmarshal(str.UnsafeBytes(hh), &hm)
+		if err == nil {
+			app.XRH.Header = hm
+		} else {
+			log.Errorf("Invalid httpHeader '%s': %v", hh, err)
+		}
+	}
+}
+
+func configAccessLogger() {
+	sec := app.INI.Section("server")
+
+	alws := []xmw.AccessLogWriter{}
+	alfs := str.Fields(sec.GetString("accessLog"))
+	for _, alf := range alfs {
+		switch alf {
+		case "text":
+			alw := xmw.NewAccessLogWriter(
+				app.XIN.Logger.GetOutputer("XINA", log.LevelTrace),
+				sec.GetString("accessLogTextFormat", xmw.AccessLogTextFormat),
+			)
+			alws = append(alws, alw)
+		case "json":
+			alw := xmw.NewAccessLogWriter(
+				app.XIN.Logger.GetOutputer("XINJ", log.LevelTrace),
+				sec.GetString("accessLogJSONFormat", xmw.AccessLogJSONFormat),
+			)
+			alws = append(alws, alw)
+		}
+	}
+
+	switch len(alws) {
+	case 0:
+		app.XAL.SetWriter(nil)
+	case 1:
+		app.XAL.SetWriter(alws[0])
+	default:
+		app.XAL.SetWriter(xmw.NewAccessLogMultiWriter(alws...))
+	}
 }
 
 func configRouter() {
