@@ -14,8 +14,7 @@ import (
 )
 
 type result struct {
-	Errors []error     `json:"errors"`
-	Files  []*fileItem `json:"files"`
+	File *fileItem `json:"file"`
 }
 
 type fileItem struct {
@@ -62,44 +61,12 @@ func Upload(c *xin.Context) {
 		return
 	}
 
-	// Upload the file to specific dst.
 	fi, err := saveUploadedFile(c, dir, file)
 	if err != nil {
-		result.Errors = append(result.Errors, err)
-	} else {
-		result.Files = append(result.Files, fi)
-	}
-
-	c.JSON(http.StatusOK, result)
-}
-
-func Uploads(c *xin.Context) {
-	dir := app.GetUploadPath()
-
-	err := os.MkdirAll(dir, os.FileMode(0770))
-	if err != nil {
-		c.Logger.Errorf("Failed to create directory %q - %v", dir, err)
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
-	result := &result{}
-
-	form, err := c.MultipartForm()
-	if err != nil {
-		c.AbortWithError(http.StatusBadRequest, err)
-		return
-	}
-
-	files := form.File["files"]
-	for _, file := range files {
-		fi, err := saveUploadedFile(c, dir, file)
-		if err != nil {
-			result.Errors = append(result.Errors, err)
-		} else {
-			result.Files = append(result.Files, fi)
-		}
-	}
-
+	result.File = fi
 	c.JSON(http.StatusOK, result)
 }
