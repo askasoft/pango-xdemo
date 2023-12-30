@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"time"
 
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango/str"
@@ -59,6 +60,11 @@ func Upload(c *xin.Context) {
 	if err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
+	}
+
+	delay := app.INI.GetDuration("upload", "delay")
+	if delay > 0 {
+		time.Sleep(delay)
 	}
 
 	fi, err := saveUploadedFile(c, dir, file)
