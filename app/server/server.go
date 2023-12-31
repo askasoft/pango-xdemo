@@ -464,10 +464,7 @@ func configRouter() {
 		g.StaticFile("/favicon.ico", filepath.Join(resPath, "favicon.ico"), cc)
 	}
 
-	updPath := app.GetUploadPath()
-	if updPath != "" {
-		g.Static("/files", updPath, cc)
-	}
+	g.Static("/files", app.GetUploadPath(), cc)
 }
 
 func initListener() {
