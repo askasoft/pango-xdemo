@@ -401,6 +401,8 @@ func configAccessLogger() {
 				sec.GetString("accessLogJSONFormat", xmw.AccessLogJSONFormat),
 			)
 			alws = append(alws, alw)
+		default:
+			log.Warnf("Invalid accessLog setting: %s", alf)
 		}
 	}
 
