@@ -444,6 +444,7 @@ func configRouter() {
 
 	rfiles := g.Group("/files")
 	rfiles.POST("/upload", files.Upload)
+	rfiles.POST("/uploads", files.Uploads)
 
 	mt := app.BuildTime
 	if mt.IsZero() {
