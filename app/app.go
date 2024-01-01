@@ -89,6 +89,9 @@ var (
 	// XAC global xin origin access controller middleware
 	XAC *xmw.OriginAccessController
 
+	// XCC global xin static cache control setter
+	XCC *xin.CacheControlSetter
+
 	// XHT global xin html templates
 	XHT render.HTMLTemplates
 

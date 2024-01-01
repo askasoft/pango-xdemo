@@ -341,6 +341,7 @@ func initRouter() {
 	app.XTP = xmw.NewTokenProtector(app.INI.GetString("app", "secret", "~ pango  xdemo ~"))
 	app.XRH = xmw.NewResponseHeader(nil)
 	app.XAC = xmw.NewOriginAccessController()
+	app.XCC = xin.NewCacheControlSetter()
 
 	configMiddleware()
 
@@ -360,6 +361,7 @@ func configMiddleware() {
 
 	app.XTP.CookiePath = sec.GetString("prefix", "/")
 	app.XAC.SetOrigins(str.Fields(sec.GetString("accessControlAllowOrigin"))...)
+	app.XCC.CacheControl = app.INI.GetString("server", "staticCacheControl", "public, max-age=31536000, immutable")
 
 	configResponseHeader()
 	configAccessLogger()
@@ -453,21 +455,22 @@ func configRouter() {
 		mt = time.Now()
 	}
 
-	cc := app.INI.GetString("server", "staticCacheControl", "public, max-age=31536000, immutable")
+	ccww := app.XCC.WriterWrapper()
+
 	for path, fs := range web.Statics {
-		g.StaticFS("/static/"+path, "", xin.FixedModTimeFS(xin.FS(fs), mt), cc)
+		xin.StaticFS(g, "/static/"+path, xin.FixedModTimeFS(xin.FS(fs), mt), "", ccww)
 	}
 
 	resPath := app.INI.GetString("app", "resourcePath")
 	if resPath == "" {
-		g.StaticFS("/assets", "/assets", xin.FixedModTimeFS(xin.FS(web.Assets), mt), cc)
-		g.StaticContent("/favicon.ico", web.Favicon, mt, cc)
+		xin.StaticFS(g, "/assets", xin.FixedModTimeFS(xin.FS(web.Assets), mt), "/assets", ccww)
+		xin.StaticContent(g, "/favicon.ico", web.Favicon, mt, ccww)
 	} else {
-		g.Static("/assets", filepath.Join(resPath, "assets"), cc)
-		g.StaticFile("/favicon.ico", filepath.Join(resPath, "favicon.ico"), cc)
+		xin.Static(g, "/assets", filepath.Join(resPath, "assets"), ccww)
+		xin.StaticFile(g, "/favicon.ico", filepath.Join(resPath, "favicon.ico"), ccww)
 	}
 
-	g.Static("/files", app.GetUploadPath(), cc)
+	xin.Static(g, "/files", app.GetUploadPath(), ccww)
 }
 
 func initListener() {
