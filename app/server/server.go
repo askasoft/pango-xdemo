@@ -26,6 +26,7 @@ import (
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/log/gormlog"
 	"github.com/askasoft/pango/net/netutil"
+	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/sch"
 	"github.com/askasoft/pango/srv"
 	"github.com/askasoft/pango/str"
@@ -351,7 +352,13 @@ func initRouter() {
 func configMiddleware() {
 	sec := app.INI.Section("server")
 
+	app.XRL.DrainBody = true
 	app.XRL.MaxBodySize = sec.GetSize("httpMaxRequestBodySize", 8<<20)
+	app.XRL.BodyTooLarge = func(c *xin.Context, limit int64) {
+		c.String(http.StatusBadRequest, tbs.Format(c.Locale, "error.request-too-large", num.HumanSize(float64(limit))))
+		c.Abort()
+	}
+
 	app.XHD.Disable(!sec.GetBool("httpDump"))
 	app.XHZ.Disable(!sec.GetBool("httpGzip"))
 
@@ -445,6 +452,7 @@ func configRouter() {
 	rdemos.Use(xtph)
 	rdemos.GET("/tags/", demos.TagsIndex)
 	rdemos.POST("/tags/", demos.TagsIndex)
+	rdemos.GET("/uploads/", demos.UploadsIndex)
 
 	rfiles := g.Group("/files")
 	rfiles.POST("/upload", files.Upload)

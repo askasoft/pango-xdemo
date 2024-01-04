@@ -12,22 +12,22 @@
 	{{template "header" .}}
 
 	<div class="container">
-	{{if .Ctx.Attrs.sidenavi}}
+	{{if eq .Ctx.Attrs.sidenavi "false"}}
+		<div id="content">
+	{{else}}
 		<div class="row">
 			<div id="content" class="col-md-9 col-sm-11">
-	{{else}}
-		<div id="content">
 	{{end}}
 {{end}}
 
 {{define "main_footer"}}
-	{{if .Ctx.Attrs.sidenavi}}
+	{{if eq .Ctx.Attrs.sidenavi "false"}}
+		</div>
+	{{else}}
 			</div>
 			<div id="sidenavi" class="col-md-3 col-sm-1 ui-sidenavi">
 				{{template "sidenavi" .}}
 			</div>
-		</div>
-	{{else}}
 		</div>
 	{{end}}
 	</div>

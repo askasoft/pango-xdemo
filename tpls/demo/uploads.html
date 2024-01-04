@@ -1,0 +1,77 @@
+{{MapSet .Ctx.Attrs "styles" (Array "demo/tags.css")}}
+{{MapSet .Ctx.Attrs "scripts" (Array "demo/tags.js")}}
+
+{{template "main_header" .}}
+
+<div class="s-section">
+	<div class="ui-headline">
+		<ol class="breadcrumb">
+			<li class="active"><i class="{{T .Locale "icon.uploads"}}"></i> {{T .Locale "menu.uploads"}}</li>
+		</ol>
+	</div>
+
+	<div class="well">{{T .Locale "demo.uploads.well"}}</div>
+
+	<hr>
+	<h4>Single File upload</h4>
+	<div id="single"
+		data-upload-url="{{.Base}}/files/upload"
+		data-dnload-url="{{.Base}}/files/$"
+		data-spy="uploader">
+		
+		<input type="hidden" name="token" class="ui-uploader-data" value="single"/>
+		<input type="file" name="file" class="ui-uploader-file" accept="image/*" style="display:none"/>
+		<a class="btn btn-sm btn-default ui-uploader-btn">Browse...</a>
+	</div>
+
+	<hr>
+	<h4>Multiple Files upload</h4>
+	<div id="multi"
+		data-upload-url="{{.Base}}/files/upload"
+		data-dnload-url="{{.Base}}/files/$"
+		data-spy="uploader">
+
+		<input type="hidden" name="token" class="ui-uploader-data" value="multi"/>
+		<input type="file" name="file" multiple class="ui-uploader-file" accept="image/*" style="display:none"/>
+		<div class="text-center">
+			<p>Drag and drop files to this area</p>
+			<a class="btn btn-sm btn-default ui-uploader-btn">Browse...</a>
+		</div>
+	</div>
+
+	<hr>
+	<h4>Multiple Files upload (image preview)</h4>
+	<div id="multi2"
+		data-upload-url="{{.Base}}/files/upload"
+		data-dnload-url="{{.Base}}/files/$"
+		data-upload-remover="true"
+		data-dnload-view="true"
+		data-spy="uploader">
+
+		<input type="hidden" name="token" class="ui-uploader-data" value="multi"/>
+		<input type="file" name="file" multiple class="ui-uploader-file" accept="image/*" style="display:none"/>
+		<div class="text-center">
+			<p>Drag and drop files to this area</p>
+			<a class="btn btn-sm btn-default ui-uploader-btn">Browse...</a>
+		</div>
+	</div>
+
+	<hr>
+	<h4>Multiple Files upload (concurrent: 5)</h4>
+	<div id="multi2"
+		data-upload-url="{{.Base}}/files/upload"
+		data-dnload-url="{{.Base}}/files/$"
+		data-upload-limit="5"
+		data-spy="uploader">
+
+		<input type="hidden" name="token" class="ui-uploader-data" value="multi"/>
+		<input type="file" name="file" multiple class="ui-uploader-file" accept="image/*" style="display:none"/>
+		<div class="text-center">
+			<p>Drag and drop files to this area</p>
+			<a class="btn btn-sm btn-default ui-uploader-btn">Browse...</a>
+		</div>
+	</div>
+
+</div>
+
+{{template "main_footer" .}}
