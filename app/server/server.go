@@ -352,7 +352,7 @@ func initRouter() {
 func configMiddleware() {
 	sec := app.INI.Section("server")
 
-	app.XRL.DrainBody = true
+	app.XRL.DrainBody = sec.GetBool("httpDrainRequestBody", false)
 	app.XRL.MaxBodySize = sec.GetSize("httpMaxRequestBodySize", 8<<20)
 	app.XRL.BodyTooLarge = func(c *xin.Context, limit int64) {
 		c.String(http.StatusBadRequest, tbs.Format(c.Locale, "error.request-too-large", num.HumanSize(float64(limit))))
