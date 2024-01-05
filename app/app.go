@@ -71,11 +71,11 @@ var (
 	// XRL global xin request limiter
 	XRL *xmw.RequestLimiter
 
+	// XHZ global xin http gziper
+	XHZ *xmw.HTTPGziper
+
 	// XHD global xin http dumper
 	XHD *xmw.HTTPDumper
-
-	// XHZ global xin http gzip
-	XHZ *xmw.HTTPGziper
 
 	// XLL global xin localizer
 	XLL *xmw.Localizer

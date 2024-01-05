@@ -336,8 +336,8 @@ func initRouter() {
 
 	app.XAL = xmw.NewAccessLogger(nil)
 	app.XRL = xmw.NewRequestLimiter(0)
-	app.XHD = xmw.DefaultHTTPDumper(app.XIN)
 	app.XHZ = xmw.DefaultHTTPGziper()
+	app.XHD = xmw.DefaultHTTPDumper(app.XIN)
 	app.XLL = xmw.NewLocalizer()
 	app.XTP = xmw.NewTokenProtector(app.INI.GetString("app", "secret", "~ pango  xdemo ~"))
 	app.XRH = xmw.NewResponseHeader(nil)
@@ -378,7 +378,7 @@ func configResponseHeader() {
 	sec := app.INI.Section("server")
 
 	hm := map[string]string{}
-	hh := sec.GetString("httpHeader")
+	hh := sec.GetString("httpResponseHeader")
 	if hh == "" {
 		app.XRH.Header = hm
 	} else {
@@ -386,7 +386,7 @@ func configResponseHeader() {
 		if err == nil {
 			app.XRH.Header = hm
 		} else {
-			log.Errorf("Invalid httpHeader '%s': %v", hh, err)
+			log.Errorf("Invalid httpResponseHeader '%s': %v", hh, err)
 		}
 	}
 }
@@ -435,8 +435,8 @@ func configRouter() {
 
 	r.Use(app.XAL.Handler())
 	r.Use(app.XRL.Handler())
-	r.Use(app.XHD.Handler())
 	r.Use(app.XHZ.Handler())
+	r.Use(app.XHD.Handler())
 	r.Use(xin.Recovery())
 	r.Use(app.XLL.Handler())
 	r.Use(app.XRH.Handler())
