@@ -99,7 +99,6 @@ xdemo.exe install
 
 
 ## apache proxy setting
-
 ```xml
 <VirtualHost *:80>
 	ServerName xdemo.local
@@ -118,5 +117,33 @@ xdemo.exe install
 	ProxyPass         /         http://localhost:6060/ nocanon retry=0
 	ProxyPassReverse  /         http://localhost:6060/ nocanon
 </VirtualHost>
+```
+
+
+## nginx proxy setting
+```xml
+server {
+	listen       80;
+	server_name  xdemo.local;
+
+	charset utf-8;
+
+	client_max_body_size 0;
+
+	location / {
+		proxy_pass              http://localhost:6060;
+		proxy_http_version      1.1;
+		proxy_set_header        X-Real-IP $remote_addr;
+		proxy_set_header        X-Forwarded-Proto $scheme;
+		proxy_set_header        X-Forwarded-Port  $server_port;
+		proxy_set_header        X-Forwarded-For   $proxy_add_x_forwarded_for;
+		proxy_set_header        Host $http_host;
+		proxy_request_buffering off;
+		proxy_buffering         off;
+		proxy_connect_timeout   10;
+		proxy_send_timeout      10;
+		proxy_read_timeout      600;
+	}
+}
 ```
 

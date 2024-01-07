@@ -3,8 +3,8 @@ module github.com/askasoft/pango-xdemo
 go 1.20
 
 require (
-	github.com/askasoft/pango v1.0.11
-	github.com/askasoft/pango-assets v1.0.4
+	github.com/askasoft/pango v1.0.12
+	github.com/askasoft/pango-assets v1.0.5
 	gorm.io/driver/mysql v1.5.1
 	gorm.io/driver/postgres v1.5.4
 	gorm.io/gorm v1.25.5

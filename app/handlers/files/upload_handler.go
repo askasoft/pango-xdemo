@@ -7,7 +7,7 @@ import (
 
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango/xin"
-	"github.com/askasoft/pango/xwm"
+	"github.com/askasoft/pango/xwa/xfu"
 )
 
 func prepare(c *xin.Context) string {
@@ -39,9 +39,9 @@ func Upload(c *xin.Context) {
 		return
 	}
 
-	result := &xwm.FileResult{}
+	result := &xfu.FileResult{}
 
-	fi, err := xwm.SaveUploadedFile(c, dir, file)
+	fi, err := xfu.SaveUploadedFile(c, dir, file)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -63,9 +63,9 @@ func Uploads(c *xin.Context) {
 		return
 	}
 
-	result := &xwm.FilesResult{}
+	result := &xfu.FilesResult{}
 	for _, file := range files {
-		fi, err := xwm.SaveUploadedFile(c, dir, file)
+		fi, err := xfu.SaveUploadedFile(c, dir, file)
 		if err != nil {
 			c.AbortWithError(http.StatusInternalServerError, err)
 			return
