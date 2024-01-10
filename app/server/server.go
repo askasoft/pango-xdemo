@@ -141,18 +141,6 @@ func Init() {
 func Reload() {
 	reloadLog(app.LogConfigFile, fsw.OpNone)
 	reloadConfigs("", fsw.OpNone)
-
-	msgPath := app.INI.GetString("app", "messagePath")
-	if msgPath != "" {
-		reloadMessages(msgPath, fsw.OpNone)
-	}
-
-	tplPath := app.INI.GetString("app", "templatePath")
-	if tplPath != "" {
-		reloadTemplates(tplPath, fsw.OpNone)
-	}
-
-	reScheduler()
 }
 
 // Run start the http server
@@ -268,8 +256,7 @@ func initDatabase() error {
 	// }
 
 	app.ORM = orm
-
-	return err
+	return nil
 }
 
 func loadConfigs() (*ini.Ini, error) {
@@ -572,7 +559,7 @@ func initScheduler() {
 				app.Exit(app.ExitErrSCH)
 			}
 			log.Infof("Schedule Task %s: %s", name, cron)
-			sch.Schedule("cleanUploadFiles", ct, callback)
+			sch.Schedule(name, ct, callback)
 		}
 	}
 }
@@ -604,6 +591,7 @@ func reScheduler() {
 					log.Infof("Reschedule Task %s: %s", name, cron)
 					task.Trigger = ct
 					task.Stop()
+					task.Start()
 				}
 			}
 		}
@@ -644,17 +632,27 @@ func reloadConfigs(path string, op fsw.Op) {
 	app.INI = ini
 	app.CFG = ini.StringMap()
 
-	err = initDatabase()
-	if err != nil {
+	if err := initDatabase(); err != nil {
 		log.Error(err)
 	}
 
 	configMiddleware()
 
-	err = configFileWatch()
-	if err != nil {
+	if err := configFileWatch(); err != nil {
 		log.Error(err)
 	}
+
+	msgPath := app.INI.GetString("app", "messagePath")
+	if msgPath != "" {
+		reloadMessages(msgPath, fsw.OpNone)
+	}
+
+	tplPath := app.INI.GetString("app", "templatePath")
+	if tplPath != "" {
+		reloadTemplates(tplPath, fsw.OpNone)
+	}
+
+	reScheduler()
 }
 
 func reloadMessages(path string, op fsw.Op) {
