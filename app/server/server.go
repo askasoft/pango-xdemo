@@ -124,7 +124,7 @@ func Init() {
 
 	err := initDatabase()
 	if err != nil {
-		log.Error(err)
+		log.Fatal(err)
 		app.Exit(app.ExitErrDB)
 	}
 
@@ -151,6 +151,8 @@ func Reload() {
 	if tplPath != "" {
 		reloadTemplates(tplPath, fsw.OpNone)
 	}
+
+	reScheduler()
 }
 
 // Run start the http server
@@ -166,7 +168,7 @@ func Shutdown() {
 	log.Info("Shutting down server ...")
 
 	// stop scheduler
-	sch.Shutdown()
+	sch.Stop()
 
 	// stop fs watch
 	fsw.Stop() //nolint: errcheck
@@ -298,7 +300,7 @@ func initMessages() {
 		err = tbs.LoadFS(txts.FS, ".")
 	}
 	if err != nil {
-		log.Error(err)
+		log.Fatal(err)
 		app.Exit(app.ExitErrTXT)
 	}
 }
@@ -315,7 +317,7 @@ func initTemplates() {
 		err = ht.LoadFS(tpls.FS, ".")
 	}
 	if err != nil {
-		log.Error(err)
+		log.Fatal(err)
 		app.Exit(app.ExitErrTPL)
 	}
 
@@ -489,7 +491,7 @@ func initListener() {
 
 	tcp, err := net.Listen("tcp", addr)
 	if err != nil {
-		log.Errorf("Listen: %v", err)
+		log.Fatalf("Listen: %v", err)
 		app.Exit(app.ExitErrTCP)
 	}
 
@@ -533,13 +535,13 @@ func initFileWatch() {
 	}
 
 	if err != nil {
-		log.Error(err)
+		log.Fatal(err)
 		app.Exit(app.ExitErrFSW)
 	}
 
 	err = configFileWatch()
 	if err != nil {
-		log.Error(err)
+		log.Fatal(err)
 		app.Exit(app.ExitErrFSW)
 	}
 }
@@ -555,16 +557,56 @@ func configFileWatch() error {
 func initScheduler() {
 	sch.Default().Logger = log.GetLogger("SCH")
 
-	cron := app.INI.GetString("upload", "cleanCron")
-	if cron != "" {
-		ct := &sch.CronTrigger{}
-		err := ct.Parse(cron)
-		if err != nil {
-			log.Error(err)
-			app.Exit(app.ExitErrSCH)
+	crons := map[string]func(){
+		"cleanUploadFiles": tasks.CleanUploadFiles,
+	}
+
+	for name, callback := range crons {
+		cron := app.INI.GetString("task", name)
+		if cron == "" {
+			sch.Schedule(name, sch.ZeroTrigger, callback)
+		} else {
+			ct := &sch.CronTrigger{}
+			if err := ct.Parse(cron); err != nil {
+				log.Fatalf("Invalid task '%s' cron: %v", name, err)
+				app.Exit(app.ExitErrSCH)
+			}
+			log.Infof("Schedule Task %s: %s", name, cron)
+			sch.Schedule("cleanUploadFiles", ct, callback)
 		}
-		log.Infof("Schedule Upload File Clean Task: %s", cron)
-		sch.Schedule(ct, tasks.CleanUploadFiles)
+	}
+}
+
+func reScheduler() {
+	crons := []string{"cleanUploadFiles"}
+
+	for _, name := range crons {
+		cron := app.INI.GetString("task", name)
+		task, ok := sch.GetTask(name)
+		if !ok {
+			log.Errorf("Failed to find task %s", name)
+			continue
+		}
+
+		if cron == "" {
+			task.Stop()
+		} else {
+			redo := true
+			if ct, ok := task.Trigger.(*sch.CronTrigger); ok {
+				redo = (ct.Cron() != cron)
+			}
+
+			if redo {
+				ct := &sch.CronTrigger{}
+				if err := ct.Parse(cron); err != nil {
+					log.Errorf("Invalid task '%s' cron: %v", name, err)
+				} else {
+					log.Infof("Reschedule Task %s: %s", name, cron)
+					task.Trigger = ct
+					task.Stop()
+				}
+			}
+		}
 	}
 }
 
