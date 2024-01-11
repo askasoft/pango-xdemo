@@ -328,7 +328,7 @@ func initRouter() {
 	app.XHZ = xmw.DefaultHTTPGziper()
 	app.XHD = xmw.DefaultHTTPDumper(app.XIN)
 	app.XLL = xmw.NewLocalizer()
-	app.XTP = xmw.NewTokenProtector(app.INI.GetString("app", "secret", "~ pango  xdemo ~"))
+	app.XTP = xmw.NewTokenProtector("")
 	app.XRH = xmw.NewResponseHeader(nil)
 	app.XAC = xmw.NewOriginAccessController()
 	app.XCC = xin.NewCacheControlSetter()
@@ -348,16 +348,18 @@ func configMiddleware() {
 		c.Abort()
 	}
 
-	app.XHD.Disable(!sec.GetBool("httpDump"))
 	app.XHZ.Disable(!sec.GetBool("httpGzip"))
+	app.XHD.Disable(!sec.GetBool("httpDump"))
 
 	if locs := app.INI.GetString("app", "locales"); locs != "" {
 		app.XLL.Locales = str.SplitAny(locs, ",; ")
 	}
 
 	app.XTP.CookiePath = sec.GetString("prefix", "/")
+	app.XTP.SetSecret(app.INI.GetString("app", "secret", "~ pango  xdemo ~"))
+
 	app.XAC.SetOrigins(str.Fields(sec.GetString("accessControlAllowOrigin"))...)
-	app.XCC.CacheControl = app.INI.GetString("server", "staticCacheControl", "public, max-age=31536000, immutable")
+	app.XCC.CacheControl = sec.GetString("staticCacheControl", "public, max-age=31536000, immutable")
 
 	configResponseHeader()
 	configAccessLogger()
