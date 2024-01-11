@@ -108,5 +108,5 @@ func Exit(code int) {
 }
 
 func GetUploadPath() string {
-	return INI.GetString("upload", "path", "files")
+	return INI.GetString("upload", "path", "data/files")
 }

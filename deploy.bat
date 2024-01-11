@@ -1,6 +1,7 @@
 set APPNAME=xdemo
 set APPHOME=C:\app\%APPNAME%
 set PREFIX=
+set LOG_WRITERS=stdout, file, dump, access
 
 if "%LOG_LEVEL%." == "." set LOG_LEVEL=INFO
 
@@ -14,8 +15,16 @@ powershell -command "(gc conf\app.ini -Encoding utf8) | %% { $_ -replace 'prefix
 powershell -command "(gc conf\log.ini -Encoding utf8).Replace('DEBUG', '%LOG_LEVEL%').Replace('HOSTNAME', '%COMPUTERNAME%') | Out-File %APPHOME%\conf\log.ini -Encoding utf8"
 
 if not "%LOG_SLACK_WEBHOOK%." == "." (
-	set LOG_WRITERS=stdout, file, access, dump, slack
+	set LOG_WRITERS=%LOG_WRITERS%, slack
 	powershell -command "(gc %APPHOME%\conf\log.ini -Encoding utf8).Replace('LOG_SLACK_WEBHOOK', '%LOG_SLACK_WEBHOOK%') | %% { $_ -replace 'writer =.*', 'writer = %LOG_WRITERS%' } | Out-File %APPHOME%\conf\log.ini -Encoding utf8"
+)
+if not "%LOG_OPENSEARCH_BATCH_WEBHOOK%." == "." (
+	set LOG_WRITERS=%LOG_WRITERS%, opensearch
+	powershell -command "(gc %APPHOME%\conf\log.ini -Encoding utf8).Replace('LOG_OPENSEARCH_BATCH_WEBHOOK', '%LOG_OPENSEARCH_BATCH_WEBHOOK%') | %% { $_ -replace 'writer =.*', 'writer = %LOG_WRITERS%' } | Out-File %APPHOME%\conf\log.ini -Encoding utf8"
+)
+if not "%LOG_OPENSEARCH_ACCESS_WEBHOOK%." == "." (
+	set LOG_WRITERS=%LOG_WRITERS%, accessos
+	powershell -command "(gc %APPHOME%\conf\log.ini -Encoding utf8).Replace('LOG_OPENSEARCH_ACCESS_WEBHOOK', '%LOG_OPENSEARCH_ACCESS_WEBHOOK%') | %% { $_ -replace 'writer =.*', 'writer = %LOG_WRITERS%' } | Out-File %APPHOME%\conf\log.ini -Encoding utf8"
 )
 
 copy  /Y %APPNAME%.exe  %APPHOME%\

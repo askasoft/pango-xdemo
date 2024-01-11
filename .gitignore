@@ -1,8 +1,8 @@
 ._*
 .#*
-/.vscode
+.vscode
 /conf/env.ini
-/files
+/data
 /logs
 /xdemo
 /*.exe
