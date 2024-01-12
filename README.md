@@ -150,9 +150,9 @@ server {
 ## OpenSearch
 
 ```
-DELETE xdemo_logs
+DELETE xdemo_applog
 
-PUT xdemo_logs
+PUT xdemo_applog
 {
 	"mappings": {
 		"properties": {
@@ -164,16 +164,16 @@ PUT xdemo_logs
 	}
 }
 
-GET xdemo_logs
+GET xdemo_applog
 
-GET xdemo_logs/_search
+GET xdemo_applog/_search
 {
 	"query": {
 		"match_all": {}
 	}
 }
 
-POST xdemo_logs/_delete_by_query
+POST xdemo_applog/_delete_by_query
 {
 	"query": {
 		"match_all": {}

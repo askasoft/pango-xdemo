@@ -5,8 +5,8 @@ APPHOME=/app/${APPNAME}
 PREFIX=
 LOG_WRITERS="stdout, file, dump, access"
 
-#LOG_OPENSEARCH_BATCH_WEBHOOK=https://localhost:9200/xdemo_logs/_bulk
-#LOG_OPENSEARCH_ACCESS_WEBHOOK=https://localhost:9200/xdemo_access/_bulk
+#LOG_OPENSEARCH_APPLOG=https://localhost:9200/xdemo_applog/_bulk
+#LOG_OPENSEARCH_ACCESS=https://localhost:9200/xdemo_access/_bulk
 
 if [ -z "${LOG_LEVEL}" ]; then
 	LOG_LEVEL=INFO
@@ -33,17 +33,21 @@ if ! [ -z "${LOG_SLACK_WEBHOOK}" ]; then
 		-e "s;writer =.*;writer = ${LOG_WRITERS};g" \
 		${APPHOME}/conf/log.ini
 fi
-if ! [ -z "${LOG_OPENSEARCH_BATCH_WEBHOOK}" ]; then
-	LOG_WRITERS="${LOG_WRITERS}, opensearch"
+if ! [ -z "${LOG_OPENSEARCH_APPLOG}" ]; then
+	LOG_WRITERS="${LOG_WRITERS}, osapplog"
 	sed -i \
-		-e "s;LOG_OPENSEARCH_BATCH_WEBHOOK;${LOG_OPENSEARCH_BATCH_WEBHOOK};g" \
+		-e "s;LOG_OPENSEARCH_APPLOG;${LOG_OPENSEARCH_APPLOG};g" \
+		-e "s;LOG_OPENSEARCH_USERNAME;${LOG_OPENSEARCH_USERNAME};g" \
+		-e "s;LOG_OPENSEARCH_PASSWORD;${LOG_OPENSEARCH_PASSWORD};g" \
 		-e "s;writer =.*;writer = ${LOG_WRITERS};g" \
 		${APPHOME}/conf/log.ini
 fi
-if ! [ -z "${LOG_OPENSEARCH_ACCESS_WEBHOOK}" ]; then
-	LOG_WRITERS="${LOG_WRITERS}, accessos"
+if ! [ -z "${LOG_OPENSEARCH_ACCESS}" ]; then
+	LOG_WRITERS="${LOG_WRITERS}, osaccess"
 	sed -i \
-		-e "s;LOG_OPENSEARCH_ACCESS_WEBHOOK;${LOG_OPENSEARCH_ACCESS_WEBHOOK};g" \
+		-e "s;LOG_OPENSEARCH_ACCESS;${LOG_OPENSEARCH_ACCESS};g" \
+		-e "s;LOG_OPENSEARCH_USERNAME;${LOG_OPENSEARCH_USERNAME};g" \
+		-e "s;LOG_OPENSEARCH_PASSWORD;${LOG_OPENSEARCH_PASSWORD};g" \
 		-e "s;writer =.*;writer = ${LOG_WRITERS};g" \
 		${APPHOME}/conf/log.ini
 fi
