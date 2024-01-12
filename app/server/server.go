@@ -185,6 +185,9 @@ func initLog() {
 		fmt.Println(err)
 		os.Exit(app.ExitErrLOG)
 	}
+
+	host, _ := os.Hostname()
+	log.SetProp("HOST", host)
 	log.SetProp("VERSION", app.Version)
 	log.SetProp("REVISION", app.Revision)
 	golog.SetOutput(log.GetOutputer("std", log.LevelInfo, 2))
