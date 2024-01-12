@@ -1,6 +1,8 @@
 module github.com/askasoft/pango-xdemo
 
-go 1.20
+go 1.21
+
+toolchain go1.21.6
 
 require (
 	github.com/askasoft/pango v1.0.12
