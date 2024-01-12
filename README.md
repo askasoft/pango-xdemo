@@ -147,3 +147,69 @@ server {
 }
 ```
 
+## OpenSearch
+
+```
+DELETE xdemo_logs
+
+PUT xdemo_logs
+{
+	"mappings": {
+		"properties": {
+			"when": {
+				"type": "date",
+				"format": "date_time"
+			}
+		}
+	}
+}
+
+GET xdemo_logs
+
+GET xdemo_logs/_search
+{
+	"query": {
+		"match_all": {}
+	}
+}
+
+POST xdemo_logs/_delete_by_query
+{
+	"query": {
+		"match_all": {}
+	}
+}
+```
+
+
+```
+DELETE xdemo_access
+
+PUT xdemo_access
+{
+	"mappings": {
+		"properties": {
+			"when": {
+				"type": "date",
+				"format": "date_time"
+			}
+		}
+	}
+}
+
+GET xdemo_access
+
+GET xdemo_access/_search
+{
+	"query": {
+		"match_all": {}
+	}
+}
+
+POST xdemo_access/_delete_by_query
+{
+	"query": {
+		"match_all": {}
+	}
+}
+```

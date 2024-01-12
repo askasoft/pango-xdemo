@@ -5,6 +5,9 @@ APPHOME=/app/${APPNAME}
 PREFIX=
 LOG_WRITERS="stdout, file, dump, access"
 
+#LOG_OPENSEARCH_BATCH_WEBHOOK=https://localhost:9200/xdemo_logs/_bulk
+#LOG_OPENSEARCH_ACCESS_WEBHOOK=https://localhost:9200/xdemo_access/_bulk
+
 if [ -z "${LOG_LEVEL}" ]; then
 	LOG_LEVEL=INFO
 fi
