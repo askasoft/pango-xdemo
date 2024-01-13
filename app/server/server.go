@@ -122,8 +122,7 @@ func Init() {
 
 	initTemplates()
 
-	err := initDatabase()
-	if err != nil {
+	if err := initDatabase(); err != nil {
 		log.Fatal(err)
 		app.Exit(app.ExitErrDB)
 	}
@@ -329,7 +328,7 @@ func initRouter() {
 	app.XAL = xmw.NewAccessLogger(nil)
 	app.XRL = xmw.NewRequestLimiter(0)
 	app.XHZ = xmw.DefaultHTTPGziper()
-	app.XHD = xmw.DefaultHTTPDumper(app.XIN)
+	app.XHD = xmw.NewHTTPDumper(app.XIN.Logger.GetOutputer("XHD", log.LevelTrace))
 	app.XLL = xmw.NewLocalizer()
 	app.XTP = xmw.NewTokenProtector("")
 	app.XRH = xmw.NewResponseHeader(nil)
@@ -394,13 +393,13 @@ func configAccessLogger() {
 		switch alf {
 		case "text":
 			alw := xmw.NewAccessLogWriter(
-				app.XIN.Logger.GetOutputer("XINA", log.LevelTrace),
+				app.XIN.Logger.GetOutputer("XAL", log.LevelTrace),
 				sec.GetString("accessLogTextFormat", xmw.AccessLogTextFormat),
 			)
 			alws = append(alws, alw)
 		case "json":
 			alw := xmw.NewAccessLogWriter(
-				app.XIN.Logger.GetOutputer("XINJ", log.LevelTrace),
+				app.XIN.Logger.GetOutputer("XAJ", log.LevelTrace),
 				sec.GetString("accessLogJSONFormat", xmw.AccessLogJSONFormat),
 			)
 			alws = append(alws, alw)
