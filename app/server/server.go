@@ -354,7 +354,7 @@ func configMiddleware() {
 	app.XHD.Disable(!sec.GetBool("httpDump"))
 
 	if locs := app.INI.GetString("app", "locales"); locs != "" {
-		app.XLL.Locales = str.SplitAny(locs, ",; ")
+		app.XLL.Locales = str.FieldsAny(locs, ",; ")
 	}
 
 	app.XTP.CookiePath = sec.GetString("prefix", "/")
