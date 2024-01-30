@@ -10,14 +10,13 @@ import (
 )
 
 func CleanUploadFiles() {
-	log := log.GetLogger("CUF")
 	dir := app.GetUploadPath()
 	due := time.Now().Add(-1 * app.INI.GetDuration("upload", "expires", time.Hour*8))
 
 	if err := fsu.DirExists(dir); err != nil {
-		log.Error("DirExists(%s) failed: %v", dir, err)
+		log.Errorf("DirExists(%s) failed: %v", dir, err)
 		return
 	}
 
-	xfu.CleanOutdatedFiles(log, dir, due)
+	xfu.CleanOutdatedFiles(dir, due)
 }
