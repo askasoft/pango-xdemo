@@ -1,13 +1,17 @@
 package files
 
 import (
+	"mime/multipart"
 	"net/http"
 	"os"
+	"path"
 	"time"
 
 	"github.com/askasoft/pango-xdemo/app"
+	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pango/xwa/xfu"
+	"github.com/google/uuid"
 )
 
 func prepare(c *xin.Context) string {
@@ -39,16 +43,25 @@ func Upload(c *xin.Context) {
 		return
 	}
 
-	result := &xfu.FileResult{}
-
-	fi, err := xfu.SaveUploadedFile(c, dir, file)
+	fi, err := SaveUploadedFile(c, file, dir)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
-	result.File = fi
-	c.JSON(http.StatusOK, result)
+	fr := &xfu.FileResult{File: fi}
+	c.JSON(http.StatusOK, fr)
+}
+
+func SaveUploadedFile(c *xin.Context, file *multipart.FileHeader, dir string) (fi *xfu.FileItem, err error) {
+	fi = xfu.NewFileItem(file)
+	fi.ID = str.RemoveByte(uuid.New().String(), '-') + path.Ext(fi.Name)
+
+	fn := path.Join(dir, fi.ID)
+	if err = c.SaveUploadedFile(file, fn); err != nil {
+		os.Remove(fn)
+	}
+	return
 }
 
 func Uploads(c *xin.Context) {
@@ -65,7 +78,7 @@ func Uploads(c *xin.Context) {
 
 	result := &xfu.FilesResult{}
 	for _, file := range files {
-		fi, err := xfu.SaveUploadedFile(c, dir, file)
+		fi, err := SaveUploadedFile(c, file, dir)
 		if err != nil {
 			c.AbortWithError(http.StatusInternalServerError, err)
 			return

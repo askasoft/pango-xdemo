@@ -7,6 +7,7 @@ toolchain go1.21.6
 require (
 	github.com/askasoft/pango v1.0.12
 	github.com/askasoft/pango-assets v1.0.5
+	github.com/google/uuid v1.6.0
 	gorm.io/driver/mysql v1.5.1
 	gorm.io/driver/postgres v1.5.4
 	gorm.io/gorm v1.25.6
@@ -15,7 +16,6 @@ require (
 require (
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/go-sql-driver/mysql v1.7.0 // indirect
-	github.com/google/uuid v1.6.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
 	github.com/jackc/pgx/v5 v5.4.3 // indirect
