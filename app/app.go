@@ -106,7 +106,3 @@ func Exit(code int) {
 	log.Close()
 	os.Exit(code)
 }
-
-func GetUploadPath() string {
-	return INI.GetString("upload", "path", "data/files")
-}

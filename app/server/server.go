@@ -36,6 +36,7 @@ import (
 	"github.com/askasoft/pango/xin/render"
 	"github.com/askasoft/pango/xmw"
 	"github.com/askasoft/pango/xvw"
+	"github.com/askasoft/pango/xwa/xwf"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -247,15 +248,12 @@ func initDatabase() error {
 	db.SetMaxOpenConns(sec.GetInt("maxOpenConns", 10))
 	db.SetConnMaxLifetime(sec.GetDuration("connMaxLifetime", time.Hour))
 
-	// migration
-	// err = orm.AutoMigrate(
-	// 	&models.Config{},
-	// 	&models.Index{},
-	// 	&models.Article{},
-	// )
-	// if err != nil {
-	// 	return err
-	// }
+	err = orm.AutoMigrate(
+		&xwf.File{},
+	)
+	if err != nil {
+		return err
+	}
 
 	app.ORM = orm
 	return nil
@@ -471,7 +469,7 @@ func configRouter() {
 		xin.StaticFile(g, "/favicon.ico", filepath.Join(resPath, "favicon.ico"), ccww)
 	}
 
-	xin.Static(g, "/files", app.GetUploadPath(), ccww)
+	xin.StaticFS(g, "/files", xwf.FS(app.ORM), "", ccww)
 }
 
 func initListener() {
