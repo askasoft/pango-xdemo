@@ -14,9 +14,6 @@ import (
 
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/handlers"
-	"github.com/askasoft/pango-xdemo/app/handlers/demos"
-	"github.com/askasoft/pango-xdemo/app/handlers/files"
-	"github.com/askasoft/pango-xdemo/app/tasks"
 	"github.com/askasoft/pango-xdemo/tpls"
 	"github.com/askasoft/pango-xdemo/txts"
 	"github.com/askasoft/pango-xdemo/web"
@@ -200,6 +197,7 @@ func initConfigs() {
 	}
 	app.INI = ini
 	app.CFG = ini.StringMap()
+	app.Base = app.INI.GetString("server", "prefix")
 }
 
 func closeDatabase() {
@@ -248,11 +246,11 @@ func initDatabase() error {
 	db.SetMaxOpenConns(sec.GetInt("maxOpenConns", 10))
 	db.SetConnMaxLifetime(sec.GetDuration("connMaxLifetime", time.Hour))
 
-	err = orm.AutoMigrate(
-		&xwf.File{},
-	)
-	if err != nil {
-		return err
+	if sec.GetBool("migrate") {
+		err = orm.AutoMigrate(migrates...)
+		if err != nil {
+			return err
+		}
 	}
 
 	app.ORM = orm
@@ -433,21 +431,12 @@ func configRouter() {
 	r.Use(app.XRH.Handler())
 	r.Use(app.XAC.Handler())
 
-	xtph := app.XTP.Handler()
+	rg := r.Group(cp)
+	rg.GET("/", handlers.Index)
+	rg.GET("/healthcheck", handlers.HealthCheck)
+	rg.GET("/panic", handlers.Panic)
 
-	g := r.Group(cp)
-	g.GET("/", handlers.Index)
-	g.GET("/panic", handlers.Panic)
-
-	rdemos := g.Group("/demos")
-	rdemos.Use(xtph)
-	rdemos.GET("/tags/", demos.TagsIndex)
-	rdemos.POST("/tags/", demos.TagsIndex)
-	rdemos.GET("/uploads/", demos.UploadsIndex)
-
-	rfiles := g.Group("/files")
-	rfiles.POST("/upload", files.Upload)
-	rfiles.POST("/uploads", files.Uploads)
+	configDemoRouters(rg)
 
 	mt := app.BuildTime
 	if mt.IsZero() {
@@ -457,19 +446,19 @@ func configRouter() {
 	ccww := app.XCC.WriterWrapper()
 
 	for path, fs := range web.Statics {
-		xin.StaticFS(g, "/static/"+path, xin.FixedModTimeFS(xin.FS(fs), mt), "", ccww)
+		xin.StaticFS(rg, "/static/"+path, xin.FixedModTimeFS(xin.FS(fs), mt), "", ccww)
 	}
 
 	resPath := app.INI.GetString("app", "resourcePath")
 	if resPath == "" {
-		xin.StaticFS(g, "/assets", xin.FixedModTimeFS(xin.FS(web.Assets), mt), "/assets", ccww)
-		xin.StaticContent(g, "/favicon.ico", web.Favicon, mt, ccww)
+		xin.StaticFS(rg, "/assets", xin.FixedModTimeFS(xin.FS(web.Assets), mt), "/assets", ccww)
+		xin.StaticContent(rg, "/favicon.ico", web.Favicon, mt, ccww)
 	} else {
-		xin.Static(g, "/assets", filepath.Join(resPath, "assets"), ccww)
-		xin.StaticFile(g, "/favicon.ico", filepath.Join(resPath, "favicon.ico"), ccww)
+		xin.Static(rg, "/assets", filepath.Join(resPath, "assets"), ccww)
+		xin.StaticFile(rg, "/favicon.ico", filepath.Join(resPath, "favicon.ico"), ccww)
 	}
 
-	xin.StaticFS(g, "/files", xwf.FS(app.ORM), "", ccww)
+	xin.StaticFS(rg, "/files", xwf.FS(app.ORM), "", ccww)
 }
 
 func initListener() {
@@ -546,11 +535,10 @@ func configFileWatch() error {
 func initScheduler() {
 	sch.Default().Logger = log.GetLogger("SCH")
 
-	crons := map[string]func(){
-		"cleanUploadFiles": tasks.CleanUploadFiles,
-	}
+	for it := schedules.Iterator(); it.Next(); {
+		name := it.Key()
+		callback := it.Value()
 
-	for name, callback := range crons {
 		cron := app.INI.GetString("task", name)
 		if cron == "" {
 			sch.Schedule(name, sch.ZeroTrigger, callback)
@@ -567,9 +555,7 @@ func initScheduler() {
 }
 
 func reScheduler() {
-	crons := []string{"cleanUploadFiles"}
-
-	for _, name := range crons {
+	for _, name := range schedules.Keys() {
 		cron := app.INI.GetString("task", name)
 		task, ok := sch.GetTask(name)
 		if !ok {
@@ -633,6 +619,7 @@ func reloadConfigs(path string, op fsw.Op) {
 
 	app.INI = ini
 	app.CFG = ini.StringMap()
+	app.Base = app.INI.GetString("server", "prefix")
 
 	if err := initDatabase(); err != nil {
 		log.Error(err)

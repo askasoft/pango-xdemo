@@ -59,6 +59,9 @@ var (
 	// CFG global ini map
 	CFG map[string]map[string]string
 
+	// Base web context path
+	Base string
+
 	// ORM
 	ORM *gorm.DB
 

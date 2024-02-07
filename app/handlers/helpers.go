@@ -14,7 +14,7 @@ func H(c *xin.Context) xin.H {
 		"VER":    app.Version,
 		"REV":    app.Revision,
 		"Host":   c.Request.Host,
-		"Base":   app.INI.GetString("server", "prefix"),
+		"Base":   app.Base,
 		"Locale": c.Locale,
 		"Now":    time.Now(),
 		"Ctx":    c,
@@ -26,8 +26,10 @@ func H(c *xin.Context) xin.H {
 func E(c *xin.Context) xin.H {
 	sb := strings.Builder{}
 	for _, e := range c.Errors {
+		if sb.Len() > 0 {
+			sb.WriteByte('\n')
+		}
 		sb.WriteString(e.Error())
-		sb.WriteByte('\n')
 	}
 	h := xin.H{
 		"error": sb.String(),
