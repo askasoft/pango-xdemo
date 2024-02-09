@@ -62,9 +62,6 @@ var (
 	// Base web context path
 	Base string
 
-	// ORM
-	ORM *gorm.DB
-
 	// XIN global xin engine
 	XIN *xin.Engine
 
@@ -103,6 +100,12 @@ var (
 
 	// HTTP global http server
 	HTTP *http.Server
+
+	// DB database instance
+	DB *gorm.DB
+
+	// DSN database connection string
+	DSN string
 )
 
 func Exit(code int) {

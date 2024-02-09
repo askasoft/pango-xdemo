@@ -10,5 +10,5 @@ import (
 func CleanUploadFiles() {
 	due := time.Now().Add(-1 * app.INI.GetDuration("upload", "expires", time.Hour*8))
 
-	xwf.CleanOutdatedFiles(app.ORM, due)
+	xwf.CleanOutdatedFiles(app.DB, "files", due)
 }

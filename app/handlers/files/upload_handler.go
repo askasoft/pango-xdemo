@@ -33,7 +33,7 @@ func Upload(c *xin.Context) {
 func SaveUploadedFile(file *multipart.FileHeader) (*xwf.File, error) {
 	id := time.Now().Format("/2006/0102/") + str.RemoveByte(uuid.New().String(), '-') + path.Ext(file.Filename)
 
-	return xwf.SaveUploadedFile(app.ORM, id, file)
+	return xwf.SaveUploadedFile(app.DB, "files", id, file)
 }
 
 func Uploads(c *xin.Context) {
