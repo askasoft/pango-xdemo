@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	golog "log"
 	"net"
 	"net/http"
@@ -30,10 +31,11 @@ import (
 // SRV service instance
 var SRV = &service{}
 
-// -----------------------------------
-
-// service srv.App implement
+// service srv.App, srv.Cmd implement
 type service struct{}
+
+// -----------------------------------
+// srv.App implement
 
 // Name app/service name
 func (s *service) Name() string {
@@ -90,17 +92,51 @@ func (s *service) Wait() {
 	srv.Wait(s)
 }
 
+// -----------------------------------
+// srv.Cmd implement
+
+// Flag process optional command flag
+func (s *service) Flag() {
+}
+
+// Flag process optional command flag
+func (s *service) CmdHelp(out io.Writer) {
+	fmt.Fprintln(out, "    migrate         migrate database schema.")
+}
+
+// Exec execute optional command except the internal command
+// Basic: 'help' 'usage' 'version'
+// Windows only: 'install' 'remove' 'start' 'stop' 'debug'
+func (s *service) Exec(cmd string) {
+	switch cmd {
+	case "migrate":
+		initLog()
+		initConfigs()
+		initMessages()
+		initTemplates()
+
+		if err := openDatabase(); err != nil {
+			log.Fatal(err) //nolint: all
+			app.Exit(app.ExitErrDB)
+		}
+
+		if err := dbMigrate(); err != nil {
+			log.Fatal(err) //nolint: all
+			app.Exit(app.ExitErrDB)
+		}
+		log.Info("DONE.")
+		app.Exit(0)
+	default:
+		fmt.Fprintf(os.Stderr, "Invalid command %q\n\n", cmd)
+		srv.Help()
+	}
+}
+
 // ------------------------------------------------------
 
 // Init initialize the app
 func Init() {
 	initLog()
-
-	dir, _ := filepath.Abs(".")
-	log.Info("Initializing ...")
-	log.Infof("Version: %s.%s", app.Version, app.Revision)
-	log.Infof("BuildTime: %s", app.BuildTime)
-	log.Infof("Directory: %s", dir)
 
 	initConfigs()
 
@@ -108,9 +144,16 @@ func Init() {
 
 	initTemplates()
 
-	if err := initDatabase(); err != nil {
-		log.Fatal(err)
+	if err := openDatabase(); err != nil {
+		log.Fatal(err) //nolint: all
 		app.Exit(app.ExitErrDB)
+	}
+
+	if app.INI.GetBool("database", "migrate") {
+		if err := dbMigrate(); err != nil {
+			log.Fatal(err) //nolint: all
+			app.Exit(app.ExitErrDB)
+		}
 	}
 
 	initRouter()
@@ -176,6 +219,12 @@ func initLog() {
 	log.SetProp("VERSION", app.Version)
 	log.SetProp("REVISION", app.Revision)
 	golog.SetOutput(log.GetOutputer("std", log.LevelInfo, 2))
+
+	dir, _ := filepath.Abs(".")
+	log.Info("Initializing ...")
+	log.Infof("Version: %s.%s", app.Version, app.Revision)
+	log.Infof("BuildTime: %s", app.BuildTime)
+	log.Infof("Directory: %s", dir)
 }
 
 func initConfigs() {
@@ -183,6 +232,7 @@ func initConfigs() {
 	if err != nil {
 		app.Exit(app.ExitErrCFG)
 	}
+
 	app.INI = ini
 	app.CFG = ini.StringMap()
 	app.Base = app.INI.GetString("server", "prefix")
@@ -216,7 +266,7 @@ func initMessages() {
 		err = tbs.LoadFS(txts.FS, ".")
 	}
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal(err) //nolint: all
 		app.Exit(app.ExitErrTXT)
 	}
 }
@@ -233,7 +283,7 @@ func initTemplates() {
 		err = ht.LoadFS(tpls.FS, ".")
 	}
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal(err) //nolint: all
 		app.Exit(app.ExitErrTPL)
 	}
 
@@ -246,6 +296,7 @@ func newHTMLTemplates() render.HTMLTemplates {
 	fm := tpl.Functions()
 	fm.Copy(xvw.Functions())
 	ht.Funcs(fm)
+
 	return ht
 }
 
@@ -257,7 +308,7 @@ func initListener() {
 
 	tcp, err := net.Listen("tcp", addr)
 	if err != nil {
-		log.Fatalf("Listen: %v", err)
+		log.Fatalf("Listen: %v", err) //nolint: all
 		app.Exit(app.ExitErrTCP)
 	}
 
@@ -301,13 +352,13 @@ func initFileWatch() {
 	}
 
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal(err) //nolint: all
 		app.Exit(app.ExitErrFSW)
 	}
 
 	err = configFileWatch()
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal(err) //nolint: all
 		app.Exit(app.ExitErrFSW)
 	}
 }
@@ -333,7 +384,7 @@ func initScheduler() {
 		} else {
 			ct := &sch.CronTrigger{}
 			if err := ct.Parse(cron); err != nil {
-				log.Fatalf("Invalid task '%s' cron: %v", name, err)
+				log.Fatalf("Invalid task '%s' cron: %v", name, err) //nolint: all
 				app.Exit(app.ExitErrSCH)
 			}
 			log.Infof("Schedule Task %s: %s", name, cron)
@@ -409,7 +460,7 @@ func reloadConfigs(path string, op fsw.Op) {
 	app.CFG = ini.StringMap()
 	app.Base = app.INI.GetString("server", "prefix")
 
-	if err := initDatabase(); err != nil {
+	if err := openDatabase(); err != nil {
 		log.Error(err)
 	}
 

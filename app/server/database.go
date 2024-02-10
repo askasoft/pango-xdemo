@@ -16,7 +16,7 @@ var migrates = []any{
 	&xwf.File{},
 }
 
-func initDatabase() error {
+func openDatabase() error {
 	sec := app.INI.Section("database")
 	typ := sec.GetString("type", "postgres")
 	dsn := sec.GetString("dsn")
@@ -75,9 +75,6 @@ func closeDatabase() {
 }
 
 func dbMigrate() error {
-	if app.INI.GetBool("database", "migrate") {
-		return app.DB.AutoMigrate(migrates...)
-	}
-
+	return app.DB.AutoMigrate(migrates...)
 	return nil
 }
