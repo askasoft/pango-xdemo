@@ -15,9 +15,10 @@ import (
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/tbs"
+	"github.com/askasoft/pango/xfs"
+	"github.com/askasoft/pango/xfs/gormfs"
 	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pango/xmw"
-	"github.com/askasoft/pango/xwa/xwf"
 )
 
 func initRouter() {
@@ -160,7 +161,7 @@ func configHandlers() {
 		xin.StaticFile(rg, "/favicon.ico", filepath.Join(resPath, "favicon.ico"), xcch)
 	}
 
-	xin.StaticFS(rg, "/files", xwf.FS(app.DB, "files"), "", xcch)
+	xin.StaticFS(rg, "/files", xfs.HFS(gormfs.FS(app.DB, "files")), "", xcch)
 }
 
 func configDemoHandlers(rg *xin.RouterGroup) {

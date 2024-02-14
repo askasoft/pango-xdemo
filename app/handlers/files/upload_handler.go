@@ -8,8 +8,9 @@ import (
 
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango/str"
+	"github.com/askasoft/pango/xfs"
+	"github.com/askasoft/pango/xfs/gormfs"
 	"github.com/askasoft/pango/xin"
-	"github.com/askasoft/pango/xwa/xwf"
 	"github.com/google/uuid"
 )
 
@@ -26,14 +27,15 @@ func Upload(c *xin.Context) {
 		return
 	}
 
-	fr := &xwf.FileResult{File: fi}
+	fr := &xfs.FileResult{File: fi}
 	c.JSON(http.StatusOK, fr)
 }
 
-func SaveUploadedFile(file *multipart.FileHeader) (*xwf.File, error) {
+func SaveUploadedFile(file *multipart.FileHeader) (*xfs.File, error) {
 	id := time.Now().Format("/2006/0102/") + str.RemoveByte(uuid.New().String(), '-') + path.Ext(file.Filename)
 
-	return xwf.SaveUploadedFile(app.DB, "files", id, file)
+	gfs := gormfs.FS(app.DB, "files")
+	return xfs.SaveUploadedFile(gfs, id, file)
 }
 
 func Uploads(c *xin.Context) {
@@ -43,7 +45,7 @@ func Uploads(c *xin.Context) {
 		return
 	}
 
-	result := &xwf.FilesResult{}
+	result := &xfs.FilesResult{}
 	for _, file := range files {
 		fi, err := SaveUploadedFile(file)
 		if err != nil {

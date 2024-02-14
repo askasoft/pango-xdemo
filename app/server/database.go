@@ -6,14 +6,14 @@ import (
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/log/gormlog"
-	"github.com/askasoft/pango/xwa/xwf"
+	"github.com/askasoft/pango/xfs"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
 var migrates = []any{
-	&xwf.File{},
+	&xfs.File{},
 }
 
 func openDatabase() error {
@@ -76,5 +76,4 @@ func closeDatabase() {
 
 func dbMigrate() error {
 	return app.DB.AutoMigrate(migrates...)
-	return nil
 }
