@@ -7,33 +7,19 @@
 </head>
 
 <body>
-	
-<div id="main">
 	{{template "header" .}}
 
-	<div class="container">
-	{{if eq .Ctx.Attrs.sidenavi "false"}}
-		<div id="content">
-	{{else}}
-		<div class="row">
-			<div id="content" class="col-md-9 col-sm-11">
-	{{end}}
+	<div id="sidenavi" class="ui-sidenavi minimal">
+		{{template "sidenavi" .}}
+	</div>
+	<div id="content" class="container-fluid">
 {{end}}
 
 {{define "main_footer"}}
-	{{if eq .Ctx.Attrs.sidenavi "false"}}
-		</div>
-	{{else}}
-			</div>
-			<div id="sidenavi" class="col-md-3 col-sm-1 ui-sidenavi">
-				{{template "sidenavi" .}}
-			</div>
-		</div>
-	{{end}}
 	</div>
-
-	{{template "footer" .}}
 </div>
+
+{{template "footer" .}}
 
 {{template "scripts" .}}
 </body>

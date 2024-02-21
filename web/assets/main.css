@@ -4,6 +4,9 @@
 body {
 	/* used by "navbar-fixed-top" of #header_navbar */
 	padding-top: 55px;
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
 }
 body > img {
 	display: none;
@@ -17,18 +20,30 @@ blockquote {
 	border-radius: 0;
 	border-bottom: 1px solid #e7e7e7;	
 	margin: 0 0 0 0;
+	height: 55px;
 	/* z-index: 1; */ /* set z-index if header is not navbar-fixed-top */
-}
-#content {
-	padding: 20px 15px;
 }
 #sidenavi {
 	padding: 20px 15px;
+	width: 250px;
+	position: fixed;
+	top: 60px;
+	left: 0px;
+}
+#content {
+	padding: 20px 15px 20px 260px;
+	margin: 0;
+}
+@media (max-width: 991px) {
+	#content {
+		padding: 20px 15px 20px 80px;
+	}
 }
 #footer {
 	border-radius: 0;
 	border-top: 1px solid #e7e7e7;	
-	margin: 20px 0 0 0;
+	margin-top: auto;
+	margin-bottom: 0;
 }
 #footnavi {
 	padding-top: 15px;
@@ -49,9 +64,6 @@ blockquote {
  */
 .navbar {
 	padding: 0;
-}
-.navbar {
-	background-color: #f8f8f8;
 }
 .navbar .navbar-header {
 	position: relative;
@@ -74,13 +86,41 @@ blockquote {
 	white-space: nowrap;
 }
 
+.well {
+	min-height: 20px;
+	margin-bottom: 20px;
+	padding: 19px;
+	text-align: center;
+}
+
 /*--------------------------------------------------
  * Popup
 --------------------------------------------------*/
+.s-popup-confirm {
+	min-width: 300px;
+}
 .s-popup-confirm .msg {
 	padding: 12px 50px;
+	white-space: pre-wrap;
 }
 .s-popup-confirm .icon {
 	position: absolute;
 }
 
+.s-popup-detail {
+	width: 800px;
+}
+.s-popup-detail .ui-popup-body {
+	max-height: 600px;
+	overflow-y: auto;
+}
+.s-popup-detail .ui-popup-body pre {
+	white-space: pre-wrap;
+}
+
+.s-popup-error .ui-popup-body {
+	color: #a94442;
+	max-width: 500px;
+	white-space: pre-wrap;
+	word-break: break-all;
+}

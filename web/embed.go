@@ -3,7 +3,8 @@ package web
 import (
 	"embed"
 
-	"github.com/askasoft/pango-assets/html/bootstrap3"
+	"github.com/askasoft/pango-assets/html/bootstrap5"
+	"github.com/askasoft/pango-assets/html/bootswatch5"
 	"github.com/askasoft/pango-assets/html/corejs"
 	"github.com/askasoft/pango-assets/html/fontawesome4"
 	"github.com/askasoft/pango-assets/html/jquery"
@@ -17,7 +18,8 @@ var Favicon []byte
 
 // Static embed static folder
 var Statics = map[string]embed.FS{
-	"bootstrap3":   bootstrap3.FS,
+	"bootstrap5":   bootstrap5.FS,
+	"bootswatch5":  bootswatch5.FS,
 	"fontawesome4": fontawesome4.FS,
 	"corejs":       corejs.FS,
 	"jquery":       jquery.FS,
