@@ -12,39 +12,39 @@
 
 	<div class="well card">{{T .Locale "demo.tags.well"}}</div>
 
-	<form id="tags_form" class="lined" method="GET">
+	<form id="tags_form" class="form-horizontal lined" method="GET">
 		<div class="row py-3">
-			<label class="col-sm-1 col-form-label required">Text</label>
-			<div class="col-sm-11">
+			<label class="col-md-2 col-form-label required">Text</label>
+			<div class="col-md-10">
 				<input name="text" class="form-control" textclear value="{{.Arg.Text}}"/>
 			</div>
 		</div>
 		<div class="row py-3">
-			<label class="col-sm-1 col-form-label">Checks</label>
-			<div class="col-sm-11">
+			<label class="col-md-2 col-form-label">Checks</label>
+			<div class="col-md-10">
 				{{Checks "List=" .ChecksList.Iterator "Value=" .Arg.Checks "Name=" "checks"}}
 			</div>
 		</div>
 		<div class="row py-3">
-			<label class="col-sm-1 col-form-label">Radios</label>
-			<div class="col-sm-11">
+			<label class="col-md-2 col-form-label">Radios</label>
+			<div class="col-md-10">
 				{{Radios "List=" .RadiosList.Iterator "Value=" .Arg.Radios "Name=" "radios" "class=" "vertical"}}
 			</div>
 		</div>
 		<div class="row py-3">
-			<label class="col-sm-1 col-form-label">Select</label>
-			<div class="col-sm-11">
+			<label class="col-md-2 col-form-label">Select</label>
+			<div class="col-md-10">
 				{{Select "List=" .SelectList.Iterator "Value=" .Arg.Select "Name=" "select" "class=" "form-control"}}
 			</div>
 		</div>
 		<div class="row py-3">
-			<label class="col-sm-1 col-form-label">Textarea</label>
-			<div class="col-sm-11">
+			<label class="col-md-2 col-form-label">Textarea</label>
+			<div class="col-md-10">
 				<textarea name="textarea" class="form-control" rows="8" autosize textclear enterfire="true">{{.Arg.Textarea}}</textarea>
 			</div>
 		</div>
 		<div class="row py-3">
-			<div class="offset-sm-1 col-sm-11">
+			<div class="offset-md-2 col-md-10">
 				<button type="submit" class="btn btn-primary">
 					<i class="fa fa-submit"></i>
 					{{T .Locale "button.submit"}}

@@ -40,6 +40,9 @@ blockquote {
 	#content {
 		padding: 20px 15px 20px 80px;
 	}
+	#sidenavi {
+		width: 75px;
+	}
 }
 #footer {
 	border-radius: 0;
@@ -60,7 +63,7 @@ blockquote {
 #footer .ver {
 	color: #999;
 	position: absolute;
-	left: 15px;
+	right: 15px;
 }
 
 /* ----------------------------------------------------
