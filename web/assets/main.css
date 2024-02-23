@@ -55,8 +55,10 @@ blockquote {
 	text-align: center;
 	width: 100%;
 }
-#footsite .ver {
+#footer .ver {
 	color: #999;
+	position: absolute;
+	left: 15px;
 }
 
 /* ----------------------------------------------------
