@@ -1,4 +1,21 @@
 /* ----------------------------------------------------
+ * bootstrap5
+ */
+:root, [data-bs-theme=light] {
+	--blue: #1d6091;
+	--bs-primary: #1d6091;
+	--bs-primary-rgb: 29, 96, 145;
+	--bs-link-color: #337ab7;
+	--bs-link-color-rgb: 51, 122, 183;
+	--bs-link-hover-color: #23527c;
+	--bs-link-hover-color-rgb: 35, 82, 124;
+}
+.btn-primary {
+	--bs-btn-bg: #337ab7;
+	--bs-btn-border-color: #2e6da4;
+}
+
+/* ----------------------------------------------------
  * Layout
  */
 body {
@@ -46,7 +63,6 @@ blockquote {
 }
 #footer {
 	border-radius: 0;
-	border-top: 1px solid #e7e7e7;	
 	margin-top: auto;
 	margin-bottom: 0;
 }
@@ -102,7 +118,7 @@ blockquote {
 
 /*--------------------------------------------------
  * Popup
---------------------------------------------------*/
+ */
 .s-popup-confirm {
 	min-width: 300px;
 }
