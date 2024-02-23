@@ -24,11 +24,13 @@ blockquote {
 	/* z-index: 1; */ /* set z-index if header is not navbar-fixed-top */
 }
 #sidenavi {
-	padding: 20px 15px;
+	padding: 80px 15px;
 	width: 250px;
 	position: fixed;
-	top: 60px;
+	top: 0px;
 	left: 0px;
+	overflow-y: auto;
+	height: 100%;
 }
 #content {
 	padding: 20px 15px 20px 260px;
