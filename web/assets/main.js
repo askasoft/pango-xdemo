@@ -124,5 +124,14 @@ $(function() {
 	$.extend($.popup.defaults, {
 		transition: 'zoomIn'
 	});
+
+	$('#header a.theme').click(function() {
+		var t = $(this).attr('href').substring(1);
+		$('body').attr('data-bs-theme', t);
+		localStorage['theme'] = t;
+		return false;
+	})
+
+	$('body').attr('data-bs-theme', localStorage['theme']);
 });
 

@@ -18,6 +18,9 @@
 /* ----------------------------------------------------
  * Layout
  */
+html {
+	scrollbar-width: thin;
+}
 body {
 	/* used by "navbar-fixed-top" of #header_navbar */
 	padding-top: 55px;
@@ -46,8 +49,9 @@ blockquote {
 	position: fixed;
 	top: 0px;
 	left: 0px;
-	overflow-y: auto;
 	height: 100%;
+	overflow-y: auto;
+	scrollbar-width: thin;
 }
 #content {
 	padding: 20px 15px 20px 260px;
@@ -99,16 +103,16 @@ blockquote {
 	padding: 12px 8px 12px 60px;
 	margin-left: 10px;
 }
-.navbar .site-desc {
-	color: #777;
-	font-size: 12px;
-	font-style: italic;
-	font-family: verdana;
-	margin: 30px 0 0 45px;
-	position: absolute;
-	white-space: nowrap;
+.navbar .ui-navibar > ul > li > a {
+	color: #eee;
+}
+.navbar .ui-navibar > ul > li > a:hover {
+	color: #333;
 }
 
+/* ----------------------------------------------------
+ * well
+ */
 .well {
 	min-height: 20px;
 	margin-bottom: 20px;

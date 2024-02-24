@@ -1,5 +1,5 @@
 {{define "header"}}
-<div id="header" class="navbar navbar-expand-lg border-bottom fixed-top text-bg-light">
+<div id="header" class="navbar navbar-expand-lg border-bottom fixed-top text-bg-primary">
 	<div class="container-fluid">
 		<div class="navbar-header">
 			<button type="button" class="navbar-toggle navbar-toggler" data-toggle="collapse" data-target="#navbar_main">
@@ -9,8 +9,16 @@
 			</button>
 			<a href="{{.Base}}/" class="navbar-brand">{{T .Locale "title"}}</a> 
 		</div>
-		<div class="navbar-collapse collapse mr-auto justify-content-end" id="navbar_main">
-			<ul class="nav navbar-nav navbar-right">
+		<div class="ui-navibar text-right">
+			<ul>
+				<li><a class="theme" href="#light"><i class="far fa-sun"></i></a></li>
+				<li><a class="theme" href="#dark"><i class="fas fa-moon"></i></a></li>
+				<li>
+					<div class="navbar-collapse collapse mr-auto justify-content-end" id="navbar_main">
+						<ul class="nav navbar-nav navbar-right">
+						</ul>
+					</div>
+				</li>
 			</ul>
 		</div>
 	</div>
