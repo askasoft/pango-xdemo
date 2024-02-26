@@ -22,11 +22,10 @@ html {
 	scrollbar-width: thin;
 }
 body {
-	/* used by "navbar-fixed-top" of #header_navbar */
-	padding-top: 55px;
-	min-height: 100vh;
 	display: flex;
 	flex-direction: column;
+	min-height: 100vh;
+	padding-top: 55px; /* for #header.fixed-top */
 }
 body > img {
 	display: none;
@@ -36,21 +35,24 @@ blockquote {
 }
 
 #header {
-	opacity: 0.9;
 	border-radius: 0;
 	border-bottom: 1px solid #e7e7e7;	
 	margin: 0 0 0 0;
 	height: 55px;
-	/* z-index: 1; */ /* set z-index if header is not navbar-fixed-top */
+	/* z-index: 1; */ /* set z-index if header is not fixed-top */
 }
 #sidenavi {
-	padding: 80px 15px;
+	padding: 55px 0 50px 0;
 	width: 250px;
 	position: fixed;
 	top: 0px;
 	left: 0px;
 	height: 100%;
+}
+#sidenavi > .ui-sidenavi {
+	height: 100%;
 	overflow-y: auto;
+	padding: 25px 15px 5px 15px;
 	scrollbar-width: thin;
 }
 #content {
@@ -67,6 +69,7 @@ blockquote {
 }
 #footer {
 	border-radius: 0;
+	height: 50px;
 	margin-top: auto;
 	margin-bottom: 0;
 }
