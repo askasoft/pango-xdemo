@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"errors"
+	"flag"
 	"fmt"
 	"io"
 	golog "log"
@@ -102,6 +103,7 @@ func (s *service) Flag() {
 // Flag process optional command flag
 func (s *service) CmdHelp(out io.Writer) {
 	fmt.Fprintln(out, "    migrate         migrate database schema.")
+	fmt.Fprintln(out, "    execsql <file>  execute sql file.")
 }
 
 // Exec execute optional command except the internal command
@@ -124,6 +126,22 @@ func (s *service) Exec(cmd string) {
 			log.Fatal(err) //nolint: all
 			app.Exit(app.ExitErrDB)
 		}
+
+		log.Info("DONE.")
+		app.Exit(0)
+	case "execsql":
+		initLog()
+		initConfigs()
+
+		if err := openDatabase(); err != nil {
+			log.Fatal(err) //nolint: all
+			app.Exit(app.ExitErrDB)
+		}
+		if err := dbExecSQL(flag.Arg(1)); err != nil {
+			log.Fatal(err) //nolint: all
+			app.Exit(app.ExitErrDB)
+		}
+
 		log.Info("DONE.")
 		app.Exit(0)
 	default:
