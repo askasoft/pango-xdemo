@@ -77,6 +77,9 @@ var (
 	// XHD global xin http dumper
 	XHD *xmw.HTTPDumper
 
+	// XSR global xin https redirector
+	XSR *xmw.HTTPSRedirector
+
 	// XLL global xin localizer
 	XLL *xmw.Localizer
 
