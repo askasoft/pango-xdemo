@@ -2,23 +2,28 @@
 <div id="header" class="navbar navbar-expand-lg border-bottom fixed-top text-bg-primary">
 	<div class="container-fluid">
 		<div class="navbar-header">
-			<button type="button" class="navbar-toggle navbar-toggler" data-toggle="collapse" data-target="#navbar_main">
-				<span class="icon-bar"></span>
-				<span class="icon-bar"></span>
-				<span class="icon-bar"></span>
-			</button>
 			<a href="{{.Base}}/" class="navbar-brand">{{T .Locale "title"}}</a> 
 		</div>
-		<div class="ui-navibar text-right">
+		<div class="ui-toolbar text-right">
 			<ul>
-				<li><a class="theme" href="#light"><i class="fas fa-sun"></i></a></li>
-				<li><a class="theme" href="#dark"><i class="fas fa-moon"></i></a></li>
-				<li>
-					<div class="navbar-collapse collapse mr-auto justify-content-end" id="navbar_main">
-						<ul class="nav navbar-nav navbar-right">
-						</ul>
+				<li class="theme">
+					<div class="btn-group btn-group-sm">
+						<a class="btn btn-primary active" href="#light"><i class="fa-fw fas fa-sun"></i></a>
+						<a class="btn btn-primary" href="#dark"><i class="fa-fw fas fa-moon"></i></a>
 					</div>
 				</li>
+				<li><div class="dropdown">
+					<button class="btn btn-primary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+						<i class="fa fa-bars"></i>
+						<span class="caret"></span>
+					</button>
+					<ul class="dropdown-menu dropdown-menu-end">
+						<li><a class="dropdown-item" href="#">Action</a></li>
+						<li><a class="dropdown-item" href="#">Another action</a></li>
+						<li class="divider"></li>
+						<li><a class="dropdown-item" href="#">Something else here</a></li>
+					</ul>
+				</div></li>
 			</ul>
 		</div>
 	</div>

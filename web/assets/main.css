@@ -41,6 +41,7 @@ blockquote {
 	height: 55px;
 	/* z-index: 1; */ /* set z-index if header is not fixed-top */
 }
+
 #sidenavi {
 	padding: 55px 0 50px 0;
 	width: 250px;
@@ -55,6 +56,7 @@ blockquote {
 	padding: 25px 15px 5px 15px;
 	scrollbar-width: thin;
 }
+
 #content {
 	padding: 20px 15px 20px 260px;
 	margin: 0;
@@ -67,6 +69,7 @@ blockquote {
 		width: 75px;
 	}
 }
+
 #footer {
 	border-radius: 0;
 	height: 50px;
@@ -106,10 +109,10 @@ blockquote {
 	padding: 12px 8px 12px 60px;
 	margin-left: 10px;
 }
-.navbar .ui-navibar > ul > li > a {
+.navbar .ui-toolbar > ul > li > a {
 	color: #eee;
 }
-.navbar .ui-navibar > ul > li > a:hover {
+.navbar .ui-toolbar > ul > li > a:hover {
 	color: #333;
 }
 

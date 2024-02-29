@@ -63,7 +63,7 @@ function s_popup_confirm(ps) {
 				+ '</div>'
 				+ '<div class="ui-popup-footer">'
 					+ '<button class="btn btn-primary ok"><i class="fas fa-check"></i> <span>OK</span></button>\n'
-					+ '<button class="btn btn-default cancel" popup-dismiss="true"><i class="fas fa-times"></i> <span>Cancel</span></button>'
+					+ '<button class="btn btn-secondary cancel" popup-dismiss="true"><i class="fas fa-times"></i> <span>Cancel</span></button>'
 				+ '</div>'
 			+ '</div>'
 		);
@@ -125,13 +125,13 @@ $(function() {
 		transition: 'zoomIn'
 	});
 
-	$('#header a.theme').click(function() {
-		var t = $(this).attr('href').substring(1);
+	$('#header li.theme a').click(function() {
+		var $a = $(this), t = $a.attr('href').substring(1);
 		$('body').attr('data-bs-theme', t);
-		localStorage['theme'] = t;
+		localStorage.theme = t;
+		$('#header li.theme a').removeClass('active');
+		$a.addClass('active');
 		return false;
-	})
-
-	$('body').attr('data-bs-theme', localStorage['theme']);
+	}).filter('[href="#' + localStorage.theme + '"]').trigger('click');
 });
 
