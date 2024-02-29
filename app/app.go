@@ -62,6 +62,9 @@ var (
 	// Base web context path
 	Base string
 
+	// WFS web resource filesystem
+	WFS http.FileSystem
+
 	// XIN global xin engine
 	XIN *xin.Engine
 

@@ -19,7 +19,7 @@ func TestEmbedFS_Statics(t *testing.T) {
 
 func TestEmbedFS_Assets(t *testing.T) {
 	fmt.Println("------------------------")
-	fs.WalkDir(Assets, ".", func(path string, d fs.DirEntry, err error) error {
+	fs.WalkDir(FS, ".", func(path string, d fs.DirEntry, err error) error {
 		fmt.Println(path)
 		return nil
 	})

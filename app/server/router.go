@@ -3,7 +3,6 @@ package server
 import (
 	"encoding/json"
 	"net/http"
-	"path/filepath"
 	"time"
 
 	"github.com/askasoft/pango-xdemo/app"
@@ -12,6 +11,7 @@ import (
 	"github.com/askasoft/pango-xdemo/app/handlers/files"
 	"github.com/askasoft/pango-xdemo/web"
 	"github.com/askasoft/pango/log"
+	"github.com/askasoft/pango/net/httpx"
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/tbs"
@@ -41,38 +41,54 @@ func initRouter() {
 }
 
 func configMiddleware() {
-	sec := app.INI.Section("server")
+	apc := app.INI.Section("app")
+	svc := app.INI.Section("server")
 
-	app.XRL.DrainBody = sec.GetBool("httpDrainRequestBody", false)
-	app.XRL.MaxBodySize = sec.GetSize("httpMaxRequestBodySize", 8<<20)
+	app.XRL.DrainBody = svc.GetBool("httpDrainRequestBody", false)
+	app.XRL.MaxBodySize = svc.GetSize("httpMaxRequestBodySize", 8<<20)
 	app.XRL.BodyTooLarge = func(c *xin.Context, limit int64) {
 		c.String(http.StatusBadRequest, tbs.Format(c.Locale, "error.request-too-large", num.HumanSize(float64(limit))))
 		c.Abort()
 	}
 
-	app.XHZ.Disable(!sec.GetBool("httpGzip"))
-	app.XHD.Disable(!sec.GetBool("httpDump"))
-	app.XSR.Disable(!sec.GetBool("httpsRedirect"))
+	app.XHZ.Disable(!svc.GetBool("httpGzip"))
+	app.XHD.Disable(!svc.GetBool("httpDump"))
+	app.XSR.Disable(!svc.GetBool("httpsRedirect"))
 
-	if locs := app.INI.GetString("app", "locales"); locs != "" {
+	if locs := apc.GetString("locales"); locs != "" {
 		app.XLL.Locales = str.FieldsAny(locs, ",; ")
 	}
 
-	app.XTP.CookiePath = sec.GetString("prefix", "/")
-	app.XTP.SetSecret(app.INI.GetString("app", "secret", "~ pango  xdemo ~"))
+	app.XTP.CookiePath = svc.GetString("prefix", "/")
+	app.XTP.SetSecret(apc.GetString("secret", "~ pango  xdemo ~"))
 
-	app.XAC.SetOrigins(str.Fields(sec.GetString("accessControlAllowOrigin"))...)
-	app.XCC.CacheControl = sec.GetString("staticCacheControl", "public, max-age=31536000, immutable")
+	app.XAC.SetOrigins(str.Fields(svc.GetString("accessControlAllowOrigin"))...)
+	app.XCC.CacheControl = svc.GetString("staticCacheControl", "public, max-age=31536000, immutable")
 
 	configResponseHeader()
 	configAccessLogger()
+	configWebFileSystem()
+}
+
+func configWebFileSystem() {
+	mt := app.BuildTime
+	if mt.IsZero() {
+		mt = time.Now()
+	}
+
+	resPath := app.INI.GetString("app", "resourcePath")
+	if resPath == "" {
+		app.WFS = xin.FixedModTimeFS(xin.FS(web.FS), mt)
+	} else {
+		app.WFS = httpx.Dir(resPath)
+	}
 }
 
 func configResponseHeader() {
-	sec := app.INI.Section("server")
+	svc := app.INI.Section("server")
 
 	hm := map[string]string{}
-	hh := sec.GetString("httpResponseHeader")
+	hh := svc.GetString("httpResponseHeader")
 	if hh == "" {
 		app.XRH.Header = hm
 	} else {
@@ -86,22 +102,22 @@ func configResponseHeader() {
 }
 
 func configAccessLogger() {
-	sec := app.INI.Section("server")
+	svc := app.INI.Section("server")
 
 	alws := []xmw.AccessLogWriter{}
-	alfs := str.Fields(sec.GetString("accessLog"))
+	alfs := str.Fields(svc.GetString("accessLog"))
 	for _, alf := range alfs {
 		switch alf {
 		case "text":
 			alw := xmw.NewAccessLogWriter(
 				app.XIN.Logger.GetOutputer("XAL", log.LevelTrace),
-				sec.GetString("accessLogTextFormat", xmw.AccessLogTextFormat),
+				svc.GetString("accessLogTextFormat", xmw.AccessLogTextFormat),
 			)
 			alws = append(alws, alw)
 		case "json":
 			alw := xmw.NewAccessLogWriter(
 				app.XIN.Logger.GetOutputer("XAJ", log.LevelTrace),
-				sec.GetString("accessLogJSONFormat", xmw.AccessLogJSONFormat),
+				svc.GetString("accessLogJSONFormat", xmw.AccessLogJSONFormat),
 			)
 			alws = append(alws, alw)
 		default:
@@ -142,8 +158,11 @@ func configHandlers() {
 	rg.GET("/healthcheck", handlers.HealthCheck)
 	rg.GET("/panic", handlers.Panic)
 
+	configStaticHandlers(rg)
 	configDemoHandlers(rg)
+}
 
+func configStaticHandlers(rg *xin.RouterGroup) {
 	mt := app.BuildTime
 	if mt.IsZero() {
 		mt = time.Now()
@@ -155,14 +174,12 @@ func configHandlers() {
 		xin.StaticFS(rg, "/static/"+path, xin.FixedModTimeFS(xin.FS(fs), mt), "", xcch)
 	}
 
-	resPath := app.INI.GetString("app", "resourcePath")
-	if resPath == "" {
-		xin.StaticFS(rg, "/assets", xin.FixedModTimeFS(xin.FS(web.Assets), mt), "/assets", xcch)
-		xin.StaticContent(rg, "/favicon.ico", web.Favicon, mt, xcch)
-	} else {
-		xin.Static(rg, "/assets", filepath.Join(resPath, "assets"), xcch)
-		xin.StaticFile(rg, "/favicon.ico", filepath.Join(resPath, "favicon.ico"), xcch)
+	wfsc := func(c *xin.Context) http.FileSystem {
+		return app.WFS
 	}
+
+	xin.StaticFSFunc(rg, "/assets", wfsc, "/assets", xcch)
+	xin.StaticFSFuncFile(rg, "/favicon.ico", wfsc, "favicon.ico", xcch)
 
 	xin.StaticFS(rg, "/files", xfs.HFS(gormfs.FS(app.DB, "files")), "", xcch)
 }
