@@ -2,15 +2,19 @@
 
 ## Linux
 
-### install golang (1.20)
-> sudo yum -y install golang
+### install golang (1.21)
+```sh
+sudo yum -y install golang
+```
 
 or
 
-> wget https://go.dev/dl/go1.20.6.linux-amd64.tar.gz
-> tar -xzvf go1.20.6.linux-amd64.tar.gz
-> sudo mv go /opt/
-
+```sh
+wget https://go.dev/dl/go1.21.6.linux-amd64.tar.gz
+tar -xzvf go1.21.6.linux-amd64.tar.gz
+sudo mv go /opt/
+sudo ln -s /opt/go/bin/go /usr/bin/go
+```
 
 ### build
 ```sh
@@ -54,8 +58,8 @@ sudo systemctl start xdemo
 
 ## Windows
 
-### install golang (1.20)
-download https://go.dev/dl/go1.20.6.windows-amd64.zip and extract it.
+### install golang (1.21)
+download https://go.dev/dl/go1.21.6.windows-amd64.zip and extract it.
 
 
 ### get goversioninfo
@@ -100,8 +104,13 @@ xdemo.exe install
 
 ## apache proxy setting
 ```xml
-<VirtualHost *:80>
+<VirtualHost *:80 *:443>
 	ServerName xdemo.local
+
+	<If "%{HTTPS} == 'on'">
+		RequestHeader set X-Forwarded-Proto "https"
+		RequestHeader set X-Forwarded-Port  "443"
+	</If>
 
 	DocumentRoot /app/xdemo/web
 	<Directory /app/xdemo/web>
@@ -110,8 +119,10 @@ xdemo.exe install
 		Require all granted
 	</Directory>
 
-	ProxyTimeout 300
-	ProxyRequests Off
+	AllowEncodedSlashes NoDecode
+
+	ProxyTimeout      300
+	ProxyRequests     Off
 	ProxyPreserveHost On
 
 	ProxyPass         /         http://localhost:6060/ nocanon retry=0
@@ -124,6 +135,7 @@ xdemo.exe install
 ```xml
 server {
 	listen       80;
+	listen       443 ssl;
 	server_name  xdemo.local;
 
 	charset utf-8;
