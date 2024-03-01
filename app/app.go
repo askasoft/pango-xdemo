@@ -118,3 +118,7 @@ func Exit(code int) {
 	log.Close()
 	os.Exit(code)
 }
+
+func Secret() string {
+	return INI.GetString("app", "secret", "~ pango  xdemo ~")
+}

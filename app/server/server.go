@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/askasoft/pango-xdemo/app"
+	"github.com/askasoft/pango-xdemo/app/utils"
 	"github.com/askasoft/pango-xdemo/tpls"
 	"github.com/askasoft/pango-xdemo/txts"
 	"github.com/askasoft/pango/fsu"
@@ -104,6 +105,8 @@ func (s *service) Flag() {
 func (s *service) CmdHelp(out io.Writer) {
 	fmt.Fprintln(out, "    migrate         migrate database schema.")
 	fmt.Fprintln(out, "    execsql <file>  execute sql file.")
+	fmt.Fprintln(out, "    encrypt <str>   encrypt string.")
+	fmt.Fprintln(out, "    decrypt <str>   decrypt string.")
 }
 
 // Exec execute optional command except the internal command
@@ -143,6 +146,16 @@ func (s *service) Exec(cmd string) {
 		}
 
 		log.Info("DONE.")
+		app.Exit(0)
+	case "encrypt":
+		initLog()
+		initConfigs()
+		fmt.Println(utils.Encrypt(flag.Arg(1)))
+		app.Exit(0)
+	case "decrypt":
+		initLog()
+		initConfigs()
+		fmt.Println(utils.Decrypt(flag.Arg(1)))
 		app.Exit(0)
 	default:
 		fmt.Fprintf(os.Stderr, "Invalid command %q\n\n", cmd)

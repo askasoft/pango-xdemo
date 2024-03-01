@@ -60,7 +60,7 @@ func configMiddleware() {
 	}
 
 	app.XTP.CookiePath = svc.GetString("prefix", "/")
-	app.XTP.SetSecret(apc.GetString("secret", "~ pango  xdemo ~"))
+	app.XTP.SetSecret(app.Secret())
 
 	app.XAC.SetOrigins(str.Fields(svc.GetString("accessControlAllowOrigin"))...)
 	app.XCC.CacheControl = svc.GetString("staticCacheControl", "public, max-age=31536000, immutable")
