@@ -107,6 +107,7 @@ func (s *service) CmdHelp(out io.Writer) {
 	fmt.Fprintln(out, "    execsql <file>  execute sql file.")
 	fmt.Fprintln(out, "    encrypt <str>   encrypt string.")
 	fmt.Fprintln(out, "    decrypt <str>   decrypt string.")
+	fmt.Fprintln(out, "    assets          export assets.")
 }
 
 // Exec execute optional command except the internal command
@@ -115,10 +116,7 @@ func (s *service) CmdHelp(out io.Writer) {
 func (s *service) Exec(cmd string) {
 	switch cmd {
 	case "migrate":
-		initLog()
 		initConfigs()
-		initMessages()
-		initTemplates()
 
 		if err := openDatabase(); err != nil {
 			log.Fatal(err) //nolint: all
@@ -133,7 +131,6 @@ func (s *service) Exec(cmd string) {
 		log.Info("DONE.")
 		app.Exit(0)
 	case "execsql":
-		initLog()
 		initConfigs()
 
 		if err := openDatabase(); err != nil {
@@ -148,14 +145,15 @@ func (s *service) Exec(cmd string) {
 		log.Info("DONE.")
 		app.Exit(0)
 	case "encrypt":
-		initLog()
 		initConfigs()
 		fmt.Println(utils.Encrypt(flag.Arg(1)))
 		app.Exit(0)
 	case "decrypt":
-		initLog()
 		initConfigs()
 		fmt.Println(utils.Decrypt(flag.Arg(1)))
+		app.Exit(0)
+	case "assets":
+		exportAssets()
 		app.Exit(0)
 	default:
 		fmt.Fprintf(os.Stderr, "Invalid command %q\n\n", cmd)
