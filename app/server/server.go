@@ -5,12 +5,12 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"io"
 	golog "log"
 	"net"
 	"net/http"
 	"os"
 	"path/filepath"
+	"runtime"
 	"time"
 
 	"github.com/askasoft/pango-xdemo/app"
@@ -56,17 +56,12 @@ func (s *service) Description() string {
 
 // Version app version
 func (s *service) Version() string {
-	return app.Version
+	return fmt.Sprintf("%s.%s (%s) [%s %s/%s]", app.Version, app.Revision, app.BuildTime.Local(), runtime.Version(), runtime.GOOS, runtime.GOARCH)
 }
 
-// Revision app revision
-func (s *service) Revision() string {
-	return app.Revision
-}
-
-// BuildTime app build time
-func (s *service) BuildTime() time.Time {
-	return app.BuildTime
+// Usage print command line usage
+func (s *service) Usage() {
+	srv.PrintUsage(s)
 }
 
 // Init initialize the app
@@ -101,13 +96,15 @@ func (s *service) Wait() {
 func (s *service) Flag() {
 }
 
-// Flag process optional command flag
-func (s *service) CmdHelp(out io.Writer) {
-	fmt.Fprintln(out, "    migrate         migrate database schema.")
-	fmt.Fprintln(out, "    execsql <file>  execute sql file.")
-	fmt.Fprintln(out, "    encrypt <str>   encrypt string.")
-	fmt.Fprintln(out, "    decrypt <str>   decrypt string.")
-	fmt.Fprintln(out, "    assets          export assets.")
+// PrintCommand print custom command
+func (s *service) PrintCommand() {
+	out := flag.CommandLine.Output()
+
+	fmt.Fprintln(out, "    migrate             migrate database schema.")
+	fmt.Fprintln(out, "    execsql <file>      execute sql file.")
+	fmt.Fprintln(out, "    encrypt <str>       encrypt string.")
+	fmt.Fprintln(out, "    decrypt <str>       decrypt string.")
+	fmt.Fprintln(out, "    assets              export assets.")
 }
 
 // Exec execute optional command except the internal command
@@ -156,8 +153,9 @@ func (s *service) Exec(cmd string) {
 		exportAssets()
 		app.Exit(0)
 	default:
+		flag.CommandLine.SetOutput(os.Stdout)
 		fmt.Fprintf(os.Stderr, "Invalid command %q\n\n", cmd)
-		srv.Help()
+		s.Usage()
 	}
 }
 
@@ -251,8 +249,9 @@ func initLog() {
 
 	dir, _ := filepath.Abs(".")
 	log.Info("Initializing ...")
-	log.Infof("Version: %s.%s", app.Version, app.Revision)
-	log.Infof("BuildTime: %s", app.BuildTime)
+	log.Infof("Version:   %s.%s", app.Version, app.Revision)
+	log.Infof("BuildTime: %s", app.BuildTime.Local())
+	log.Infof("Runtime:   %s %s/%s", runtime.Version(), runtime.GOOS, runtime.GOARCH)
 	log.Infof("Directory: %s", dir)
 }
 
