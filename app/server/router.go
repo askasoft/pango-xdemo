@@ -110,13 +110,13 @@ func configAccessLogger() {
 		switch alf {
 		case "text":
 			alw := xmw.NewAccessLogWriter(
-				app.XIN.Logger.GetOutputer("XAL", log.LevelTrace),
+				app.XIN.Logger.GetOutputer("XAL", log.LevelInfo),
 				svc.GetString("accessLogTextFormat", xmw.AccessLogTextFormat),
 			)
 			alws = append(alws, alw)
 		case "json":
 			alw := xmw.NewAccessLogWriter(
-				app.XIN.Logger.GetOutputer("XAJ", log.LevelTrace),
+				app.XIN.Logger.GetOutputer("XAJ", log.LevelInfo),
 				svc.GetString("accessLogJSONFormat", xmw.AccessLogJSONFormat),
 			)
 			alws = append(alws, alw)
