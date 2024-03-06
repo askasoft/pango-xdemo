@@ -7,6 +7,7 @@ import (
 	"github.com/askasoft/pango/fsu"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/log/gormlog"
+	"github.com/askasoft/pango/mag"
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/xfs"
 	"gorm.io/driver/mysql"
@@ -20,12 +21,16 @@ var migrates = []any{
 
 func openDatabase() error {
 	sec := app.INI.Section("database")
+
+	dbs := sec.StringMap()
+	if mag.Equal(app.DBS, dbs) {
+		return nil
+	}
+
 	typ := sec.GetString("type", "postgres")
 	dsn := sec.GetString("dsn")
 
-	if app.DSN == dsn {
-		return nil
-	}
+	log.Infof("Connect Database (%s): %s", typ, dsn)
 
 	var dbd gorm.Dialector
 	switch typ {
@@ -34,8 +39,6 @@ func openDatabase() error {
 	default:
 		dbd = postgres.Open(dsn)
 	}
-
-	log.Infof("Connect Database (%s): %s", typ, dsn)
 
 	dbc := &gorm.Config{
 		Logger: gormlog.NewGormLogger(
@@ -60,7 +63,7 @@ func openDatabase() error {
 	db.SetConnMaxLifetime(sec.GetDuration("connMaxLifetime", time.Hour))
 
 	app.DB = dbi
-	app.DSN = dsn
+	app.DBS = dbs
 
 	return nil
 }

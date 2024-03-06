@@ -110,8 +110,8 @@ var (
 	// DB database instance
 	DB *gorm.DB
 
-	// DSN database connection string
-	DSN string
+	// DBS database settings
+	DBS map[string]string
 )
 
 func Exit(code int) {
