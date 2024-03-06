@@ -49,7 +49,7 @@ var (
 	buildTime string
 
 	// BuildTime app build time
-	BuildTime, _ = time.Parse("2006-01-02T15:04:05Z", buildTime)
+	BuildTime, _ = time.ParseInLocation("2006-01-02T15:04:05Z", buildTime, time.UTC)
 )
 
 var (
