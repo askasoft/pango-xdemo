@@ -3,7 +3,6 @@ package server
 import (
 	"context"
 	"errors"
-	"flag"
 	"fmt"
 	golog "log"
 	"net"
@@ -14,7 +13,6 @@ import (
 	"time"
 
 	"github.com/askasoft/pango-xdemo/app"
-	"github.com/askasoft/pango-xdemo/app/utils"
 	"github.com/askasoft/pango-xdemo/tpls"
 	"github.com/askasoft/pango-xdemo/txts"
 	"github.com/askasoft/pango/fsu"
@@ -87,76 +85,6 @@ func (s *service) Shutdown() {
 // Wait wait signal for reload or shutdown the app
 func (s *service) Wait() {
 	srv.Wait(s)
-}
-
-// -----------------------------------
-// srv.Cmd implement
-
-// Flag process optional command flag
-func (s *service) Flag() {
-}
-
-// PrintCommand print custom command
-func (s *service) PrintCommand() {
-	out := flag.CommandLine.Output()
-
-	fmt.Fprintln(out, "    migrate             migrate database schema.")
-	fmt.Fprintln(out, "    execsql <file>      execute sql file.")
-	fmt.Fprintln(out, "    encrypt <str>       encrypt string.")
-	fmt.Fprintln(out, "    decrypt <str>       decrypt string.")
-	fmt.Fprintln(out, "    assets              export assets.")
-}
-
-// Exec execute optional command except the internal command
-// Basic: 'help' 'usage' 'version'
-// Windows only: 'install' 'remove' 'start' 'stop' 'debug'
-func (s *service) Exec(cmd string) {
-	switch cmd {
-	case "migrate":
-		initConfigs()
-
-		if err := openDatabase(); err != nil {
-			log.Fatal(err) //nolint: all
-			app.Exit(app.ExitErrDB)
-		}
-
-		if err := dbMigrate(); err != nil {
-			log.Fatal(err) //nolint: all
-			app.Exit(app.ExitErrDB)
-		}
-
-		log.Info("DONE.")
-		app.Exit(0)
-	case "execsql":
-		initConfigs()
-
-		if err := openDatabase(); err != nil {
-			log.Fatal(err) //nolint: all
-			app.Exit(app.ExitErrDB)
-		}
-		if err := dbExecSQL(flag.Arg(1)); err != nil {
-			log.Fatal(err) //nolint: all
-			app.Exit(app.ExitErrDB)
-		}
-
-		log.Info("DONE.")
-		app.Exit(0)
-	case "encrypt":
-		initConfigs()
-		fmt.Println(utils.Encrypt(flag.Arg(1)))
-		app.Exit(0)
-	case "decrypt":
-		initConfigs()
-		fmt.Println(utils.Decrypt(flag.Arg(1)))
-		app.Exit(0)
-	case "assets":
-		exportAssets()
-		app.Exit(0)
-	default:
-		flag.CommandLine.SetOutput(os.Stdout)
-		fmt.Fprintf(os.Stderr, "Invalid command %q\n\n", cmd)
-		s.Usage()
-	}
 }
 
 // ------------------------------------------------------
