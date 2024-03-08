@@ -13,8 +13,6 @@ import (
 	"time"
 
 	"github.com/askasoft/pango-xdemo/app"
-	"github.com/askasoft/pango-xdemo/tpls"
-	"github.com/askasoft/pango-xdemo/txts"
 	"github.com/askasoft/pango/fsu"
 	"github.com/askasoft/pango/fsw"
 	"github.com/askasoft/pango/imc"
@@ -23,10 +21,7 @@ import (
 	"github.com/askasoft/pango/net/netutil"
 	"github.com/askasoft/pango/sch"
 	"github.com/askasoft/pango/srv"
-	"github.com/askasoft/pango/tbs"
-	"github.com/askasoft/pango/tpl"
-	"github.com/askasoft/pango/xin/render"
-	"github.com/askasoft/pango/xvw"
+	"github.com/askasoft/pango/str"
 )
 
 // SRV service instance
@@ -100,17 +95,7 @@ func Init() {
 
 	initTemplates()
 
-	if err := openDatabase(); err != nil {
-		log.Fatal(err) //nolint: all
-		app.Exit(app.ExitErrDB)
-	}
-
-	if app.INI.GetBool("database", "migrate") {
-		if err := dbMigrate(); err != nil {
-			log.Fatal(err) //nolint: all
-			app.Exit(app.ExitErrDB)
-		}
-	}
+	initDatabase()
 
 	initRouter()
 
@@ -192,10 +177,14 @@ func initConfigs() {
 
 	app.INI = ini
 	app.CFG = ini.StringMap()
-	app.Domain = app.INI.GetString("server", "domain")
-	app.Base = app.INI.GetString("server", "prefix")
 
-	app.USERS = imc.New(app.INI.GetDuration("app", "userCacheExpiry", time.Second*10), time.Second)
+	apc := app.INI.Section("app")
+	app.Locales = str.FieldsAny(apc.GetString("locales"), ",; ")
+	app.USERS = imc.New(apc.GetDuration("userCacheExpiry", time.Second*10), time.Second)
+
+	svc := app.INI.Section("server")
+	app.Domain = svc.GetString("domain")
+	app.Base = svc.GetString("prefix")
 }
 
 func loadConfigs() (*ini.Ini, error) {
@@ -214,50 +203,6 @@ func loadConfigs() (*ini.Ini, error) {
 	}
 
 	return c, nil
-}
-
-func initMessages() {
-	var err error
-
-	msgPath := app.INI.GetString("app", "messagePath")
-	if msgPath != "" {
-		err = tbs.Load(msgPath)
-	} else {
-		err = tbs.LoadFS(txts.FS, ".")
-	}
-	if err != nil {
-		log.Fatal(err) //nolint: all
-		app.Exit(app.ExitErrTXT)
-	}
-}
-
-func initTemplates() {
-	ht := newHTMLTemplates()
-
-	var err error
-
-	tplPath := app.INI.GetString("app", "templatePath")
-	if tplPath != "" {
-		err = ht.Load(tplPath)
-	} else {
-		err = ht.LoadFS(tpls.FS, ".")
-	}
-	if err != nil {
-		log.Fatal(err) //nolint: all
-		app.Exit(app.ExitErrTPL)
-	}
-
-	app.XHT = ht
-}
-
-func newHTMLTemplates() render.HTMLTemplates {
-	ht := render.NewHTMLTemplates()
-
-	fm := tpl.Functions()
-	fm.Copy(xvw.Functions())
-	ht.Funcs(fm)
-
-	return ht
 }
 
 func initListener() {
@@ -282,106 +227,6 @@ func initListener() {
 		ReadTimeout:       svc.GetDuration("httpReadTimeout", 30*time.Second),
 		WriteTimeout:      svc.GetDuration("httpWriteTimeout", 300*time.Second),
 		IdleTimeout:       svc.GetDuration("httpIdleTimeout", 30*time.Second),
-	}
-}
-
-// initFileWatch initialize file watch
-func initFileWatch() {
-	fsw.Default().Logger = log.GetLogger("FSW")
-
-	err := fsw.Add(app.LogConfigFile, fsw.OpWrite, reloadLog)
-	if err == nil {
-		for _, f := range app.AppConfigFiles {
-			if err == nil && fsu.FileExists(f) == nil {
-				err = fsw.Add(f, fsw.OpWrite, reloadConfigs)
-			}
-		}
-	}
-
-	if err == nil {
-		msgPath := app.INI.GetString("app", "messagePath")
-		if msgPath != "" {
-			err = fsw.AddRecursive(msgPath, fsw.OpModifies, reloadMessages)
-		}
-	}
-	if err == nil {
-		tplPath := app.INI.GetString("app", "templatePath")
-		if tplPath != "" {
-			err = fsw.AddRecursive(tplPath, fsw.OpModifies, reloadTemplates)
-		}
-	}
-
-	if err != nil {
-		log.Fatal(err) //nolint: all
-		app.Exit(app.ExitErrFSW)
-	}
-
-	err = configFileWatch()
-	if err != nil {
-		log.Fatal(err) //nolint: all
-		app.Exit(app.ExitErrFSW)
-	}
-}
-
-func configFileWatch() error {
-	if app.INI.GetBool("app", "reloadable") {
-		return fsw.Start()
-	}
-
-	return fsw.Stop()
-}
-
-func initScheduler() {
-	sch.Default().Logger = log.GetLogger("SCH")
-
-	for it := schedules.Iterator(); it.Next(); {
-		name := it.Key()
-		callback := it.Value()
-
-		cron := app.INI.GetString("task", name)
-		if cron == "" {
-			sch.Schedule(name, sch.ZeroTrigger, callback)
-		} else {
-			ct := &sch.CronTrigger{}
-			if err := ct.Parse(cron); err != nil {
-				log.Fatalf("Invalid task '%s' cron: %v", name, err) //nolint: all
-				app.Exit(app.ExitErrSCH)
-			}
-			log.Infof("Schedule Task %s: %s", name, cron)
-			sch.Schedule(name, ct, callback)
-		}
-	}
-}
-
-func reScheduler() {
-	for _, name := range schedules.Keys() {
-		cron := app.INI.GetString("task", name)
-		task, ok := sch.GetTask(name)
-		if !ok {
-			log.Errorf("Failed to find task %s", name)
-			continue
-		}
-
-		if cron == "" {
-			task.Stop()
-		} else {
-			redo := true
-			if ct, ok := task.Trigger.(*sch.CronTrigger); ok {
-				redo = (ct.Cron() != cron)
-			}
-
-			if redo {
-				ct := &sch.CronTrigger{}
-				if err := ct.Parse(cron); err != nil {
-					log.Errorf("Invalid task '%s' cron: %v", name, err)
-				} else {
-					log.Infof("Reschedule Task %s: %s", name, cron)
-					task.Trigger = ct
-					task.Stop()
-					task.Start()
-				}
-			}
-		}
 	}
 }
 
@@ -419,9 +264,13 @@ func reloadConfigs(path string, op fsw.Op) {
 	app.INI = ini
 	app.CFG = ini.StringMap()
 
+	apc := app.INI.Section("app")
+	app.Locales = str.FieldsAny(apc.GetString("locales"), ",; ")
+
 	svc := app.INI.Section("server")
 	app.Domain = svc.GetString("domain")
 	app.Base = svc.GetString("prefix")
+
 	app.TCP.Disable(!svc.GetBool("tcpDump"))
 
 	if err := openDatabase(); err != nil {
@@ -434,44 +283,9 @@ func reloadConfigs(path string, op fsw.Op) {
 		log.Error(err)
 	}
 
-	msgPath := app.INI.GetString("app", "messagePath")
-	if msgPath != "" {
-		reloadMessages(msgPath, fsw.OpNone)
-	}
+	reloadMessages(path, fsw.OpNone)
 
-	tplPath := app.INI.GetString("app", "templatePath")
-	if tplPath != "" {
-		reloadTemplates(tplPath, fsw.OpNone)
-	}
+	reloadTemplates(path, fsw.OpNone)
 
 	reScheduler()
-}
-
-func reloadMessages(path string, op fsw.Op) {
-	log.Infof("Reloading messages %v [%v]", path, op)
-
-	msgPath := app.INI.GetString("app", "messagePath")
-	if msgPath != "" {
-		_tbs := tbs.NewTextBundles()
-		if err := _tbs.Load(msgPath); err != nil {
-			log.Errorf("Failed to reload messages %q: %v", msgPath, err)
-			return
-		}
-		tbs.SetDefault(_tbs)
-	}
-}
-
-func reloadTemplates(path string, op fsw.Op) {
-	log.Infof("Reloading templates %v [%v]", path, op)
-
-	tplPath := app.INI.GetString("app", "templatePath")
-	if tplPath != "" {
-		ht := newHTMLTemplates()
-		if err := ht.Load(tplPath); err != nil {
-			log.Errorf("Failed to reload templates %q: %v", tplPath, err)
-			return
-		}
-		app.XHT = ht
-		app.XIN.HTMLTemplates = ht
-	}
 }

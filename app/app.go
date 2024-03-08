@@ -60,14 +60,17 @@ var (
 	// CFG global ini map
 	CFG map[string]map[string]string
 
+	// Locales supported languages
+	Locales []string
+
 	// Domain site domain
 	Domain string
 
 	// Base web context path
 	Base string
 
-	// WFS web resource filesystem
-	WFS http.FileSystem
+	// WAS web assets filesystem
+	WAS http.FileSystem
 
 	// XIN global xin engine
 	XIN *xin.Engine

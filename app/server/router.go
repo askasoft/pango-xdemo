@@ -45,24 +45,22 @@ func initRouter() {
 	configHandlers()
 }
 
+func bodyTooLarge(c *xin.Context, limit int64) {
+	c.String(http.StatusBadRequest, tbs.Format(c.Locale, "error.request-too-large", num.HumanSize(float64(limit))))
+	c.Abort()
+}
+
 func configMiddleware() {
-	apc := app.INI.Section("app")
 	svc := app.INI.Section("server")
 
 	app.XRL.DrainBody = svc.GetBool("httpDrainRequestBody", false)
 	app.XRL.MaxBodySize = svc.GetSize("httpMaxRequestBodySize", 8<<20)
-	app.XRL.BodyTooLarge = func(c *xin.Context, limit int64) {
-		c.String(http.StatusBadRequest, tbs.Format(c.Locale, "error.request-too-large", num.HumanSize(float64(limit))))
-		c.Abort()
-	}
+	app.XRL.BodyTooLarge = bodyTooLarge
 
 	app.XHZ.Disable(!svc.GetBool("httpGzip"))
 	app.XHD.Disable(!svc.GetBool("httpDump"))
 	app.XSR.Disable(!svc.GetBool("httpsRedirect"))
-
-	if locs := apc.GetString("locales"); locs != "" {
-		app.XLL.Locales = str.FieldsAny(locs, ",; ")
-	}
+	app.XLL.Locales = app.Locales
 
 	prefix := svc.GetString("prefix")
 
@@ -79,20 +77,15 @@ func configMiddleware() {
 
 	configResponseHeader()
 	configAccessLogger()
-	configWebFileSystem()
+	configWebAssetsHFS()
 }
 
-func configWebFileSystem() {
-	mt := app.BuildTime
-	if mt.IsZero() {
-		mt = time.Now()
-	}
-
-	resPath := app.INI.GetString("app", "resourcePath")
-	if resPath == "" {
-		app.WFS = xin.FixedModTimeFS(xin.FS(web.FS), mt)
+func configWebAssetsHFS() {
+	was := app.INI.GetString("app", "webassets")
+	if was == "" {
+		app.WAS = xin.FixedModTimeFS(xin.FS(web.FS), app.BuildTime)
 	} else {
-		app.WFS = httpx.Dir(resPath)
+		app.WAS = httpx.Dir(was)
 	}
 }
 
@@ -183,9 +176,6 @@ func configHandlers() {
 
 func configStaticHandlers(rg *xin.RouterGroup) {
 	mt := app.BuildTime
-	if mt.IsZero() {
-		mt = time.Now()
-	}
 
 	xcch := app.XCC.Handler()
 
@@ -194,7 +184,7 @@ func configStaticHandlers(rg *xin.RouterGroup) {
 	}
 
 	wfsc := func(c *xin.Context) http.FileSystem {
-		return app.WFS
+		return app.WAS
 	}
 
 	xin.StaticFSFunc(rg, "/assets", wfsc, "/assets", xcch)
