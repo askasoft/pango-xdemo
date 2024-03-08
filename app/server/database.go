@@ -10,14 +10,23 @@ import (
 	"github.com/askasoft/pango/log/gormlog"
 	"github.com/askasoft/pango/mag"
 	"github.com/askasoft/pango/str"
-	"github.com/askasoft/pango/xfs"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
-var migrates = []any{
-	&xfs.File{},
+func initDatabase() {
+	if err := openDatabase(); err != nil {
+		log.Fatal(err) //nolint: all
+		app.Exit(app.ExitErrDB)
+	}
+
+	if app.INI.GetBool("database", "migrate") {
+		if err := dbMigrate(); err != nil {
+			log.Fatal(err) //nolint: all
+			app.Exit(app.ExitErrDB)
+		}
+	}
 }
 
 func openDatabase() error {
