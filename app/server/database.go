@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/askasoft/pango-xdemo/app"
+	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango/fsu"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/log/gormlog"
@@ -79,7 +80,25 @@ func closeDatabase() {
 }
 
 func dbMigrate() error {
-	return app.DB.AutoMigrate(migrates...)
+	if err := dbMigrateSchemas(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func dbMigrateSchemas() error {
+	return tenant.Iterate(func(tt tenant.Tenant) error {
+		return tt.MigrateSchema()
+	})
+}
+
+func dbMigrateSupers() error {
+	err := tenant.Iterate(func(tt tenant.Tenant) error {
+		return tt.MigrateSuper()
+	})
+
+	return err
 }
 
 func dbExecSQL(sqlfile string) error {
@@ -90,23 +109,31 @@ func dbExecSQL(sqlfile string) error {
 		return err
 	}
 
-	sqls := str.FieldsRune(sql, ';')
+	err = tenant.Iterate(func(tt tenant.Tenant) error {
+		log.Info(str.PadCenter(" "+tt.Schema()+" ", 78, "="))
 
-	err = app.DB.Transaction(func(db *gorm.DB) error {
-		for i, s := range sqls {
-			s := str.Strip(s)
-			if s == "" {
-				continue
-			}
+		tsql := str.ReplaceAll(sql, "{{SCHEMA}}", tt.Schema())
 
-			log.Infof("[%d] %s", i+1, s)
-			r := db.Exec(s)
-			if r.Error != nil {
-				return r.Error
+		tsqls := str.FieldsRune(tsql, ';')
+
+		err := app.DB.Transaction(func(db *gorm.DB) error {
+			for i, s := range tsqls {
+				s := str.Strip(s)
+				if s == "" || str.StartsWith(s, "--") {
+					continue
+				}
+
+				log.Infof("[%d] %s", i+1, s)
+				r := db.Exec(s)
+				if r.Error != nil {
+					return r.Error
+				}
+				log.Infof("[%d] = %d", i+1, r.RowsAffected)
 			}
-			log.Infof("[%d] = %d", i+1, r.RowsAffected)
-		}
-		return nil
+			return nil
+		})
+
+		return err
 	})
 
 	return err

@@ -1,0 +1,28 @@
+{{define "headnavi"}}
+<div class="ui-toolbar text-right">
+	<ul>
+		<li class="theme">
+			<div class="btn-group btn-group-sm">
+				<a class="btn btn-primary active" href="#light"><i class="fa-fw fas fa-sun"></i></a>
+				<a class="btn btn-primary" href="#dark"><i class="fa-fw fas fa-moon"></i></a>
+			</div>
+		</li>
+		<li><div class="dropdown">
+			<button class="btn btn-primary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+				<i class="fa fa-bars"></i>
+				<span class="caret"></span>
+			</button>
+			<ul class="dropdown-menu dropdown-menu-end">
+				<li><a class="dropdown-item" href="#"><i class="fas fa-gear"></i> <span>Action</span></a></li>
+				<li><a class="dropdown-item" href="#"><i class="fas fa-gear"></i> <span>Another Action</span></a></li>
+				<li class="divider"></li>
+				<li><a class="dropdown-item" href="#"><i class="fas fa-gear"></i> <span>Something else here</span></a></li>
+			{{if .AuthUser}}
+				<li class="divider"></li>
+				<li><a class="dropdown-item" href="{{.Base}}/login/logout"><i class="{{T .Locale "icon.logout"}}"></i> <span>{{T .Locale "menu.logout"}}</span></a></li>
+			{{end}}
+			</ul>
+		</div></li>
+	</ul>
+</div>
+{{end}}

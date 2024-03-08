@@ -15,6 +15,14 @@
 	--bs-btn-border-color: #2e6da4;
 }
 
+/* copy from bootstrap3 */
+.dropdown-menu .divider {
+	height: 1px;
+	margin: 9px 0;
+	overflow: hidden;
+	background-color: #e5e5e5;
+}
+
 /* ----------------------------------------------------
  * Layout
  */

@@ -1,0 +1,9 @@
+#content {
+	margin: 20px !important;
+	text-align: center;
+}
+#content > .s-section {
+	display: inline-block;
+	text-align: left;
+	width: 600px;
+}

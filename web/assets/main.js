@@ -88,6 +88,14 @@ var xdemo = {
 		});
 	},
 
+	// load mask
+	loadmask: function() {
+		$('body').loadmask();
+	},
+	unloadmask: function() {
+		$('body').unloadmask();
+	},
+
 	// popup messagebox
 	popup_confirm: function(ps) {
 		var $pc = $('#s_popup_confirm');
