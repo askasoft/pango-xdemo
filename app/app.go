@@ -5,6 +5,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/askasoft/pango/imc"
 	"github.com/askasoft/pango/ini"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/net/netutil"
@@ -59,6 +60,9 @@ var (
 	// CFG global ini map
 	CFG map[string]map[string]string
 
+	// Domain site domain
+	Domain string
+
 	// Base web context path
 	Base string
 
@@ -98,6 +102,12 @@ var (
 	// XCC global xin static cache control setter
 	XCC *xin.CacheControlSetter
 
+	// XBA global basic auth middleware
+	XBA *xmw.BasicAuth
+
+	// XCA global cookie auth middleware
+	XCA *xmw.CookieAuth
+
 	// XHT global xin html templates
 	XHT render.HTMLTemplates
 
@@ -112,6 +122,9 @@ var (
 
 	// DBS database settings
 	DBS map[string]string
+
+	// USERS tenant user cache
+	USERS *imc.Cache
 )
 
 func Exit(code int) {

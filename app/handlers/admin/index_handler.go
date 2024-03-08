@@ -1,4 +1,4 @@
-package demos
+package admin
 
 import (
 	"net/http"
@@ -7,8 +7,8 @@ import (
 	"github.com/askasoft/pango/xin"
 )
 
-func UploadsIndex(c *xin.Context) {
+func Index(c *xin.Context) {
 	h := handlers.H(c)
 
-	c.HTML(http.StatusOK, "demos/uploads", h)
+	c.HTML(http.StatusOK, "admin/index", h)
 }

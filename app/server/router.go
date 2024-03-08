@@ -7,8 +7,11 @@ import (
 
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/handlers"
+	"github.com/askasoft/pango-xdemo/app/handlers/admin"
 	"github.com/askasoft/pango-xdemo/app/handlers/demos"
 	"github.com/askasoft/pango-xdemo/app/handlers/files"
+	"github.com/askasoft/pango-xdemo/app/handlers/login"
+	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango-xdemo/web"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/net/httpx"
@@ -34,6 +37,8 @@ func initRouter() {
 	app.XRH = xmw.NewResponseHeader(nil)
 	app.XAC = xmw.NewOriginAccessController()
 	app.XCC = xin.NewCacheControlSetter()
+	app.XBA = xmw.NewBasicAuth(tenant.FindUser)
+	app.XCA = xmw.NewCookieAuth(tenant.FindUser, app.Secret())
 
 	configMiddleware()
 
@@ -59,11 +64,18 @@ func configMiddleware() {
 		app.XLL.Locales = str.FieldsAny(locs, ",; ")
 	}
 
-	app.XTP.CookiePath = svc.GetString("prefix", "/")
-	app.XTP.SetSecret(app.Secret())
+	prefix := svc.GetString("prefix")
 
 	app.XAC.SetOrigins(str.Fields(svc.GetString("accessControlAllowOrigin"))...)
 	app.XCC.CacheControl = svc.GetString("staticCacheControl", "public, max-age=31536000, immutable")
+
+	app.XCA.RedirectURL = prefix + "/login/"
+	app.XCA.CookieMaxAge = app.INI.GetDuration("login", "cookieMaxAge", time.Minute*30)
+	app.XCA.CookiePath = str.IfEmpty(prefix, "/")
+	app.XCA.CookieSecure = app.INI.GetBool("login", "cookieSecure", true)
+
+	app.XTP.CookiePath = str.IfEmpty(prefix, "/")
+	app.XTP.SetSecret(app.Secret())
 
 	configResponseHeader()
 	configAccessLogger()
@@ -155,11 +167,18 @@ func configHandlers() {
 
 	rg := r.Group(cp)
 	rg.GET("/", handlers.Index)
+	rg.HEAD("/healthcheck", handlers.HealthCheck)
 	rg.GET("/healthcheck", handlers.HealthCheck)
 	rg.GET("/panic", handlers.Panic)
 
 	configStaticHandlers(rg)
-	configDemoHandlers(rg)
+
+	configAPIHandlers(rg.Group("/api"))
+
+	configLoginHandlers(rg.Group("/login"))
+	configFilesHandlers(rg.Group("/files"))
+	configDemosHandlers(rg.Group("/demos"))
+	configAdminHandlers(rg.Group("/a"))
 }
 
 func configStaticHandlers(rg *xin.RouterGroup) {
@@ -184,16 +203,37 @@ func configStaticHandlers(rg *xin.RouterGroup) {
 	xin.StaticFS(rg, "/files", xfs.HFS(gormfs.FS(app.DB, "files")), "", xcch)
 }
 
-func configDemoHandlers(rg *xin.RouterGroup) {
-	xtph := app.XTP.Handler()
+func configAPIHandlers(rg *xin.RouterGroup) {
+	rg.Use(app.XBA.Handler()) // Basic auth
+}
 
-	rdemos := rg.Group("/demos")
-	rdemos.Use(xtph)
-	rdemos.GET("/tags/", demos.TagsIndex)
-	rdemos.POST("/tags/", demos.TagsIndex)
-	rdemos.GET("/uploads/", demos.UploadsIndex)
+func configLoginHandlers(rg *xin.RouterGroup) {
+	rg.Use(tenant.CheckTenant) // Check Tenant schema exists
+	rg.Use(app.XTP.Handler())  // token protector
 
-	rfiles := rg.Group("/files")
-	rfiles.POST("/upload", files.Upload)
-	rfiles.POST("/uploads", files.Uploads)
+	rg.GET("/", login.Index)
+	rg.POST("/login", login.Login)
+	rg.GET("/logout", login.Logout)
+}
+
+func configFilesHandlers(rg *xin.RouterGroup) {
+	rg.POST("/upload", files.Upload)
+	rg.POST("/uploads", files.Uploads)
+}
+
+func configDemosHandlers(rg *xin.RouterGroup) {
+	rg.Use(tenant.CheckTenant) // Check Tenant schema exists
+	rg.Use(app.XTP.Handler())
+
+	rg.GET("/tags/", demos.TagsIndex)
+	rg.POST("/tags/", demos.TagsIndex)
+	rg.GET("/uploads/", demos.UploadsIndex)
+}
+
+func configAdminHandlers(a *xin.RouterGroup) {
+	a.Use(tenant.CheckTenant) // Check Tenant schema exists
+	a.Use(app.XCA.Handler())  // Cookie auth
+	a.Use(app.XTP.Handler())  // token protector
+
+	a.GET("/", admin.Index)
 }

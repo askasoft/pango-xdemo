@@ -38,5 +38,5 @@ func TagsIndex(c *xin.Context) {
 	h["SelectList"] = selects
 	h["Arg"] = a
 
-	c.HTML(http.StatusOK, "demo/tags", h)
+	c.HTML(http.StatusOK, "demos/tags", h)
 }

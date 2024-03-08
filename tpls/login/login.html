@@ -1,0 +1,44 @@
+{{MapSet .Ctx.Attrs "styles" (Array "login/login.css")}}
+{{MapSet .Ctx.Attrs "scripts" (Array "login/login.js")}}
+{{MapSet .Ctx.Attrs "headnavi" false}}
+{{MapSet .Ctx.Attrs "sidenavi" false}}
+
+{{template "main_header" .}}
+
+<div class="s-section">
+	<div class="ui-headline">
+		<ol class="breadcrumb">
+			<li class="active"><i class="{{T .Locale "icon.login"}}"></i> {{T .Locale "menu.login"}}</li>
+		</ol>
+	</div>
+
+	<div class="well card text-bg-light">{{T .Locale "login.well"}}</div>
+
+	<div id="login_alert">
+		{{template "alerts" .}}
+	</div>
+
+	<form id="login_form" class="form-horizontal" autocomplete="off">
+		<input type="hidden" name="_token_" value="{{.Token}}"/>
+		<input type="hidden" name="origin" value="{{.origin}}"/>
+		<div class="row py-3">
+			<label class="col-md-2 col-form-label">{{T .Locale "login.username"}}</label>
+			<div class="col-md-10">
+				<input name="username" type="text" class="form-control" maxlength="250" textclear/>
+			</div>
+		</div>
+		<div class="row py-3">
+			<label class="col-md-2 col-form-label">{{T .Locale "login.password"}}</label>
+			<div class="col-md-10">
+				<input name="password" type="password" class="form-control" maxlength="50" textclear/>
+			</div>
+		</div>
+		<div class="row py-3">
+			<div class="offset-md-2 col-md-10">
+				<button type="submit" class="btn btn-primary"><i class="fas fa-upload"></i> {{T .Locale "button.login"}}</button>
+			</div>
+		</div>
+	</form>
+</div>
+
+{{template "main_footer" .}}

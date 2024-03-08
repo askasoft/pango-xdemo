@@ -17,6 +17,7 @@ import (
 	"github.com/askasoft/pango-xdemo/txts"
 	"github.com/askasoft/pango/fsu"
 	"github.com/askasoft/pango/fsw"
+	"github.com/askasoft/pango/imc"
 	"github.com/askasoft/pango/ini"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/net/netutil"
@@ -191,7 +192,10 @@ func initConfigs() {
 
 	app.INI = ini
 	app.CFG = ini.StringMap()
+	app.Domain = app.INI.GetString("server", "domain")
 	app.Base = app.INI.GetString("server", "prefix")
+
+	app.USERS = imc.New(app.INI.GetDuration("app", "userCacheExpiry", time.Second*10), time.Second)
 }
 
 func loadConfigs() (*ini.Ini, error) {
@@ -257,9 +261,9 @@ func newHTMLTemplates() render.HTMLTemplates {
 }
 
 func initListener() {
-	sec := app.INI.Section("server")
+	svc := app.INI.Section("server")
 
-	addr := sec.GetString("listen", ":9090")
+	addr := svc.GetString("listen", ":9090")
 	log.Infof("Listening %s ...", addr)
 
 	tcp, err := net.Listen("tcp", addr)
@@ -269,15 +273,15 @@ func initListener() {
 	}
 
 	app.TCP = netutil.DumpListener(tcp, "logs")
-	app.TCP.Disable(!sec.GetBool("tcpDump"))
+	app.TCP.Disable(!svc.GetBool("tcpDump"))
 
 	app.HTTP = &http.Server{
 		Addr:              addr,
 		Handler:           app.XIN,
-		ReadHeaderTimeout: sec.GetDuration("httpReadHeaderTimeout", 5*time.Second),
-		ReadTimeout:       sec.GetDuration("httpReadTimeout", 30*time.Second),
-		WriteTimeout:      sec.GetDuration("httpWriteTimeout", 300*time.Second),
-		IdleTimeout:       sec.GetDuration("httpIdleTimeout", 30*time.Second),
+		ReadHeaderTimeout: svc.GetDuration("httpReadHeaderTimeout", 5*time.Second),
+		ReadTimeout:       svc.GetDuration("httpReadTimeout", 30*time.Second),
+		WriteTimeout:      svc.GetDuration("httpWriteTimeout", 300*time.Second),
+		IdleTimeout:       svc.GetDuration("httpIdleTimeout", 30*time.Second),
 	}
 }
 
@@ -414,7 +418,11 @@ func reloadConfigs(path string, op fsw.Op) {
 
 	app.INI = ini
 	app.CFG = ini.StringMap()
-	app.Base = app.INI.GetString("server", "prefix")
+
+	svc := app.INI.Section("server")
+	app.Domain = svc.GetString("domain")
+	app.Base = svc.GetString("prefix")
+	app.TCP.Disable(!svc.GetBool("tcpDump"))
 
 	if err := openDatabase(); err != nil {
 		log.Error(err)

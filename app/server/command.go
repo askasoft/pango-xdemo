@@ -21,8 +21,10 @@ func (s *service) Flag() {
 func (s *service) PrintCommand() {
 	out := flag.CommandLine.Output()
 
-	fmt.Fprintln(out, "    migrate             migrate database schema.")
-	fmt.Fprintln(out, "    execsql <file>      execute sql file.")
+	fmt.Fprintln(out, "    migrate kind...     migrate database schemas or configurations.")
+	fmt.Fprintln(out, "      kind=schema       migrate database schemas.")
+	fmt.Fprintln(out, "      kind=super        migrate tenant super users.")
+	fmt.Fprintln(out, "    execsql <file>      execute sql for all database schemas.")
 	fmt.Fprintln(out, "    encrypt [key] <str> encrypt string.")
 	fmt.Fprintln(out, "    decrypt [key] <str> decrypt string.")
 	fmt.Fprintln(out, "    assets              export assets.")
@@ -41,9 +43,20 @@ func (s *service) Exec(cmd string) {
 			app.Exit(app.ExitErrDB)
 		}
 
-		if err := dbMigrate(); err != nil {
-			log.Fatal(err) //nolint: all
-			app.Exit(app.ExitErrDB)
+		args := flag.Args()[1:]
+		for _, arg := range args {
+			switch arg {
+			case "schema":
+				if err := dbMigrateSchemas(); err != nil {
+					log.Fatal(err) //nolint: all
+					app.Exit(app.ExitErrDB)
+				}
+			case "super":
+				if err := dbMigrateSupers(); err != nil {
+					log.Fatal(err) //nolint: all
+					app.Exit(app.ExitErrDB)
+				}
+			}
 		}
 
 		log.Info("DONE.")
