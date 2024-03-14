@@ -46,7 +46,7 @@ func initRouter() {
 }
 
 func bodyTooLarge(c *xin.Context, limit int64) {
-	c.String(http.StatusBadRequest, tbs.Format(c.Locale, "error.request-too-large", num.HumanSize(float64(limit))))
+	c.String(http.StatusBadRequest, tbs.Format(c.Locale, "error.request.toolarge", num.HumanSize(float64(limit))))
 	c.Abort()
 }
 
@@ -164,17 +164,17 @@ func configHandlers() {
 	rg.GET("/healthcheck", handlers.HealthCheck)
 	rg.GET("/panic", handlers.Panic)
 
-	configStaticHandlers(rg)
+	addStaticHandlers(rg)
 
-	configAPIHandlers(rg.Group("/api"))
+	addAPIHandlers(rg.Group("/api"))
 
-	configLoginHandlers(rg.Group("/login"))
-	configFilesHandlers(rg.Group("/files"))
-	configDemosHandlers(rg.Group("/demos"))
-	configAdminHandlers(rg.Group("/a"))
+	addLoginHandlers(rg.Group("/login"))
+	addFilesHandlers(rg.Group("/files"))
+	addDemosHandlers(rg.Group("/demos"))
+	addAdminHandlers(rg.Group("/a"))
 }
 
-func configStaticHandlers(rg *xin.RouterGroup) {
+func addStaticHandlers(rg *xin.RouterGroup) {
 	mt := app.BuildTime
 
 	xcch := app.XCC.Handler()
@@ -193,11 +193,16 @@ func configStaticHandlers(rg *xin.RouterGroup) {
 	xin.StaticFS(rg, "/files", xfs.HFS(gormfs.FS(app.DB, "files")), "", xcch)
 }
 
-func configAPIHandlers(rg *xin.RouterGroup) {
+func addAPIHandlers(rg *xin.RouterGroup) {
 	rg.Use(app.XBA.Handler()) // Basic auth
 }
 
-func configLoginHandlers(rg *xin.RouterGroup) {
+func addFilesHandlers(rg *xin.RouterGroup) {
+	rg.POST("/upload", files.Upload)
+	rg.POST("/uploads", files.Uploads)
+}
+
+func addLoginHandlers(rg *xin.RouterGroup) {
 	rg.Use(tenant.CheckTenant) // Check Tenant schema exists
 	rg.Use(app.XTP.Handler())  // token protector
 
@@ -206,12 +211,7 @@ func configLoginHandlers(rg *xin.RouterGroup) {
 	rg.GET("/logout", login.Logout)
 }
 
-func configFilesHandlers(rg *xin.RouterGroup) {
-	rg.POST("/upload", files.Upload)
-	rg.POST("/uploads", files.Uploads)
-}
-
-func configDemosHandlers(rg *xin.RouterGroup) {
+func addDemosHandlers(rg *xin.RouterGroup) {
 	rg.Use(tenant.CheckTenant) // Check Tenant schema exists
 	rg.Use(app.XTP.Handler())
 
@@ -220,7 +220,7 @@ func configDemosHandlers(rg *xin.RouterGroup) {
 	rg.GET("/uploads/", demos.UploadsIndex)
 }
 
-func configAdminHandlers(a *xin.RouterGroup) {
+func addAdminHandlers(a *xin.RouterGroup) {
 	a.Use(tenant.CheckTenant) // Check Tenant schema exists
 	a.Use(app.XCA.Handler())  // Cookie auth
 	a.Use(app.XTP.Handler())  // token protector

@@ -13,6 +13,22 @@ var xdemo = {
 		return m;
 	},
 
+	fmt_date: new DateFormat("yyyy-MM-dd"),
+	fmt_time: new DateFormat("yyyy-MM-dd HH:mm:ss"),
+
+	format_date: function(d) {
+		if (typeof(d) == 'string') {
+			d = new Date(d);
+		}
+		return xdemo.fmt_date.format(d);
+	},
+	format_time: function(d) {
+		if (typeof(d) == 'string') {
+			d = new Date(d);
+		}
+		return xdemo.fmt_time.format(d);
+	},
+
 	safe_parse_json: function(s, d) {
 		try {
 			return $.parseJSON(s);
@@ -82,6 +98,15 @@ var xdemo = {
 			err = xhr.responseJSON.error || JSON.stringify(xhr.responseJSON, null, 4) || err;
 		}
 
+		if (err.title && err.detail) {
+			$.toast({
+				icon: 'error',
+				heading: err.title,
+				text: err.detail
+			});
+			return;
+		}
+
 		$.toast({
 			icon: 'error',
 			text: err
@@ -94,6 +119,36 @@ var xdemo = {
 	},
 	unloadmask: function() {
 		$('body').unloadmask();
+	},
+
+	// table
+	get_table_checked_ids: function($tb) {
+		var ids = [];
+		$tb.find('td.check > input:checked').each(function() {
+			ids.push($(this).val());
+		});
+		return ids;
+	},
+	set_table_tr_values: function($tr, vs) {
+		for (var k in vs) {
+			var $td = $tr.find('td.' + k);
+			if ($td.length == 0 || $td.hasClass('ro')) {
+				continue;
+			}
+
+			var $c = $td.children('a, pre'), v = vs[k] || '';
+			if (v && k.endsWith("_at")) {
+				v = xdemo.format_time(v);
+			}
+			($c.length ? $c : $td).text(v);
+		}
+
+		// blink tr
+		xdemo.blink($tr);
+	},
+	blink: function($e) {
+		$e.addClass('ui-blink-1s2');
+		setTimeout(function() { $e.removeClass('ui-blink-1s2'); }, 2000);
 	},
 
 	// popup messagebox
