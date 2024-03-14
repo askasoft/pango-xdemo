@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/askasoft/pango/cpt"
-	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/str"
 )
 
@@ -14,8 +13,7 @@ func Encrypt(secret, s string) string {
 
 	es, err := cryptor.EncryptString(s)
 	if err != nil {
-		log.Error(err)
-		return s
+		panic(err)
 	}
 	return es
 }
@@ -25,8 +23,7 @@ func Decrypt(secret, s string) string {
 
 	ds, err := cryptor.DecryptString(s)
 	if err != nil {
-		log.Error(err)
-		return s
+		panic(err)
 	}
 	return ds
 }

@@ -26,7 +26,7 @@
 /* ----------------------------------------------------
  * Layout
  */
-html {
+* {
 	scrollbar-width: thin;
 }
 body {
@@ -34,9 +34,6 @@ body {
 	flex-direction: column;
 	min-height: 100vh;
 	padding-top: 55px; /* for #header.fixed-top */
-}
-body > img {
-	display: none;
 }
 blockquote {
 	font-size: inherit;
@@ -149,12 +146,20 @@ blockquote {
 }
 
 .s-popup-detail {
-	width: 800px;
+	width: 80vw;
+	min-width: 600px;
+}
+.s-popup-detail.wide {
+	width: 90vw;
 }
 .s-popup-detail .ui-popup-body {
-	max-height: 600px;
+	max-height: 70vh;
 	overflow-y: auto;
 }
+.s-popup-detail.wide .ui-popup-body {
+	max-height: 80vh;
+}
+
 .s-popup-detail .ui-popup-body pre {
 	white-space: pre-wrap;
 }
