@@ -142,58 +142,10 @@ var xdemo = {
 			}
 			($c.length ? $c : $td).text(v);
 		}
-
-		// blink tr
-		xdemo.blink($tr);
 	},
 	blink: function($e) {
 		$e.addClass('ui-blink-1s2');
 		setTimeout(function() { $e.removeClass('ui-blink-1s2'); }, 2000);
-	},
-
-	// popup messagebox
-	popup_confirm: function(ps) {
-		var $pc = $('#s_popup_confirm');
-		if (!$pc.length) {
-			$pc = $('<div id="s_popup_confirm" class="ui-popup s-popup-confirm" popup-mask="true" popup-position="center" popup-closer="false">'
-					+ '<h5 class="ui-popup-header"></h5>'
-					+ '<div class="ui-popup-body">'
-						+ '<i class="icon fas fa-3x fa-question-circle"></i>'
-						+ '<div class="msg"></div>'
-					+ '</div>'
-					+ '<div class="ui-popup-footer">'
-						+ '<button class="btn btn-primary ok"><i class="fas fa-check"></i> <span>OK</span></button>\n'
-						+ '<button class="btn btn-secondary cancel" popup-dismiss="true"><i class="fas fa-times"></i> <span>Cancel</span></button>'
-					+ '</div>'
-				+ '</div>'
-			);
-			$pc.popup();
-		}
-
-		$pc.find('.ui-popup-header').text(ps.title);
-		$pc.find('.msg').text(ps.message);
-		if (ps.icon) {
-			if (ps.icon.ok) {
-				$pc.find('.ok>i').prop('class', ps.icon.ok);
-			}
-			if (ps.icon.cancel) {
-				$pc.find('.cancel>i').prop('class', ps.icon.cancel);
-			}
-		}
-		if (ps.text) {
-			if (ps.text.ok) {
-				$pc.find('.ok>span').text(ps.text.ok);
-			}
-			if (ps.text.cancel) {
-				$pc.find('.cancel>span').text(ps.text.cancel);
-			}
-		}
-
-		$pc.find('.ok').off('click').on('click', function() {
-			$pc.popup('hide');
-			ps.onok();
-		})
-		$pc.popup('show');
 	},
 
 	init: function() {

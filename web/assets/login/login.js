@@ -10,8 +10,7 @@ $(function() {
 			success: function(data, ts, xhr) {
 				$.toast({
 					icon: 'success',
-					text: data.success,
-					hideAfter: 3000
+					text: data.success
 				});
 
 				setTimeout(function() {
