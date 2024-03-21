@@ -11,6 +11,7 @@ import (
 	"github.com/askasoft/pango-xdemo/app/handlers/demos"
 	"github.com/askasoft/pango-xdemo/app/handlers/files"
 	"github.com/askasoft/pango-xdemo/app/handlers/login"
+	"github.com/askasoft/pango-xdemo/app/handlers/self"
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango-xdemo/web"
 	"github.com/askasoft/pango/log"
@@ -19,7 +20,6 @@ import (
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/tbs"
 	"github.com/askasoft/pango/xfs"
-	"github.com/askasoft/pango/xfs/gormfs"
 	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pango/xmw"
 )
@@ -166,11 +166,10 @@ func configHandlers() {
 
 	addStaticHandlers(rg)
 
-	addAPIHandlers(rg.Group("/api"))
-
 	addLoginHandlers(rg.Group("/login"))
 	addFilesHandlers(rg.Group("/files"))
 	addDemosHandlers(rg.Group("/demos"))
+	addSelfHandlers(rg.Group("/s"))
 	addAdminHandlers(rg.Group("/a"))
 }
 
@@ -189,22 +188,24 @@ func addStaticHandlers(rg *xin.RouterGroup) {
 
 	xin.StaticFSFunc(rg, "/assets", wfsc, "/assets", xcch)
 	xin.StaticFSFuncFile(rg, "/favicon.ico", wfsc, "favicon.ico", xcch)
-
-	xin.StaticFS(rg, "/files", xfs.HFS(gormfs.FS(app.DB, "files")), "", xcch)
-}
-
-func addAPIHandlers(rg *xin.RouterGroup) {
-	rg.Use(app.XBA.Handler()) // Basic auth
 }
 
 func addFilesHandlers(rg *xin.RouterGroup) {
+	rg.Use(tenant.CheckTenant) // schema protect
 	rg.POST("/upload", files.Upload)
 	rg.POST("/uploads", files.Uploads)
+
+	xcch := app.XCC.Handler()
+
+	xin.StaticFSFunc(rg, "/", func(c *xin.Context) http.FileSystem {
+		tt := tenant.FromCtx(c)
+		return xfs.HFS(tt.FS(app.DB))
+	}, "", xcch)
 }
 
 func addLoginHandlers(rg *xin.RouterGroup) {
-	rg.Use(tenant.CheckTenant) // Check Tenant schema exists
-	rg.Use(app.XTP.Handler())  // token protector
+	rg.Use(tenant.CheckTenant) // schema protect
+	rg.Use(app.XTP.Handler())  // token protect
 
 	rg.GET("/", login.Index)
 	rg.POST("/login", login.Login)
@@ -212,18 +213,68 @@ func addLoginHandlers(rg *xin.RouterGroup) {
 }
 
 func addDemosHandlers(rg *xin.RouterGroup) {
-	rg.Use(tenant.CheckTenant) // Check Tenant schema exists
-	rg.Use(app.XTP.Handler())
+	rg.Use(tenant.CheckTenant) // schema protect
+	rg.Use(app.XTP.Handler())  // token protect
 
 	rg.GET("/tags/", demos.TagsIndex)
 	rg.POST("/tags/", demos.TagsIndex)
 	rg.GET("/uploads/", demos.UploadsIndex)
 }
 
+func addSelfHandlers(s *xin.RouterGroup) {
+	s.Use(tenant.CheckTenant) // schema protect
+	s.Use(app.XCA.Handler())  // cookie auth
+	s.Use(tenant.IPProtect)   // IP protect
+	s.Use(app.XTP.Handler())  // token protect
+
+	rg := s.Group("/pwdchg")
+	rg.GET("/", self.PasswordChangeIndex)
+	rg.POST("/change", self.PasswordChangeChange)
+}
+
 func addAdminHandlers(a *xin.RouterGroup) {
-	a.Use(tenant.CheckTenant) // Check Tenant schema exists
-	a.Use(app.XCA.Handler())  // Cookie auth
-	a.Use(app.XTP.Handler())  // token protector
+	a.Use(tenant.CheckTenant) // schema protect
+	a.Use(app.XCA.Handler())  // cookie auth
+	a.Use(tenant.IPProtect)   // IP protect
+	a.Use(app.XTP.Handler())  // token protect
 
 	a.GET("/", admin.Index)
+
+	addAdminConfigHandlers(a.Group("/config"))
+	addAdminUserHandlers(a.Group("/users"))
+}
+
+func addAdminConfigHandlers(rg *xin.RouterGroup) {
+	rg.Use(tenant.RoleAdminProtect) // role protect
+
+	rg.GET("/", admin.ConfigIndex)
+	rg.POST("/save", admin.ConfigSave)
+}
+
+func addAdminUserHandlers(rg *xin.RouterGroup) {
+	rg.Use(tenant.RoleAdminProtect) // role protect
+
+	rg.GET("/", admin.UserIndex)
+	rg.GET("/new", admin.UserNew)
+	rg.GET("/detail", admin.UserDetail)
+	rg.POST("/create", admin.UserCreate)
+	rg.POST("/update", admin.UserUpdate)
+	rg.POST("/delete", admin.UserDelete)
+	rg.POST("/clear", admin.UserClear)
+	rg.POST("/enable", admin.UserEnable)
+	rg.POST("/disable", admin.UserDisable)
+	rg.GET("/export/csv", admin.UserCsvExport)
+
+	addAdminUserImportHandlers(rg.Group("/import"))
+}
+
+func addAdminUserImportHandlers(rg *xin.RouterGroup) {
+	rg.GET("/", xin.Redirector("./csv/"))
+
+	rg.GET("/csv/", admin.UserCsvImportJobCtrl.Index)
+	rg.POST("/csv/start", admin.UserCsvImportJobCtrl.Start)
+	rg.POST("/csv/abort", admin.UserCsvImportJobCtrl.Abort)
+	rg.GET("/csv/status", admin.UserCsvImportJobCtrl.Status)
+	rg.GET("/csv/list", admin.UserCsvImportJobCtrl.List)
+	rg.GET("/csv/sample", admin.UserCsvImportSample)
 }

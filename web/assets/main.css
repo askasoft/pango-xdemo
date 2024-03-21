@@ -137,6 +137,85 @@ blockquote {
 	padding: 19px;
 	text-align: center;
 	white-space: pre-wrap;
+
+	background-color: #f5f5f5;
+	border: 1px solid #e3e3e3;
+	border-radius: 4px;
+	box-shadow: inset 0 1px 1px rgba(0,0,0,.05);
+  }
+
+/*--------------------------------------------------
+ * Form
+ */
+form .desc {
+	font-size: 80%;
+	margin: 5px 0 10px 0;
+	white-space: pre-wrap;
+}
+
+/*--------------------------------------------------
+ * Search
+ */
+.s-head-search {
+	float: right;
+	width: 300px;
+}
+
+/*--------------------------------------------------
+ * Table
+ */
+.s-table {
+	border-top: 1px solid #ccc;
+	border-bottom: 1px solid #ccc;
+}
+
+.s-table > thead > tr > th {
+	vertical-align: middle;
+}
+.s-table th.created_at, .s-table td.created_at,
+.s-table th.updated_at, .s-table td.updated_at,
+.s-table th.indexed_at, .s-table td.indexed_at,
+.s-table th.summary_at, .s-table td.summary_at {
+	width: 90px;
+	min-width: 90px;
+}
+
+.s-table th.check, .s-table td.check,
+.s-table th.id, .s-table td.id {
+	width: 1%;
+}
+.s-table th.actions, .s-table td.actions {
+	width: 1%;
+	white-space: nowrap;
+}
+
+.s-table td > ol {
+	padding-left: 20px;
+}
+.s-table td pre {
+	background-color: transparent;
+	border: 0 none;
+	margin: 0;
+	padding: 0;
+	white-space: pre-wrap;
+}
+
+.s-table td > pre, .s-table td > div {
+	max-height: 3em;
+	overflow-y: auto;
+}
+.s-table td > div > hr {
+	border-top: 1px dashed #00f;
+}
+.s-table td.error * {
+	color: #a94442;
+}
+
+/*--------------------------------------------------
+ * input group
+ */
+.s-group-items {
+	width: 140px;
 }
 
 /*--------------------------------------------------

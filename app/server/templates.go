@@ -2,6 +2,7 @@ package server
 
 import (
 	"github.com/askasoft/pango-xdemo/app"
+	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/tpls"
 	"github.com/askasoft/pango/fsw"
 	"github.com/askasoft/pango/log"
@@ -18,6 +19,8 @@ func newHTMLTemplates() render.HTMLTemplates {
 
 	fm := tpl.Functions()
 	fm.Copy(xvw.Functions())
+	fm["DATE"] = models.FormatDate
+	fm["TIME"] = models.FormatTime
 	ht.Funcs(fm)
 
 	return ht

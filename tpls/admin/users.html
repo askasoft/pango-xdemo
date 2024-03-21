@@ -1,0 +1,184 @@
+{{MapSet .Ctx.Attrs "styles" (Array "admin/users.css")}}
+{{MapSet .Ctx.Attrs "scripts" (Array "admin/users.js")}}
+
+{{template "main_header" .}}
+
+{{$au := .AuthUser}}
+{{$base := .Base}}
+{{$loc := .Locale}}
+{{$dcm := .DCM}}
+{{$sm := .StatusMap}}
+{{$rm := .RoleMap}}
+
+<div class="s-section">
+	<div class="ui-headline">
+		<form class="s-head-search" method="GET">
+			<div class="input-group">
+				<span class="input-group-text">{{T .Locale "button.search"}}</span>
+				<input type="text" class="form-control" name="k" value="{{.Q.Key}}" textclear>
+				<button type="submit" class="btn btn-outline-secondary"><i class="fa fa-search"></i></button>
+			</div>
+		</form>
+
+		<ol class="breadcrumb">
+			<li class="active"><i class="{{T .Locale "icon.admin.users"}}"></i> {{T $loc "menu.admin.users"}}</li>
+		{{if .Q.Key}}
+			<li>{{.Q.Key}}</li>
+		{{end}}
+		</ol>
+	</div>
+
+	<div class="row">
+		<div class="col-md-6 ui-toolbar">
+			<button class="btn btn-sm btn-outline-danger" popup-target="#users_delete_popup" enableby="#users_table td.check input">
+				<i class="{{T $loc "icon.delete"}}"></i> {{T $loc "button.delete"}}
+			</button>
+			<button class="btn btn-sm btn-outline-danger" popup-target="#users_clear_popup">
+				<i class="{{T $loc "icon.delete-all"}}"></i> {{T $loc "button.delete-all"}}
+			</button>
+			<button class="btn btn-sm btn-outline-success" popup-target="#users_enable_popup" enableby="#users_table td.check input">
+				<i class="{{T $loc "icon.user.enable"}}"></i> {{T $loc "button.enable"}}
+			</button>
+			<button class="btn btn-sm btn-outline-secondary" popup-target="#users_disable_popup" enableby="#users_table td.check input">
+				<i class="{{T $loc "icon.user.disable"}}"></i> {{T $loc "button.disable"}}
+			</button>
+		</div>
+		<div class="col-md-6 ui-toolbar text-end">
+			<button id="users_new" class="btn btn-sm btn-outline-primary"><i class="{{T $loc "icon.new"}}"></i> {{T $loc "button.new"}}</button>
+			<a class="btn btn-sm btn-outline-primary" href="./import/"><i class="{{T $loc "icon.upload"}}"></i> {{T $loc "button.import"}}</a>
+			<a class="btn btn-sm btn-outline-primary" href="./export/csv?k={{.Q.Key}}"><i class="{{T $loc "icon.dnload"}}"></i> {{T $loc "button.export"}}</a>
+		</div>
+	</div>
+
+	<form id="users_pageform" method="GET">
+		<input type="hidden" name="k" value="{{.Q.Key}}"/>
+		<input type="hidden" name="p" value="{{.Q.Page}}"/>
+		<input type="hidden" name="l" value="{{.Q.Limit}}"/>
+		<input type="hidden" name="c" value="{{.Q.Col}}"/>
+		<input type="hidden" name="d" value="{{.Q.Dir}}"/>
+	</form>
+
+	<div id="users_alert">
+		{{template "alerts" .}}
+	</div>
+	
+	{{Pager .Q.Pager "Locale=" $loc}}
+
+	<form autocomplete="off" class="table-responsive">
+	<table id="users_table" class="table table-striped ui-sortable s-table"
+		data-spy="sortable" data-sorted-col="{{.Q.Sorter.Col}}" data-sorted-dir="{{.Q.Sorter.Dir}}">
+		<thead>
+			<tr>
+				<th class="check"><input type="checkbox" checkall="#users_table td.check > input"/></th>
+				<th class="id sortable" data-sort-col="id">{{T $loc "user.id"}}</th>
+				<th class="name sortable" data-sort-col="name">{{T $loc "user.name"}}</th>
+				<th class="email sortable" data-sort-col="email">{{T $loc "user.email"}}</th>
+				<th class="role sortable" data-sort-col="role">{{T $loc "user.role"}}</th>
+				<th class="status sortable" data-sort-col="status">{{T $loc "user.status"}}</th>
+				<th class="cidr" data-sort-col="cidr">{{T $loc "user.cidr"}}</th>
+				<th class="created_at sortable" data-sort-col="created_at">{{T $loc "user.created_at"}}</th>
+				<th class="updated_at sortable" data-sort-col="updated_at">{{T $loc "user.updated_at"}}</th>
+				<th class="actions"></th>
+			</tr>
+		</thead>
+		<tbody>
+		{{range $i, $u := .Users}}
+			<tr class="{{$u.Status}}" id="usr_{{$u.ID}}">
+				<td class="check">{{if ne $u.ID $au.ID}}<input type="checkbox" value="{{$u.ID}}"/>{{end}}</td>
+				<td class="id ro">{{$u.ID}}</td>
+				<td class="name">{{$u.Name}}</td>
+				<td class="email">{{$u.Email}}</td>
+				<td class="role">{{$rm.MustGet $u.Role $u.Role}}</td>
+				<td class="status">{{$sm.MustGet $u.Status $u.Status}}</td>
+				<td class="cidr"><pre>{{$u.CIDR}}</pre></td>
+				<td class="created_at ro">{{TIME $u.CreatedAt}}</td>
+				<td class="updated_at">{{TIME $u.UpdatedAt}}</td>
+				<td class="actions">
+					<button class="btn btn-outline-secondary edit" title="{{T $loc "button.edit"}}"><i class="{{T $loc "icon.edit"}}"></i></button>
+				</td>
+			</tr>
+		{{end}}
+			<tr class="hidden" id="usr_new">
+				<td class="check"></td>
+				<td class="id"></td>
+				<td class="name"></td>
+				<td class="email"></td>
+				<td class="role"></td>
+				<td class="status"></td>
+				<td class="cidr"></td>
+				<td class="created_at"></td>
+				<td class="updated_at"></td>
+				<td class="actions">
+					<button class="btn btn-secondary edit" title="{{T $loc "button.edit"}}"><i class="{{T $loc "icon.edit"}}"></i></button>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+	</form>
+
+	{{Pager .Q.Pager "Locale=" $loc}}
+</div>
+
+<div id="user_maps" class="hidden" data-status="{{JSON $sm}}" data-role="{{JSON $rm}}"></div>
+
+<div id="users_delete_popup" class="ui-popup s-popup-confirm" data-spy="popup" tabindex="-1"
+	popup-mask="true" popup-keyboard="false" popup-mouse="false">
+	<form>
+		<div class="ui-popup-body">
+			<i class="icon fa fa-3x fa-question-circle text-warning"></i>
+			<div class="msg">{{T $loc "user.confirm.delete"}}</div>
+		</div>
+		<div class="ui-popup-footer">
+			<button type="submit" class="btn btn-warning"><i class="fa fa-check"></i> {{T $loc "button.ok"}}</button>
+			<button type="button" class="btn btn-default" popup-dismiss="true"><i class="fa fa-times"></i> {{T $loc "button.cancel"}}</button>
+		</div>
+	</form>
+</div>
+
+<div id="users_clear_popup" class="ui-popup s-popup-confirm" data-spy="popup" tabindex="-1"
+	popup-mask="true" popup-keyboard="false" popup-mouse="false">
+	<form>
+		<div class="ui-popup-body">
+			<i class="icon fa fa-3x fa-exclamation-triangle text-danger"></i>
+			<div class="msg">{{T $loc "user.confirm.clear"}}</div>
+		</div>
+		<div class="ui-popup-footer">
+			<button type="submit" class="btn btn-danger"><i class="fa fa-check"></i> {{T $loc "button.ok"}}</button>
+			<button type="button" class="btn btn-default" popup-dismiss="true"><i class="fa fa-times"></i> {{T $loc "button.cancel"}}</button>
+		</div>
+	</form>
+</div>
+
+<div id="users_enable_popup" class="ui-popup s-popup-confirm" data-spy="popup" tabindex="-1"
+	popup-mask="true" popup-keyboard="false" popup-mouse="false">
+	<form>
+		<div class="ui-popup-body">
+			<i class="icon fa fa-3x fa-question-circle text-warning"></i>
+			<div class="msg">{{T $loc "user.confirm.enable"}}</div>
+		</div>
+		<div class="ui-popup-footer">
+			<button type="submit" class="btn btn-warning"><i class="fa fa-check"></i> {{T $loc "button.ok"}}</button>
+			<button type="button" class="btn btn-default" popup-dismiss="true"><i class="fa fa-times"></i> {{T $loc "button.cancel"}}</button>
+		</div>
+	</form>
+</div>
+
+<div id="users_disable_popup" class="ui-popup s-popup-confirm" data-spy="popup" tabindex="-1"
+	popup-mask="true" popup-keyboard="false" popup-mouse="false">
+	<form>
+		<div class="ui-popup-body">
+			<i class="icon fa fa-3x fa-exclamation-triangle text-warning"></i>
+			<div class="msg">{{T $loc "user.confirm.disable"}}</div>
+		</div>
+		<div class="ui-popup-footer">
+			<button type="submit" class="btn btn-warning"><i class="fa fa-check"></i> {{T $loc "button.ok"}}</button>
+			<button type="button" class="btn btn-default" popup-dismiss="true"><i class="fa fa-times"></i> {{T $loc "button.cancel"}}</button>
+		</div>
+	</form>
+</div>
+
+<div id="users_detail_popup" class="ui-popup s-popup-detail w800" data-spy="popup" tabindex="-1"
+	popup-mask="false" popup-position="center" popup-keyboard="false" popup-mouse="false" popup-closer="true"
+	popup-focus="#user_detail_title"></div>
+
+{{template "main_footer" .}}

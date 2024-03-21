@@ -93,13 +93,26 @@ func dbMigrate() error {
 		return err
 	}
 
-	return nil
+	return dbMigrateConfigs()
 }
 
 func dbMigrateSchemas() error {
 	return tenant.Iterate(func(tt tenant.Tenant) error {
 		return tt.MigrateSchema()
 	})
+}
+
+func dbMigrateConfigs() error {
+	configs, err := tenant.LoadConfigFile()
+	if err != nil {
+		return err
+	}
+
+	err = tenant.Iterate(func(tt tenant.Tenant) error {
+		return tt.MigrateConfig(configs)
+	})
+
+	return err
 }
 
 func dbMigrateSupers() error {
