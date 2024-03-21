@@ -114,6 +114,9 @@ var (
 	// XCA global cookie auth middleware
 	XCA *xmw.CookieAuth
 
+	// XCN global cookie auth middleware
+	XCN *xmw.CookieAuth
+
 	// XHT global xin html templates
 	XHT render.HTMLTemplates
 
