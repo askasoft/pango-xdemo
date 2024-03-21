@@ -14,6 +14,8 @@ powershell -command "(gc conf\app.ini -Encoding utf8) | %% { $_ -replace 'prefix
 
 powershell -command "(gc conf\log.ini -Encoding utf8).Replace('DEBUG', '%LOG_LEVEL%').Replace('HOSTNAME', '%COMPUTERNAME%') | Out-File %APPHOME%\conf\log.ini -Encoding utf8"
 
+copy /Y conf\config.csv %APPHOME%\conf\
+
 if not "%LOG_SLACK_WEBHOOK%." == "." (
 	set LOG_WRITERS=%LOG_WRITERS%, slack
 	powershell -command "(gc %APPHOME%\conf\log.ini -Encoding utf8).Replace('LOG_SLACK_WEBHOOK', '%LOG_SLACK_WEBHOOK%') | %% { $_ -replace 'writer =.*', 'writer = %LOG_WRITERS%' } | Out-File %APPHOME%\conf\log.ini -Encoding utf8"
@@ -28,6 +30,7 @@ if not "%LOG_OPENSEARCH_ACCESS%." == "." (
 	powershell -command "(gc %APPHOME%\conf\log.ini -Encoding utf8).Replace('LOG_OPENSEARCH_ACCESS', '%LOG_OPENSEARCH_ACCESS%') | %% { $_ -replace 'writer =.*', 'writer = %LOG_WRITERS%' } | Out-File %APPHOME%\conf\log.ini -Encoding utf8"
 	powershell -command "(gc %APPHOME%\conf\log.ini -Encoding utf8).Replace('LOG_OPENSEARCH_USERNAME', '%LOG_OPENSEARCH_USERNAME%') | %% { $_ -replace 'LOG_OPENSEARCH_PASSWORD', '%LOG_OPENSEARCH_PASSWORD%' } | Out-File %APPHOME%\conf\log.ini -Encoding utf8"
 )
+
 
 copy  /Y %APPNAME%.exe  %APPHOME%\
 @REM xcopy /Y /I /E tpls     %APPHOME%\tpls

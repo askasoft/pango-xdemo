@@ -9,25 +9,36 @@ import (
 )
 
 const (
-	ROLE_SUPER   = "$"
-	ROLE_ADMIN   = "A"
-	ROLE_VIEWER  = "V"
-	ROLE_APIONLY = "~"
+	UserStartID = int64(101)
 
-	USER_ACTIVE   = "A"
-	USER_DISABLED = "D"
+	RoleSuper   = "$"
+	RoleAdmin   = "A"
+	RoleEditor  = "E"
+	RoleViewer  = "V"
+	RoleApiOnly = "~"
+
+	UserActive   = "A"
+	UserDisabled = "D"
 )
 
+func ParseUserStatus(val string) (string, bool) {
+	return utils.FindKeyByValue("user.map.status", val)
+}
+
+func ParseUserRole(val string) (string, bool) {
+	return utils.FindKeyByValue("user.map.role", val)
+}
+
 type User struct {
-	ID        int64     `gorm:"not null;primaryKey;autoIncrement" form:"id" json:"id,omitempty"`
-	Name      string    `gorm:"name:100;not null" form:"name" json:"name,omitempty"`
-	Email     string    `gorm:"size:100;not null;uniqueIndex" form:"email" json:"email,omitempty"`
-	Password  string    `gorm:"size:128;not null" form:"password" json:"password,omitempty"`
-	Status    string    `gorm:"size:1;not null" form:"status" json:"status,omitempty"`
-	Role      string    `gorm:"size:1;not null" form:"role" json:"role,omitempty"`
-	CIDR      string    `gorm:"not null" form:"cidr" json:"cidr,omitempty"`
-	CreatedAt time.Time `gorm:"not null;<-:create" json:"created_at,omitempty"`
-	UpdatedAt time.Time `gorm:"not null;autoUpdateTime:true" json:"updated_at,omitempty"`
+	ID        int64     `gorm:"not null;primaryKey;autoIncrement" form:"id" json:"id"`
+	Name      string    `gorm:"size:100;not null" form:"name,strip" validate:"required,maxlen=100" json:"name"`
+	Email     string    `gorm:"size:100;not null;uniqueIndex" form:"email,strip" validate:"required,maxlen=100,email" json:"email"`
+	Password  string    `gorm:"size:128;not null" form:"password,strip" validate:"omitempty,minlen=8,maxlen=16" json:"password"`
+	Status    string    `gorm:"size:1;not null" form:"status,strip" json:"status"`
+	Role      string    `gorm:"size:1;not null" form:"role,strip" json:"role"`
+	CIDR      string    `gorm:"column:cidr;not null" form:"cidr,strip" json:"cidr"`
+	CreatedAt time.Time `gorm:"not null;<-:create" json:"created_at"`
+	UpdatedAt time.Time `gorm:"not null;autoUpdateTime:true" json:"updated_at"`
 }
 
 func (u *User) String() string {
@@ -43,6 +54,34 @@ func (u *User) CIDRs() (cidrs []*net.IPNet) {
 		}
 	}
 	return
+}
+
+func (u *User) HasRole(role string) bool {
+	return str.Compare(u.Role, role) <= 0
+}
+
+func (u *User) IsSuper() bool {
+	return u.Role == RoleSuper
+}
+
+func (u *User) IsAdmin() bool {
+	return str.Compare(u.Role, RoleAdmin) <= 0
+}
+
+func (u *User) IsEditor() bool {
+	return str.Compare(u.Role, RoleEditor) <= 0
+}
+
+func (u *User) IsViewer() bool {
+	return str.Compare(u.Role, RoleViewer) <= 0
+}
+
+func (u *User) IsApiOnly() bool {
+	return str.Compare(u.Role, RoleApiOnly) <= 0
+}
+
+func (u *User) SetPassword(password string) {
+	u.Password = utils.Encrypt(u.Email, password)
 }
 
 //-------------------------------------

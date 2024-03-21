@@ -1,0 +1,14 @@
+#users_table th.status,
+#users_table th.role {
+	white-space: nowrap;
+	width: 1%;
+}
+
+#users_table td.status,
+#users_table td.role {
+	width: 1%;
+}
+
+#users_table tr.D {
+	text-decoration: line-through;
+}

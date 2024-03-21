@@ -3,15 +3,16 @@ package files
 import (
 	"mime/multipart"
 	"net/http"
-	"path"
-	"time"
+	"path/filepath"
 
 	"github.com/askasoft/pango-xdemo/app"
+	"github.com/askasoft/pango-xdemo/app/models"
+	"github.com/askasoft/pango-xdemo/app/tenant"
+	"github.com/askasoft/pango-xdemo/app/utils"
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/xfs"
 	"github.com/askasoft/pango/xfs/gormfs"
 	"github.com/askasoft/pango/xin"
-	"github.com/google/uuid"
 )
 
 func Upload(c *xin.Context) {
@@ -21,7 +22,7 @@ func Upload(c *xin.Context) {
 		return
 	}
 
-	fi, err := SaveUploadedFile(file)
+	fi, err := SaveUploadedFile(c, file)
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
@@ -31,11 +32,13 @@ func Upload(c *xin.Context) {
 	c.JSON(http.StatusOK, fr)
 }
 
-func SaveUploadedFile(file *multipart.FileHeader) (*xfs.File, error) {
-	id := time.Now().Format("/2006/0102/") + str.RemoveByte(uuid.New().String(), '-') + path.Ext(file.Filename)
+func SaveUploadedFile(c *xin.Context, ff *multipart.FileHeader) (*xfs.File, error) {
+	ext := str.ToLower(filepath.Ext(ff.Filename))
+	fid := utils.MakeFileID(models.PrefixTmpFile, ext)
 
-	gfs := gormfs.FS(app.DB, "files")
-	return xfs.SaveUploadedFile(gfs, id, file)
+	tt := tenant.FromCtx(c)
+	gfs := gormfs.FS(app.DB, tt.TableFiles())
+	return xfs.SaveUploadedFile(gfs, fid, ff)
 }
 
 func Uploads(c *xin.Context) {
@@ -47,7 +50,7 @@ func Uploads(c *xin.Context) {
 
 	result := &xfs.FilesResult{}
 	for _, file := range files {
-		fi, err := SaveUploadedFile(file)
+		fi, err := SaveUploadedFile(c, file)
 		if err != nil {
 			c.AbortWithError(http.StatusInternalServerError, err)
 			return

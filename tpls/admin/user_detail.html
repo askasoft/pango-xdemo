@@ -1,0 +1,56 @@
+{{$pwd_desc := "user.desc.update.password"}}
+{{if eq .User.ID 0}}{{$pwd_desc = "user.desc.create.password"}}{{end}}
+<div>
+	<div class="ui-popup-header">
+		<h4><i class="{{T .Locale "icon.edit"}}"></i>
+			{{T .Locale "user.detail.header"}}
+			{{if ne .User.ID 0}}#{{.User.ID}}{{end}}
+		</h4>
+	</div>
+	<form class="ui-popup-body form-horizontal grey lined">
+		<input type="hidden" name="_token_" value="{{.Token}}"/>
+		<input type="hidden" id="user_detail_id" name="id" value="{{.User.ID}}"/>
+		<div class="row py-3">
+			<label class="col-sm-2 col-form-label" for="user_detail_name">{{T .Locale "user.name"}}</label>
+			<div class="col-sm-10">
+				<input id="user_detail_name" name="name" type="text" class="form-control" maxlength="100" value="{{.User.Name}}">
+			</div>
+		</div>
+		<div class="row py-3">
+			<label class="col-sm-2 col-form-label" for="user_detail_email">{{T .Locale "user.email"}}</label>
+			<div class="col-sm-10">
+				<input id="user_detail_email" name="email" type="text" class="form-control" maxlength="100" value="{{.User.Email}}">
+			</div>
+		</div>
+		<div class="row py-3">
+			<label class="col-sm-2 col-form-label" for="user_detail_password">{{T .Locale "user.password"}}</label>
+			<div class="col-sm-10">
+				<input id="user_detail_password" name="password" type="text" class="form-control" maxlength="16" value="">
+				<div class="desc">{{T .Locale $pwd_desc}}</div>
+			</div>
+		</div>
+		<div class="row py-3">
+			<label class="col-sm-2 col-form-label" for="user_detail_role">{{T .Locale "user.role"}}</label>
+			<div class="col-sm-10">
+				{{Radios "id=" "user_detail_role" "Name=" "role" "List=" .RoleMap.Iterator "Value=" .User.Role }}
+			</div>
+		</div>
+		<div class="row py-3">
+			<label class="col-sm-2 col-form-label" for="user_detail_status">{{T .Locale "user.status"}}</label>
+			<div class="col-sm-10">
+				{{Radios "id=" "user_detail_status" "Name=" "status" "List=" .StatusMap.Iterator "Value=" .User.Status }}
+			</div>
+		</div>
+		<div class="row py-3">
+			<label class="col-sm-2 col-form-label" for="user_detail_cidr">{{T .Locale "user.cidr"}}</label>
+			<div class="col-sm-10">
+				<textarea id="user_detail_cidr" name="cidr" class="form-control" rows="2">{{.User.CIDR}}</textarea>
+			</div>
+		</div>
+		<button type="submit" class="hidden"></button>
+	</form>
+	<div class="ui-popup-footer">
+		<button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> {{T .Locale "button.save"}}</button>
+		<button type="button" class="btn btn-secondary" popup-dismiss="true"><i class="fa fa-times"></i> {{T .Locale "button.close"}}</button>
+	</div>
+</div>

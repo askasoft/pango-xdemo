@@ -6,6 +6,7 @@ import (
 
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/handlers"
+	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango/tbs"
 	"github.com/askasoft/pango/xin"
@@ -38,7 +39,7 @@ func Login(c *xin.Context) {
 			return
 		}
 
-		if user != nil && password == user.GetPassword() {
+		if user != nil && password == user.GetPassword() && user.(*models.User).HasRole(models.RoleViewer) {
 			err := app.XCA.SaveUserPassToCookie(c, username, password)
 			if err != nil {
 				c.AddError(err)

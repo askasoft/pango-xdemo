@@ -2,6 +2,7 @@ package server
 
 import (
 	"github.com/askasoft/pango-xdemo/app"
+	"github.com/askasoft/pango-xdemo/app/jobs"
 	"github.com/askasoft/pango-xdemo/app/tasks"
 	"github.com/askasoft/pango/cog"
 	"github.com/askasoft/pango/log"
@@ -9,7 +10,10 @@ import (
 )
 
 var schedules = cog.NewLinkedHashMap[string, func()](
-	cog.KV("cleanUploadFiles", tasks.CleanUploadFiles),
+	cog.KV("tmpClean", tasks.CleanTemporaryFiles),
+	cog.KV("jobStart", jobs.Start),
+	cog.KV("jobReappend", jobs.Reappend),
+	cog.KV("jobClean", jobs.CleanOutdatedJobs),
 )
 
 func initScheduler() {

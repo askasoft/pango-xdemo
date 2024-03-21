@@ -30,6 +30,7 @@ func (s *service) PrintCommand() {
 
 	fmt.Fprintln(out, "    migrate kind...     migrate database schemas or configurations.")
 	fmt.Fprintln(out, "      kind=schema       migrate database schemas.")
+	fmt.Fprintln(out, "      kind=config       migrate tenant configurations.")
 	fmt.Fprintln(out, "      kind=super        migrate tenant super users.")
 	fmt.Fprintln(out, "    execsql <file>      execute sql for all database schemas.")
 	fmt.Fprintln(out, "    encrypt [key] <str> encrypt string.")
@@ -55,6 +56,11 @@ func (s *service) Exec(cmd string) {
 			switch arg {
 			case "schema":
 				if err := dbMigrateSchemas(); err != nil {
+					log.Fatal(err) //nolint: all
+					app.Exit(app.ExitErrDB)
+				}
+			case "config":
+				if err := dbMigrateConfigs(); err != nil {
 					log.Fatal(err) //nolint: all
 					app.Exit(app.ExitErrDB)
 				}

@@ -1,0 +1,41 @@
+{{MapSet .Ctx.Attrs "styles" (Array "admin/jobctrl.css")}}
+{{MapSet .Ctx.Attrs "scripts" (Array "admin/jobctrl.js")}}
+
+{{template "main_header" .}}
+
+<div class="s-section">
+	<div class="ui-headline">
+		<ol class="breadcrumb">
+			<li class="active"><i class="{{T .Locale "icon.user.import"}}"></i> {{T .Locale "menu.user.import"}}</li>
+		</ol>
+	</div>
+
+	<div class="ui-toolbar text-end">
+		<a class="btn btn-sm btn-secondary" href="./sample" target="_blank"><i class="fa fa-download"></i> {{T .Locale "button.sample"}}</a>
+	</div>
+
+	<div class="well">{{T .Locale "user.import.csv.well"}}</div>
+
+	<fieldset data-spy="fieldset">
+		<legend>{{T .Locale "user.import.csv.legend"}}</legend>
+		<form id="job_form" class="form-horizontal grey" enctype="multipart/form-data" autocomplete="off">
+			<input type="hidden" name="_token_" value="{{.Token}}"/>
+			<input type="hidden" name="source" value="csv"/>
+			<div class="row py-3">
+				<label class="col-sm-3 col-form-label">{{T .Locale "user.import.csv.file"}}</label>
+				<div class="col-sm-9">
+					<input type="file" name="file" accept=".csv" class="form-control">
+				</div>
+			</div>
+		</form>
+	</fieldset>
+
+	<div class="text-center">
+		<button id="job_start" class="btn btn-primary" disabled><i class="fas fa-play"></i> {{T .Locale "button.start"}}</button>
+		<button id="job_abort" class="btn btn-danger"  disabled><i class="fas fa-stop"></i> {{T .Locale "button.stop"}}</button>
+	</div>
+
+	<div id="job_list"></div>
+</div>
+
+{{template "main_footer" .}}

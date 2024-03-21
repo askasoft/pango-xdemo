@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/askasoft/pango-xdemo/app"
+	"github.com/askasoft/pango-xdemo/app/jobs"
 	"github.com/askasoft/pango/fsu"
 	"github.com/askasoft/pango/fsw"
 	"github.com/askasoft/pango/imc"
@@ -117,6 +118,11 @@ func Run() {
 	// Starting the server in a goroutine so that
 	// it won't block the graceful shutdown handling below
 	go start()
+
+	// Start jobs (Resume interrupted jobs)
+	if app.INI.GetBool("job", "startAtStartup") {
+		jobs.Start()
+	}
 }
 
 // Shutdown shutdown the app
@@ -180,6 +186,7 @@ func initConfigs() {
 
 	apc := app.INI.Section("app")
 	app.Locales = str.FieldsAny(apc.GetString("locales"), ",; ")
+	app.CONFS = imc.New(apc.GetDuration("confCacheExpiry", time.Minute), time.Second)
 	app.USERS = imc.New(apc.GetDuration("userCacheExpiry", time.Second*10), time.Second)
 
 	svc := app.INI.Section("server")

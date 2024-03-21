@@ -18,6 +18,9 @@ import (
 const (
 	// LogConfigFile log config file
 	LogConfigFile = "conf/log.ini"
+
+	// Database Config table init file
+	DBConfigFile = "conf/config.csv"
 )
 
 const (
@@ -125,6 +128,9 @@ var (
 
 	// DBS database settings
 	DBS map[string]string
+
+	// CONFS tenant config map cache
+	CONFS *imc.Cache
 
 	// USERS tenant user cache
 	USERS *imc.Cache
