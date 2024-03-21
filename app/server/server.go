@@ -208,7 +208,7 @@ func loadConfigs() (*ini.Ini, error) {
 func initListener() {
 	svc := app.INI.Section("server")
 
-	addr := svc.GetString("listen", ":9090")
+	addr := svc.GetString("listen", ":6060")
 	log.Infof("Listening %s ...", addr)
 
 	tcp, err := net.Listen("tcp", addr)
