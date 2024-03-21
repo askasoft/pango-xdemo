@@ -39,6 +39,10 @@ func initRouter() {
 	app.XCC = xin.NewCacheControlSetter()
 	app.XBA = xmw.NewBasicAuth(tenant.FindUser)
 	app.XCA = xmw.NewCookieAuth(tenant.FindUser, app.Secret())
+	app.XCN = xmw.NewCookieAuth(tenant.FindUser, app.Secret())
+	app.XCN.NoAuth = func(c *xin.Context) {
+		c.Next()
+	}
 
 	configMiddleware()
 
@@ -71,6 +75,10 @@ func configMiddleware() {
 	app.XCA.CookieMaxAge = app.INI.GetDuration("login", "cookieMaxAge", time.Minute*30)
 	app.XCA.CookiePath = str.IfEmpty(prefix, "/")
 	app.XCA.CookieSecure = app.INI.GetBool("login", "cookieSecure", true)
+
+	app.XCN.CookieMaxAge = app.XCA.CookieMaxAge
+	app.XCN.CookiePath = app.XCA.CookiePath
+	app.XCN.CookieSecure = app.XCA.CookieSecure
 
 	app.XTP.CookiePath = str.IfEmpty(prefix, "/")
 	app.XTP.SetSecret(app.Secret())
@@ -159,7 +167,7 @@ func configHandlers() {
 	r.Use(app.XAC.Handler())
 
 	rg := r.Group(cp)
-	rg.GET("/", handlers.Index)
+	rg.GET("/", app.XCN.Handler(), handlers.Index)
 	rg.HEAD("/healthcheck", handlers.HealthCheck)
 	rg.GET("/healthcheck", handlers.HealthCheck)
 	rg.GET("/panic", handlers.Panic)
@@ -206,6 +214,7 @@ func addFilesHandlers(rg *xin.RouterGroup) {
 func addLoginHandlers(rg *xin.RouterGroup) {
 	rg.Use(tenant.CheckTenant) // schema protect
 	rg.Use(app.XTP.Handler())  // token protect
+	rg.Use(app.XCN.Handler())
 
 	rg.GET("/", login.Index)
 	rg.POST("/login", login.Login)
@@ -215,6 +224,7 @@ func addLoginHandlers(rg *xin.RouterGroup) {
 func addDemosHandlers(rg *xin.RouterGroup) {
 	rg.Use(tenant.CheckTenant) // schema protect
 	rg.Use(app.XTP.Handler())  // token protect
+	rg.Use(app.XCN.Handler())
 
 	rg.GET("/tags/", demos.TagsIndex)
 	rg.POST("/tags/", demos.TagsIndex)
