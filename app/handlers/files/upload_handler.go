@@ -8,7 +8,6 @@ import (
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/tenant"
-	"github.com/askasoft/pango-xdemo/app/utils"
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/xfs"
 	"github.com/askasoft/pango/xfs/gormfs"
@@ -34,7 +33,7 @@ func Upload(c *xin.Context) {
 
 func SaveUploadedFile(c *xin.Context, ff *multipart.FileHeader) (*xfs.File, error) {
 	ext := str.ToLower(filepath.Ext(ff.Filename))
-	fid := utils.MakeFileID(models.PrefixTmpFile, ext)
+	fid := models.MakeFileID(models.PrefixTmpFile, ext)
 
 	tt := tenant.FromCtx(c)
 	gfs := gormfs.FS(app.DB, tt.TableFiles())
