@@ -10,7 +10,6 @@ import (
 	"github.com/askasoft/pango-xdemo/app/jobs"
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/tenant"
-	"github.com/askasoft/pango-xdemo/app/utils"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/str"
@@ -35,7 +34,7 @@ type JobController struct {
 
 func (jc *JobController) SetFile(tt tenant.Tenant, ff *multipart.FileHeader) error {
 	ext := str.ToLower(filepath.Ext(ff.Filename))
-	fid := utils.MakeFileID(models.PrefixJobFile, ext)
+	fid := models.MakeFileID(models.PrefixJobFile, ext)
 	gfs := tt.FS(app.DB)
 	if _, err := xfs.SaveUploadedFile(gfs, fid, ff); err != nil {
 		return err
