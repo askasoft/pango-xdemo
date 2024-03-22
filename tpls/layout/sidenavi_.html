@@ -1,27 +1,29 @@
 {{define "sidenavi"}}
 <div id="sidenavi"><div class="ui-sidenavi minimal">
-<div id="navi_sites" class="card">
-	<div class="card-header">
-		<i class="fas fa-earth-asia"></i> <span>{{T .Locale "menu.menu"}}</span>
-	</div>
-	<div class="card-body">
-		<ul class="nav flex-column">
-			<li class="nav-item"><a class="nav-link" href="{{.Base}}/demos/tags/"><i class="{{T .Locale "icon.tags"}}"></i> <span>{{T .Locale "menu.tags"}}</span></a></li>
-			<li class="nav-item"><a class="nav-link" href="{{.Base}}/demos/uploads/"><i class="{{T .Locale "icon.uploads"}}"></i> <span>{{T .Locale "menu.uploads"}}</span></a></li>
-		</ul>
-	</div>
-</div>
 
-{{if .LoginUser}}
-<div id="navi_user" class="card">
-	<div class="card-header">
-		<i class="fas fa-user"></i> <span>Users</span>
+	<div id="navi_demmos" class="card">
+		<div class="card-header">
+			<i class="fas fa-earth-asia"></i><span>{{T .Locale "menu.demos"}}</span>
+		</div>
+		<div class="card-body">
+			<ul class="nav flex-column">
+				<li class="nav-item"><a class="nav-link" href="{{.Base}}/demos/tags/"><i class="{{T .Locale "icon.tags"}}"></i><span>{{T .Locale "menu.tags"}}</span></a></li>
+				<li class="nav-item"><a class="nav-link" href="{{.Base}}/demos/uploads/"><i class="{{T .Locale "icon.uploads"}}"></i><span>{{T .Locale "menu.uploads"}}</span></a></li>
+			</ul>
+		</div>
 	</div>
-	<div class="card-body">
-		<ul class="nav flex-column">
-		</ul>
+
+{{if and .AuthUser .AuthUser.IsAdmin}}
+	<div id="navi_admin" class="card">
+		<div class="card-header">
+			<i class="{{T .Locale "icon.admin"}}"></i><span>{{T .Locale "menu.admin"}}</span>
+		</div>
+		<div class="card-body">
+			<ul class="nav flex-column">
+				<li class="nav-item"><a class="nav-link" href="{{.Base}}/a/users/"><i class="{{T .Locale "icon.admin.users"}}"></i><span>{{T .Locale "menu.admin.users"}}</span></a></li>
+			</ul>
+		</div>
 	</div>
-</div><!-- end of navi_user -->
 {{end}}
 
 </div></div>
