@@ -137,6 +137,9 @@ var (
 
 	// USERS tenant user cache
 	USERS *imc.Cache
+
+	// AFIPS authenticate failure ip cache
+	AFIPS *imc.Cache
 )
 
 func Exit(code int) {

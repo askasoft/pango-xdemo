@@ -37,12 +37,15 @@ func initRouter() {
 	app.XRH = xmw.NewResponseHeader(nil)
 	app.XAC = xmw.NewOriginAccessController()
 	app.XCC = xin.NewCacheControlSetter()
-	app.XBA = xmw.NewBasicAuth(tenant.FindUser)
+	app.XBA = xmw.NewBasicAuth(tenant.CheckClientAndFindUser)
+	app.XBA.AuthPassed = tenant.AuthPassed
+	app.XBA.AuthFailed = tenant.BasicAuthFailed
 	app.XCA = xmw.NewCookieAuth(tenant.FindUser, app.Secret())
+
+	// only get AuthUser from cookie
 	app.XCN = xmw.NewCookieAuth(tenant.FindUser, app.Secret())
-	app.XCN.NoAuth = func(c *xin.Context) {
-		c.Next()
-	}
+	app.XCN.AuthFailed = tenant.AuthNext
+	app.XCN.AuthRequired = tenant.AuthNext
 
 	configMiddleware()
 
