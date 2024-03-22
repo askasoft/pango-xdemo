@@ -4,7 +4,6 @@ import (
 	"errors"
 	"mime/multipart"
 	"net/http"
-	"path/filepath"
 
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/jobs"
@@ -12,7 +11,6 @@ import (
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/num"
-	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/tbs"
 	"github.com/askasoft/pango/xfs"
 	"github.com/askasoft/pango/xin"
@@ -33,8 +31,7 @@ type JobController struct {
 }
 
 func (jc *JobController) SetFile(tt tenant.Tenant, ff *multipart.FileHeader) error {
-	ext := str.ToLower(filepath.Ext(ff.Filename))
-	fid := models.MakeFileID(models.PrefixJobFile, ext)
+	fid := models.MakeFileID(models.PrefixJobFile, ff.Filename)
 	gfs := tt.FS(app.DB)
 	if _, err := xfs.SaveUploadedFile(gfs, fid, ff); err != nil {
 		return err
