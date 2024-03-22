@@ -55,3 +55,53 @@ func FindUser(c *xin.Context, username string) (xmw.AuthUser, error) {
 	app.USERS.Set(k, u)
 	return u, nil
 }
+
+func CheckClientAndFindUser(c *xin.Context, username string) (xmw.AuthUser, error) {
+	if IsClientBlocked(c) {
+		return nil, nil
+	}
+	return FindUser(c, username)
+}
+
+func AuthNext(c *xin.Context) {
+	c.Next()
+}
+
+func AuthPassed(c *xin.Context) {
+	cip := c.ClientIP()
+	app.AFIPS.Delete(cip)
+	c.Next()
+}
+
+func AuthFailed(c *xin.Context) {
+	cip := c.ClientIP()
+
+	cnt := 1
+	if v, ok := app.AFIPS.Get(cip); ok {
+		cnt = v.(int) + 1
+	}
+	app.AFIPS.Set(cip, cnt)
+}
+
+func BasicAuthFailed(c *xin.Context) {
+	AuthFailed(c)
+	app.XBA.Unauthorized(c)
+}
+
+func CookieAuthFailed(c *xin.Context) {
+	AuthFailed(c)
+	app.XCA.Unauthorized(c)
+}
+
+func IsClientBlocked(c *xin.Context) bool {
+	cip := c.ClientIP()
+
+	if v, ok := app.AFIPS.Get(cip); ok {
+		cnt := v.(int)
+		if cnt >= app.INI.GetInt("login", "maxFailure", 5) {
+			return true
+		}
+	}
+
+	return false
+}
