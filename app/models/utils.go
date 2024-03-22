@@ -2,7 +2,7 @@ package models
 
 import (
 	"encoding/json"
-	"fmt"
+	"path/filepath"
 	"time"
 
 	"github.com/askasoft/pango/str"
@@ -14,12 +14,15 @@ const (
 	PrefixJobFile = "j"
 )
 
-func MakeFileID(prefix, ext string) string {
-	fid := fmt.Sprintf("/%s/%s/%s%s",
-		prefix,
-		time.Now().Format("2006/0102"),
-		str.RemoveByte(uuid.New().String(), '-'),
-		ext)
+func MakeFileID(prefix, name string) string {
+	fid := "/" + prefix + time.Now().Format("/2006/0102/") + str.RemoveByte(uuid.New().String(), '-') + "/"
+
+	_, name = filepath.Split(name)
+	ext := filepath.Ext(name)
+	name = name[:len(name)-len(ext)] + str.ToLower(ext)
+	name = str.Right(name, 255-len(fid))
+
+	fid += name
 	return fid
 }
 
