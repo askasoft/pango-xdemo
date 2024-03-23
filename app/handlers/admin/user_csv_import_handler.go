@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/handlers"
 	"github.com/askasoft/pango-xdemo/app/jobs"
 	"github.com/askasoft/pango-xdemo/app/models"
@@ -81,12 +80,13 @@ func UserCsvImportSample(c *xin.Context) {
 	sm := utils.GetUserStatusMap(c.Locale)
 	rm := utils.GetUserRoleMap(c.Locale)
 
+	domain := c.Request.Host
 	data := [][]string{
-		{"101", "admin", "admin@" + app.Domain, rm.MustGet(models.RoleAdmin), sm.MustGet(models.UserActive), str.RandLetterNumbers(16), "127.0.0.1/32\n192.168.1.1/32"},
-		{"102", "editor", "editor@" + app.Domain, rm.MustGet(models.RoleEditor), sm.MustGet(models.UserActive), str.RandLetterNumbers(16), "127.0.0.1/32\n192.168.1.1/32"},
-		{"103", "viewer", "viewer@" + app.Domain, rm.MustGet(models.RoleViewer), sm.MustGet(models.UserActive), str.RandLetterNumbers(16), "127.0.0.1/32\n192.168.1.1/32"},
-		{"104", "api", "api@" + app.Domain, rm.MustGet(models.RoleApiOnly), sm.MustGet(models.UserActive), str.RandLetterNumbers(16), "127.0.0.1/32\n192.168.1.1/32"},
-		{"", "disabled", "disabled@" + app.Domain, rm.MustGet(models.RoleViewer), sm.MustGet(models.UserDisabled), str.RandLetterNumbers(16), "127.0.0.1/32\n192.168.1.1/32"},
+		{"101", "admin", "admin@" + domain, rm.MustGet(models.RoleAdmin), sm.MustGet(models.UserActive), str.RandLetterNumbers(16), "127.0.0.1/32\n192.168.1.1/32"},
+		{"102", "editor", "editor@" + domain, rm.MustGet(models.RoleEditor), sm.MustGet(models.UserActive), str.RandLetterNumbers(16), "127.0.0.1/32\n192.168.1.1/32"},
+		{"103", "viewer", "viewer@" + domain, rm.MustGet(models.RoleViewer), sm.MustGet(models.UserActive), str.RandLetterNumbers(16), "127.0.0.1/32\n192.168.1.1/32"},
+		{"104", "api", "api@" + domain, rm.MustGet(models.RoleApiOnly), sm.MustGet(models.UserActive), str.RandLetterNumbers(16), "127.0.0.1/32\n192.168.1.1/32"},
+		{"", "disabled", "disabled@" + domain, rm.MustGet(models.RoleViewer), sm.MustGet(models.UserDisabled), str.RandLetterNumbers(16), "127.0.0.1/32\n192.168.1.1/32"},
 	}
 
 	err = cw.WriteAll(data)
