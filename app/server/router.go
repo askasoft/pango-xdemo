@@ -60,6 +60,7 @@ func bodyTooLarge(c *xin.Context, limit int64) {
 
 func configMiddleware() {
 	svc := app.INI.Section("server")
+	prefix := svc.GetString("prefix")
 
 	app.XRL.DrainBody = svc.GetBool("httpDrainRequestBody", false)
 	app.XRL.MaxBodySize = svc.GetSize("httpMaxRequestBodySize", 8<<20)
@@ -70,10 +71,13 @@ func configMiddleware() {
 	app.XSR.Disable(!svc.GetBool("httpsRedirect"))
 	app.XLL.Locales = app.Locales
 
-	prefix := svc.GetString("prefix")
-
 	app.XAC.SetAllowOrigins(str.Fields(svc.GetString("accessControlAllowOrigin"))...)
+	app.XAC.SetAllowCredentials(svc.GetBool("accessControlAllowCredentials"))
 	app.XAC.SetAllowHeaders(svc.GetString("accessControlAllowHeaders"))
+	app.XAC.SetAllowMethods(svc.GetString("accessControlAllowMethods"))
+	app.XAC.SetExposeHeaders(svc.GetString("accessControlExposeHeaders"))
+	app.XAC.SetMaxAge(svc.GetInt("accessControlMaxAge"))
+
 	app.XCC.CacheControl = svc.GetString("staticCacheControl", "public, max-age=31536000, immutable")
 
 	app.XCA.RedirectURL = prefix + "/login/"
