@@ -186,9 +186,9 @@ func initConfigs() {
 
 	apc := app.INI.Section("app")
 	app.Locales = str.FieldsAny(apc.GetString("locales"), ",; ")
-	app.CONFS = imc.New(apc.GetDuration("confCacheExpiry", time.Minute), time.Second)
-	app.USERS = imc.New(apc.GetDuration("userCacheExpiry", time.Second*10), time.Second)
-	app.AFIPS = imc.New(apc.GetDuration("afipCacheExpiry", time.Minute*5), time.Second)
+	app.CONFS = imc.New(apc.GetDuration("confCacheExpiry", time.Minute), time.Minute)
+	app.USERS = imc.New(apc.GetDuration("userCacheExpiry", time.Second*15), time.Minute)
+	app.AFIPS = imc.New(apc.GetDuration("afipCacheExpiry", time.Minute*15), time.Minute)
 
 	svc := app.INI.Section("server")
 	app.Domain = svc.GetString("domain")

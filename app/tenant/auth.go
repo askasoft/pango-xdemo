@@ -6,6 +6,7 @@ import (
 
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/models"
+	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pango/xmw"
 	"gorm.io/gorm"
@@ -76,11 +77,10 @@ func AuthPassed(c *xin.Context) {
 func AuthFailed(c *xin.Context) {
 	cip := c.ClientIP()
 
-	cnt := 1
-	if v, ok := app.AFIPS.Get(cip); ok {
-		cnt = v.(int) + 1
+	err := app.AFIPS.Increment(cip, 1, 1)
+	if err != nil {
+		log.Errorf("Failed to increment AFIPS for '%s'", cip)
 	}
-	app.AFIPS.Set(cip, cnt)
 }
 
 func BasicAuthFailed(c *xin.Context) {
