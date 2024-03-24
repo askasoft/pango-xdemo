@@ -8,6 +8,7 @@ import (
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/handlers"
 	"github.com/askasoft/pango-xdemo/app/handlers/admin"
+	"github.com/askasoft/pango-xdemo/app/handlers/api"
 	"github.com/askasoft/pango-xdemo/app/handlers/demos"
 	"github.com/askasoft/pango-xdemo/app/handlers/files"
 	"github.com/askasoft/pango-xdemo/app/handlers/login"
@@ -44,8 +45,8 @@ func initRouter() {
 
 	// only get AuthUser from cookie
 	app.XCN = xmw.NewCookieAuth(tenant.FindUser, app.Secret())
-	app.XCN.AuthFailed = tenant.AuthNext
-	app.XCN.AuthRequired = tenant.AuthNext
+	app.XCN.AuthFailed = xin.Next
+	app.XCN.AuthRequired = xin.Next
 
 	configMiddleware()
 
@@ -71,7 +72,8 @@ func configMiddleware() {
 
 	prefix := svc.GetString("prefix")
 
-	app.XAC.SetOrigins(str.Fields(svc.GetString("accessControlAllowOrigin"))...)
+	app.XAC.SetAllowOrigins(str.Fields(svc.GetString("accessControlAllowOrigin"))...)
+	app.XAC.SetAllowHeaders(svc.GetString("accessControlAllowHeaders"))
 	app.XCC.CacheControl = svc.GetString("staticCacheControl", "public, max-age=31536000, immutable")
 
 	app.XCA.RedirectURL = prefix + "/login/"
@@ -167,7 +169,6 @@ func configHandlers() {
 	r.Use(app.XSR.Handler())
 	r.Use(app.XLL.Handler())
 	r.Use(app.XRH.Handler())
-	r.Use(app.XAC.Handler())
 
 	rg := r.Group(cp)
 	rg.GET("/", app.XCN.Handler(), handlers.Index)
@@ -177,8 +178,9 @@ func configHandlers() {
 
 	addStaticHandlers(rg)
 
-	addLoginHandlers(rg.Group("/login"))
+	addAPIHandlers(rg.Group("/api"))
 	addFilesHandlers(rg.Group("/files"))
+	addLoginHandlers(rg.Group("/login"))
 	addDemosHandlers(rg.Group("/demos"))
 	addSelfHandlers(rg.Group("/s"))
 	addAdminHandlers(rg.Group("/a"))
@@ -199,6 +201,19 @@ func addStaticHandlers(rg *xin.RouterGroup) {
 
 	xin.StaticFSFunc(rg, "/assets", wfsc, "/assets", xcch)
 	xin.StaticFSFuncFile(rg, "/favicon.ico", wfsc, "favicon.ico", xcch)
+}
+
+func addAPIHandlers(a *xin.RouterGroup) {
+	a.Use(app.XAC.Handler()) // access control
+	a.OPTIONS("/*path", xin.Next)
+
+	rg := a.Group("")
+	rg.Use(tenant.CheckTenant) // schema protect
+	rg.Use(app.XBA.Handler())  // Basic auth
+	rg.Use(tenant.IPProtect)   // IP protect
+
+	rg.GET("/get", api.Get)
+	rg.POST("/post", api.Post)
 }
 
 func addFilesHandlers(rg *xin.RouterGroup) {

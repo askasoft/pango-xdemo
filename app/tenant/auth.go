@@ -64,10 +64,6 @@ func CheckClientAndFindUser(c *xin.Context, username string) (xmw.AuthUser, erro
 	return FindUser(c, username)
 }
 
-func AuthNext(c *xin.Context) {
-	c.Next()
-}
-
 func AuthPassed(c *xin.Context) {
 	cip := c.ClientIP()
 	app.AFIPS.Delete(cip)
