@@ -287,6 +287,7 @@ func addAdminUserHandlers(rg *xin.RouterGroup) {
 	rg.Use(tenant.RoleAdminProtect) // role protect
 
 	rg.GET("/", admin.UserIndex)
+	rg.POST("/list", admin.UserList)
 	rg.GET("/new", admin.UserNew)
 	rg.GET("/detail", admin.UserDetail)
 	rg.POST("/create", admin.UserCreate)
@@ -295,7 +296,7 @@ func addAdminUserHandlers(rg *xin.RouterGroup) {
 	rg.POST("/clear", admin.UserClear)
 	rg.POST("/enable", admin.UserEnable)
 	rg.POST("/disable", admin.UserDisable)
-	rg.GET("/export/csv", admin.UserCsvExport)
+	rg.POST("/export/csv", admin.UserCsvExport)
 
 	addAdminUserImportHandlers(rg.Group("/import"))
 }

@@ -1,0 +1,61 @@
+{{$au := .AuthUser}}
+{{$base := .Base}}
+{{$loc := .Locale}}
+{{$sm := .StatusMap}}
+{{$rm := .RoleMap}}
+
+{{Pager .Q.Pager "Locale=" $loc}}
+
+<form autocomplete="off" class="table-responsive">
+<table id="users_table" class="table table-striped ui-sortable s-table"
+	data-spy="sortable" data-sorted-col="{{.Q.Sorter.Col}}" data-sorted-dir="{{.Q.Sorter.Dir}}">
+	<thead>
+		<tr>
+			<th class="check"><input type="checkbox" checkall="#users_table td.check > input"/></th>
+			<th class="id sortable" data-sort-col="id">{{T $loc "user.id"}}</th>
+			<th class="name sortable" data-sort-col="name">{{T $loc "user.name"}}</th>
+			<th class="email sortable" data-sort-col="email">{{T $loc "user.email"}}</th>
+			<th class="role sortable" data-sort-col="role">{{T $loc "user.role"}}</th>
+			<th class="status sortable" data-sort-col="status">{{T $loc "user.status"}}</th>
+			<th class="cidr" data-sort-col="cidr">{{T $loc "user.cidr"}}</th>
+			<th class="created_at sortable" data-sort-col="created_at">{{T $loc "user.created_at"}}</th>
+			<th class="updated_at sortable" data-sort-col="updated_at">{{T $loc "user.updated_at"}}</th>
+			<th class="actions"></th>
+		</tr>
+	</thead>
+	<tbody>
+	{{range $i, $u := .Users}}
+		<tr class="{{$u.Status}}" id="usr_{{$u.ID}}">
+			<td class="check">{{if ne $u.ID $au.ID}}<input type="checkbox" value="{{$u.ID}}"/>{{end}}</td>
+			<td class="id ro">{{$u.ID}}</td>
+			<td class="name">{{$u.Name}}</td>
+			<td class="email">{{$u.Email}}</td>
+			<td class="role">{{$rm.MustGet $u.Role $u.Role}}</td>
+			<td class="status">{{$sm.MustGet $u.Status $u.Status}}</td>
+			<td class="cidr"><pre>{{$u.CIDR}}</pre></td>
+			<td class="created_at ro">{{TIME $u.CreatedAt}}</td>
+			<td class="updated_at">{{TIME $u.UpdatedAt}}</td>
+			<td class="actions">
+				<button class="btn btn-outline-secondary edit" title="{{T $loc "button.edit"}}"><i class="{{T $loc "icon.edit"}}"></i></button>
+			</td>
+		</tr>
+	{{end}}
+		<tr class="hidden" id="usr_new">
+			<td class="check"></td>
+			<td class="id"></td>
+			<td class="name"></td>
+			<td class="email"></td>
+			<td class="role"></td>
+			<td class="status"></td>
+			<td class="cidr"></td>
+			<td class="created_at"></td>
+			<td class="updated_at"></td>
+			<td class="actions">
+				<button class="btn btn-secondary edit" title="{{T $loc "button.edit"}}"><i class="{{T $loc "icon.edit"}}"></i></button>
+			</td>
+		</tr>
+	</tbody>
+</table>
+</form>
+
+{{Pager .Q.Pager "Locale=" $loc}}

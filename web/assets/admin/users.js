@@ -1,21 +1,79 @@
 $(function() {
-	//----------------------------------------------------
-	// pager & sorter
-	//----------------------------------------------------
-	$('.ui-pager').on('goto.pager', function(evt, pno) {
-		$('#users_pageform').find('input[name="p"]').val(pno).end().submit();
-	});
+	var sskey = "a.users";
 
-	$('.ui-pager select').on('change', function() {
-		$('#users_pageform').find('input[name="l"]').val($(this).val()).end().submit();
-	});
+	//----------------------------------------------------
+	// list: pager & sorter
+	//----------------------------------------------------
+	function users_reset() {
+		$(this).formClear().submit();
+		return false;
+	}
 
-	$('#users_table').on('sort.sortable', function(evt, col, dir) {
-		$('#users_pageform')
-			.find('input[name="c"]').val(col).end()
-			.find('input[name="d"]').val(dir).end()
-			.submit();
-	});
+	function users_search() {
+		$('body').loadmask();
+
+		xdemo.sssave(sskey, xdemo.input_values($(this)));
+
+		$.ajax({
+			url: './list',
+			type: 'POST',
+			data: $(this).serialize(),
+			success: function(data, ts, xhr) {
+				$('#users_list').html(data);
+
+				$('#users_list [checkall]').checkall();
+				$('#users_list [data-spy="pager"]').pager();
+				$('#users_list [data-spy="sortable"]').sortable();
+			},
+			error: xdemo.ajax_error,
+			complete: function() {
+				$('body').unloadmask();
+			}
+		});
+		return false;
+	}
+
+	function users_export() {
+		$('body').loadmask();
+
+		$.ajaf({
+			url: './export/csv',
+			type: 'POST',
+			data: $("#users_listform").serializeArray(),
+			error: xdemo.ajax_error,
+			complete: function() {
+				$('body').unloadmask();
+			}
+		});
+		return false;
+	}
+
+	function has_search_params() {
+		return $('users_listform input:checked').length || $('#users_listform input[type=text]').filter(function() { return $(this).val(); }).length;
+	}
+
+	$('#users_listform').formValues(xdemo.ssload(sskey));
+	if (has_search_params()) {
+		$('#users_listfset').fieldset('expand', 'show');
+	}
+
+	$('#users_list')
+		.on('goto.pager', '.ui-pager', function(evt, pno) {
+			$('#users_listform').find('input[name="p"]').val(pno).end().submit();
+		})
+		.on('change', '.ui-pager select', function() {
+			$('#users_listform').find('input[name="l"]').val($(this).val()).end().submit();
+		})
+		.on('sort.sortable', '#users_table', function(evt, col, dir) {
+			$('#users_listform')
+				.find('input[name="c"]').val(col).end()
+				.find('input[name="d"]').val(dir).end()
+				.submit();
+		});
+
+	$('#users_listform').on('submit', users_search).submit();
+	$('#users_listform').on('reset', users_reset);
+	$('#users_export').on('click', users_export);
 
 
 	//----------------------------------------------------
@@ -41,7 +99,7 @@ $(function() {
 		return false;
 	}
 
-	$('#users_table').on('click', 'button.edit', user_detail);
+	$('#users_list').on('click', 'button.edit', user_detail);
 
 	//----------------------------------------------------
 	// new
@@ -86,10 +144,10 @@ $(function() {
 				var usr = data.result, $tr = $('tr#usr_' + usr.id);
 
 				xdemo.set_table_tr_values($tr, usr);
-				xdemo.blink($tr);
 				$tr.attr('class', '').addClass(usr.status);
 				$tr.find('td.status').text(USM[usr.status]);
 				$tr.find('td.role').text(URM[usr.role]);
+				xdemo.blink($tr);
 			},
 			error: xdemo.ajax_error,
 			complete: function() {
@@ -125,11 +183,11 @@ $(function() {
 				$('#users_table > tbody').prepend($tr);
 
 				xdemo.set_table_tr_values($tr, usr);
-				xdemo.blink($tr);
 				$tr.addClass(usr.status);
 				$tr.find('td.status').text(USM[usr.status]);
 				$tr.find('td.role').text(URM[usr.role]);
 				$tr.find('td.id, td.created_at').addClass('ro');
+				xdemo.blink($tr);
 			},
 			error: xdemo.ajax_error,
 			complete: function() {
@@ -207,8 +265,7 @@ $(function() {
 			url: './clear',
 			type: 'POST',
 			data: {
-				_token_: xdemo.token,
-				k: $('#users_pageform').find('input[name="k"]').val()
+				_token_: xdemo.token
 			},
 			dataType: 'json',
 			success: function(data, ts, xhr) {
