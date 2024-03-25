@@ -34,8 +34,8 @@ type User struct {
 	Name      string    `gorm:"size:100;not null" form:"name,strip" validate:"required,maxlen=100" json:"name"`
 	Email     string    `gorm:"size:100;not null;uniqueIndex" form:"email,strip" validate:"required,maxlen=100,email" json:"email"`
 	Password  string    `gorm:"size:128;not null" form:"password,strip" validate:"omitempty,minlen=8,maxlen=16" json:"password"`
-	Status    string    `gorm:"size:1;not null" form:"status,strip" json:"status"`
 	Role      string    `gorm:"size:1;not null" form:"role,strip" json:"role"`
+	Status    string    `gorm:"size:1;not null" form:"status,strip" json:"status"`
 	CIDR      string    `gorm:"column:cidr;not null" form:"cidr,strip" json:"cidr"`
 	CreatedAt time.Time `gorm:"not null;<-:create" json:"created_at"`
 	UpdatedAt time.Time `gorm:"not null;autoUpdateTime:true" json:"updated_at"`

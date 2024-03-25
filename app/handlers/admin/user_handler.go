@@ -11,11 +11,27 @@ import (
 	"github.com/askasoft/pango-xdemo/app/utils/gormutil"
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/sqx"
-	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pango/xvw/args"
 	"gorm.io/gorm"
 )
+
+type UserQuery struct {
+	ID     string   `form:"id,strip" json:"id"`
+	Name   string   `form:"name,strip" json:"name"`
+	Email  string   `form:"email,strip" json:"email"`
+	Role   []string `form:"role,strip" json:"role"`
+	Status []string `form:"status,strip" json:"status"`
+	CIDR   string   `form:"cidr,strip" json:"cidr"`
+
+	args.Pager
+	args.Sorter
+}
+
+func (uq *UserQuery) Normalize(columns []string, limits []int) {
+	uq.Sorter.Normalize(columns...)
+	uq.Pager.Normalize(limits...)
+}
 
 var userSortables = []string{
 	"id",
@@ -27,16 +43,25 @@ var userSortables = []string{
 	"updated_at",
 }
 
-func filterUsers(c *xin.Context) func(tx *gorm.DB, key string) *gorm.DB {
-	return func(tx *gorm.DB, key string) *gorm.DB {
-		if key != "" {
-			if str.IsNumber(key) {
-				id := num.Atol(key)
-				tx = tx.Where("id = ?", id)
-			} else {
-				val := sqx.StringLike(key)
-				tx = tx.Where("name LIKE ? or email LIKE ?", val, val)
-			}
+func filterUsers(c *xin.Context) func(tx *gorm.DB, uq *UserQuery) *gorm.DB {
+	return func(tx *gorm.DB, uq *UserQuery) *gorm.DB {
+		if id := num.Atoi(uq.ID); id != 0 {
+			tx = tx.Where("id = ?", id)
+		}
+		if uq.Name != "" {
+			tx = tx.Where("name LIKE ?", sqx.StringLike(uq.Name))
+		}
+		if uq.Email != "" {
+			tx = tx.Where("email LIKE ?", sqx.StringLike(uq.Email))
+		}
+		if uq.CIDR != "" {
+			tx = tx.Where("cidr LIKE ?", sqx.StringLike(uq.CIDR))
+		}
+		if len(uq.Role) > 0 {
+			tx = tx.Where("role IN ?", uq.Role)
+		}
+		if len(uq.Status) > 0 {
+			tx = tx.Where("status IN ?", uq.Status)
 		}
 
 		au := tenant.AuthUser(c)
@@ -47,12 +72,12 @@ func filterUsers(c *xin.Context) func(tx *gorm.DB, key string) *gorm.DB {
 	}
 }
 
-func countUsers(tt tenant.Tenant, key string, filter func(tx *gorm.DB, key string) *gorm.DB) (int, error) {
+func countUsers(tt tenant.Tenant, uq *UserQuery, filter func(tx *gorm.DB, uq *UserQuery) *gorm.DB) (int, error) {
 	var total int64
 
 	tx := app.DB.Table(tt.TableUsers())
 
-	tx = filter(tx, key)
+	tx = filter(tx, uq)
 
 	r := tx.Count(&total)
 	if r.Error != nil {
@@ -62,22 +87,22 @@ func countUsers(tt tenant.Tenant, key string, filter func(tx *gorm.DB, key strin
 	return int(total), nil
 }
 
-func findUsers(tt tenant.Tenant, q *args.Query, filter func(tx *gorm.DB, key string) *gorm.DB) (usrs []*models.User, err error) {
+func findUsers(tt tenant.Tenant, uq *UserQuery, filter func(tx *gorm.DB, uq *UserQuery) *gorm.DB) (usrs []*models.User, err error) {
 	tx := app.DB.Table(tt.TableUsers())
 
-	tx = filter(tx, q.Key)
+	tx = filter(tx, uq)
 
-	ob := gormutil.Sorter2OrderBy(&q.Sorter)
-	tx = tx.Offset(q.Start()).Limit(q.Limit).Order(ob)
+	ob := gormutil.Sorter2OrderBy(&uq.Sorter)
+	tx = tx.Offset(uq.Start()).Limit(uq.Limit).Order(ob)
 
 	r := tx.Find(&usrs)
 	err = r.Error
 	return
 }
 
-func userListArgs(c *xin.Context) (q *args.Query) {
-	q = &args.Query{
-		Sorter: args.Sorter{Col: "name", Dir: "asc"},
+func userListArgs(c *xin.Context) (q *UserQuery) {
+	q = &UserQuery{
+		Sorter: args.Sorter{Col: "id", Dir: "asc"},
 	}
 	_ = c.Bind(q)
 
@@ -85,6 +110,25 @@ func userListArgs(c *xin.Context) (q *args.Query) {
 }
 
 func UserIndex(c *xin.Context) {
+	h := handlers.H(c)
+
+	q := userListArgs(c)
+	q.Normalize(userSortables, pagerLimits)
+
+	h["Q"] = q
+	h["StatusMap"] = utils.GetUserStatusMap(c.Locale)
+
+	au := tenant.AuthUser(c)
+	if au.IsSuper() {
+		h["RoleMap"] = utils.GetSuperRoleMap(c.Locale)
+	} else {
+		h["RoleMap"] = utils.GetUserRoleMap(c.Locale)
+	}
+
+	c.HTML(http.StatusOK, "admin/users", h)
+}
+
+func UserList(c *xin.Context) {
 	tt := tenant.FromCtx(c)
 
 	h := handlers.H(c)
@@ -93,7 +137,7 @@ func UserIndex(c *xin.Context) {
 	q := userListArgs(c)
 
 	var err error
-	q.Total, err = countUsers(tt, q.Key, f)
+	q.Total, err = countUsers(tt, q, f)
 	q.Normalize(userSortables, pagerLimits)
 
 	if err != nil {
@@ -118,5 +162,5 @@ func UserIndex(c *xin.Context) {
 		h["RoleMap"] = utils.GetUserRoleMap(c.Locale)
 	}
 
-	c.HTML(http.StatusOK, "admin/users", h)
+	c.HTML(http.StatusOK, "admin/users_list", h)
 }

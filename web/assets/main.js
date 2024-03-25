@@ -121,6 +121,13 @@ var xdemo = {
 		$('body').unloadmask();
 	},
 
+	// form input (not hidden) values
+	input_values: function($f) {
+		var vs = $f.formValues();
+		delete vs._token_;
+		return vs;
+	},
+
 	// table
 	get_table_checked_ids: function($tb) {
 		var ids = [];
