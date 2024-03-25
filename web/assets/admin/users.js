@@ -4,20 +4,25 @@ $(function() {
 	//----------------------------------------------------
 	// list: pager & sorter
 	//----------------------------------------------------
+	function users_reload() {
+		$('#users_listform [name="p"]').val(1);
+		users_reset();
+	}
+
 	function users_reset() {
-		$(this).formClear().submit();
+		$('#users_listform').formClear().submit();
 		return false;
 	}
 
 	function users_search() {
 		$('body').loadmask();
 
-		xdemo.sssave(sskey, xdemo.input_values($(this)));
+		xdemo.sssave(sskey, xdemo.input_values($('#users_listform')));
 
 		$.ajax({
 			url: './list',
 			type: 'POST',
-			data: $(this).serialize(),
+			data: $('#users_listform').serialize(),
 			success: function(data, ts, xhr) {
 				$('#users_list').html(data);
 
@@ -39,7 +44,7 @@ $(function() {
 		$.ajaf({
 			url: './export/csv',
 			type: 'POST',
-			data: $("#users_listform").serializeArray(),
+			data: $('#users_listform').serializeArray(),
 			error: xdemo.ajax_error,
 			complete: function() {
 				$('body').unloadmask();
@@ -52,7 +57,9 @@ $(function() {
 		return $('users_listform input:checked').length || $('#users_listform input[type=text]').filter(function() { return $(this).val(); }).length;
 	}
 
-	$('#users_listform').formValues(xdemo.ssload(sskey));
+	if (!location.search) {
+		$('#users_listform').formValues(xdemo.ssload(sskey));
+	}
 	if (has_search_params()) {
 		$('#users_listfset').fieldset('expand', 'show');
 	}
@@ -238,12 +245,10 @@ $(function() {
 
 				$.toast({
 					icon: 'success',
-					text: data.success,
-					hideAfter: 3000,
-					afterHidden: function() {
-						location.reload();
-					}
+					text: data.success
 				});
+
+				users_search();
 			},
 			error: xdemo.ajax_error,
 			complete: function() {
@@ -273,12 +278,10 @@ $(function() {
 
 				$.toast({
 					icon: 'success',
-					text: data.success,
-					hideAfter: 3000,
-					afterHidden: function() {
-						location.reload();
-					}
+					text: data.success
 				});
+
+				users_reload();
 			},
 			error: xdemo.ajax_error,
 			complete: function() {
@@ -291,14 +294,15 @@ $(function() {
 	$('#users_clear_popup form').submit(users_clear);
 
 	//----------------------------------------------------
-	// users enable
+	// users enable/disable
 	//----------------------------------------------------
-	function users_enable() {
+	function users_enable(en) {
+		var $p = $(en ? '#users_enable_popup' : '#users_disable_popup');
 		var ids = xdemo.get_table_checked_ids($('#users_table'));
 
-		$('#users_enable_popup').loadmask();
+		$p.loadmask();
 		$.ajax({
-			url: './enable',
+			url: en ? 'enable' : 'disable',
 			type: 'POST',
 			data: {
 				_token_: xdemo.token,
@@ -306,61 +310,27 @@ $(function() {
 			},
 			dataType: 'json',
 			success: function(data, ts, xhr) {
-				$('#users_enable_popup').popup('hide');
+				$p.popup('hide');
 
 				$.toast({
 					icon: 'success',
-					text: data.success,
-					hideAfter: 3000,
-					afterHidden: function() {
-						location.reload();
-					}
+					text: data.success
 				});
+
+				var sts = en ? 'A' : 'D';
+				var $trs = xdemo.get_table_trs('#usr_', ids);
+				$trs.attr('class', '').addClass(sts);
+				$trs.find('td.status').text(USM[sts]);
+				xdemo.blink($trs);
 			},
 			error: xdemo.ajax_error,
 			complete: function() {
-				$('#users_enable_popup').unloadmask();
+				$p.unloadmask();
 			}
 		});
 		return false;
 	}
 
-	$('#users_enable_popup form').submit(users_enable);
-
-	//----------------------------------------------------
-	// disable
-	//----------------------------------------------------
-	function users_disable() {
-		var ids = xdemo.get_table_checked_ids($('#users_table'));
-
-		$('#users_disable_popup').loadmask();
-		$.ajax({
-			url: './disable',
-			type: 'POST',
-			data: {
-				_token_: xdemo.token,
-				id: ids
-			},
-			dataType: 'json',
-			success: function(data, ts, xhr) {
-				$('#users_disable_popup').popup('hide');
-
-				$.toast({
-					icon: 'success',
-					text: data.success,
-					hideAfter: 3000,
-					afterHidden: function() {
-						location.reload();
-					}
-				});
-			},
-			error: xdemo.ajax_error,
-			complete: function() {
-				$('#users_disable_popup').unloadmask();
-			}
-		});
-		return false;
-	}
-
-	$('#users_disable_popup form').submit(users_disable);
+	$('#users_enable_popup form').submit(function() { return users_enable(true); });
+	$('#users_disable_popup form').submit(function() { return users_enable(false); });
 });
