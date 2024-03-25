@@ -129,6 +129,13 @@ var xdemo = {
 	},
 
 	// table
+	get_table_trs: function(px, ids) {
+		var trs = [];
+		$.each(ids, function(i, v) {
+			trs.push(px + v);
+		});
+		return $(trs.join(','));
+	},
 	get_table_checked_ids: function($tb) {
 		var ids = [];
 		$tb.find('td.check > input:checked').each(function() {
