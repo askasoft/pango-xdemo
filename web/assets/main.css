@@ -205,8 +205,8 @@ form .desc {
 .s-table th.updated_at, .s-table td.updated_at,
 .s-table th.indexed_at, .s-table td.indexed_at,
 .s-table th.summary_at, .s-table td.summary_at {
-	width: 90px;
-	min-width: 90px;
+	width: 110px;
+	min-width: 110px;
 }
 
 .s-table th.check, .s-table td.check,
