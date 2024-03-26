@@ -1,11 +1,8 @@
 #users_table th.status,
-#users_table th.role {
-	white-space: nowrap;
-	width: 1%;
-}
-
+#users_table th.role,
 #users_table td.status,
 #users_table td.role {
+	white-space: nowrap;
 	width: 1%;
 }
 
