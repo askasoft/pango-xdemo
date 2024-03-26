@@ -93,8 +93,20 @@ var xdemo = {
 
 	// ajax error handler
 	ajax_error: function(xhr, status, err) {
+		if (xhr.readyState == 0) { // window unload
+			console.log('ajax canceled.');
+			return;
+		}
+
+		var afterHidden;
+		if (xhr.status == 401) { // unauthorized
+			afterHidden = function() {
+				window.location.href = xdemo.base + '/login/';
+			};
+		}
+
 		err = err || status || 'Server error';
-		if (xhr && xhr.responseJSON) {
+		if (xhr.responseJSON) {
 			err = xhr.responseJSON.error || JSON.stringify(xhr.responseJSON, null, 4) || err;
 		}
 
@@ -102,14 +114,16 @@ var xdemo = {
 			$.toast({
 				icon: 'error',
 				heading: err.title,
-				text: err.detail
+				text: err.detail,
+				afterHidden: afterHidden
 			});
 			return;
 		}
 
 		$.toast({
 			icon: 'error',
-			text: err
+			text: err,
+			afterHidden: afterHidden
 		});
 	},
 
