@@ -21,22 +21,14 @@ const (
 	UserDisabled = "D"
 )
 
-func ParseUserStatus(val string) (string, bool) {
-	return utils.FindKeyByValue("user.map.status", val)
-}
-
-func ParseUserRole(val string) (string, bool) {
-	return utils.FindKeyByValue("user.map.role", val)
-}
-
 type User struct {
-	ID        int64     `gorm:"not null;primaryKey;autoIncrement" form:"id" json:"id"`
-	Name      string    `gorm:"size:100;not null" form:"name,strip" validate:"required,maxlen=100" json:"name"`
-	Email     string    `gorm:"size:100;not null;uniqueIndex" form:"email,strip" validate:"required,maxlen=100,email" json:"email"`
-	Password  string    `gorm:"size:128;not null" form:"password,strip" validate:"omitempty,minlen=8,maxlen=16" json:"password"`
-	Role      string    `gorm:"size:1;not null" form:"role,strip" json:"role"`
-	Status    string    `gorm:"size:1;not null" form:"status,strip" json:"status"`
-	CIDR      string    `gorm:"column:cidr;not null" form:"cidr,strip" json:"cidr"`
+	ID        int64     `gorm:"not null;primaryKey;autoIncrement" json:"id" form:"id"`
+	Name      string    `gorm:"size:100;not null" json:"name" form:"name,strip" validate:"required,maxlen=100"`
+	Email     string    `gorm:"size:100;not null;uniqueIndex" json:"email" form:"email,strip" validate:"required,maxlen=100,email"`
+	Password  string    `gorm:"size:128;not null" json:"password" form:"password,strip" validate:"omitempty,minlen=8,maxlen=16"`
+	Role      string    `gorm:"size:1;not null" json:"role" form:"role,strip"`
+	Status    string    `gorm:"size:1;not null" json:"status" form:"status,strip"`
+	CIDR      string    `gorm:"column:cidr;not null" json:"cidr" form:"cidr,strip"`
 	CreatedAt time.Time `gorm:"not null;<-:create" json:"created_at"`
 	UpdatedAt time.Time `gorm:"not null;autoUpdateTime:true" json:"updated_at"`
 }
