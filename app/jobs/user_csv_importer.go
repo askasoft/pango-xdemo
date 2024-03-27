@@ -34,6 +34,9 @@ type UserCsvImporter struct {
 
 	roleMap   *cog.LinkedHashMap[string, string]
 	statusMap *cog.LinkedHashMap[string, string]
+
+	roleRevMap   map[string]string
+	statusRevMap map[string]string
 }
 
 func NewUserCsvImporter(tt tenant.Tenant, job *xjm.Job) *UserCsvImporter {
@@ -63,6 +66,8 @@ func (uci *UserCsvImporter) Run() {
 
 	uci.roleMap = utils.GetUserRoleMap("")
 	uci.statusMap = utils.GetUserStatusMap("")
+	uci.roleRevMap = utils.GetUserRoleReverseMap()
+	uci.statusRevMap = utils.GetUserStatusReverseMap()
 
 	total, err := uci.doCheckCsv()
 	if err != nil {
@@ -182,8 +187,8 @@ func (uci *UserCsvImporter) doCheckCsv() (total int, err error) {
 func (uci *UserCsvImporter) checkRecord(rec *csvUserRecord) error {
 	var errs []string
 	if rec.ID != "" {
-		if num.Atol(rec.ID) == 0 {
-			errs = append(errs, tbs.GetText("ja", "user.id"))
+		if num.Atol(rec.ID) < models.UserStartID {
+			errs = append(errs, tbs.GetText("ja", "user.id")+fmt.Sprintf("(%d以上の番号)", models.UserStartID))
 		}
 	}
 	if rec.Name == "" {
@@ -214,7 +219,7 @@ func (uci *UserCsvImporter) doImportCsv() error {
 
 func (uci *UserCsvImporter) importRecord(rec *csvUserRecord) error {
 	uci.Step = rec.Line - 1
-	uci.Log.Infof("%s Import #%s %s", uci.StepInfo(), rec.ID, rec.Name)
+	uci.Log.Infof("%s Import #%s %s <%s>", uci.StepInfo(), rec.ID, rec.Name, rec.Email)
 
 	if uci.PingAborted() {
 		return xjm.ErrJobAborted
@@ -323,7 +328,7 @@ func (uci *UserCsvImporter) parseData(row []string) *csvUserRecord {
 		rv := csvutil.GetString(row, h.IdxRole)
 		if rv != "" {
 			rec.Role = rv
-			if role, ok := models.ParseUserRole(rv); ok {
+			if role, ok := uci.roleRevMap[rv]; ok {
 				rec.Role = role
 			}
 		}
@@ -334,7 +339,7 @@ func (uci *UserCsvImporter) parseData(row []string) *csvUserRecord {
 		sv := csvutil.GetString(row, h.IdxStatus)
 		if sv != "" {
 			rec.Status = sv
-			if status, ok := models.ParseUserStatus(sv); ok {
+			if status, ok := uci.statusRevMap[sv]; ok {
 				rec.Status = status
 			}
 		}
