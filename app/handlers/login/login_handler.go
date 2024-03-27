@@ -23,7 +23,10 @@ func Index(c *xin.Context) {
 }
 
 func Logout(c *xin.Context) {
+	tenant.DeleteAuthUser(c)
+
 	app.XCA.DeleteCookie(c)
+
 	h := handlers.H(c)
 	c.HTML(http.StatusOK, "login/login", h)
 }

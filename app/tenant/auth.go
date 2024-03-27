@@ -6,7 +6,6 @@ import (
 
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/models"
-	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pango/xmw"
 	"gorm.io/gorm"
@@ -57,36 +56,18 @@ func FindUser(c *xin.Context, username string) (xmw.AuthUser, error) {
 	return u, nil
 }
 
-func CheckClientAndFindUser(c *xin.Context, username string) (xmw.AuthUser, error) {
-	if IsClientBlocked(c) {
-		return nil, nil
+// AuthUser get authenticated user
+func AuthUser(c *xin.Context) *models.User {
+	au, ok := c.Get(app.XCA.AuthUserKey)
+	if ok {
+		return au.(*models.User)
 	}
-	return FindUser(c, username)
+
+	panic("Invalid Authenticate User!")
 }
 
-func AuthPassed(c *xin.Context) {
-	cip := c.ClientIP()
-	app.AFIPS.Delete(cip)
-	c.Next()
-}
-
-func AuthFailed(c *xin.Context) {
-	cip := c.ClientIP()
-
-	err := app.AFIPS.Increment(cip, 1, 1)
-	if err != nil {
-		log.Errorf("Failed to increment AFIPS for '%s'", cip)
-	}
-}
-
-func BasicAuthFailed(c *xin.Context) {
-	AuthFailed(c)
-	app.XBA.Unauthorized(c)
-}
-
-func CookieAuthFailed(c *xin.Context) {
-	AuthFailed(c)
-	app.XCA.Unauthorized(c)
+func DeleteAuthUser(c *xin.Context) {
+	c.Del(app.XCA.AuthUserKey)
 }
 
 func IsClientBlocked(c *xin.Context) bool {
@@ -100,4 +81,11 @@ func IsClientBlocked(c *xin.Context) bool {
 	}
 
 	return false
+}
+
+func CheckClientAndFindUser(c *xin.Context, username string) (xmw.AuthUser, error) {
+	if IsClientBlocked(c) {
+		return nil, nil
+	}
+	return FindUser(c, username)
 }

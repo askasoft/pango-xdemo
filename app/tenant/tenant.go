@@ -8,8 +8,10 @@ import (
 	"github.com/askasoft/pango/cog"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/sqx"
+	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/xfs"
 	"github.com/askasoft/pango/xfs/gormfs"
+	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pango/xjm"
 	"github.com/askasoft/pango/xjm/gormjm"
 	"gorm.io/gorm"
@@ -118,6 +120,18 @@ func Create(name string) error {
 	}
 
 	return nil
+}
+
+func FromCtx(c *xin.Context) (tt Tenant) {
+	if IsMultiTenant() {
+		host := c.Request.Host
+		domain := app.Domain
+		suffix := "." + domain
+		if host != domain && str.EndsWith(host, suffix) {
+			tt = Tenant(host[0 : len(host)-len(suffix)])
+		}
+	}
+	return
 }
 
 func (tt Tenant) Logger(name string) log.Logger {

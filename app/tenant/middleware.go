@@ -6,21 +6,39 @@ import (
 
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/models"
-	"github.com/askasoft/pango/str"
+	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/xin"
 )
 
-func FromCtx(c *xin.Context) (tt Tenant) {
-	if IsMultiTenant() {
-		host := c.Request.Host
-		domain := app.Domain
-		suffix := "." + domain
-		if host != domain && str.EndsWith(host, suffix) {
-			tt = Tenant(host[0 : len(host)-len(suffix)])
-		}
-	}
-	return
+//----------------------------------------------------
+// Auth Handler
+
+func AuthPassed(c *xin.Context) {
+	cip := c.ClientIP()
+	app.AFIPS.Delete(cip)
+	c.Next()
 }
+
+func AuthFailed(c *xin.Context) {
+	cip := c.ClientIP()
+
+	err := app.AFIPS.Increment(cip, 1, 1)
+	if err != nil {
+		log.Errorf("Failed to increment AFIPS for '%s'", cip)
+	}
+}
+
+func BasicAuthFailed(c *xin.Context) {
+	AuthFailed(c)
+	app.XBA.Unauthorized(c)
+}
+
+func CookieAuthFailed(c *xin.Context) {
+	AuthFailed(c)
+	app.XCA.Unauthorized(c)
+}
+
+//----------------------------------------------------
 
 func SetCtxLogProp(c *xin.Context) {
 	tt := FromCtx(c)
@@ -44,16 +62,6 @@ func CheckTenant(c *xin.Context) {
 
 //----------------------------------------------------
 // Auth Protector
-
-// AuthUser get authenticated user
-func AuthUser(c *xin.Context) *models.User {
-	au, ok := c.Get(app.XCA.AuthUserKey)
-	if ok {
-		return au.(*models.User)
-	}
-
-	panic("Invalid Authenticate User!")
-}
 
 func CheckClientIP(c *xin.Context, u *models.User) bool {
 	cidrs := u.CIDRs()
