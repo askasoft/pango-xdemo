@@ -1,5 +1,5 @@
 {{define "headnavi"}}
-<div class="ui-toolbar">
+<div id="headnavi" class="ui-toolbar">
 	<ul>
 		<li class="theme">
 			<div class="btn-group btn-group-sm">
@@ -14,16 +14,16 @@
 			</button>
 			<ul class="dropdown-menu dropdown-menu-end">
 			{{if .AuthUser.IsAdmin}}
-				<li><a class="dropdown-item" href="{{.Base}}/a/config/"><i class="{{T .Locale "icon.config"}}"></i> <span>{{T .Locale "menu.config"}}</span></a></li>
-				<li><a class="dropdown-item" href="{{.Base}}/a/users/"><i class="{{T .Locale "icon.admin.users"}}"></i> <span>{{T .Locale "menu.admin.users"}}</span></a></li>
-			{{end}}
+				<li><a class="dropdown-item" href="{{.Base}}/a/config/"><i class="{{T .Locale "icon.config"}}"></i><span>{{T .Locale "menu.config"}}</span></a></li>
+				<li><a class="dropdown-item" href="{{.Base}}/a/users/"><i class="{{T .Locale "icon.admin.users"}}"></i><span>{{T .Locale "menu.admin.users"}}</span></a></li>
 				<li class="divider"></li>
-				<li><a class="dropdown-item" href="{{.Base}}/s/pwdchg/"><i class="{{T .Locale "icon.self.pwdchg"}}"></i> <span>{{T .Locale "menu.self.pwdchg"}}</span></a></li>
-				<li><a class="dropdown-item" href="{{.Base}}/login/logout"><i class="{{T .Locale "icon.logout"}}"></i> <span>{{T .Locale "menu.logout"}}</span></a></li>
+			{{end}}
+				<li><a class="dropdown-item" href="{{.Base}}/s/pwdchg/"><i class="{{T .Locale "icon.self.pwdchg"}}"></i><span>{{T .Locale "menu.self.pwdchg"}}</span></a></li>
+				<li><a class="dropdown-item" href="{{.Base}}/login/logout"><i class="{{T .Locale "icon.logout"}}"></i><span>{{T .Locale "menu.logout"}}</span></a></li>
 			</ul>
 		</div></li>
 {{else}}
-		<li><a href="{{.Base}}/login/"><i class="{{T .Locale "icon.login"}}"></i> <span>{{T .Locale "menu.login"}}</span></a></li>
+		<li><a href="{{.Base}}/login/"><i class="{{T .Locale "icon.login"}}"></i><span>{{T .Locale "menu.login"}}</span></a></li>
 {{end}}
 	</ul>
 </div>
