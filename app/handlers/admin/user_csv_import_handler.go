@@ -36,22 +36,21 @@ type UserCsvImportJobController struct {
 func (ucijc *UserCsvImportJobController) Start(c *xin.Context) {
 	ff, err := c.FormFile("file")
 	if err != nil {
-		err = errors.New("CSVファイルを選択してください。")
+		err = errors.New(tbs.GetText(c.Locale, "csv.error.required"))
 		c.AddError(err)
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}
 
 	tt := tenant.FromCtx(c)
-
-	err = ucijc.SetFile(tt, ff)
-	if err != nil {
-		err = fmt.Errorf("CSVファイルが読み込めません。詳細エラー：%w", err)
+	if err = ucijc.SetFile(tt, ff); err != nil {
+		err = fmt.Errorf(tbs.GetText(c.Locale, "csv.error.read"), err)
 		c.AddError(err)
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}
 
+	ucijc.SetParam(c.Locale)
 	ucijc.JobController.Start(c)
 }
 
