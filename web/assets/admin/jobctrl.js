@@ -242,7 +242,7 @@ $(function() {
 		}
 
 		if (job.param) {
-			var params = JSON.parse(job.param);
+			var params = xmain.safe_parse_json(job.param);
 			for (var k in params) {
 				var v = params[k];
 				if (typeof(v) == 'string') {
