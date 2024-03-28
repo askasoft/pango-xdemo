@@ -13,13 +13,13 @@ $(function() {
 	function users_search() {
 		var $f = $('#users_listform');
 
-		xdemo.sssave(sskey, xdemo.form_values($f));
+		xmain.sssave(sskey, xmain.form_values($f));
 
 		$.ajax({
 			url: './list',
 			type: 'POST',
 			data: $f.serialize(),
-			beforeSend: xdemo.loadmask,
+			beforeSend: xmain.loadmask,
 			success: function(data, ts, xhr) {
 				$('#users_list').html(data);
 
@@ -27,8 +27,8 @@ $(function() {
 				$('#users_list [data-spy="pager"]').pager();
 				$('#users_list [data-spy="sortable"]').sortable();
 			},
-			error: xdemo.ajax_error,
-			complete: xdemo.unloadmask
+			error: xmain.ajax_error,
+			complete: xmain.unloadmask
 		});
 		return false;
 	}
@@ -38,9 +38,9 @@ $(function() {
 			url: './export/csv',
 			type: 'POST',
 			data: $('#users_listform').serializeArray(),
-			beforeSend: xdemo.loadmask,
-			error: xdemo.ajax_error,
-			complete: xdemo.unloadmask
+			beforeSend: xmain.loadmask,
+			error: xmain.ajax_error,
+			complete: xmain.unloadmask
 		});
 		return false;
 	}
@@ -50,7 +50,7 @@ $(function() {
 	}
 
 	if (!location.search) {
-		$('#users_listform').formValues(xdemo.ssload(sskey));
+		$('#users_listform').formValues(xmain.ssload(sskey));
 	}
 	if (has_search_params()) {
 		$('#users_listfset').fieldset('expand', 'show');
@@ -133,7 +133,7 @@ $(function() {
 			type: 'POST',
 			data: $p.find('form').serialize(),
 			dataType: 'json',
-			beforeSend: xdemo.form_ajax_start($p),
+			beforeSend: xmain.form_ajax_start($p),
 			success: function(data, ts, xhr) {
 				$('#users_detail_popup').popup('hide');
 
@@ -144,14 +144,14 @@ $(function() {
 
 				var usr = data.result, $tr = $('tr#usr_' + usr.id);
 
-				xdemo.set_table_tr_values($tr, usr);
+				xmain.set_table_tr_values($tr, usr);
 				$tr.attr('class', '').addClass(usr.status);
 				$tr.find('td.status').text(USM[usr.status]);
 				$tr.find('td.role').text(URM[usr.role]);
-				xdemo.blink($tr);
+				xmain.blink($tr);
 			},
-			error: xdemo.form_ajax_error($p),
-			complete: xdemo.form_ajax_end($p)
+			error: xmain.form_ajax_error($p),
+			complete: xmain.form_ajax_end($p)
 		});
 		return false;
 	}
@@ -167,7 +167,7 @@ $(function() {
 			type: 'POST',
 			data: $p.find('form').serialize(),
 			dataType: 'json',
-			beforeSend: xdemo.form_ajax_start($p),
+			beforeSend: xmain.form_ajax_start($p),
 			success: function(data, ts, xhr) {
 				$p.popup('hide');
 
@@ -183,15 +183,15 @@ $(function() {
 				$tr.find('td.check').append($('<input type="checkbox"/>').val(usr.id));
 				$('#users_table > tbody').prepend($tr);
 
-				xdemo.set_table_tr_values($tr, usr);
+				xmain.set_table_tr_values($tr, usr);
 				$tr.addClass(usr.status);
 				$tr.find('td.status').text(USM[usr.status]);
 				$tr.find('td.role').text(URM[usr.role]);
 				$tr.find('td.id, td.created_at').addClass('ro');
-				xdemo.blink($tr);
+				xmain.blink($tr);
 			},
-			error: xdemo.form_ajax_error($p),
-			complete: xdemo.form_ajax_end($p)
+			error: xmain.form_ajax_error($p),
+			complete: xmain.form_ajax_end($p)
 		});
 		return false;
 	}
@@ -222,17 +222,17 @@ $(function() {
 	//----------------------------------------------------
 	function users_delete() {
 		var $p = $('#users_delete_popup');
-		var ids = xdemo.get_table_checked_ids($('#users_table'));
+		var ids = xmain.get_table_checked_ids($('#users_table'));
 
 		$.ajax({
 			url: './delete',
 			type: 'POST',
 			data: {
-				_token_: xdemo.token,
+				_token_: xmain.token,
 				id: ids
 			},
 			dataType: 'json',
-			beforeSend: xdemo.form_ajax_start($p),
+			beforeSend: xmain.form_ajax_start($p),
 			success: function(data, ts, xhr) {
 				$p.popup('hide');
 
@@ -243,8 +243,8 @@ $(function() {
 
 				users_search();
 			},
-			error: xdemo.ajax_error,
-			complete: xdemo.form_ajax_end($p)
+			error: xmain.ajax_error,
+			complete: xmain.form_ajax_end($p)
 		});
 		return false;
 	}
@@ -261,10 +261,10 @@ $(function() {
 			url: './clear',
 			type: 'POST',
 			data: {
-				_token_: xdemo.token
+				_token_: xmain.token
 			},
 			dataType: 'json',
-			beforeSend: xdemo.form_ajax_start($p),
+			beforeSend: xmain.form_ajax_start($p),
 			success: function(data, ts, xhr) {
 				$p.popup('hide');
 
@@ -275,8 +275,8 @@ $(function() {
 
 				users_reset();
 			},
-			error: xdemo.ajax_error,
-			complete: xdemo.form_ajax_end($p)
+			error: xmain.ajax_error,
+			complete: xmain.form_ajax_end($p)
 		});
 		return false;
 	}
@@ -288,17 +288,17 @@ $(function() {
 	//----------------------------------------------------
 	function users_enable(en) {
 		var $p = $(en ? '#users_enable_popup' : '#users_disable_popup');
-		var ids = xdemo.get_table_checked_ids($('#users_table'));
+		var ids = xmain.get_table_checked_ids($('#users_table'));
 
 		$.ajax({
 			url: en ? 'enable' : 'disable',
 			type: 'POST',
 			data: {
-				_token_: xdemo.token,
+				_token_: xmain.token,
 				id: ids
 			},
 			dataType: 'json',
-			beforeSend: xdemo.form_ajax_start($p),
+			beforeSend: xmain.form_ajax_start($p),
 			success: function(data, ts, xhr) {
 				$p.popup('hide');
 
@@ -308,13 +308,13 @@ $(function() {
 				});
 
 				var sts = en ? 'A' : 'D';
-				var $trs = xdemo.get_table_trs('#usr_', ids);
+				var $trs = xmain.get_table_trs('#usr_', ids);
 				$trs.attr('class', '').addClass(sts);
 				$trs.find('td.status').text(USM[sts]);
-				xdemo.blink($trs);
+				xmain.blink($trs);
 			},
-			error: xdemo.ajax_error,
-			complete: xdemo.form_ajax_end($p)
+			error: xmain.ajax_error,
+			complete: xmain.form_ajax_end($p)
 		});
 		return false;
 	}
