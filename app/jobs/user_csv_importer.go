@@ -28,6 +28,8 @@ type UserCsvImporter struct {
 
 	JobStep
 
+	locale string
+
 	file string
 	data []byte
 	head csvUserHeader
@@ -43,6 +45,12 @@ func NewUserCsvImporter(tt tenant.Tenant, job *xjm.Job) *UserCsvImporter {
 	uci := &UserCsvImporter{}
 
 	uci.JobRunner = newJobRunner(tt, job.ID)
+
+	if err := xjm.Decode(job.Param, &uci.locale); err != nil {
+		uci.Abort(fmt.Sprintf("invalid params: %v", err)) //nolint: errcheck
+		return nil
+	}
+
 	uci.file = job.File
 
 	uci.head.init()
@@ -64,8 +72,8 @@ func (uci *UserCsvImporter) Run() {
 		return
 	}
 
-	uci.roleMap = utils.GetUserRoleMap("")
-	uci.statusMap = utils.GetUserStatusMap("")
+	uci.roleMap = utils.GetUserRoleMap(uci.locale)
+	uci.statusMap = utils.GetUserStatusMap(uci.locale)
 	uci.roleRevMap = utils.GetUserRoleReverseMap()
 	uci.statusRevMap = utils.GetUserStatusReverseMap()
 
@@ -122,7 +130,7 @@ func (uci *UserCsvImporter) doReadCsv(callback func(rec *csvUserRecord) error) e
 
 	bp, err := iox.SkipBOM(fp)
 	if err != nil {
-		return fmt.Errorf("CSVファイルが読み込めません。詳細エラー：%w", err)
+		return fmt.Errorf(tbs.GetText(uci.locale, "csv.error.read"), err)
 	}
 
 	i := 0
@@ -138,7 +146,7 @@ func (uci *UserCsvImporter) doReadCsv(callback func(rec *csvUserRecord) error) e
 			break
 		}
 		if err != nil {
-			return fmt.Errorf("CSVファイルが読み込めません。詳細エラー：%w", err)
+			return fmt.Errorf(tbs.GetText(uci.locale, "csv.error.read"), err)
 		}
 
 		if i == 1 {
@@ -161,7 +169,7 @@ func (uci *UserCsvImporter) doReadCsv(callback func(rec *csvUserRecord) error) e
 }
 
 func (uci *UserCsvImporter) doCheckCsv() (total int, err error) {
-	uci.Log.Info("Checking CSV file ...")
+	uci.Log.Info(tbs.GetText(uci.locale, "csv.info.checking"))
 
 	valid := true
 	err = uci.doReadCsv(func(rec *csvUserRecord) error {
@@ -169,7 +177,7 @@ func (uci *UserCsvImporter) doCheckCsv() (total int, err error) {
 		err := uci.checkRecord(rec)
 		if err != nil {
 			valid = false
-			uci.Log.Error(err.Error())
+			uci.Log.Warn(err.Error())
 		}
 		return nil
 	})
@@ -178,7 +186,7 @@ func (uci *UserCsvImporter) doCheckCsv() (total int, err error) {
 		return
 	}
 	if !valid {
-		err = errors.New("CSVファイルのデータが正しくありません。")
+		err = errors.New(tbs.GetText(uci.locale, "csv.error.data"))
 	}
 
 	return
@@ -188,38 +196,38 @@ func (uci *UserCsvImporter) checkRecord(rec *csvUserRecord) error {
 	var errs []string
 	if rec.ID != "" {
 		if num.Atol(rec.ID) < models.UserStartID {
-			errs = append(errs, tbs.GetText("ja", "user.id")+fmt.Sprintf("(%d以上の番号)", models.UserStartID))
+			errs = append(errs, tbs.GetText(uci.locale, "user.id")+tbs.Format(uci.locale, "user.id.range", models.UserStartID))
 		}
 	}
 	if rec.Name == "" {
-		errs = append(errs, tbs.GetText("ja", "user.name"))
+		errs = append(errs, tbs.GetText(uci.locale, "user.name"))
 	}
 	if rec.Email == "" {
-		errs = append(errs, tbs.GetText("ja", "user.email"))
+		errs = append(errs, tbs.GetText(uci.locale, "user.email"))
 	}
 	if !uci.roleMap.Contain(rec.Role) {
-		errs = append(errs, tbs.GetText("ja", "user.role"))
+		errs = append(errs, tbs.GetText(uci.locale, "user.role"))
 	}
 	if !uci.statusMap.Contain(rec.Status) {
-		errs = append(errs, tbs.GetText("ja", "user.status"))
+		errs = append(errs, tbs.GetText(uci.locale, "user.status"))
 	}
 
 	if len(errs) > 0 {
-		return fmt.Errorf("行[%d]: データ不備 - [%s]", rec.Line, str.Join(errs, ","))
+		return fmt.Errorf(tbs.GetText(uci.locale, "csv.error.line"), rec.Line, str.Join(errs, ","))
 	}
 
 	return nil
 }
 
 func (uci *UserCsvImporter) doImportCsv() error {
-	uci.Log.Info("Importing CSV file ...")
+	uci.Log.Info(tbs.GetText(uci.locale, "csv.info.importing"))
 
 	return uci.doReadCsv(uci.importRecord)
 }
 
 func (uci *UserCsvImporter) importRecord(rec *csvUserRecord) error {
 	uci.Step = rec.Line - 1
-	uci.Log.Infof("%s Import #%s %s <%s>", uci.StepInfo(), rec.ID, rec.Name, rec.Email)
+	uci.Log.Infof(tbs.GetText(uci.locale, "user.import.csv.step.info"), uci.StepInfo(), rec.ID, rec.Name, rec.Email)
 
 	if uci.PingAborted() {
 		return xjm.ErrJobAborted
@@ -250,16 +258,16 @@ func (uci *UserCsvImporter) importRecord(rec *csvUserRecord) error {
 				r = db.Table(uci.Tenant.TableUsers()).Updates(usr)
 				if r.Error != nil {
 					if pgutil.IsUniqueViolation(r.Error) {
-						uci.Log.Warnf("%s #%d %s メールアドレス<%s>が重複しています!", uci.StepInfo(), usr.ID, usr.Name, usr.Email)
+						uci.Log.Warnf(tbs.GetText(uci.locale, "user.import.csv.step.dup_email"), uci.StepInfo(), usr.ID, usr.Name, usr.Email)
 						return ErrItemSkip
 					}
 					return r.Error
 				}
 
 				if r.RowsAffected > 0 {
-					uci.Log.Infof("%s Updated #%d %s <%s>", uci.StepInfo(), usr.ID, usr.Name, usr.Email)
+					uci.Log.Infof(tbs.GetText(uci.locale, "user.import.csv.step.updated"), uci.StepInfo(), usr.ID, usr.Name, usr.Email)
 				} else {
-					uci.Log.Warnf("%s Update failed #%d %s <%s>", uci.StepInfo(), usr.ID, usr.Name, usr.Email)
+					uci.Log.Warnf(tbs.GetText(uci.locale, "user.import.csv.step.ufailed"), uci.StepInfo(), usr.ID, usr.Name, usr.Email)
 				}
 				return nil
 			}
@@ -279,14 +287,14 @@ func (uci *UserCsvImporter) importRecord(rec *csvUserRecord) error {
 		r := db.Table(uci.Tenant.TableUsers()).Create(usr)
 		if r.Error != nil {
 			if pgutil.IsUniqueViolation(r.Error) {
-				uci.Log.Warnf("%s #%d %s メールアドレス<%s>が重複しています!", uci.StepInfo(), usr.ID, usr.Name, usr.Email)
+				uci.Log.Warnf(tbs.GetText(uci.locale, "user.import.csv.step.dup_email"), uci.StepInfo(), usr.ID, usr.Name, usr.Email)
 				return ErrItemSkip
 			}
 			return r.Error
 		}
 
 		if r.RowsAffected > 0 {
-			uci.Log.Infof("%s Created #%d %s <%s>", uci.StepInfo(), usr.ID, usr.Name, usr.Email)
+			uci.Log.Infof(tbs.GetText(uci.locale, "user.import.csv.step.created"), uci.StepInfo(), usr.ID, usr.Name, usr.Email)
 			if uid == 0 {
 				// reset sequence if create with ID
 				r := db.Exec(uci.Tenant.ResetSequence("users", models.UserStartID))
@@ -295,7 +303,7 @@ func (uci *UserCsvImporter) importRecord(rec *csvUserRecord) error {
 				}
 			}
 		} else {
-			uci.Log.Warnf("%s Create failed #%d %s <%s>", uci.StepInfo(), usr.ID, usr.Name, usr.Email)
+			uci.Log.Warnf(tbs.GetText(uci.locale, "user.import.csv.step.cfailed"), uci.StepInfo(), usr.ID, usr.Name, usr.Email)
 		}
 		return nil
 	})
@@ -307,7 +315,7 @@ func (uci *UserCsvImporter) parseHead(row []string) error {
 	h.ParseHead(row)
 
 	if h.IdxName < 0 || h.IdxEmail < 0 {
-		return errors.New("CSVヘッダーが正しくないです")
+		return errors.New(tbs.GetText(uci.locale, "csv.error.head"))
 	}
 
 	return nil
