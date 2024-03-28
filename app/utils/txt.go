@@ -45,7 +45,7 @@ func GetReverseMap(locale, name string) map[string]string {
 	if err != nil {
 		panic(err)
 	}
-	return m
+	return mag.Reverse(m)
 }
 
 func GetAllReverseMap(name string) map[string]string {
