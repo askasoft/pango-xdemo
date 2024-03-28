@@ -1,23 +1,15 @@
 $(function() {
 	function config_save() {
-		xdemo.loadmask();
-
 		var $f = $(this);
 		$.ajax({
 			url: './save',
 			type: 'POST',
 			data: $f.serialize(),
 			dataType: 'json',
-			success: function(data, ts, xhr) {
-				$.toast({
-					icon: 'success',
-					text: data.success
-				});
-			},
+			beforeSend: xdemo.form_ajax_start($f),
+			success: xdemo.ajax_success,
 			error: xdemo.ajax_error,
-			complete: function() {
-				xdemo.unloadmask();
-			}
+			complete: xdemo.form_ajax_end($f)
 		});
 
 		return false;

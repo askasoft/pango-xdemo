@@ -1,12 +1,13 @@
 $(function() {
 	function login() {
-		$('#login_form').loadmask();
-
+		var $f = $('#login_form');
+		
 		$.ajax({
 			url: './login',
 			type: 'POST',
-			data: $('#login_form').serialize(),
+			data: $f.serialize(),
 			dataType: 'json',
+			beforeSend: xdemo.form_ajax_start($f),
 			success: function(data, ts, xhr) {
 				$.toast({
 					icon: 'success',
@@ -14,14 +15,12 @@ $(function() {
 				});
 
 				setTimeout(function() {
-					var origin = $('#login_form input[name=origin]').val() || xdemo.base || '/';
+					var origin = $f.find('input[name=origin]').val() || xdemo.base || '/';
 					location.href = origin;
 				}, 500);
 			},
-			error: xdemo.ajax_error,
-			complete: function() {
-				$('#login_form').unloadmask();
-			}
+			error: xdemo.form_ajax_error($f),
+			complete: xdemo.form_ajax_end($f)
 		});
 		return false;
 	}

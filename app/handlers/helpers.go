@@ -1,11 +1,11 @@
 package handlers
 
 import (
-	"strings"
 	"time"
 
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/tenant"
+	"github.com/askasoft/pango-xdemo/app/utils"
 	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pango/xmw"
 )
@@ -33,15 +33,24 @@ func H(c *xin.Context) xin.H {
 }
 
 func E(c *xin.Context) xin.H {
-	sb := strings.Builder{}
+	errs := []any{}
 	for _, e := range c.Errors {
-		if sb.Len() > 0 {
-			sb.WriteByte('\n')
+		if pe, ok := e.(*utils.ParamError); ok { //nolint: errorlint
+			errs = append(errs, pe)
+		} else {
+			errs = append(errs, e.Error())
 		}
-		sb.WriteString(e.Error())
 	}
+
+	var err any
+	if len(errs) == 1 {
+		err = errs[0]
+	} else {
+		err = errs
+	}
+
 	h := xin.H{
-		"error": sb.String(),
+		"error": err,
 	}
 	return h
 }
