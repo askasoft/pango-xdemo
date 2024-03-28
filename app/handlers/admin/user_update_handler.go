@@ -76,12 +76,12 @@ func userBind(c *xin.Context) *models.User {
 	}
 
 	if !utils.ValidateCIDRs(usr.CIDR) {
-		c.AddError(utils.ErrInvalidField(c, "user.cidr"))
+		c.AddError(utils.ErrInvalidField(c, "user.", "cidr"))
 	}
 
 	sm := utils.GetUserStatusMap(c.Locale)
 	if !sm.Contain(usr.Status) {
-		c.AddError(utils.ErrInvalidField(c, "user.status"))
+		c.AddError(utils.ErrInvalidField(c, "user.", "status"))
 	}
 
 	rm := utils.GetUserRoleMap(c.Locale)
@@ -91,7 +91,7 @@ func userBind(c *xin.Context) *models.User {
 		rm = utils.GetSuperRoleMap(c.Locale)
 	}
 	if !rm.Contain(usr.Role) {
-		c.AddError(utils.ErrInvalidField(c, "user.role"))
+		c.AddError(utils.ErrInvalidField(c, "user.", "role"))
 	}
 
 	return usr

@@ -4,25 +4,22 @@ $(function() {
 	//----------------------------------------------------
 	// list: pager & sorter
 	//----------------------------------------------------
-	function users_reload() {
-		$('#users_listform [name="p"]').val(1);
-		users_reset();
-	}
-
 	function users_reset() {
+		$('#users_listform [name="p"]').val(1);
 		$('#users_listform').formClear().submit();
 		return false;
 	}
 
 	function users_search() {
-		$('body').loadmask();
+		var $f = $('#users_listform');
 
-		xdemo.sssave(sskey, xdemo.input_values($('#users_listform')));
+		xdemo.sssave(sskey, xdemo.form_values($f));
 
 		$.ajax({
 			url: './list',
 			type: 'POST',
-			data: $('#users_listform').serialize(),
+			data: $f.serialize(),
+			beforeSend: xdemo.loadmask,
 			success: function(data, ts, xhr) {
 				$('#users_list').html(data);
 
@@ -31,30 +28,25 @@ $(function() {
 				$('#users_list [data-spy="sortable"]').sortable();
 			},
 			error: xdemo.ajax_error,
-			complete: function() {
-				$('body').unloadmask();
-			}
+			complete: xdemo.unloadmask
 		});
 		return false;
 	}
 
 	function users_export() {
-		$('body').loadmask();
-
 		$.ajaf({
 			url: './export/csv',
 			type: 'POST',
 			data: $('#users_listform').serializeArray(),
+			beforeSend: xdemo.loadmask,
 			error: xdemo.ajax_error,
-			complete: function() {
-				$('body').unloadmask();
-			}
+			complete: xdemo.unloadmask
 		});
 		return false;
 	}
 
 	function has_search_params() {
-		return $('users_listform input:checked').length || $('#users_listform input[type=text]').filter(function() { return $(this).val(); }).length;
+		return $('#users_listform input:checked').length || $('#users_listform input[type=text]').filter(function() { return $(this).val(); }).length;
 	}
 
 	if (!location.search) {
@@ -134,12 +126,14 @@ $(function() {
 	var URM = $('#user_maps').data('role');
 
 	function user_update() {
-		$('#users_detail_popup').loadmask();
+		var $p = $('#users_detail_popup');
+
 		$.ajax({
 			url: './update',
 			type: 'POST',
-			data: $('#users_detail_popup form').serialize(),
+			data: $p.find('form').serialize(),
 			dataType: 'json',
+			beforeSend: xdemo.form_ajax_start($p),
 			success: function(data, ts, xhr) {
 				$('#users_detail_popup').popup('hide');
 
@@ -156,10 +150,8 @@ $(function() {
 				$tr.find('td.role').text(URM[usr.role]);
 				xdemo.blink($tr);
 			},
-			error: xdemo.ajax_error,
-			complete: function() {
-				$('#users_detail_popup').unloadmask();
-			}
+			error: xdemo.form_ajax_error($p),
+			complete: xdemo.form_ajax_end($p)
 		});
 		return false;
 	}
@@ -168,14 +160,16 @@ $(function() {
 	// create
 	//----------------------------------------------------
 	function user_create() {
-		$('#users_detail_popup').loadmask();
+		var $p = $('#users_detail_popup');
+
 		$.ajax({
 			url: './create',
 			type: 'POST',
-			data: $('#users_detail_popup form').serialize(),
+			data: $p.find('form').serialize(),
 			dataType: 'json',
+			beforeSend: xdemo.form_ajax_start($p),
 			success: function(data, ts, xhr) {
-				$('#users_detail_popup').popup('hide');
+				$p.popup('hide');
 
 				$.toast({
 					icon: 'success',
@@ -196,10 +190,8 @@ $(function() {
 				$tr.find('td.id, td.created_at').addClass('ro');
 				xdemo.blink($tr);
 			},
-			error: xdemo.ajax_error,
-			complete: function() {
-				$('#users_detail_popup').unloadmask();
-			}
+			error: xdemo.form_ajax_error($p),
+			complete: xdemo.form_ajax_end($p)
 		});
 		return false;
 	}
@@ -229,9 +221,9 @@ $(function() {
 	// delete
 	//----------------------------------------------------
 	function users_delete() {
+		var $p = $('#users_delete_popup');
 		var ids = xdemo.get_table_checked_ids($('#users_table'));
 
-		$('#users_delete_popup').loadmask();
 		$.ajax({
 			url: './delete',
 			type: 'POST',
@@ -240,8 +232,9 @@ $(function() {
 				id: ids
 			},
 			dataType: 'json',
+			beforeSend: xdemo.form_ajax_start($p),
 			success: function(data, ts, xhr) {
-				$('#users_delete_popup').popup('hide');
+				$p.popup('hide');
 
 				$.toast({
 					icon: 'success',
@@ -251,9 +244,7 @@ $(function() {
 				users_search();
 			},
 			error: xdemo.ajax_error,
-			complete: function() {
-				$('#users_delete_popup').unloadmask();
-			}
+			complete: xdemo.form_ajax_end($p)
 		});
 		return false;
 	}
@@ -265,7 +256,7 @@ $(function() {
 	// clear
 	//----------------------------------------------------
 	function users_clear() {
-		$('#users_clear_popup').loadmask();
+		var $p = $('#users_clear_popup');
 		$.ajax({
 			url: './clear',
 			type: 'POST',
@@ -273,20 +264,19 @@ $(function() {
 				_token_: xdemo.token
 			},
 			dataType: 'json',
+			beforeSend: xdemo.form_ajax_start($p),
 			success: function(data, ts, xhr) {
-				$('#users_clear_popup').popup('hide');
+				$p.popup('hide');
 
 				$.toast({
 					icon: 'success',
 					text: data.success
 				});
 
-				users_reload();
+				users_reset();
 			},
 			error: xdemo.ajax_error,
-			complete: function() {
-				$('#users_clear_popup').unloadmask();
-			}
+			complete: xdemo.form_ajax_end($p)
 		});
 		return false;
 	}
@@ -300,7 +290,6 @@ $(function() {
 		var $p = $(en ? '#users_enable_popup' : '#users_disable_popup');
 		var ids = xdemo.get_table_checked_ids($('#users_table'));
 
-		$p.loadmask();
 		$.ajax({
 			url: en ? 'enable' : 'disable',
 			type: 'POST',
@@ -309,6 +298,7 @@ $(function() {
 				id: ids
 			},
 			dataType: 'json',
+			beforeSend: xdemo.form_ajax_start($p),
 			success: function(data, ts, xhr) {
 				$p.popup('hide');
 
@@ -324,9 +314,7 @@ $(function() {
 				xdemo.blink($trs);
 			},
 			error: xdemo.ajax_error,
-			complete: function() {
-				$p.unloadmask();
-			}
+			complete: xdemo.form_ajax_end($p)
 		});
 		return false;
 	}

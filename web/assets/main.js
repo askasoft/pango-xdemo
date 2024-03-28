@@ -78,6 +78,24 @@ var xdemo = {
 		}
 	},
 
+	// load mask
+	loadmask: function() {
+		$('body').loadmask();
+	},
+	unloadmask: function() {
+		$('body').unloadmask();
+	},
+	floadmask: function($e) {
+		return function() {
+			$e.loadmask();
+		};
+	},
+	funloadmask: function($e) {
+		return function() {
+			$e.unloadmask();
+		};
+	},
+
 	// ajaf error handler
 	ajaf_error: function(data) {
 		data = xdemo.safe_parse_json(data);
@@ -92,7 +110,7 @@ var xdemo = {
 	},
 
 	// ajax error handler
-	ajax_error: function(xhr, status, err) {
+	ajax_error: function(xhr, status, err, $f) {
 		if (xhr.readyState == 0) { // window unload
 			console.log('ajax canceled.');
 			return;
@@ -110,14 +128,20 @@ var xdemo = {
 			err = xhr.responseJSON.error || JSON.stringify(xhr.responseJSON, null, 4) || err;
 		}
 
-		if (err.title && err.detail) {
-			$.toast({
-				icon: 'error',
-				heading: err.title,
-				text: err.detail,
-				afterHidden: afterHidden
+		if ($.isArray(err)) {
+			var es = [];
+			$.each(err, function(i, e) {
+				if (e.param && e.message) {
+					xdemo.form_add_invalid($f, e);
+					es.push(e.message);
+				} else {
+					es.push(e + "");
+				}
 			});
-			return;
+			err = es;
+		} else if (err.param && err.message) {
+			xdemo.form_add_invalid($f, err);
+			err = err.message;
 		}
 
 		$.toast({
@@ -126,20 +150,42 @@ var xdemo = {
 			afterHidden: afterHidden
 		});
 	},
-
-	// load mask
-	loadmask: function() {
-		$('body').loadmask();
-	},
-	unloadmask: function() {
-		$('body').unloadmask();
+	ajax_success: function(data, ts, xhr) {
+		$.toast({
+			icon: 'success',
+			text: data.success
+		});
 	},
 
 	// form input (not hidden) values
-	input_values: function($f) {
+	form_values: function($f) {
 		var vs = $f.formValues();
 		delete vs._token_;
 		return vs;
+	},
+	form_clear_invalid: function($f) {
+		$f.find('.is-invalid').removeClass('is-invalid').end().find('.verr').remove();
+	},
+	form_add_invalid: function($f, err) {
+		if ($f) {
+			$f.find('[name="' + err.param + '"]').addClass('is-invalid').closest('div').append($('<div class="verr">').text(err.message));
+		}
+	},
+	form_ajax_error: function($f) {
+		return function(xhr, status, err) {
+			xdemo.ajax_error(xhr, status, err, $f);
+		};
+	},
+	form_ajax_start: function($f) {
+		return function() {
+			xdemo.form_clear_invalid($f);
+			$f.loadmask();
+		};
+	},
+	form_ajax_end: function($f) {
+		return function() {
+			$f.unloadmask();
+		};
 	},
 
 	// table

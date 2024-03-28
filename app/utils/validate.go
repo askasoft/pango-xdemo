@@ -11,9 +11,23 @@ import (
 	"github.com/askasoft/pango/xin"
 )
 
-func ErrInvalidField(c *xin.Context, f string) error {
-	fn := tbs.GetText(c.Locale, f, f)
-	return errors.New(tbs.Format(c.Locale, "error.param.invalid", fn))
+type ParamError struct {
+	Param   string `json:"param"`
+	Message string `json:"message"`
+}
+
+func (pe *ParamError) Error() string {
+	return pe.Message
+}
+
+func ErrInvalidField(c *xin.Context, ns, field string) error {
+	fn := ns + field
+	fn = tbs.GetText(c.Locale, fn, fn)
+	fe := &ParamError{
+		Param:   field,
+		Message: tbs.Format(c.Locale, "error.param.invalid", fn),
+	}
+	return fe
 }
 
 func ErrInvalidID(c *xin.Context) error {
@@ -38,10 +52,11 @@ func AddValidateErrors(c *xin.Context, err error, ns string) {
 				}
 			}
 
+			var em string
 			if fn == "" {
-				err = errors.New(fm)
+				em = fm
 			} else if fe.Param() == "" {
-				err = fmt.Errorf(fm, fn)
+				em = fmt.Sprintf(fm, fn)
 			} else {
 				if str.Count(fm, "%s") > 1 {
 					fp := fe.Param()
@@ -49,12 +64,13 @@ func AddValidateErrors(c *xin.Context, err error, ns string) {
 						tk := str.SnakeCase(fp)
 						fp = tbs.GetText(c.Locale, ns+tk, tk)
 					}
-					err = fmt.Errorf(fm, fn, fp)
+					em = fmt.Sprintf(fm, fn, fp)
 				} else {
-					err = fmt.Errorf(fm, fn)
+					em = fmt.Sprintf(fm, fn)
 				}
 			}
-			c.AddError(err)
+
+			c.AddError(&ParamError{Param: fk, Message: em})
 		}
 	} else {
 		c.AddError(err)

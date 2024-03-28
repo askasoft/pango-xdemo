@@ -2,13 +2,13 @@ $(function() {
 	function job_start() {
 		$('#job_start').prop('disabled', true);
 
-		xdemo.loadmask();
 		$.ajaf({
 			url: './start',
 			type: 'POST',
 			data: $('#job_form').serializeArray(),
 			file: $('#job_form').find('input[type="file"]'),
 			dataType: 'json',
+			beforeSend: xdemo.loadmask,
 			success: function(data, ts, xhr) {
 				$.toast({
 					icon: 'info',
