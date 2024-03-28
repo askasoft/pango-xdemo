@@ -1,4 +1,4 @@
-var xdemo = {
+var xmain = {
 	base: '',
 	cookie: { expires: 180 },
 
@@ -20,13 +20,13 @@ var xdemo = {
 		if (typeof(d) == 'string') {
 			d = new Date(d);
 		}
-		return xdemo.fmt_date.format(d);
+		return xmain.fmt_date.format(d);
 	},
 	format_time: function(d) {
 		if (typeof(d) == 'string') {
 			d = new Date(d);
 		}
-		return xdemo.fmt_time.format(d);
+		return xmain.fmt_time.format(d);
 	},
 
 	safe_parse_json: function(s, d) {
@@ -85,20 +85,10 @@ var xdemo = {
 	unloadmask: function() {
 		$('body').unloadmask();
 	},
-	floadmask: function($e) {
-		return function() {
-			$e.loadmask();
-		};
-	},
-	funloadmask: function($e) {
-		return function() {
-			$e.unloadmask();
-		};
-	},
 
 	// ajaf error handler
 	ajaf_error: function(data) {
-		data = xdemo.safe_parse_json(data);
+		data = xmain.safe_parse_json(data);
 		if (data && data.error) {
 			$.toast({
 				icon: 'error',
@@ -119,7 +109,7 @@ var xdemo = {
 		var afterHidden;
 		if (xhr.status == 401) { // unauthorized
 			afterHidden = function() {
-				window.location.href = xdemo.base + '/login/';
+				window.location.href = xmain.base + '/login/';
 			};
 		}
 
@@ -132,7 +122,7 @@ var xdemo = {
 			var es = [];
 			$.each(err, function(i, e) {
 				if (e.param && e.message) {
-					xdemo.form_add_invalid($f, e);
+					xmain.form_add_invalid($f, e);
 					es.push(e.message);
 				} else {
 					es.push(e + "");
@@ -140,7 +130,7 @@ var xdemo = {
 			});
 			err = es;
 		} else if (err.param && err.message) {
-			xdemo.form_add_invalid($f, err);
+			xmain.form_add_invalid($f, err);
 			err = err.message;
 		}
 
@@ -173,12 +163,12 @@ var xdemo = {
 	},
 	form_ajax_error: function($f) {
 		return function(xhr, status, err) {
-			xdemo.ajax_error(xhr, status, err, $f);
+			xmain.ajax_error(xhr, status, err, $f);
 		};
 	},
 	form_ajax_start: function($f) {
 		return function() {
-			xdemo.form_clear_invalid($f);
+			xmain.form_clear_invalid($f);
 			$f.loadmask();
 		};
 	},
@@ -212,7 +202,7 @@ var xdemo = {
 
 			var $c = $td.children('a, pre'), v = vs[k] || '';
 			if (v && k.endsWith("_at")) {
-				v = xdemo.format_time(v);
+				v = xmain.format_time(v);
 			}
 			($c.length ? $c : $td).text(v);
 		}
@@ -224,13 +214,13 @@ var xdemo = {
 
 	init: function() {
 		// set cookie defaults
-		$.extend($.cookie.defaults, xdemo.cookie);
+		$.extend($.cookie.defaults, xmain.cookie);
 
 		// enable script cache
 		$.enableScriptCache();
 		
 		// get meta properties
-		$.extend(xdemo, xdemo.meta_props());
+		$.extend(xmain, xmain.meta_props());
 
 		// set plugins defaults
 		$.extend($.toast.defaults, {
@@ -267,6 +257,6 @@ var xdemo = {
 
 //------------------------------------------------------
 $(function() {
-	xdemo.init();
+	xmain.init();
 });
 

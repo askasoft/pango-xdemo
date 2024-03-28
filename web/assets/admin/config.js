@@ -6,10 +6,10 @@ $(function() {
 			type: 'POST',
 			data: $f.serialize(),
 			dataType: 'json',
-			beforeSend: xdemo.form_ajax_start($f),
-			success: xdemo.ajax_success,
-			error: xdemo.ajax_error,
-			complete: xdemo.form_ajax_end($f)
+			beforeSend: xmain.form_ajax_start($f),
+			success: xmain.ajax_success,
+			error: xmain.ajax_error,
+			complete: xmain.form_ajax_end($f)
 		});
 
 		return false;
