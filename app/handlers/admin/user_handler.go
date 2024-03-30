@@ -79,9 +79,9 @@ func countUsers(tt tenant.Tenant, uq *UserQuery, filter func(tx *gorm.DB, uq *Us
 
 	tx = filter(tx, uq)
 
-	r := tx.Count(&total)
-	if r.Error != nil {
-		return 0, r.Error
+	err := tx.Count(&total).Error
+	if err != nil {
+		return 0, err
 	}
 
 	return int(total), nil
@@ -95,8 +95,7 @@ func findUsers(tt tenant.Tenant, uq *UserQuery, filter func(tx *gorm.DB, uq *Use
 	ob := gormutil.Sorter2OrderBy(&uq.Sorter)
 	tx = tx.Offset(uq.Start()).Limit(uq.Limit).Order(ob)
 
-	r := tx.Find(&usrs)
-	err = r.Error
+	err = tx.Find(&usrs).Error
 	return
 }
 

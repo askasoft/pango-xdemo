@@ -10,6 +10,22 @@ import (
 	"github.com/askasoft/pango/tbs"
 )
 
+func GetPetGenderMap(locale string) *cog.LinkedHashMap[string, string] {
+	return GetLinkedHashMap(locale, "pet.map.gender")
+}
+
+func GetPetOriginMap(locale string) *cog.LinkedHashMap[string, string] {
+	return GetLinkedHashMap(locale, "pet.map.origin")
+}
+
+func GetPetTemperMap(locale string) *cog.LinkedHashMap[string, string] {
+	return GetLinkedHashMap(locale, "pet.map.temper")
+}
+
+func GetPetHabitsMap(locale string) *cog.LinkedHashMap[string, string] {
+	return GetLinkedHashMap(locale, "pet.map.habits")
+}
+
 func GetUserStatusMap(locale string) *cog.LinkedHashMap[string, string] {
 	return GetLinkedHashMap(locale, "user.map.status")
 }

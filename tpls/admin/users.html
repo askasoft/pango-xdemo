@@ -7,8 +7,8 @@
 {{$base := .Base}}
 {{$loc := .Locale}}
 {{$dcm := .DCM}}
-{{$sm := .StatusMap}}
-{{$rm := .RoleMap}}
+{{$usm := .StatusMap}}
+{{$urm := .RoleMap}}
 
 <div class="s-section">
 	<div class="ui-headline">
@@ -77,13 +77,13 @@
 			<div class="row py-1">
 				<label class="col-sm-2 col-form-label">{{T $loc "user.role"}}</label>
 				<div class="col-sm-10">
-					{{Checks "List=" $rm.Iterator "Name=" "role" "Value=" .Q.Role}}
+					{{Checks "List=" $urm.Iterator "Name=" "role" "Values=" .Q.Role}}
 				</div>
 			</div>
 			<div class="row py-1">
 				<label class="col-sm-2 col-form-label">{{T $loc "user.status"}}</label>
 				<div class="col-sm-10">
-					{{Checks "List=" $sm.Iterator "Name=" "status" "Value=" .Q.Status}}
+					{{Checks "List=" $usm.Iterator "Name=" "status" "Values=" .Q.Status}}
 				</div>
 			</div>
 			<div class="row py-1">
@@ -98,7 +98,7 @@
 	<div id="users_list"></div>
 </div>
 
-<div id="user_maps" class="hidden" data-status="{{JSON $sm}}" data-role="{{JSON $rm}}"></div>
+<div id="user_maps" class="hidden" data-status="{{JSON $usm}}" data-role="{{JSON $urm}}"></div>
 
 <div id="users_delete_popup" class="ui-popup s-popup-confirm" data-spy="popup" tabindex="-1"
 	popup-mask="true" popup-keyboard="false" popup-mouse="false">

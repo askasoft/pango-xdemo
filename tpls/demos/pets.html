@@ -1,0 +1,163 @@
+{{MapSet .Ctx.Attrs "styles" (Array "demos/pets.css")}}
+{{MapSet .Ctx.Attrs "scripts" (Array "demos/pets.js")}}
+
+{{template "main_header" .}}
+
+{{$base := .Base}}
+{{$loc := .Locale}}
+{{$pgm := .GenderMap}}
+{{$pom := .OriginMap}}
+{{$ptm := .TemperMap}}
+{{$phm := .HabitsMap}}
+
+<div class="s-section">
+	<div class="ui-headline">
+		<ol class="breadcrumb">
+			<li class="active"><i class="{{T .Locale "icon.demos.pets"}}"></i> {{T $loc "menu.demos.pets"}}</li>
+		</ol>
+	</div>
+
+	<div class="row">
+		<div class="col-md-6 ui-toolbar">
+			<button class="btn btn-sm btn-outline-danger" popup-target="#pets_delete_popup" enableby="#pets_list td.check input">
+				<i class="{{T $loc "icon.delete"}}"></i> {{T $loc "button.delete"}}
+			</button>
+			<button class="btn btn-sm btn-outline-danger" popup-target="#pets_clear_popup">
+				<i class="{{T $loc "icon.delete-all"}}"></i> {{T $loc "button.delete-all"}}
+			</button>
+		</div>
+		<div class="col-md-6 ui-toolbar text-end">
+			<button id="pets_new" class="btn btn-sm btn-outline-primary"><i class="{{T $loc "icon.new"}}"></i> {{T $loc "button.new"}}</button>
+			<button id="pets_export" class="btn btn-sm btn-outline-primary"><i class="{{T $loc "icon.dnload"}}"></i> {{T $loc "button.export"}}</button>
+		</div>
+	</div>
+
+	<div id="pets_alert">{{template "alerts" .}}</div>
+	
+	<fieldset id="pets_listfset" class="ui-fieldset collapsed" data-spy="fieldset">
+		<legend>{{T $loc "button.search"}}</legend>
+		<form id="pets_listform" class="form-horizontal grey" method="POST">
+			<input type="hidden" name="_token_" value="{{.Token}}"/>
+			<input type="hidden" name="p" value="{{.Q.Page}}"/>
+			<input type="hidden" name="l" value="{{.Q.Limit}}"/>
+			<input type="hidden" name="c" value="{{.Q.Col}}"/>
+			<input type="hidden" name="d" value="{{.Q.Dir}}"/>
+
+			<div class="row py-1">
+				<label class="col-sm-2 col-form-label">{{T $loc "pet.id"}}</label>
+				<div class="col-sm-10">
+					<input name="id" type="text" class="form-control" textclear value="{{.Q.ID}}"/>
+				</div>
+			</div>
+			<div class="row py-1">
+				<label class="col-sm-2 col-form-label">{{T $loc "pet.name"}}</label>
+				<div class="col-sm-10">
+					<input name="name" type="text" class="form-control" textclear value="{{.Q.Name}}"/>
+				</div>
+			</div>
+			<div class="row py-1">
+				<label class="col-sm-2 col-form-label">{{T $loc "pet.gender"}}</label>
+				<div class="col-sm-10">
+					{{Checks "List=" $pgm.Iterator "Name=" "gender" "Values=" .Q.Gender}}
+				</div>
+			</div>
+			<div class="row py-1">
+				<label class="col-sm-2 col-form-label">{{T $loc "pet.born_at"}}</label>
+				<div class="col-sm-10">
+					<input type="date" class="form-control" name="born_from">
+					～
+					<input type="date" class="form-control" name="born_to">
+				</div>
+			</div>
+			<div class="row py-1">
+				<label class="col-sm-2 col-form-label">{{T $loc "pet.origin"}}</label>
+				<div class="col-sm-10">
+					{{Select "List=" $pom.Iterator "Name=" "origin" "Values=" .Q.Origin "Multiple=" true "class=" "col2 wide" "data-spy=" "niceSelect"}}
+				</div>
+			</div>
+			<div class="row py-1">
+				<label class="col-sm-2 col-form-label">{{T $loc "pet.temper"}}</label>
+				<div class="col-sm-10">
+					{{Checks "List=" $ptm.Iterator "Name=" "temper" "Values=" .Q.Temper}}
+				</div>
+			</div>
+			<div class="row py-1">
+				<label class="col-sm-2 col-form-label">{{T $loc "pet.habits"}}</label>
+				<div class="col-sm-10">
+					{{Checks "List=" $phm.Iterator "Name=" "habits" "Values=" .Q.Habits}}
+				</div>
+			</div>
+			<div class="row py-1">
+				<label class="col-sm-2 col-form-label">{{T $loc "pet.amount"}}</label>
+				<div class="col-sm-10">
+					<input type="number" class="form-control" name="amount_min" size="16">
+					～
+					<input type="number" class="form-control" name="amount_max" size="16">
+				</div>
+			</div>
+			<div class="row py-1">
+				<label class="col-sm-2 col-form-label">{{T $loc "pet.price"}}</label>
+				<div class="col-sm-10">
+					<input type="number" class="form-control" name="price_min" size="16">
+					～
+					<input type="number" class="form-control" name="price_max" size="16">
+				</div>
+			</div>
+			<div class="row py-1">
+				<label class="col-sm-2 col-form-label">{{T $loc "pet.shop_name"}}</label>
+				<div class="col-sm-10">
+					<input name="shop_name" type="text" class="form-control" textclear value="{{.Q.ShopName}}"/>
+				</div>
+			</div>
+			<div class="row py-1">
+				<div class="offset-sm-2 col-sm-10">
+					<button type="submit" class="btn btn-primary"><i class="{{T $loc "icon.search"}}"></i> {{T $loc "button.search"}}</button>
+					<button type="reset" class="btn btn-secondary"><i class="{{T $loc "icon.clear"}}"></i> {{T $loc "button.clear"}}</button>
+				</div>
+			</div>
+		</form>
+	</fieldset>
+
+	<div id="pets_list"></div>
+</div>
+
+<div id="pet_maps" class="hidden"
+	data-gender="{{JSON $pgm}}"
+	data-origin="{{JSON $pom}}"
+	data-temper="{{JSON $ptm}}"
+	data-habits="{{JSON $phm}}"
+></div>
+
+<div id="pets_delete_popup" class="ui-popup s-popup-confirm" data-spy="popup" tabindex="-1"
+	popup-mask="true" popup-keyboard="false" popup-mouse="false">
+	<form>
+		<div class="ui-popup-body">
+			<i class="icon fas fa-2x fa-fw fa-circle-exclamation text-danger"></i>
+			<div class="msg">{{T $loc "pet.confirm.delete"}}</div>
+		</div>
+		<div class="ui-popup-footer">
+			<button type="submit" class="btn btn-danger"><i class="fas fa-check"></i> {{T $loc "button.ok"}}</button>
+			<button type="button" class="btn btn-secondary" popup-dismiss="true"><i class="fas fa-times"></i> {{T $loc "button.cancel"}}</button>
+		</div>
+	</form>
+</div>
+
+<div id="pets_clear_popup" class="ui-popup s-popup-confirm" data-spy="popup" tabindex="-1"
+	popup-mask="true" popup-keyboard="false" popup-mouse="false">
+	<form>
+		<div class="ui-popup-body">
+			<i class="icon fas fa-2x fa-fw fa-exclamation-triangle text-danger"></i>
+			<div class="msg">{{T $loc "pet.confirm.clear"}}</div>
+		</div>
+		<div class="ui-popup-footer">
+			<button type="submit" class="btn btn-danger"><i class="fas fa-check"></i> {{T $loc "button.ok"}}</button>
+			<button type="button" class="btn btn-secondary" popup-dismiss="true"><i class="fas fa-times"></i> {{T $loc "button.cancel"}}</button>
+		</div>
+	</form>
+</div>
+
+<div id="pets_detail_popup" class="ui-popup s-popup-detail" data-spy="popup" tabindex="-1"
+	popup-mask="false" popup-position="center" popup-keyboard="false" popup-mouse="false" popup-closer="true"
+	popup-focus="#pet_detail_name"></div>
+
+{{template "main_footer" .}}

@@ -15,6 +15,7 @@ const (
 
 	PrefixTmpFile = "t"
 	PrefixJobFile = "j"
+	PrefixPetFile = "p"
 )
 
 func FormatDate(t time.Time) string {

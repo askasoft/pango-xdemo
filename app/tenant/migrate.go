@@ -17,14 +17,6 @@ import (
 	"gorm.io/gorm/schema"
 )
 
-var migrates = []any{
-	&xfs.File{},
-	&xjm.Job{},
-	&xjm.JobLog{},
-	&models.Config{},
-	&models.User{},
-}
-
 func (tt Tenant) MigrateSchema() error {
 	dbc := &gorm.Config{
 		NamingStrategy: schema.NamingStrategy{TablePrefix: tt.Prefix()},
@@ -39,6 +31,15 @@ func (tt Tenant) MigrateSchema() error {
 	dbi, err := gorm.Open(dbd, dbc)
 	if err != nil {
 		return err
+	}
+
+	migrates := []any{
+		&xfs.File{},
+		&xjm.Job{},
+		&xjm.JobLog{},
+		&models.Config{},
+		&models.User{},
+		&models.Pet{},
 	}
 
 	err = dbi.AutoMigrate(migrates...)

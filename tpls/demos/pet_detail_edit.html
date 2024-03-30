@@ -1,0 +1,99 @@
+<div class="ui-popup-header">
+	<h4><i class="{{T .Locale "icon.edit"}}"></i>
+		{{T .Locale "pet.detail.header"}}
+		{{if ne .Pet.ID 0}}#{{.Pet.ID}}{{end}}
+	</h4>
+</div>
+<form class="ui-popup-body form-horizontal grey lined">
+	<input type="hidden" name="_token_" value="{{.Token}}"/>
+	<input type="hidden" id="pet_detail_id" name="id" value="{{.Pet.ID}}"/>
+	<div class="row py-3">
+		<label class="col-sm-2 col-form-label" for="pet_detail_name">{{T .Locale "pet.name"}}</label>
+		<div class="col-sm-10">
+			<input id="pet_detail_name" name="name" type="text" class="form-control" maxlength="100" value="{{.Pet.Name}}">
+		</div>
+	</div>
+	<div class="row py-3">
+		<label class="col-sm-2 col-form-label" for="pet_detail_gender">{{T .Locale "pet.gender"}}</label>
+		<div class="col-sm-10">
+			{{Radios "id=" "pet_detail_gender" "Name=" "gender" "List=" .GenderMap.Iterator "Value=" .Pet.Gender }}
+		</div>
+	</div>
+	<div class="row py-3">
+		<label class="col-sm-2 col-form-label" for="pet_detail_birthday">{{T .Locale "pet.born_at"}}</label>
+		<div class="col-sm-10">
+			<input id="pet_detail_birthday" name="born_at" type="date" class="form-control" value="{{DATE .Pet.Born_at}}">
+		</div>
+	</div>
+	<div class="row py-3">
+		<label class="col-sm-2 col-form-label" for="pet_detail_origin">{{T .Locale "pet.origin"}}</label>
+		<div class="col-sm-10">
+			{{Select "id=" "pet_detail_origin" "Name=" "origin" "List=" .OriginMap.Iterator "Value=" .Pet.Origin }}
+		</div>
+	</div>
+	<div class="row py-3">
+		<label class="col-sm-2 col-form-label" for="pet_detail_temper">{{T .Locale "pet.temper"}}</label>
+		<div class="col-sm-10">
+			{{Radios "id=" "pet_detail_temper" "Name=" "temper" "List=" .TemperMap.Iterator "Value=" .Pet.Temper }}
+		</div>
+	</div>
+	<div class="row py-3">
+		<label class="col-sm-2 col-form-label" for="pet_detail_habits">{{T .Locale "pet.habits"}}</label>
+		<div class="col-sm-10">
+			{{Checks "id=" "pet_detail_habits" "Name=" "habits" "List=" .HabitsMap.Iterator "Values=" .Pet.Habits }}
+		</div>
+	</div>
+	<div class="row py-3">
+		<label class="col-sm-2 col-form-label" for="pet_detail_amount">{{T .Locale "pet.amount"}}</label>
+		<div class="col-sm-10">
+			<input id="pet_detail_amount" name="amount" type="number" class="form-control" size="20" value="{{.Pet.Amount}}">
+		</div>
+	</div>
+	<div class="row py-3">
+		<label class="col-sm-2 col-form-label" for="pet_detail_price">{{T .Locale "pet.price"}}</label>
+		<div class="col-sm-10">
+			<input id="pet_detail_price" name="price" type="number" class="form-control" size="20" value="{{.Pet.Price}}">
+		</div>
+	</div>
+	<div class="row py-3">
+		<label class="col-sm-2 col-form-label" for="pet_detail_shop_name">{{T .Locale "pet.shop_name"}}</label>
+		<div class="col-sm-10">
+			<input id="pet_detail_shop_name" name="shop_name" type="text" class="form-control" maxlength="200" value="{{.Pet.ShopName}}">
+		</div>
+	</div>
+	<div class="row py-3">
+		<label class="col-sm-2 col-form-label" for="pet_detail_shop_address">{{T .Locale "pet.shop_address"}}</label>
+		<div class="col-sm-10">
+			<input id="pet_detail_shop_address" name="shop_address" type="text" class="form-control" maxlength="200" value="{{.Pet.ShopAddress}}">
+		</div>
+	</div>
+	<div class="row py-3">
+		<label class="col-sm-2 col-form-label" for="pet_detail_shop_telephone">{{T .Locale "pet.shop_telephone"}}</label>
+		<div class="col-sm-10">
+			<input id="pet_detail_shop_telephone" name="shop_telephone" type="text" class="form-control" size="20" maxlength="20" value="{{.Pet.ShopTelephone}}">
+		</div>
+	</div>
+	<div class="row py-3">
+		<label class="col-sm-2 col-form-label" for="pet_detail_shop_close_time">{{T .Locale "pet.shop_close_time"}}</label>
+		<div class="col-sm-10">
+			<input id="pet_detail_shop_close_time" name="shop_close_time" type="time" class="form-control" value="{{.Pet.ShopCloseTime}}">
+		</div>
+	</div>
+	<div class="row py-3">
+		<label class="col-sm-2 col-form-label" for="pet_detail_shop_link">{{T .Locale "pet.shop_link"}}</label>
+		<div class="col-sm-10">
+			<input id="pet_detail_shop_link" name="shop_link" type="text" class="form-control" value="{{.Pet.ShopLink}}">
+		</div>
+	</div>
+	<div class="row py-3">
+		<label class="col-sm-2 col-form-label" for="pet_detail_description">{{T .Locale "pet.description"}}</label>
+		<div class="col-sm-10">
+			<textarea id="pet_detail_description" name="description" class="form-control" rows="2">{{.Pet.Description}}</textarea>
+		</div>
+	</div>
+	<button type="submit" class="hidden"></button>
+</form>
+<div class="ui-popup-footer">
+	<button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> {{T .Locale "button.save"}}</button>
+	<button type="button" class="btn btn-secondary" popup-dismiss="true"><i class="fa fa-times"></i> {{T .Locale "button.close"}}</button>
+</div>

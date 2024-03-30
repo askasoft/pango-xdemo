@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/askasoft/pango-xdemo/app"
+	"github.com/askasoft/pango-xdemo/app/tasks"
 	"github.com/askasoft/pango-xdemo/app/utils"
 	"github.com/askasoft/pango-xdemo/tpls"
 	"github.com/askasoft/pango-xdemo/txts"
@@ -32,6 +33,7 @@ func (s *service) PrintCommand() {
 	fmt.Fprintln(out, "      kind=schema       migrate database schemas.")
 	fmt.Fprintln(out, "      kind=config       migrate tenant configurations.")
 	fmt.Fprintln(out, "      kind=super        migrate tenant super users.")
+	fmt.Fprintln(out, "    resetdb             reset database schemas data.")
 	fmt.Fprintln(out, "    execsql <file>      execute sql for all database schemas.")
 	fmt.Fprintln(out, "    encrypt [key] <str> encrypt string.")
 	fmt.Fprintln(out, "    decrypt [key] <str> decrypt string.")
@@ -70,6 +72,22 @@ func (s *service) Exec(cmd string) {
 					app.Exit(app.ExitErrDB)
 				}
 			}
+		}
+
+		log.Info("DONE.")
+		app.Exit(0)
+	case "resetdb":
+		initConfigs()
+		initMessages()
+
+		if err := openDatabase(); err != nil {
+			log.Fatal(err) //nolint: all
+			app.Exit(app.ExitErrDB)
+		}
+
+		if err := tasks.ResetShcemasData(); err != nil {
+			log.Fatal(err) //nolint: all
+			app.Exit(app.ExitErrDB)
 		}
 
 		log.Info("DONE.")

@@ -159,6 +159,10 @@ func (tt Tenant) Table(s string) string {
 	return tt.Prefix() + s
 }
 
+func (tt Tenant) TablePets() string {
+	return tt.Table("pets")
+}
+
 func (tt Tenant) TableFiles() string {
 	return tt.Table("files")
 }
@@ -194,5 +198,5 @@ func (tt Tenant) JM(db *gorm.DB) xjm.JobManager {
 }
 
 func (tt Tenant) FS(db *gorm.DB) xfs.XFS {
-	return gormfs.FS(app.DB, tt.TableFiles())
+	return gormfs.FS(db, tt.TableFiles())
 }

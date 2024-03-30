@@ -248,9 +248,24 @@ func addDemosHandlers(rg *xin.RouterGroup) {
 	rg.Use(app.XTP.Handler())  // token protect
 	rg.Use(app.XCN.Handler())
 
+	addDemosPetsHandlers(rg.Group("/pets"))
+
 	rg.GET("/tags/", demos.TagsIndex)
 	rg.POST("/tags/", demos.TagsIndex)
 	rg.GET("/uploads/", demos.UploadsIndex)
+}
+
+func addDemosPetsHandlers(rg *xin.RouterGroup) {
+	rg.GET("/", demos.PetIndex)
+	rg.POST("/list", demos.PetList)
+	rg.GET("/new", demos.PetNew)
+	rg.GET("/view", demos.PetView)
+	rg.GET("/edit", demos.PetEdit)
+	rg.POST("/create", demos.PetCreate)
+	rg.POST("/update", demos.PetUpdate)
+	rg.POST("/delete", demos.PetDelete)
+	rg.POST("/clear", demos.PetClear)
+	rg.POST("/export/csv", demos.PetCsvExport)
 }
 
 func addSelfHandlers(s *xin.RouterGroup) {

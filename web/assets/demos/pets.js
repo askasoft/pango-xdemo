@@ -1,17 +1,17 @@
 $(function() {
-	var sskey = "a.users";
+	var sskey = "d.pets";
 
 	//----------------------------------------------------
 	// list: pager & sorter
 	//----------------------------------------------------
-	function users_reset() {
-		$('#users_listform [name="p"]').val(1);
-		$('#users_listform').formClear(true).submit();
+	function pets_reset() {
+		$('#pets_listform [name="p"]').val(1);
+		$('#pets_listform').formClear(true).submit();
 		return false;
 	}
 
-	function users_search() {
-		var $f = $('#users_listform');
+	function pets_search() {
+		var $f = $('#pets_listform');
 
 		xmain.sssave(sskey, xmain.form_input_values($f));
 
@@ -21,11 +21,11 @@ $(function() {
 			data: $f.serialize(),
 			beforeSend: xmain.loadmask,
 			success: function(data, ts, xhr) {
-				$('#users_list').html(data);
+				$('#pets_list').html(data);
 
-				$('#users_list [checkall]').checkall();
-				$('#users_list [data-spy="pager"]').pager();
-				$('#users_list [data-spy="sortable"]').sortable();
+				$('#pets_list [checkall]').checkall();
+				$('#pets_list [data-spy="pager"]').pager();
+				$('#pets_list [data-spy="sortable"]').sortable();
 			},
 			error: xmain.ajax_error,
 			complete: xmain.unloadmask
@@ -33,11 +33,11 @@ $(function() {
 		return false;
 	}
 
-	function users_export() {
+	function pets_export() {
 		$.ajaf({
 			url: './export/csv',
 			type: 'POST',
-			data: $('#users_listform').serializeArray(),
+			data: $('#pets_listform').serializeArray(),
 			beforeSend: xmain.loadmask,
 			error: xmain.ajax_error,
 			complete: xmain.unloadmask
@@ -46,46 +46,46 @@ $(function() {
 	}
 
 	if (!location.search) {
-		$('#users_listform').formValues(xmain.ssload(sskey));
+		$('#pets_listform').formValues(xmain.ssload(sskey));
 	}
-	if (xmain.form_has_inputs($('#users_listform'))) {
-		$('#users_listfset').fieldset('expand', 'show');
+	if (xmain.form_has_inputs($('#pets_listform'))) {
+		$('#pets_listfset').fieldset('expand', 'show');
 	}
 
-	$('#users_list')
+	$('#pets_list')
 		.on('goto.pager', '.ui-pager', function(evt, pno) {
-			$('#users_listform').find('input[name="p"]').val(pno).end().submit();
+			$('#pets_listform').find('input[name="p"]').val(pno).end().submit();
 		})
 		.on('change', '.ui-pager select', function() {
-			$('#users_listform').find('input[name="l"]').val($(this).val()).end().submit();
+			$('#pets_listform').find('input[name="l"]').val($(this).val()).end().submit();
 		})
-		.on('sort.sortable', '#users_table', function(evt, col, dir) {
-			$('#users_listform')
+		.on('sort.sortable', '#pets_table', function(evt, col, dir) {
+			$('#pets_listform')
 				.find('input[name="c"]').val(col).end()
 				.find('input[name="d"]').val(dir).end()
 				.submit();
 		});
 
-	$('#users_listform').on('submit', users_search).submit();
-	$('#users_listform').on('reset', users_reset);
-	$('#users_export').on('click', users_export);
+	$('#pets_listform').on('submit', pets_search).submit();
+	$('#pets_listform').on('reset', pets_reset);
+	$('#pets_export').on('click', pets_export);
 
 
 	//----------------------------------------------------
 	// detail
 	//----------------------------------------------------
-	function user_detail(evt) {
+	function pet_detail(self, evt, url) {
 		evt.stopPropagation();
 
-		var $tr = $(this).closest('tr');
+		var $tr = $(self).closest('tr');
 		var params = {
-			id: $tr.attr('id').replace('usr_', '')
+			id: $tr.attr('id').replace('pet_', '')
 		};
 
-		$('#users_detail_popup').popup({
+		$('#pets_detail_popup').popup({
 			loaded: false,
 			ajax: {
-				url: './detail',
+				url: url,
 				method: 'GET',
 				data: params
 			}
@@ -94,15 +94,16 @@ $(function() {
 		return false;
 	}
 
-	$('#users_list').on('click', 'button.edit', user_detail);
+	$('#pets_list').on('click', 'button.view', function(evt) { return pet_detail(this, evt, "view"); });
+	$('#pets_list').on('click', 'button.edit', function(evt) { return pet_detail(this, evt, "edit"); });
 
 	//----------------------------------------------------
 	// new
 	//----------------------------------------------------
-	function user_new(evt) {
+	function pet_new(evt) {
 		evt.stopPropagation();
 
-		$('#users_detail_popup').popup({
+		$('#pets_detail_popup').popup({
 			loaded: false,
 			ajax: {
 				url: './new',
@@ -113,16 +114,18 @@ $(function() {
 		return false;
 	}
 
-	$('#users_new').on('click', user_new);
+	$('#pets_new').on('click', pet_new);
 
 	//----------------------------------------------------
 	// update
 	//----------------------------------------------------
-	var USM = $('#user_maps').data('status');
-	var URM = $('#user_maps').data('role');
+	var PGM = $('#pet_maps').data('gender');
+	var POM = $('#pet_maps').data('origin');
+	var PTM = $('#pet_maps').data('temper');
+	var PHM = $('#pet_maps').data('habits');
 
-	function user_update() {
-		var $p = $('#users_detail_popup');
+	function pet_update() {
+		var $p = $('#pets_detail_popup');
 
 		$.ajax({
 			url: './update',
@@ -131,16 +134,15 @@ $(function() {
 			dataType: 'json',
 			beforeSend: xmain.form_ajax_start($p),
 			success: function(data, ts, xhr) {
-				$('#users_detail_popup').popup('hide');
+				$('#pets_detail_popup').popup('hide');
 
 				$.toast({
 					icon: 'success',
 					text: data.success
 				});
 
-				var usr = data.result, $tr = $('tr#usr_' + usr.id);
-
-				user_set_tr_values($tr, usr);
+				var pet = data.result, $tr = $('tr#pet_' + pet.id);
+				pet_set_tr_values($tr, pet);
 			},
 			error: xmain.form_ajax_error($p),
 			complete: xmain.form_ajax_end($p)
@@ -148,19 +150,24 @@ $(function() {
 		return false;
 	}
 
-	function user_set_tr_values($tr, usr) {
-		xmain.set_table_tr_values($tr, usr);
-		$tr.attr('class', '').addClass(usr.status);
-		$tr.find('td.status').text(USM[usr.status]);
-		$tr.find('td.role').text(URM[usr.role]);
+	function pet_set_tr_values($tr, pet) {
+		xmain.set_table_tr_values($tr, pet);
+		$tr.find('td.gender').text(PGM[pet.gender]);
+		$tr.find('td.origin').text(POM[pet.origin]);
+		$tr.find('td.temper').text(PTM[pet.temper]);
+		var hs = [];
+		$.each(pet.habits, function(i, h) {
+			hs.push($('<b>').text(PHM[h]));
+		})
+		$tr.find('td.habits').empty().append(hs);
 		xmain.blink($tr);
 	}
 
 	//----------------------------------------------------
 	// create
 	//----------------------------------------------------
-	function user_create() {
-		var $p = $('#users_detail_popup');
+	function pet_create() {
+		var $p = $('#pets_detail_popup');
 
 		$.ajax({
 			url: './create',
@@ -176,14 +183,14 @@ $(function() {
 					text: data.success
 				});
 
-				var usr = data.result;
-				var $tr = $('#usr_new').clone();
+				var pet = data.result;
+				var $tr = $('#pet_new').clone();
 
-				$tr.removeClass('hidden').attr('id', 'usr_' + usr.id);
-				$tr.find('td.check').append($('<input type="checkbox"/>').val(usr.id));
-				$('#users_table > tbody').prepend($tr);
+				$tr.removeClass('hidden').attr('id', 'pet_' + pet.id);
+				$tr.find('td.check').append($('<input type="checkbox"/>').val(pet.id));
+				$('#pets_table > tbody').prepend($tr);
 
-				user_set_tr_values($tr, usr);
+				pet_set_tr_values($tr, pet);
 				$tr.find('td.id, td.created_at').addClass('ro');
 			},
 			error: xmain.form_ajax_error($p),
@@ -195,18 +202,18 @@ $(function() {
 	//----------------------------------------------------
 	// detail popup
 	//----------------------------------------------------
-	function user_detail_submit() {
-		$('#user_detail_id').val() == '0' ? user_create() : user_update();
+	function pet_detail_submit() {
+		$('#pet_detail_id').val() == '0' ? pet_create() : pet_update();
 		return false;
 	}
 
-	$('#users_detail_popup')
+	$('#pets_detail_popup')
 		.on('loaded.popup', function() {
-			$('#users_detail_popup')
-				.find('form').submit(user_detail_submit).end()
-				.find('.ui-popup-footer button[type=submit]').click(user_detail_submit);
+			$('#pets_detail_popup')
+				.find('form').submit(pet_detail_submit).end()
+				.find('.ui-popup-footer button[type=submit]').click(pet_detail_submit);
 		}).on('shown.popup', function() {
-			$('#users_detail_popup')
+			$('#pets_detail_popup')
 				.find('.ui-popup-body').prop('scrollTop', 0).end()
 				.find('input[type="text"]').textclear().end()
 				.find('textarea').autosize().textclear().enterfire();
@@ -216,9 +223,9 @@ $(function() {
 	//----------------------------------------------------
 	// delete
 	//----------------------------------------------------
-	function users_delete() {
-		var $p = $('#users_delete_popup');
-		var ids = xmain.get_table_checked_ids($('#users_table'));
+	function pets_delete() {
+		var $p = $('#pets_delete_popup');
+		var ids = xmain.get_table_checked_ids($('#pets_table'));
 
 		$.ajax({
 			url: './delete',
@@ -237,7 +244,7 @@ $(function() {
 					text: data.success
 				});
 
-				users_search();
+				pets_search();
 			},
 			error: xmain.ajax_error,
 			complete: xmain.form_ajax_end($p)
@@ -245,14 +252,14 @@ $(function() {
 		return false;
 	}
 
-	$('#users_delete_popup form').submit(users_delete);
+	$('#pets_delete_popup form').submit(pets_delete);
 
 
 	//----------------------------------------------------
 	// clear
 	//----------------------------------------------------
-	function users_clear() {
-		var $p = $('#users_clear_popup');
+	function pets_clear() {
+		var $p = $('#pets_clear_popup');
 		$.ajax({
 			url: './clear',
 			type: 'POST',
@@ -269,7 +276,7 @@ $(function() {
 					text: data.success
 				});
 
-				users_reset();
+				pets_reset();
 			},
 			error: xmain.ajax_error,
 			complete: xmain.form_ajax_end($p)
@@ -277,44 +284,5 @@ $(function() {
 		return false;
 	}
 
-	$('#users_clear_popup form').submit(users_clear);
-
-	//----------------------------------------------------
-	// users enable/disable
-	//----------------------------------------------------
-	function users_enable(en) {
-		var $p = $(en ? '#users_enable_popup' : '#users_disable_popup');
-		var ids = xmain.get_table_checked_ids($('#users_table'));
-
-		$.ajax({
-			url: en ? 'enable' : 'disable',
-			type: 'POST',
-			data: {
-				_token_: xmain.token,
-				id: ids
-			},
-			dataType: 'json',
-			beforeSend: xmain.form_ajax_start($p),
-			success: function(data, ts, xhr) {
-				$p.popup('hide');
-
-				$.toast({
-					icon: 'success',
-					text: data.success
-				});
-
-				var sts = en ? 'A' : 'D';
-				var $trs = xmain.get_table_trs('#usr_', ids);
-				$trs.attr('class', '').addClass(sts);
-				$trs.find('td.status').text(USM[sts]);
-				xmain.blink($trs);
-			},
-			error: xmain.ajax_error,
-			complete: xmain.form_ajax_end($p)
-		});
-		return false;
-	}
-
-	$('#users_enable_popup form').submit(function() { return users_enable(true); });
-	$('#users_disable_popup form').submit(function() { return users_enable(false); });
+	$('#pets_clear_popup form').submit(pets_clear);
 });

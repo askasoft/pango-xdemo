@@ -1,0 +1,25 @@
+#pets_table th.name, #pets_table td.name,
+#pets_table th.shop_name, #pets_table td.shop_name {
+	min-width: 150px;
+}
+
+#pets_table th.born_at, #pets_table td.born_at,
+#pets_table th.gender, #pets_table td.gender,
+#pets_table th.origin, #pets_table td.origin,
+#pets_table th.temper, #pets_table td.temper,
+#pets_table th.habits, #pets_table td.habits,
+#pets_table th.amount, #pets_table td.amount,
+#pets_table th.price, #pets_table td.price {
+	white-space: nowrap;
+	width: 1%;
+}
+#pets_table td.habits > b {
+	display: block;
+	font-weight: normal;
+}
+
+#pets_detail_popup .ui-value > b {
+	font-weight: normal;
+	margin-right: 20px;
+}
+

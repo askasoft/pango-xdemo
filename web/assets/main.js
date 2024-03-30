@@ -148,10 +148,19 @@ var xmain = {
 	},
 
 	// form input (not hidden) values
-	form_values: function($f) {
+	form_input_values: function($f) {
 		var vs = $f.formValues();
 		delete vs._token_;
 		return vs;
+	},
+	form_has_inputs: function($f) {
+		var f = function() {
+			var v = $(this).val();
+			return v && v.length > 0;
+		};
+		return $f.find('input:checked').length
+			|| $f.find('select').filter(f).length
+			|| $f.find('input[type=text]').filter(f).length;
 	},
 	form_clear_invalid: function($f) {
 		$f.find('.is-invalid').removeClass('is-invalid').end().find('.verr').remove();
@@ -202,7 +211,7 @@ var xmain = {
 
 			var $c = $td.children('a, pre'), v = vs[k] || '';
 			if (v && k.endsWith("_at")) {
-				v = xmain.format_time(v);
+				v = xmain[$td.hasClass('date') ? 'format_date' : 'format_time'](v);
 			}
 			($c.length ? $c : $td).text(v);
 		}

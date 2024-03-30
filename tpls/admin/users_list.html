@@ -1,8 +1,8 @@
 {{$au := .AuthUser}}
 {{$base := .Base}}
 {{$loc := .Locale}}
-{{$sm := .StatusMap}}
-{{$rm := .RoleMap}}
+{{$usm := .StatusMap}}
+{{$urm := .RoleMap}}
 
 {{Pager .Q.Pager "Locale=" $loc}}
 
@@ -30,8 +30,8 @@
 			<td class="id ro">{{$u.ID}}</td>
 			<td class="name">{{$u.Name}}</td>
 			<td class="email">{{$u.Email}}</td>
-			<td class="role">{{$rm.MustGet $u.Role $u.Role}}</td>
-			<td class="status">{{$sm.MustGet $u.Status $u.Status}}</td>
+			<td class="role">{{$urm.MustGet $u.Role $u.Role}}</td>
+			<td class="status">{{$usm.MustGet $u.Status $u.Status}}</td>
 			<td class="cidr"><pre>{{$u.CIDR}}</pre></td>
 			<td class="created_at ro">{{TIME $u.CreatedAt}}</td>
 			<td class="updated_at">{{TIME $u.UpdatedAt}}</td>
