@@ -12,9 +12,9 @@ import (
 	"github.com/askasoft/pango-xdemo/app/utils/gormutil"
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/sqx"
+	"github.com/askasoft/pango/sqx/pqx"
 	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pango/xvw/args"
-	"github.com/lib/pq"
 	"gorm.io/gorm"
 )
 
@@ -37,9 +37,9 @@ type PetQuery struct {
 	args.Sorter
 }
 
-func (q *PetQuery) Normalize(columns []string, limits []int) {
-	q.Sorter.Normalize(columns...)
-	q.Pager.Normalize(limits...)
+func (pq *PetQuery) Normalize(columns []string, limits []int) {
+	pq.Sorter.Normalize(columns...)
+	pq.Pager.Normalize(limits...)
 }
 
 var petSortables = []string{
@@ -57,49 +57,49 @@ var petSortables = []string{
 	"updated_at",
 }
 
-func filterPets(tx *gorm.DB, q *PetQuery) *gorm.DB {
-	if id := num.Atoi(q.ID); id != 0 {
+func filterPets(tx *gorm.DB, pq *PetQuery) *gorm.DB {
+	if id := num.Atoi(pq.ID); id != 0 {
 		tx = tx.Where("id = ?", id)
 	}
-	if q.Name != "" {
-		tx = tx.Where("name LIKE ?", sqx.StringLike(q.Name))
+	if pq.Name != "" {
+		tx = tx.Where("name LIKE ?", sqx.StringLike(pq.Name))
 	}
-	if len(q.Gender) > 0 {
-		tx = tx.Where("gender IN ?", q.Gender)
+	if len(pq.Gender) > 0 {
+		tx = tx.Where("gender IN ?", pq.Gender)
 	}
-	if len(q.Origin) > 0 {
-		tx = tx.Where("origin IN ?", q.Origin)
+	if len(pq.Origin) > 0 {
+		tx = tx.Where("origin IN ?", pq.Origin)
 	}
-	if len(q.Temper) > 0 {
-		tx = tx.Where("temper IN ?", q.Temper)
+	if len(pq.Temper) > 0 {
+		tx = tx.Where("temper IN ?", pq.Temper)
 	}
-	if len(q.Habits) > 0 {
-		tx = tx.Where("habits @> ?", pq.Array(q.Habits))
+	if len(pq.Habits) > 0 {
+		tx = tx.Where("habits @> ?", pqx.StringArray(pq.Habits))
 	}
-	if q.AmountMin != "" {
-		tx = tx.Where("amount >= ?", num.Atoi(q.AmountMin))
+	if pq.AmountMin != "" {
+		tx = tx.Where("amount >= ?", num.Atoi(pq.AmountMin))
 	}
-	if q.AmountMax != "" {
-		tx = tx.Where("amount <= ?", num.Atoi(q.AmountMax))
+	if pq.AmountMax != "" {
+		tx = tx.Where("amount <= ?", num.Atoi(pq.AmountMax))
 	}
-	if q.PriceMin != "" {
-		tx = tx.Where("price >= ?", num.Atof(q.PriceMin))
+	if pq.PriceMin != "" {
+		tx = tx.Where("price >= ?", num.Atof(pq.PriceMin))
 	}
-	if q.PriceMax != "" {
-		tx = tx.Where("price <= ?", num.Atof(q.PriceMax))
+	if pq.PriceMax != "" {
+		tx = tx.Where("price <= ?", num.Atof(pq.PriceMax))
 	}
-	if q.ShopName != "" {
-		tx = tx.Where("shop_name LIKE ?", sqx.StringLike(q.ShopName))
+	if pq.ShopName != "" {
+		tx = tx.Where("shop_name LIKE ?", sqx.StringLike(pq.ShopName))
 	}
 	return tx
 }
 
-func countPets(tt tenant.Tenant, q *PetQuery, filter func(tx *gorm.DB, q *PetQuery) *gorm.DB) (int, error) {
+func countPets(tt tenant.Tenant, pq *PetQuery, filter func(tx *gorm.DB, pq *PetQuery) *gorm.DB) (int, error) {
 	var total int64
 
 	tx := app.DB.Table(tt.TablePets())
 
-	tx = filter(tx, q)
+	tx = filter(tx, pq)
 
 	r := tx.Count(&total)
 	if r.Error != nil {
@@ -109,23 +109,23 @@ func countPets(tt tenant.Tenant, q *PetQuery, filter func(tx *gorm.DB, q *PetQue
 	return int(total), nil
 }
 
-func findPets(tt tenant.Tenant, q *PetQuery, filter func(tx *gorm.DB, q *PetQuery) *gorm.DB) (arts []*models.Pet, err error) {
+func findPets(tt tenant.Tenant, pq *PetQuery, filter func(tx *gorm.DB, pq *PetQuery) *gorm.DB) (arts []*models.Pet, err error) {
 	tx := app.DB.Table(tt.TablePets())
 
-	tx = filter(tx, q)
+	tx = filter(tx, pq)
 
-	ob := gormutil.Sorter2OrderBy(&q.Sorter)
-	tx = tx.Offset(q.Start()).Limit(q.Limit).Order(ob)
+	ob := gormutil.Sorter2OrderBy(&pq.Sorter)
+	tx = tx.Offset(pq.Start()).Limit(pq.Limit).Order(ob)
 
 	err = tx.Omit("shop_address", "shop_link", "description").Find(&arts).Error
 	return
 }
 
-func petListArgs(c *xin.Context) (q *PetQuery) {
-	q = &PetQuery{
+func petListArgs(c *xin.Context) (pq *PetQuery) {
+	pq = &PetQuery{
 		Sorter: args.Sorter{Col: "updated_at", Dir: "desc"},
 	}
-	_ = c.Bind(q)
+	_ = c.Bind(pq)
 
 	return
 }
@@ -140,10 +140,10 @@ func petAddMaps(c *xin.Context, h xin.H) {
 func PetIndex(c *xin.Context) {
 	h := handlers.H(c)
 
-	q := petListArgs(c)
-	q.Normalize(petSortables, pagerLimits)
+	pq := petListArgs(c)
+	pq.Normalize(petSortables, pagerLimits)
 
-	h["Q"] = q
+	h["Q"] = pq
 	petAddMaps(c, h)
 
 	c.HTML(http.StatusOK, "demos/pets", h)
@@ -154,25 +154,25 @@ func PetList(c *xin.Context) {
 
 	h := handlers.H(c)
 
-	q := petListArgs(c)
+	pq := petListArgs(c)
 
 	var err error
-	q.Total, err = countPets(tt, q, filterPets)
-	q.Normalize(petSortables, pagerLimits)
+	pq.Total, err = countPets(tt, pq, filterPets)
+	pq.Normalize(petSortables, pagerLimits)
 
 	if err != nil {
 		c.AddError(err)
-	} else if q.Total > 0 {
-		results, err := findPets(tt, q, filterPets)
+	} else if pq.Total > 0 {
+		results, err := findPets(tt, pq, filterPets)
 		if err != nil {
 			c.AddError(err)
 		} else {
 			h["Pets"] = results
 		}
-		q.Count = len(results)
+		pq.Count = len(results)
 	}
 
-	h["Q"] = q
+	h["Q"] = pq
 	petAddMaps(c, h)
 
 	c.HTML(http.StatusOK, "demos/pets_list", h)
