@@ -3,26 +3,26 @@ package models
 import (
 	"time"
 
-	"github.com/askasoft/pango/sqx"
+	"github.com/lib/pq"
 )
 
 type Pet struct {
-	ID            int64     `gorm:"not null;primaryKey;autoIncrement" form:"id" json:"id"`
-	Name          string    `gorm:"size:100;not null" form:"name,strip" validate:"required,maxlen=100" json:"name"`
-	Gender        string    `gorm:"size:1;not null" form:"gender,strip" json:"gender"`
-	Born_at       time.Time `gorm:"not null" form:"born_at" json:"born_at"`
-	Origin        string    `gorm:"size:10;not null" form:"origin,strip" json:"origin"`
-	Temper        string    `gorm:"size:1;not null" form:"temper,strip" json:"temper"`
-	Habits        sqx.Array `gorm:"type:varchar(100);not null" form:"habits,strip" json:"habits"`
-	Amount        int       `gorm:"not null" form:"amount" json:"amount"`
-	Price         float64   `gorm:"not null;precision:10;scale:2" form:"price" json:"price"`
-	ShopName      string    `gorm:"size:200;not null" form:"shop_name,strip" json:"shop_name"`
-	ShopAddress   string    `gorm:"size:200;not null" form:"shop_address,strip" json:"shop_address"`
-	ShopTelephone string    `gorm:"size:20;not null" form:"shop_telephone,strip" json:"shop_telephone"`
-	ShopLink      string    `gorm:"size:1000;not null" form:"shop_link,strip" json:"shop_link"`
-	Description   string    `gorm:"not null" form:"description" json:"description"`
-	CreatedAt     time.Time `gorm:"not null;<-:create" json:"created_at"`
-	UpdatedAt     time.Time `gorm:"not null;autoUpdateTime:true" json:"updated_at"`
+	ID            int64          `gorm:"not null;primaryKey;autoIncrement" json:"id" form:"id"`
+	Name          string         `gorm:"size:100;not null" json:"name" form:"name,strip" validate:"required,maxlen=100"`
+	Gender        string         `gorm:"size:1;not null" json:"gender" form:"gender,strip" validate:"required"`
+	Born_at       time.Time      `gorm:"not null" json:"born_at" form:"born_at" validate:"required"`
+	Origin        string         `gorm:"size:10;not null" json:"origin" form:"origin,strip" validate:"required"`
+	Temper        string         `gorm:"size:1;not null" json:"temper" form:"temper,strip" validate:"required"`
+	Habits        pq.StringArray `gorm:"type:char(1)[]" json:"habits" form:"habits,strip"`
+	Amount        int            `gorm:"not null" json:"amount" form:"amount"`
+	Price         float64        `gorm:"not null;precision:10;scale:2" json:"price" form:"price"`
+	ShopName      string         `gorm:"size:200;not null" json:"shop_name" form:"shop_name,strip" validate:"omitempty,maxlen=200"`
+	ShopAddress   string         `gorm:"size:200;not null" json:"shop_address" form:"shop_address,strip" validate:"omitempty,maxlen=200"`
+	ShopTelephone string         `gorm:"size:20;not null" json:"shop_telephone" form:"shop_telephone,strip" validate:"omitempty,maxlen=200"`
+	ShopLink      string         `gorm:"size:1000;not null" json:"shop_link" form:"shop_link,strip" validate:"omitempty,maxlen=1000,url"`
+	Description   string         `gorm:"not null" json:"description" form:"description"`
+	CreatedAt     time.Time      `gorm:"not null;<-:create" json:"created_at"`
+	UpdatedAt     time.Time      `gorm:"not null;autoUpdateTime:true" json:"updated_at"`
 }
 
 func (p *Pet) String() string {

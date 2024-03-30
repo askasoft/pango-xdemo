@@ -39,7 +39,7 @@ type UserPass struct {
 func Login(c *xin.Context) {
 	userpass := &UserPass{}
 	if err := c.Bind(userpass); err != nil {
-		utils.AddValidateErrors(c, err, "login.")
+		utils.AddBindErrors(c, err, "login.")
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}

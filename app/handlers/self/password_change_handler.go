@@ -28,17 +28,15 @@ type PwdChgArg struct {
 func PasswordChangeChange(c *xin.Context) {
 	pca := &PwdChgArg{}
 
-	err := c.Bind(pca)
-	if err != nil {
-		utils.AddValidateErrors(c, err, "pwdchg.")
+	if err := c.Bind(pca); err != nil {
+		utils.AddBindErrors(c, err, "pwdchg.")
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}
 
 	au := tenant.AuthUser(c)
 	if pca.Oldpwd != au.GetPassword() {
-		err = errors.New(tbs.GetText(c.Locale, "pwdchg.error.oldpwd"))
-		c.AddError(err)
+		c.AddError(errors.New(tbs.GetText(c.Locale, "pwdchg.error.oldpwd")))
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}
@@ -57,15 +55,13 @@ func PasswordChangeChange(c *xin.Context) {
 		return
 	}
 	if r.RowsAffected != 1 {
-		err = errors.New(tbs.GetText(c.Locale, "error.update.notfound"))
-		c.AddError(err)
+		c.AddError(errors.New(tbs.GetText(c.Locale, "error.update.notfound")))
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}
 
 	au.Password = nu.Password
-	err = app.XCA.SaveUserPassToCookie(c, au.Email, pca.Newpwd)
-	if err != nil {
+	if err := app.XCA.SaveUserPassToCookie(c, au.Email, pca.Newpwd); err != nil {
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return

@@ -10,6 +10,7 @@ import (
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango-xdemo/app/utils"
+	"github.com/askasoft/pango/cog"
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/tbs"
@@ -70,28 +71,33 @@ func UserDetail(c *xin.Context) {
 
 func userBind(c *xin.Context) *models.User {
 	usr := &models.User{}
-	err := c.Bind(usr)
-	if err != nil {
-		utils.AddValidateErrors(c, err, "user.")
+	if err := c.Bind(usr); err != nil {
+		utils.AddBindErrors(c, err, "user.")
 	}
 
 	if !utils.ValidateCIDRs(usr.CIDR) {
 		c.AddError(utils.ErrInvalidField(c, "user.", "cidr"))
 	}
 
-	sm := utils.GetUserStatusMap(c.Locale)
-	if !sm.Contain(usr.Status) {
-		c.AddError(utils.ErrInvalidField(c, "user.", "status"))
+	if usr.Role != "" {
+		var rm *cog.LinkedHashMap[string, string]
+
+		au := tenant.AuthUser(c)
+		if au.IsSuper() {
+			rm = utils.GetSuperRoleMap(c.Locale)
+		} else {
+			rm = utils.GetUserRoleMap(c.Locale)
+		}
+		if !rm.Contain(usr.Role) {
+			c.AddError(utils.ErrInvalidField(c, "user.", "role"))
+		}
 	}
 
-	rm := utils.GetUserRoleMap(c.Locale)
-
-	au := tenant.AuthUser(c)
-	if au.IsSuper() {
-		rm = utils.GetSuperRoleMap(c.Locale)
-	}
-	if !rm.Contain(usr.Role) {
-		c.AddError(utils.ErrInvalidField(c, "user.", "role"))
+	if usr.Status != "" {
+		sm := utils.GetUserStatusMap(c.Locale)
+		if !sm.Contain(usr.Status) {
+			c.AddError(utils.ErrInvalidField(c, "user.", "status"))
+		}
 	}
 
 	return usr

@@ -9,6 +9,7 @@ import (
 	"github.com/askasoft/pango/tbs"
 	"github.com/askasoft/pango/vad"
 	"github.com/askasoft/pango/xin"
+	"github.com/askasoft/pango/xin/binding"
 )
 
 type ParamError struct {
@@ -34,9 +35,18 @@ func ErrInvalidID(c *xin.Context) error {
 	return errors.New(tbs.Format(c.Locale, "error.param.invalid", "ID"))
 }
 
-func AddValidateErrors(c *xin.Context, err error, ns string) {
-	var ves vad.ValidationErrors
-	if errors.As(err, &ves) {
+func AddBindErrors(c *xin.Context, err error, ns string) {
+	if fbes, ok := err.(binding.FieldBindErrors); ok { //nolint: errorlint
+		for _, fbe := range fbes {
+			fk := str.SnakeCase(fbe.Field)
+			fn := tbs.GetText(c.Locale, ns+fk, fk)
+			fm := tbs.GetText(c.Locale, ns+"error."+fk)
+			if fm == "" {
+				fm = tbs.Format(c.Locale, "error.param.invalid", fn)
+			}
+			c.AddError(&ParamError{Param: fk, Message: fm})
+		}
+	} else if ves, ok := err.(vad.ValidationErrors); ok { //nolint: errorlint
 		for _, fe := range ves {
 			fk := str.SnakeCase(fe.Field())
 			fn := ""

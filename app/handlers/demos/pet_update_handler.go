@@ -67,31 +67,38 @@ func PetEdit(c *xin.Context) {
 
 func petBind(c *xin.Context) *models.Pet {
 	pet := &models.Pet{}
-	err := c.Bind(pet)
-	if err != nil {
-		utils.AddValidateErrors(c, err, "pet.")
+	if err := c.Bind(pet); err != nil {
+		utils.AddBindErrors(c, err, "pet.")
 	}
 
-	pgm := utils.GetPetGenderMap(c.Locale)
-	if !pgm.Contain(pet.Gender) {
-		c.AddError(utils.ErrInvalidField(c, "pet.", "gender"))
+	if pet.Gender != "" {
+		pgm := utils.GetPetGenderMap(c.Locale)
+		if !pgm.Contain(pet.Gender) {
+			c.AddError(utils.ErrInvalidField(c, "pet.", "gender"))
+		}
 	}
 
-	pom := utils.GetPetOriginMap(c.Locale)
-	if !pom.Contain(pet.Origin) {
-		c.AddError(utils.ErrInvalidField(c, "pet.", "origin"))
+	if pet.Origin != "" {
+		pom := utils.GetPetOriginMap(c.Locale)
+		if !pom.Contain(pet.Origin) {
+			c.AddError(utils.ErrInvalidField(c, "pet.", "origin"))
+		}
 	}
 
-	ptm := utils.GetPetTemperMap(c.Locale)
-	if !ptm.Contain(pet.Temper) {
-		c.AddError(utils.ErrInvalidField(c, "pet.", "temper"))
+	if pet.Temper != "" {
+		ptm := utils.GetPetTemperMap(c.Locale)
+		if !ptm.Contain(pet.Temper) {
+			c.AddError(utils.ErrInvalidField(c, "pet.", "temper"))
+		}
 	}
 
-	phm := utils.GetPetHabitsMap(c.Locale)
-	for _, h := range pet.Habits {
-		if !phm.Contain(h) {
-			c.AddError(utils.ErrInvalidField(c, "pet.", "habits"))
-			break
+	if len(pet.Habits) > 0 {
+		phm := utils.GetPetHabitsMap(c.Locale)
+		for _, h := range pet.Habits {
+			if !phm.Contain(h) {
+				c.AddError(utils.ErrInvalidField(c, "pet.", "habits"))
+				break
+			}
 		}
 	}
 
@@ -110,8 +117,7 @@ func PetCreate(c *xin.Context) {
 	pet.UpdatedAt = pet.CreatedAt
 
 	tt := tenant.FromCtx(c)
-	err := app.DB.Table(tt.TablePets()).Create(pet).Error
-	if err != nil {
+	if err := app.DB.Table(tt.TablePets()).Create(pet).Error; err != nil {
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return
