@@ -10,7 +10,6 @@ import (
 	"github.com/askasoft/pango/log/gormlog"
 	"github.com/askasoft/pango/mag"
 	"github.com/askasoft/pango/str"
-	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -37,18 +36,11 @@ func openDatabase() error {
 		return nil
 	}
 
-	typ := sec.GetString("type", "postgres")
 	dsn := sec.GetString("dsn")
 
-	log.Infof("Connect Database (%s): %s", typ, dsn)
+	log.Infof("Connect Database: %s", dsn)
 
-	var dbd gorm.Dialector
-	switch typ {
-	case "mysql":
-		dbd = mysql.Open(dsn)
-	default:
-		dbd = postgres.Open(dsn)
-	}
+	dbd := postgres.Open(dsn)
 
 	dbc := &gorm.Config{
 		Logger: gormlog.NewGormLogger(

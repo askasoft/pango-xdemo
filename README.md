@@ -79,7 +79,7 @@ SET LOG_SLACK_WEBHOOK=https://hooks.slack.com/services/...
 deploy.bat
 ```
 
-### init mysql database
+### init mysql database (not supported yet)
 ```sql
 CREATE USER 'xdemo'@'%' IDENTIFIED BY 'xdemo';
 CREATE DATABASE xdemo CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
