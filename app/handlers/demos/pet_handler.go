@@ -124,7 +124,7 @@ func findPets(tt tenant.Tenant, pq *PetQuery, filter func(tx *gorm.DB, pq *PetQu
 	ob := gormutil.Sorter2OrderBy(&pq.Sorter)
 	tx = tx.Offset(pq.Start()).Limit(pq.Limit).Order(ob)
 
-	err = tx.Omit("shop_address", "shop_close_time", "shop_link", "description").Find(&arts).Error
+	err = tx.Omit("shop_address", "shop_link", "description").Find(&arts).Error
 	return
 }
 

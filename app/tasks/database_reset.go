@@ -72,18 +72,17 @@ func initPets(db *gorm.DB, cid int64, cat string) error {
 		//		File f = files.get(Randoms.randInt(files.size()));
 
 		pet := &models.Pet{
-			ID:            cid*1000 + int64(i),
-			Name:          cat + " " + str.PadLeft(num.Itoa(i), 2, "0") + " " + petRandText(5),
-			Gender:        pgs[rand.Intn(len(pgs))], //nolint: gosec
-			Born_at:       bd.AddDate(0, 0, 1),
-			Origin:        pos[rand.Intn(len(pos))],                                                            //nolint: gosec
-			Temper:        pts[rand.Intn(len(pts))],                                                            //nolint: gosec
-			Habits:        cog.NewHashSet[string](phs[rand.Intn(len(phs))], phs[rand.Intn(len(phs))]).Values(), //nolint: gosec
-			Amount:        rand.Intn(100),                                                                      //nolint: gosec
-			Price:         rand.Float64() * 10000,                                                              //nolint: gosec
-			ShopName:      petRandText(10),
-			ShopCloseTime: 1300 + i,
-			Description:   petRandText(64),
+			ID:          cid*1000 + int64(i),
+			Name:        cat + " " + str.PadLeft(num.Itoa(i), 2, "0") + " " + petRandText(5),
+			Gender:      pgs[rand.Intn(len(pgs))], //nolint: gosec
+			Born_at:     bd.AddDate(0, 0, 1),
+			Origin:      pos[rand.Intn(len(pos))],                                                            //nolint: gosec
+			Temper:      pts[rand.Intn(len(pts))],                                                            //nolint: gosec
+			Habits:      cog.NewHashSet[string](phs[rand.Intn(len(phs))], phs[rand.Intn(len(phs))]).Values(), //nolint: gosec
+			Amount:      rand.Intn(100),                                                                      //nolint: gosec
+			Price:       rand.Float64() * 10000,                                                              //nolint: gosec
+			ShopName:    petRandText(10),
+			Description: petRandText(64),
 		}
 
 		if err := db.Create(pet).Error; err != nil {

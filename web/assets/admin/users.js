@@ -74,9 +74,7 @@ $(function() {
 	//----------------------------------------------------
 	// detail
 	//----------------------------------------------------
-	function user_detail(evt) {
-		evt.stopPropagation();
-
+	function user_detail() {
 		var $tr = $(this).closest('tr');
 		var params = {
 			id: $tr.attr('id').replace('usr_', '')
@@ -99,9 +97,7 @@ $(function() {
 	//----------------------------------------------------
 	// new
 	//----------------------------------------------------
-	function user_new(evt) {
-		evt.stopPropagation();
-
+	function user_new() {
 		$('#users_detail_popup').popup({
 			loaded: false,
 			ajax: {

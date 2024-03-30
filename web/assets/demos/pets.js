@@ -74,9 +74,7 @@ $(function() {
 	//----------------------------------------------------
 	// detail
 	//----------------------------------------------------
-	function pet_detail(self, evt, url) {
-		evt.stopPropagation();
-
+	function pet_detail(self, edit) {
 		var $tr = $(self).closest('tr');
 		var params = {
 			id: $tr.attr('id').replace('pet_', '')
@@ -84,8 +82,9 @@ $(function() {
 
 		$('#pets_detail_popup').popup({
 			loaded: false,
+			keyboard: !edit,
 			ajax: {
-				url: url,
+				url: edit ? "edit" : "view",
 				method: 'GET',
 				data: params
 			}
@@ -94,17 +93,16 @@ $(function() {
 		return false;
 	}
 
-	$('#pets_list').on('click', 'button.view', function(evt) { return pet_detail(this, evt, "view"); });
-	$('#pets_list').on('click', 'button.edit', function(evt) { return pet_detail(this, evt, "edit"); });
+	$('#pets_list').on('click', 'button.view', function(evt) { return pet_detail(this, false); });
+	$('#pets_list').on('click', 'button.edit', function(evt) { return pet_detail(this, true); });
 
 	//----------------------------------------------------
 	// new
 	//----------------------------------------------------
-	function pet_new(evt) {
-		evt.stopPropagation();
-
+	function pet_new() {
 		$('#pets_detail_popup').popup({
 			loaded: false,
+			keyboard: false,
 			ajax: {
 				url: './new',
 				method: 'GET'
@@ -215,6 +213,7 @@ $(function() {
 		}).on('shown.popup', function() {
 			$('#pets_detail_popup')
 				.find('.ui-popup-body').prop('scrollTop', 0).end()
+				.find('[data-spy="niceSelect"]').niceSelect().end()
 				.find('input[type="text"]').textclear().end()
 				.find('textarea').autosize().textclear().enterfire();
 			$(window).trigger('resize');

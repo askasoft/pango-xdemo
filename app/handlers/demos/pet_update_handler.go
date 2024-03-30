@@ -173,7 +173,6 @@ var petUpdatables = []string{
 	"shop_name",
 	"shop_address",
 	"shop_telephone",
-	"shop_close_time",
 	"updated_at",
 }
 

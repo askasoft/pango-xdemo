@@ -19,7 +19,6 @@ type Pet struct {
 	ShopName      string    `gorm:"size:200;not null" form:"shop_name,strip" json:"shop_name"`
 	ShopAddress   string    `gorm:"size:200;not null" form:"shop_address,strip" json:"shop_address"`
 	ShopTelephone string    `gorm:"size:20;not null" form:"shop_telephone,strip" json:"shop_telephone"`
-	ShopCloseTime int       `gorm:"not null" form:"shop_close_time" json:"shop_close_time"`
 	ShopLink      string    `gorm:"size:1000;not null" form:"shop_link,strip" json:"shop_link"`
 	Description   string    `gorm:"not null" form:"description" json:"description"`
 	CreatedAt     time.Time `gorm:"not null;<-:create" json:"created_at"`

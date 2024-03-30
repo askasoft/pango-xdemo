@@ -50,10 +50,6 @@
 		<div class="col-sm-10 ui-value">{{.Pet.ShopTelephone}}</div>
 	</div>
 	<div class="row py-3">
-		<label class="col-sm-2 ui-label">{{T .Locale "pet.shop_close_time"}}</label>
-		<div class="col-sm-10 ui-value">{{.Pet.ShopCloseTime}}</div>
-	</div>
-	<div class="row py-3">
 		<label class="col-sm-2 ui-label">{{T .Locale "pet.shop_link"}}</label>
 		<div class="col-sm-10 ui-value">{{if .Pet.ShopLink}}<a href="{{.Pet.ShopLink}}" taret="_blank">{{.Pet.ShopLink}}</a>{{end}}</div>
 	</div>
