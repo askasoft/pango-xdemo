@@ -50,7 +50,8 @@ func (ucijc *UserCsvImportJobController) Start(c *xin.Context) {
 		return
 	}
 
-	ucijc.SetParam(c.Locale)
+	ucia := &jobs.UserCsvImportArg{Locale: c.Locale}
+	ucijc.SetParam(ucia)
 	ucijc.JobController.Start(c)
 }
 

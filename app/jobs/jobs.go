@@ -27,17 +27,21 @@ var (
 	ErrItemSkip = errors.New("item skip")
 )
 
-type JobArg struct {
+type ArgLocale struct {
+	Locale string `json:"locale,omitempty"`
+}
+
+type ArgFilter struct {
 	Start time.Time `form:"start" json:"start,omitempty"`
 	End   time.Time `form:"end" json:"end,omitempty"`
 	Items int       `form:"items" json:"items,omitempty"`
 }
 
-func (ja *JobArg) Bind(c *xin.Context, a any) error {
+func (af *ArgFilter) Bind(c *xin.Context, a any) error {
 	err := c.Bind(a)
 
-	if !ja.End.IsZero() {
-		ja.End = ja.End.Add(time.Hour*24 - time.Microsecond)
+	if !af.End.IsZero() {
+		af.End = af.End.Add(time.Hour*24 - time.Microsecond)
 	}
 
 	return err
