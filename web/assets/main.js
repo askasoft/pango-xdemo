@@ -107,7 +107,7 @@ var xmain = {
 		}
 
 		var afterHidden;
-		if (xhr.status == 401) { // unauthorized
+		if (xhr.status == 401 || xhr.status == 403) { // unauthorized, forbidden
 			afterHidden = function() {
 				window.location.href = xmain.base + '/login/';
 			};
