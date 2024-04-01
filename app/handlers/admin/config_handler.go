@@ -1,7 +1,7 @@
 package admin
 
 import (
-	"fmt"
+	"errors"
 	"net/http"
 
 	"github.com/askasoft/pango-xdemo/app"
@@ -27,14 +27,24 @@ type ConfigCategory struct {
 
 func ConfigIndex(c *xin.Context) {
 	tt := tenant.FromCtx(c)
+	au := tenant.AuthUser(c)
 
-	configs := []*models.Config{}
-
-	if r := app.DB.Table(tt.TableConfigs()).Order(clause.OrderByColumn{Column: clause.Column{Name: "order"}}).Find(&configs); r.Error != nil {
-		panic(r.Error)
+	tx := app.DB.Table(tt.TableConfigs()).Order(clause.OrderByColumn{Column: clause.Column{Name: "order"}})
+	if !au.IsSuper() {
+		tx = tx.Where("hidden = ?", false)
 	}
 
-	h := handlers.H(c)
+	configs := []*models.Config{}
+	if err := tx.Find(&configs).Error; err != nil {
+		panic(err)
+	}
+
+	if au.IsSuper() {
+		for _, cfg := range configs {
+			cfg.Readonly = false
+			cfg.Secret = false
+		}
+	}
 
 	values := map[string]any{}
 	for _, cfg := range configs {
@@ -48,6 +58,8 @@ func ConfigIndex(c *xin.Context) {
 			values[cfg.Name] = lhm
 		}
 	}
+
+	h := handlers.H(c)
 	h["Values"] = values
 
 	categories := []*ConfigCategory{}
@@ -74,18 +86,18 @@ func ConfigIndex(c *xin.Context) {
 
 func ConfigSave(c *xin.Context) {
 	tt := tenant.FromCtx(c)
+	au := tenant.AuthUser(c)
 
 	configs := []*models.Config{}
-
-	if r := app.DB.Order("name ASC").Find(&configs); r.Error != nil {
-		panic(r.Error)
+	if err := app.DB.Order("name ASC").Find(&configs).Error; err != nil {
+		panic(err)
 	}
 
 	var vs []string
 	var v string
 	var ok bool
 
-	tx := app.DB.Table(tt.TableConfigs()).Begin()
+	db := app.DB.Begin()
 	for _, cfg := range configs {
 		if cfg.Style == models.StyleChecks {
 			vs, ok = c.GetPostFormArray(cfg.Name)
@@ -100,36 +112,40 @@ func ConfigSave(c *xin.Context) {
 			continue
 		}
 
-		if cfg.Secret && str.CountRune(v, '*') == len(v) {
+		if cfg.Secret && str.CountByte(v, '*') == len(v) {
 			// skip unmodified secret value
 			continue
 		}
 
-		txu := tx.Where("name = ?", cfg.Name)
-		txu = txu.Where("readonly = ?", false)
-		r := txu.Update("value", v)
+		tx := db.Table(tt.TableConfigs()).Where("name = ?", cfg.Name)
+		if !au.IsSuper() {
+			tx = tx.Where("readonly = ?", false)
+		}
+
+		r := tx.Update("value", v)
 		if r.Error != nil {
 			c.Logger.Warn(r.Error)
 			c.AddError(r.Error)
 		} else if r.RowsAffected != 1 {
-			c.AddError(fmt.Errorf(tbs.Format(c.Locale, "error.param.invalid", cfg.Name)))
+			msg := tbs.Format(c.Locale, "error.param.invalid", cfg.Name)
+			c.Logger.Warn(msg)
+			c.AddError(errors.New(msg))
 		}
 	}
 
 	if len(c.Errors) > 0 {
-		tx.Rollback()
+		db.Rollback()
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}
 
-	tt.PurgeConfigMap()
-
-	r := tx.Commit()
-	if r.Error != nil {
-		c.AddError(r.Error)
+	if err := db.Commit().Error; err != nil {
+		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return
 	}
+
+	tt.PurgeConfigMap()
 
 	c.JSON(http.StatusOK, xin.H{"success": tbs.GetText(c.Locale, "success.saved")})
 }

@@ -21,6 +21,7 @@ type Config struct {
 	Required  bool      `gorm:"not null"`
 	Secret    bool      `gorm:"not null"`
 	Readonly  bool      `gorm:"not null"`
+	Hidden    bool      `gorm:"not null"`
 	CreatedAt time.Time `gorm:"not null;<-:create" json:"created_at"`
 	UpdatedAt time.Time `gorm:"not null" json:"updated_at"`
 }

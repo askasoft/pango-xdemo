@@ -54,7 +54,7 @@ func (tt Tenant) MigrateConfig(configs []*models.Config) error {
 	tn := tt.TableConfigs()
 
 	for _, cfg := range configs {
-		r := app.DB.Table(tn).Where("name = ?", cfg.Name).Select("style", "order", "required", "secret").Updates(cfg)
+		r := app.DB.Table(tn).Where("name = ?", cfg.Name).Select("style", "order", "required", "secret", "readonly", "hidden").Updates(cfg)
 		if r.Error != nil {
 			return r.Error
 		}

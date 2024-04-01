@@ -44,9 +44,8 @@ func (tt Tenant) GetConfigMap() map[string]string {
 func (tt Tenant) loadConfigMap(db *gorm.DB) (map[string]string, error) {
 	configs := []*models.Config{}
 
-	r := db.Table(tt.TableConfigs()).Find(&configs)
-	if r.Error != nil {
-		return nil, r.Error
+	if err := db.Table(tt.TableConfigs()).Find(&configs).Error; err != nil {
+		return nil, err
 	}
 
 	cm := make(map[string]string)

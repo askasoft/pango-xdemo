@@ -30,14 +30,18 @@
 			<legend>{{T $loc (print "config.group.label." $cg.Name)}}</legend>
 		{{range $c := $cg.Items}}
 			<div class="row py-3">
-				<label class="col-md-3 col-form-label{{if $c.Required}} required {{end}}">{{T $loc (print "config." $c.Name)}}</label>
-				<div class="col-md-9">
+				<label class="col-sm-3 col-form-label{{if $c.Required}} required {{end}}">{{T $loc (print "config." $c.Name)}}</label>
+				<div class="col-sm-9">
 				{{if eq $c.Style "T"}}
 					<textarea name="{{$c.Name}}" class="form-control" rows="2" textclear{{if $c.Readonly}} disabled{{end}}>{{$c.DisplayValue}}</textarea>
 				{{else if eq $c.Style "C"}}
 					{{Checks "List=" (MapGet $vss $c.Name).Iterator "Name=" $c.Name "Values=" $c.Values "Disabled=" $c.Readonly}}
 				{{else if eq $c.Style "R"}}
 					{{Radios "List=" (MapGet $vss $c.Name).Iterator "Name=" $c.Name "Value=" $c.Value "Disabled=" $c.Readonly}}
+				{{else if eq $c.Style "S"}}
+					{{Select "List=" (MapGet $vss $c.Name).Iterator "Name=" $c.Name "Value=" $c.Value "Disabled=" $c.Readonly}}
+				{{else if eq $c.Style "M"}}
+					{{Select "List=" (MapGet $vss $c.Name).Iterator "Name=" $c.Name "Values=" $c.Values "Multiple=" true "Disabled=" $c.Readonly}}
 				{{else if eq $c.Style "N"}}
 					<input name="{{$c.Name}}" type="number" size="20" class="form-control" textclear value="{{$c.DisplayValue}}"{{if $c.Readonly}} disabled{{end}}/>
 				{{else}}
@@ -53,7 +57,7 @@
 		</fieldset>
 	{{end}}
 		<div class="row py-3">
-			<div class="offset-md-3 col-md-9">
+			<div class="offset-sm-3 col-sm-9">
 				<button class="btn btn-primary"><i class="fa fa-save"></i> {{T $loc "button.save"}}</button>
 			</div>
 		</div>
