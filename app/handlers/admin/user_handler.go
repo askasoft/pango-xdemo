@@ -79,8 +79,7 @@ func countUsers(tt tenant.Tenant, uq *UserQuery, filter func(tx *gorm.DB, uq *Us
 
 	tx = filter(tx, uq)
 
-	err := tx.Count(&total).Error
-	if err != nil {
+	if err := tx.Count(&total).Error; err != nil {
 		return 0, err
 	}
 

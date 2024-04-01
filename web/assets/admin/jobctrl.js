@@ -67,7 +67,7 @@ $(function() {
 		var $logs = $('#job_logs_' + jid),
 			$tb = $logs.find('tbody'),
 			timeout = 0,
-			param = { jid: jid, skip: $tb.children().length, limit: 1000 };
+			param = { jid: jid, skip: $tb.children().length, limit: 10000 };
 
 		$.ajax({
 			url: './status',
@@ -101,10 +101,10 @@ $(function() {
 						td2.textContent = '[' + lg.level + ']';
 						td3.textContent = lg.message;
 						tr.append(td1, td2, td3);
-						c.append(tr);
 						if (i >= logs.length - 50) {
 							tr.className = lg.level + " hidden";
 						}
+						c.append(tr);
 					}
 					tb.prepend(c);
 

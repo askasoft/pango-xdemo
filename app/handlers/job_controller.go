@@ -150,7 +150,7 @@ func (jc *JobController) Status(c *xin.Context) {
 	skip := num.Atoi(c.Query("skip"))
 	limit := num.Atoi(c.Query("limit"))
 	if limit > 0 {
-		max := app.INI.GetInt("job", "maxJobLogsFetch", 1000)
+		max := app.INI.GetInt("job", "maxJobLogsFetch", 10000)
 		if limit > max {
 			limit = max
 		}
