@@ -10,7 +10,7 @@ require (
 	github.com/jackc/pgerrcode v0.0.0-20240316143900-6e2875d9b438
 	github.com/jackc/pgx/v5 v5.5.5
 	gorm.io/driver/postgres v1.5.7
-	gorm.io/gorm v1.25.8
+	gorm.io/gorm v1.25.9
 )
 
 require (
