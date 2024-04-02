@@ -206,9 +206,7 @@ form .verr {
 	vertical-align: middle;
 }
 .s-table th.created_at, .s-table td.created_at,
-.s-table th.updated_at, .s-table td.updated_at,
-.s-table th.indexed_at, .s-table td.indexed_at,
-.s-table th.summary_at, .s-table td.summary_at {
+.s-table th.updated_at, .s-table td.updated_at {
 	width: 110px;
 	min-width: 110px;
 }
