@@ -97,7 +97,7 @@ $(function() {
 							td2 = document.createElement("td"),
 							td3 = document.createElement("td");
 						tr.className = lg.level;
-						td1.textContent = xmain.format_time(lg.when);
+						td1.textContent = xmain.format_time(lg.time);
 						td2.textContent = '[' + lg.level + ']';
 						td3.textContent = lg.message;
 						tr.append(td1, td2, td3);

@@ -168,7 +168,7 @@ PUT xdemo_applog
 {
 	"mappings": {
 		"properties": {
-			"when": {
+			"time": {
 				"type": "date",
 				"format": "date_time"
 			}
@@ -201,7 +201,7 @@ PUT xdemo_access
 {
 	"mappings": {
 		"properties": {
-			"when": {
+			"time": {
 				"type": "date",
 				"format": "date_time"
 			}
