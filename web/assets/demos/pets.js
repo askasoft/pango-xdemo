@@ -13,13 +13,13 @@ $(function() {
 	function pets_search() {
 		var $f = $('#pets_listform');
 
-		xmain.sssave(sskey, xmain.form_input_values($f));
+		main.sssave(sskey, main.form_input_values($f));
 
 		$.ajax({
 			url: './list',
 			type: 'POST',
 			data: $f.serialize(),
-			beforeSend: xmain.loadmask,
+			beforeSend: main.loadmask,
 			success: function(data, ts, xhr) {
 				$('#pets_list').html(data);
 
@@ -27,8 +27,8 @@ $(function() {
 				$('#pets_list [data-spy="pager"]').pager();
 				$('#pets_list [data-spy="sortable"]').sortable();
 			},
-			error: xmain.ajax_error,
-			complete: xmain.unloadmask
+			error: main.ajax_error,
+			complete: main.unloadmask
 		});
 		return false;
 	}
@@ -38,17 +38,17 @@ $(function() {
 			url: './export/csv',
 			type: 'POST',
 			data: $('#pets_listform').serializeArray(),
-			beforeSend: xmain.loadmask,
-			error: xmain.ajax_error,
-			complete: xmain.unloadmask
+			beforeSend: main.loadmask,
+			error: main.ajax_error,
+			complete: main.unloadmask
 		});
 		return false;
 	}
 
 	if (!location.search) {
-		$('#pets_listform').formValues(xmain.ssload(sskey));
+		$('#pets_listform').formValues(main.ssload(sskey));
 	}
-	if (xmain.form_has_inputs($('#pets_listform'))) {
+	if (main.form_has_inputs($('#pets_listform'))) {
 		$('#pets_listfset').fieldset('expand', 'show');
 	}
 
@@ -130,7 +130,7 @@ $(function() {
 			type: 'POST',
 			data: $p.find('form').serialize(),
 			dataType: 'json',
-			beforeSend: xmain.form_ajax_start($p),
+			beforeSend: main.form_ajax_start($p),
 			success: function(data, ts, xhr) {
 				$('#pets_detail_popup').popup('hide');
 
@@ -142,14 +142,14 @@ $(function() {
 				var pet = data.result, $tr = $('tr#pet_' + pet.id);
 				pet_set_tr_values($tr, pet);
 			},
-			error: xmain.form_ajax_error($p),
-			complete: xmain.form_ajax_end($p)
+			error: main.form_ajax_error($p),
+			complete: main.form_ajax_end($p)
 		});
 		return false;
 	}
 
 	function pet_set_tr_values($tr, pet) {
-		xmain.set_table_tr_values($tr, pet);
+		main.set_table_tr_values($tr, pet);
 		$tr.find('td.gender').text(PGM[pet.gender]);
 		$tr.find('td.origin').text(POM[pet.origin]);
 		$tr.find('td.temper').text(PTM[pet.temper]);
@@ -158,7 +158,7 @@ $(function() {
 			hs.push($('<b>').text(PHM[h]));
 		})
 		$tr.find('td.habits').empty().append(hs);
-		xmain.blink($tr);
+		main.blink($tr);
 	}
 
 	//----------------------------------------------------
@@ -172,7 +172,7 @@ $(function() {
 			type: 'POST',
 			data: $p.find('form').serialize(),
 			dataType: 'json',
-			beforeSend: xmain.form_ajax_start($p),
+			beforeSend: main.form_ajax_start($p),
 			success: function(data, ts, xhr) {
 				$p.popup('hide');
 
@@ -191,8 +191,8 @@ $(function() {
 				pet_set_tr_values($tr, pet);
 				$tr.find('td.id, td.created_at').addClass('ro');
 			},
-			error: xmain.form_ajax_error($p),
-			complete: xmain.form_ajax_end($p)
+			error: main.form_ajax_error($p),
+			complete: main.form_ajax_end($p)
 		});
 		return false;
 	}
@@ -224,17 +224,17 @@ $(function() {
 	//----------------------------------------------------
 	function pets_delete() {
 		var $p = $('#pets_delete_popup');
-		var ids = xmain.get_table_checked_ids($('#pets_table'));
+		var ids = main.get_table_checked_ids($('#pets_table'));
 
 		$.ajax({
 			url: './delete',
 			type: 'POST',
 			data: {
-				_token_: xmain.token,
+				_token_: main.token,
 				id: ids
 			},
 			dataType: 'json',
-			beforeSend: xmain.form_ajax_start($p),
+			beforeSend: main.form_ajax_start($p),
 			success: function(data, ts, xhr) {
 				$p.popup('hide');
 
@@ -245,8 +245,8 @@ $(function() {
 
 				pets_search();
 			},
-			error: xmain.ajax_error,
-			complete: xmain.form_ajax_end($p)
+			error: main.ajax_error,
+			complete: main.form_ajax_end($p)
 		});
 		return false;
 	}
@@ -263,10 +263,10 @@ $(function() {
 			url: './clear',
 			type: 'POST',
 			data: {
-				_token_: xmain.token
+				_token_: main.token
 			},
 			dataType: 'json',
-			beforeSend: xmain.form_ajax_start($p),
+			beforeSend: main.form_ajax_start($p),
 			success: function(data, ts, xhr) {
 				$p.popup('hide');
 
@@ -277,8 +277,8 @@ $(function() {
 
 				pets_reset();
 			},
-			error: xmain.ajax_error,
-			complete: xmain.form_ajax_end($p)
+			error: main.ajax_error,
+			complete: main.form_ajax_end($p)
 		});
 		return false;
 	}

@@ -8,16 +8,16 @@ $(function() {
 			data: $('#job_form').serializeArray(),
 			file: $('#job_form').find('input[type="file"]'),
 			dataType: 'json',
-			beforeSend: xmain.loadmask,
+			beforeSend: main.loadmask,
 			success: function(data, ts, xhr) {
 				$.toast({
 					icon: 'info',
 					text: data.message
 				});
 			},
-			error: xmain.ajax_error,
+			error: main.ajax_error,
 			complete: function() {
-				xmain.unloadmask();
+				main.unloadmask();
 				job_list();
 			}
 		});
@@ -33,20 +33,20 @@ $(function() {
 			url: './abort',
 			type: 'POST',
 			data: {
-				_token_: xmain.token,
+				_token_: main.token,
 				jid: jid
 			},
 			dataType: 'json',
-			beforeSend: xmain.loadmask,
+			beforeSend: main.loadmask,
 			success: function(data, ts, xhr) {
 				$.toast({
 					icon: 'info',
 					text: data.message
 				});
 			},
-			error: xmain.ajax_error,
+			error: main.ajax_error,
 			complete: function() {
-				xmain.unloadmask();
+				main.unloadmask();
 				job_list();
 			}
 		});
@@ -97,7 +97,7 @@ $(function() {
 							td2 = document.createElement("td"),
 							td3 = document.createElement("td");
 						tr.className = lg.level;
-						td1.textContent = xmain.format_time(lg.time);
+						td1.textContent = main.format_time(lg.time);
 						td2.textContent = '[' + lg.level + ']';
 						td3.textContent = lg.message;
 						tr.append(td1, td2, td3);
@@ -119,7 +119,7 @@ $(function() {
 					$job.data('timer', setTimeout(function() { job_status(jid); }, timeout));
 				}
 			},
-			error: xmain.ajax_error
+			error: main.ajax_error
 		});
 	}
 
@@ -196,7 +196,7 @@ $(function() {
 
 			var $a = $('<a>', { href: '#job_info_' + job.id, 'class': 'nav-link' });
 			$a.append($('<i>', { 'class': job_status_icon(job.status) }));
-			$a.append($('<span>').text(xmain.format_time(job.created_at)));
+			$a.append($('<span>').text(main.format_time(job.created_at)));
 			
 			$li = $('<li>', { id: 'job_' + job.id, 'class': 'nav-item ' + job.status }).append($a);
 			$ul.prepend($li.data('job', job));
@@ -236,19 +236,19 @@ $(function() {
 
 		var $f = $form.find('[type=file]').hide();
 		if (job.file) {
-			$('<a>', { 'class': 'btn btn-secondary', href: xmain.base + '/files' + job.file })
+			$('<a>', { 'class': 'btn btn-secondary', href: main.base + '/files' + job.file })
 				.append($('<i>', { 'class': 'fas fa-download' }))
 				.insertAfter($f);
 		}
 
 		if (job.param) {
-			var params = xmain.safe_parse_json(job.param);
+			var params = main.safe_parse_json(job.param);
 			for (var k in params) {
 				var v = params[k];
 				if (typeof(v) == 'string') {
 					var d = new Date(v);
 					if (d.getTime() > 0 ) {
-						params[k] = xmain.format_date(d);
+						params[k] = main.format_date(d);
 					}
 				}
 			}
@@ -279,7 +279,7 @@ $(function() {
 				build_job_list(data);
 				job_btn_refresh();
 			},
-			error: xmain.ajax_error
+			error: main.ajax_error
 		});
 		return false;
 	}

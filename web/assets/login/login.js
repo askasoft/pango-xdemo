@@ -7,7 +7,7 @@ $(function() {
 			type: 'POST',
 			data: $f.serialize(),
 			dataType: 'json',
-			beforeSend: xmain.form_ajax_start($f),
+			beforeSend: main.form_ajax_start($f),
 			success: function(data, ts, xhr) {
 				$.toast({
 					icon: 'success',
@@ -15,12 +15,12 @@ $(function() {
 				});
 
 				setTimeout(function() {
-					var origin = $f.find('input[name=origin]').val() || xmain.base || '/';
+					var origin = $f.find('input[name=origin]').val() || main.base || '/';
 					location.href = origin;
 				}, 500);
 			},
-			error: xmain.form_ajax_error($f),
-			complete: xmain.form_ajax_end($f)
+			error: main.form_ajax_error($f),
+			complete: main.form_ajax_end($f)
 		});
 		return false;
 	}
