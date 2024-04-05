@@ -176,13 +176,13 @@ blockquote {
 /*--------------------------------------------------
  * Form
  */
-form .desc, form .verr {
+form div.desc, form div.verr {
 	font-size: 90%;
 	margin-top: 5px;
 	margin-bottom: 5px;
 	white-space: pre-wrap;
 }
-form .verr {
+form div.verr {
 	color: #a94442;
 }
 
