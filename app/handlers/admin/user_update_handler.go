@@ -43,7 +43,7 @@ func UserDetail(c *xin.Context) {
 	tt := tenant.FromCtx(c)
 
 	usr := &models.User{}
-	r := app.DB.Table(tt.TableUsers()).Where("id = ?", aid).Take(usr)
+	r := app.GDB.Table(tt.TableUsers()).Where("id = ?", aid).Take(usr)
 	if errors.Is(r.Error, gorm.ErrRecordNotFound) {
 		c.AddError(r.Error)
 		c.JSON(http.StatusNotFound, handlers.E(c))
@@ -119,7 +119,7 @@ func UserCreate(c *xin.Context) {
 	usr.UpdatedAt = usr.CreatedAt
 
 	tt := tenant.FromCtx(c)
-	err := app.DB.Table(tt.TableUsers()).Create(usr).Error
+	err := app.GDB.Table(tt.TableUsers()).Create(usr).Error
 	if err != nil {
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
@@ -147,7 +147,7 @@ func userUpdate(c *xin.Context, cols ...string) {
 
 	if usr.Password == "" {
 		eu := &models.User{}
-		err := app.DB.Table(tt.TableUsers()).Where("id = ?", usr.ID).Take(eu).Error
+		err := app.GDB.Table(tt.TableUsers()).Where("id = ?", usr.ID).Take(eu).Error
 		if err != nil {
 			c.AddError(err)
 			c.JSON(http.StatusInternalServerError, handlers.E(c))
@@ -162,7 +162,7 @@ func userUpdate(c *xin.Context, cols ...string) {
 
 	usr.UpdatedAt = time.Now()
 
-	tx := app.DB.Table(tt.TableUsers())
+	tx := app.GDB.Table(tt.TableUsers())
 	if len(cols) > 0 {
 		tx = tx.Select(cols)
 	}
@@ -200,7 +200,7 @@ func UserDelete(c *xin.Context) {
 		au := tenant.AuthUser(c)
 		tt := tenant.FromCtx(c)
 
-		tx := app.DB.Table(tt.TableUsers())
+		tx := app.GDB.Table(tt.TableUsers())
 		tx = tx.Where("role <> ? AND id <> ? AND id IN ?", models.RoleSuper, au.ID, arg.IDs)
 		r := tx.Delete(&models.User{})
 
@@ -224,7 +224,7 @@ func UserClear(c *xin.Context) {
 	tt := tenant.FromCtx(c)
 
 	var cnt int64
-	err := app.DB.Transaction(func(db *gorm.DB) error {
+	err := app.GDB.Transaction(func(db *gorm.DB) error {
 		r := db.Table(tt.TableUsers()).Where("role <> ? AND id <> ?", models.RoleSuper, au.ID).Delete(&models.User{})
 		if r.Error != nil {
 			return r.Error
@@ -260,7 +260,7 @@ func userStatusUpdate(c *xin.Context, enable bool) {
 		tt := tenant.FromCtx(c)
 
 		status := str.If(enable, models.UserActive, models.UserDisabled)
-		tx := app.DB.Table(tt.TableUsers())
+		tx := app.GDB.Table(tt.TableUsers())
 		tx = tx.Where("role <> ? AND id <> ? AND id IN ?", models.RoleSuper, au.ID, arg.IDs)
 		r := tx.Update("status", status)
 

@@ -48,7 +48,7 @@ func PasswordChangeChange(c *xin.Context) {
 	nu.SetPassword(pca.Newpwd)
 
 	tt := tenant.FromCtx(c)
-	r := app.DB.Table(tt.TableUsers()).Where("id = ?", au.ID).Update("password", nu.Password)
+	r := app.GDB.Table(tt.TableUsers()).Where("id = ?", au.ID).Update("password", nu.Password)
 	if r.Error != nil {
 		c.AddError(r.Error)
 		c.JSON(http.StatusBadRequest, handlers.E(c))

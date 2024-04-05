@@ -26,7 +26,7 @@ func PetCsvExport(c *xin.Context) {
 
 	tt := tenant.FromCtx(c)
 
-	tx := app.DB.Table(tt.TablePets())
+	tx := app.GDB.Table(tt.TablePets())
 	tx = filterPets(tx, q).Order("id ASC")
 
 	rows, err := tx.Rows()

@@ -7,7 +7,6 @@ import (
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango/xfs"
-	"github.com/askasoft/pango/xfs/gormfs"
 )
 
 func CleanTemporaryFiles() {
@@ -15,9 +14,9 @@ func CleanTemporaryFiles() {
 	before := time.Now().Add(-1 * app.INI.GetDuration("app", "tempfileExpires", time.Hour*2))
 
 	_ = tenant.Iterate(func(tt tenant.Tenant) error {
-		gfs := gormfs.FS(app.DB, tt.TableFiles())
+		tfs := tt.FS()
 
-		xfs.CleanOutdatedFiles(gfs, prefix, before)
+		xfs.CleanOutdatedFiles(tfs, prefix, before)
 
 		return nil
 	})

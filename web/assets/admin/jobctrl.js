@@ -29,7 +29,6 @@ $(function() {
 
 		$('#job_abort').prop('disabled', true);
 
-		xmain.loadmask();
 		$.ajax({
 			url: './abort',
 			type: 'POST',
@@ -38,6 +37,7 @@ $(function() {
 				jid: jid
 			},
 			dataType: 'json',
+			beforeSend: xmain.loadmask,
 			success: function(data, ts, xhr) {
 				$.toast({
 					icon: 'info',

@@ -123,7 +123,7 @@ type JobRunner struct {
 func newJobRunner(tt tenant.Tenant, jid int64) *JobRunner {
 	jr := &JobRunner{
 		JobRunner: xjm.NewJobRunner(
-			tt.JM(app.DB),
+			tt.JM(),
 			jid,
 			time.Now().UnixMilli(),
 			tt.Logger("JOB"),
@@ -137,12 +137,12 @@ func doneJob(jr *JobRunner, err error) {
 	defer jr.Log.Close()
 
 	if err != nil && !errors.Is(err, xjm.ErrJobAborted) && !errors.Is(err, xjm.ErrJobCompleted) && !errors.Is(err, xjm.ErrJobMissing) {
-		jr.Log.Error(err)
+		jr.Log.Warn(err)
 		err = jr.Abort(err.Error())
 		if err != nil {
 			jr.Log.Error(err)
 		}
-		jr.Log.Error("ABORTED.")
+		jr.Log.Warn("ABORTED.")
 		return
 	}
 
@@ -273,8 +273,8 @@ func Start() {
 			c = a
 		}
 
-		gjm := tt.JM(app.DB)
-		return gjm.StartJobs(c, func(job *xjm.Job) {
+		tjm := tt.JM()
+		return tjm.StartJobs(c, func(job *xjm.Job) {
 			logger := tt.Logger("JOB")
 
 			defer func() {
@@ -323,8 +323,8 @@ func Reappend() {
 	_ = tenant.Iterate(func(tt tenant.Tenant) error {
 		d := app.INI.GetDuration("job", "reappendBefore", time.Minute*30)
 		before := time.Now().Add(-d)
-		gjm := tt.JM(app.DB)
-		_, err := gjm.ReappendJobs(before)
+		tjm := tt.JM()
+		_, err := tjm.ReappendJobs(before)
 		if err != nil {
 			tt.Logger("JOB").Errorf("Failed to reappend job (%s): %v", string(tt), err)
 		}
@@ -338,7 +338,7 @@ func CleanOutdatedJobs() {
 	before := time.Now().Add(-1 * app.INI.GetDuration("job", "outdatedBefore", time.Hour*240))
 
 	_ = tenant.Iterate(func(tt tenant.Tenant) error {
-		return app.DB.Transaction(func(db *gorm.DB) error {
+		return app.GDB.Transaction(func(db *gorm.DB) error {
 			logger := tt.Logger("JOB")
 
 			jobTable := tt.TableJobs()
@@ -356,7 +356,7 @@ func CleanOutdatedJobs() {
 				logger.Infof("Delete outdated job files: %d", r.RowsAffected)
 			}
 
-			gjm := tt.JM(db)
+			gjm := tt.GJM(db)
 			_, _, err := gjm.CleanOutdatedJobs(before)
 			if err != nil {
 				tt.Logger("JOB").Errorf("Failed to CleanOutdatedJobs('%s', '%s')", string(tt), before.Format(time.RFC3339))

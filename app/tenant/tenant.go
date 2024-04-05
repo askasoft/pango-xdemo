@@ -8,12 +8,15 @@ import (
 	"github.com/askasoft/pango/cog"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/sqx"
+	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/xfs"
 	"github.com/askasoft/pango/xfs/gormfs"
+	"github.com/askasoft/pango/xfs/sqlxfs"
 	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pango/xjm"
 	"github.com/askasoft/pango/xjm/gormjm"
+	"github.com/askasoft/pango/xjm/sqlxjm"
 	"gorm.io/gorm"
 )
 
@@ -37,14 +40,13 @@ func ExistsTenant(s string) (bool, error) {
 	}
 
 	sm := &Schemata{}
-	r := app.DB.Table(TableSchemata).Where("schema_name = ?", s).Select("schema_name").Take(sm)
+	r := app.GDB.Table(TableSchemata).Where("schema_name = ?", s).Select("schema_name").Take(sm)
 	if r.Error != nil {
 		if errors.Is(r.Error, gorm.ErrRecordNotFound) {
 			return false, nil
 		}
 		return false, r.Error
 	}
-
 	return true, nil
 }
 
@@ -53,7 +55,7 @@ func ListTenants() ([]Tenant, error) {
 		return []Tenant{""}, nil
 	}
 
-	tx := app.DB.Table(TableSchemata).Where("schema_name NOT LIKE ?", sqx.StringLike("_")).Select("schema_name").Order("schema_name asc")
+	tx := app.GDB.Table(TableSchemata).Where("schema_name NOT LIKE ?", sqx.StringLike("_")).Select("schema_name").Order("schema_name asc")
 	rows, err := tx.Rows()
 	if err != nil {
 		return nil, err
@@ -96,7 +98,7 @@ func Iterate(it func(tt Tenant) error) error {
 }
 
 func Create(name string) error {
-	if err := app.DB.Exec("CREATE SCHEMA " + name).Error; err != nil {
+	if err := app.GDB.Exec("CREATE SCHEMA " + name).Error; err != nil {
 		return err
 	}
 
@@ -193,10 +195,32 @@ func (tt Tenant) ResetSequence(table string, starts ...int64) string {
 	return fmt.Sprintf("SELECT SETVAL('%s_id_seq', GREATEST((SELECT MAX(id)+1 FROM %s), %d), false)", stn, stn, start)
 }
 
-func (tt Tenant) JM(db *gorm.DB) xjm.JobManager {
+func (tt Tenant) GJM(db *gorm.DB) xjm.JobManager {
 	return gormjm.JM(db, tt.TableJobs(), tt.TableJobLogs())
 }
 
-func (tt Tenant) FS(db *gorm.DB) xfs.XFS {
+func (tt Tenant) GFS(db *gorm.DB) xfs.XFS {
 	return gormfs.FS(db, tt.TableFiles())
+}
+
+func (tt Tenant) SJM(db sqlx.Sqlx) xjm.JobManager {
+	return sqlxjm.JM(db, tt.TableJobs(), tt.TableJobLogs())
+}
+
+func (tt Tenant) SFS(db sqlx.Sqlx) xfs.XFS {
+	return sqlxfs.FS(db, tt.TableFiles())
+}
+
+func (tt Tenant) JM() xjm.JobManager {
+	if app.INI.GetString("internal", "xjm") == "sqlxjm" {
+		return tt.SJM(app.SDB)
+	}
+	return tt.GJM(app.GDB)
+}
+
+func (tt Tenant) FS() xfs.XFS {
+	if app.INI.GetString("internal", "xfs") == "sqlxfs" {
+		return tt.SFS(app.SDB)
+	}
+	return tt.GFS(app.GDB)
 }

@@ -97,7 +97,7 @@ func filterPets(tx *gorm.DB, pq *PetQuery) *gorm.DB {
 func countPets(tt tenant.Tenant, pq *PetQuery, filter func(tx *gorm.DB, pq *PetQuery) *gorm.DB) (int, error) {
 	var total int64
 
-	tx := app.DB.Table(tt.TablePets())
+	tx := app.GDB.Table(tt.TablePets())
 
 	tx = filter(tx, pq)
 
@@ -110,7 +110,7 @@ func countPets(tt tenant.Tenant, pq *PetQuery, filter func(tx *gorm.DB, pq *PetQ
 }
 
 func findPets(tt tenant.Tenant, pq *PetQuery, filter func(tx *gorm.DB, pq *PetQuery) *gorm.DB) (arts []*models.Pet, err error) {
-	tx := app.DB.Table(tt.TablePets())
+	tx := app.GDB.Table(tt.TablePets())
 
 	tx = filter(tx, pq)
 

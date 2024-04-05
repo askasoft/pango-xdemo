@@ -43,7 +43,7 @@ func FindUser(c *xin.Context, username string) (xmw.AuthUser, error) {
 	}
 
 	u := &models.User{}
-	r := app.DB.Table(tt.TableUsers()).Where("email = ? AND status = ?", username, models.UserActive).Take(u)
+	r := app.GDB.Table(tt.TableUsers()).Where("email = ? AND status = ?", username, models.UserActive).Take(u)
 	if r.Error != nil {
 		if errors.Is(r.Error, gorm.ErrRecordNotFound) {
 			app.USERS.Set(k, noUser)

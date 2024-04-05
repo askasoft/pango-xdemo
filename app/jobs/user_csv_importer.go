@@ -67,8 +67,8 @@ func (uci *UserCsvImporter) Run() {
 		return
 	}
 
-	gfs := uci.Tenant.FS(app.DB)
-	uci.data, err = gfs.ReadFile(uci.file)
+	tfs := uci.Tenant.FS()
+	uci.data, err = tfs.ReadFile(uci.file)
 	if err != nil {
 		doneJob(uci.JobRunner, err)
 		return
@@ -245,7 +245,7 @@ func (uci *UserCsvImporter) importRecord(rec *csvUserRecord) error {
 		UpdatedAt: time.Now(),
 	}
 
-	err := app.DB.Transaction(func(db *gorm.DB) error {
+	err := app.GDB.Transaction(func(db *gorm.DB) error {
 		if usr.ID != 0 {
 			eu := &models.User{}
 			r := db.Table(uci.Tenant.TableUsers()).Where("id = ?", usr.ID).Take(eu)

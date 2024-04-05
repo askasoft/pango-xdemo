@@ -229,7 +229,7 @@ func addFilesHandlers(rg *xin.RouterGroup) {
 
 	xin.StaticFSFunc(rg, "/", func(c *xin.Context) http.FileSystem {
 		tt := tenant.FromCtx(c)
-		return xfs.HFS(tt.FS(app.DB))
+		return xfs.HFS(tt.FS())
 	}, "", xcch)
 }
 

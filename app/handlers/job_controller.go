@@ -32,8 +32,8 @@ type JobController struct {
 
 func (jc *JobController) SetFile(tt tenant.Tenant, ff *multipart.FileHeader) error {
 	fid := models.MakeFileID(models.PrefixJobFile, ff.Filename)
-	gfs := tt.FS(app.DB)
-	if _, err := xfs.SaveUploadedFile(gfs, fid, ff); err != nil {
+	tfs := tt.FS()
+	if _, err := xfs.SaveUploadedFile(tfs, fid, ff); err != nil {
 		return err
 	}
 
@@ -53,8 +53,8 @@ func (jc *JobController) Index(c *xin.Context) {
 func (jc *JobController) Start(c *xin.Context) {
 	tt := tenant.FromCtx(c)
 
-	gjm := tt.JM(app.DB)
-	job, err := gjm.FindJob(jc.Name)
+	tjm := tt.JM()
+	job, err := tjm.FindJob(jc.Name)
 	if err != nil {
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, E(c))
@@ -67,7 +67,7 @@ func (jc *JobController) Start(c *xin.Context) {
 		return
 	}
 
-	jid, err := gjm.AppendJob(jc.Name, jc.File, jc.Param)
+	jid, err := tjm.AppendJob(jc.Name, jc.File, jc.Param)
 	if err != nil {
 		log.Errorf("Failed to pending job %s: %v", jc.Name, err)
 		c.AddError(err)
@@ -85,8 +85,8 @@ func (jc *JobController) Abort(c *xin.Context) {
 	if jid > 0 {
 		tt := tenant.FromCtx(c)
 
-		gjm := tt.JM(app.DB)
-		err := gjm.AbortJob(jid, "User aborted")
+		tjm := tt.JM()
+		err := tjm.AbortJob(jid, "User aborted")
 		if err != nil {
 			c.Logger.Errorf("Failed to abort job #%d: %v", jid, err)
 			c.AddError(err)
@@ -100,7 +100,7 @@ func (jc *JobController) Abort(c *xin.Context) {
 
 func (jc *JobController) List(c *xin.Context) {
 	tt := tenant.FromCtx(c)
-	gjm := tt.JM(app.DB)
+	tjm := tt.JM()
 
 	skip := num.Atoi(c.Query("skip"))
 	limit := num.Atoi(c.Query("limit"))
@@ -109,7 +109,7 @@ func (jc *JobController) List(c *xin.Context) {
 		limit = max
 	}
 
-	jobs, err := gjm.FindJobs(jc.Name, skip, limit)
+	jobs, err := tjm.FindJobs(jc.Name, skip, limit)
 	if err != nil {
 		c.Logger.Errorf("Failed to find jobs for '%s': %v", jc.Name, err)
 		c.AddError(err)
@@ -129,9 +129,9 @@ func (jc *JobController) Status(c *xin.Context) {
 	}
 
 	tt := tenant.FromCtx(c)
-	gjm := tt.JM(app.DB)
+	tjm := tt.JM()
 
-	job, err := gjm.GetJob(jid)
+	job, err := tjm.GetJob(jid)
 	if err != nil {
 		c.Logger.Errorf("Failed to get job #%d: %v", jid, err)
 		c.AddError(err)
@@ -162,7 +162,7 @@ func (jc *JobController) Status(c *xin.Context) {
 			log.LevelInfo.Prefix(),
 		}
 
-		logs, err = gjm.GetJobLogs(job.ID, skip, limit, lvls...)
+		logs, err = tjm.GetJobLogs(job.ID, skip, limit, lvls...)
 		if err != nil {
 			log.Errorf("Failed to get job logs #%d: %v", job.ID, err)
 			c.AddError(err)

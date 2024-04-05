@@ -25,7 +25,7 @@ func UserCsvExport(c *xin.Context) {
 
 	tt := tenant.FromCtx(c)
 
-	tx := app.DB.Table(tt.TableUsers())
+	tx := app.GDB.Table(tt.TableUsers())
 	tx = filterUsers(c)(tx, q).Order("id ASC")
 
 	rows, err := tx.Rows()

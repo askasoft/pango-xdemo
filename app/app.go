@@ -9,6 +9,7 @@ import (
 	"github.com/askasoft/pango/ini"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/net/netutil"
+	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pango/xin/render"
 	"github.com/askasoft/pango/xmw"
@@ -126,8 +127,11 @@ var (
 	// HTTP global http server
 	HTTP *http.Server
 
-	// DB database instance
-	DB *gorm.DB
+	// GDB gorm database instance
+	GDB *gorm.DB
+
+	// SDB sqx database instance
+	SDB *sqlx.DB
 
 	// DBS database settings
 	DBS map[string]string

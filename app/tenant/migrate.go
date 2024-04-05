@@ -26,9 +26,9 @@ func (tt Tenant) MigrateSchema() error {
 		),
 	}
 
-	dbd := app.DB.Dialector
+	gdd := app.GDB.Dialector
 
-	dbi, err := gorm.Open(dbd, dbc)
+	gdb, err := gorm.Open(gdd, dbc)
 	if err != nil {
 		return err
 	}
@@ -42,9 +42,9 @@ func (tt Tenant) MigrateSchema() error {
 		&models.Pet{},
 	}
 
-	err = dbi.AutoMigrate(migrates...)
+	err = gdb.AutoMigrate(migrates...)
 
-	if db, err := dbi.DB(); err == nil {
+	if db, err := gdb.DB(); err == nil {
 		db.Close()
 	}
 	return err
@@ -54,14 +54,14 @@ func (tt Tenant) MigrateConfig(configs []*models.Config) error {
 	tn := tt.TableConfigs()
 
 	for _, cfg := range configs {
-		r := app.DB.Table(tn).Where("name = ?", cfg.Name).Select("style", "order", "required", "secret", "readonly", "hidden").Updates(cfg)
+		r := app.GDB.Table(tn).Where("name = ?", cfg.Name).Select("style", "order", "required", "secret", "readonly", "hidden").Updates(cfg)
 		if r.Error != nil {
 			return r.Error
 		}
 
 		if r.RowsAffected == 0 {
 			log.Infof("INSERT INTO %s: %v", tn, cfg)
-			r = app.DB.Table(tn).Create(cfg)
+			r = app.GDB.Table(tn).Create(cfg)
 			if r.Error != nil {
 				return r.Error
 			}
@@ -97,7 +97,7 @@ func (tt Tenant) MigrateSuper() error {
 	superEmail := suc.GetString("email")
 
 	user := &models.User{}
-	r := app.DB.Table(tt.TableUsers()).Where("email = ?", superEmail).Take(user)
+	r := app.GDB.Table(tt.TableUsers()).Where("email = ?", superEmail).Take(user)
 	if r.Error != nil {
 		if !errors.Is(r.Error, gorm.ErrRecordNotFound) {
 			return r.Error
@@ -111,18 +111,18 @@ func (tt Tenant) MigrateSuper() error {
 		user.Status = models.UserActive
 		user.CIDR = "0.0.0.0/0\n::/0"
 
-		r = app.DB.Table(tt.TableUsers()).Create(user)
+		r = app.GDB.Table(tt.TableUsers()).Create(user)
 		if r.Error != nil {
 			return r.Error
 		}
 
 		seq := tt.ResetSequence("users", models.UserStartID)
-		r = app.DB.Exec(seq)
+		r = app.GDB.Exec(seq)
 		return r.Error
 	}
 
 	user.Role = models.RoleSuper
 	user.Status = models.UserActive
-	r = app.DB.Table(tt.TableUsers()).Select("role", "status").Updates(user)
+	r = app.GDB.Table(tt.TableUsers()).Select("role", "status").Updates(user)
 	return r.Error
 }

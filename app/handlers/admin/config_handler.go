@@ -29,7 +29,7 @@ func ConfigIndex(c *xin.Context) {
 	tt := tenant.FromCtx(c)
 	au := tenant.AuthUser(c)
 
-	tx := app.DB.Table(tt.TableConfigs()).Order(clause.OrderByColumn{Column: clause.Column{Name: "order"}})
+	tx := app.GDB.Table(tt.TableConfigs()).Order(clause.OrderByColumn{Column: clause.Column{Name: "order"}})
 	if !au.IsSuper() {
 		tx = tx.Where("hidden = ?", false)
 	}
@@ -89,7 +89,7 @@ func ConfigSave(c *xin.Context) {
 	au := tenant.AuthUser(c)
 
 	configs := []*models.Config{}
-	if err := app.DB.Order("name ASC").Find(&configs).Error; err != nil {
+	if err := app.GDB.Order("name ASC").Find(&configs).Error; err != nil {
 		panic(err)
 	}
 
@@ -97,7 +97,7 @@ func ConfigSave(c *xin.Context) {
 	var v string
 	var ok bool
 
-	db := app.DB.Begin()
+	db := app.GDB.Begin()
 	for _, cfg := range configs {
 		if cfg.Style == models.StyleChecks {
 			vs, ok = c.GetPostFormArray(cfg.Name)

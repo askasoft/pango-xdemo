@@ -38,7 +38,7 @@ func petDetail(c *xin.Context, edit bool) {
 	tt := tenant.FromCtx(c)
 
 	pet := &models.Pet{}
-	r := app.DB.Table(tt.TablePets()).Where("id = ?", aid).Take(pet)
+	r := app.GDB.Table(tt.TablePets()).Where("id = ?", aid).Take(pet)
 	if errors.Is(r.Error, gorm.ErrRecordNotFound) {
 		c.AddError(r.Error)
 		c.JSON(http.StatusNotFound, handlers.E(c))
@@ -117,7 +117,7 @@ func PetCreate(c *xin.Context) {
 	pet.UpdatedAt = pet.CreatedAt
 
 	tt := tenant.FromCtx(c)
-	if err := app.DB.Table(tt.TablePets()).Create(pet).Error; err != nil {
+	if err := app.GDB.Table(tt.TablePets()).Create(pet).Error; err != nil {
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return
@@ -148,7 +148,7 @@ func petUpdate(c *xin.Context, cols ...string) {
 
 	tt := tenant.FromCtx(c)
 
-	tx := app.DB.Table(tt.TablePets())
+	tx := app.GDB.Table(tt.TablePets())
 
 	if len(cols) > 0 {
 		tx = tx.Select(cols)
@@ -199,7 +199,7 @@ func PetDelete(c *xin.Context) {
 	if len(arg.IDs) > 0 {
 		tt := tenant.FromCtx(c)
 
-		err = app.DB.Transaction(func(db *gorm.DB) error {
+		err = app.GDB.Transaction(func(db *gorm.DB) error {
 			// sq := db.Table(tt.TablePets()).Where("id IN ?", arg.IDs)
 
 			// gfs := tt.FS(db)
@@ -225,8 +225,8 @@ func PetDelete(c *xin.Context) {
 func PetClear(c *xin.Context) {
 	tt := tenant.FromCtx(c)
 
-	err := app.DB.Session(&gorm.Session{AllowGlobalUpdate: true}).Transaction(func(db *gorm.DB) error {
-		gfs := tt.FS(db)
+	err := app.GDB.Session(&gorm.Session{AllowGlobalUpdate: true}).Transaction(func(db *gorm.DB) error {
+		gfs := tt.GFS(db)
 		if _, err := gfs.DeletePrefix("/" + models.PrefixPetFile + "/"); err != nil {
 			return err
 		}

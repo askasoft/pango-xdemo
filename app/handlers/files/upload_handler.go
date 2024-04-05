@@ -4,11 +4,9 @@ import (
 	"mime/multipart"
 	"net/http"
 
-	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango/xfs"
-	"github.com/askasoft/pango/xfs/gormfs"
 	"github.com/askasoft/pango/xin"
 )
 
@@ -33,8 +31,8 @@ func SaveUploadedFile(c *xin.Context, ff *multipart.FileHeader) (*xfs.File, erro
 	fid := models.MakeFileID(models.PrefixTmpFile, ff.Filename)
 
 	tt := tenant.FromCtx(c)
-	gfs := gormfs.FS(app.DB, tt.TableFiles())
-	return xfs.SaveUploadedFile(gfs, fid, ff)
+	tfs := tt.FS()
+	return xfs.SaveUploadedFile(tfs, fid, ff)
 }
 
 func Uploads(c *xin.Context) {

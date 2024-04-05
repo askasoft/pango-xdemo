@@ -9,6 +9,7 @@ import (
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/log/gormlog"
 	"github.com/askasoft/pango/mag"
+	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/str"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -40,9 +41,9 @@ func openDatabase() error {
 
 	log.Infof("Connect Database: %s", dsn)
 
-	dbd := postgres.Open(dsn)
+	gdd := postgres.Open(dsn)
 
-	dbc := &gorm.Config{
+	gdc := &gorm.Config{
 		Logger: gormlog.NewGormLogger(
 			log.GetLogger("SQL"),
 			sec.GetDuration("slowSql", time.Second),
@@ -50,12 +51,12 @@ func openDatabase() error {
 		SkipDefaultTransaction: true,
 	}
 
-	dbi, err := gorm.Open(dbd, dbc)
+	gdb, err := gorm.Open(gdd, gdc)
 	if err != nil {
 		return err
 	}
 
-	db, err := dbi.DB()
+	db, err := gdb.DB()
 	if err != nil {
 		return err
 	}
@@ -64,19 +65,21 @@ func openDatabase() error {
 	db.SetMaxOpenConns(sec.GetInt("maxOpenConns", 10))
 	db.SetConnMaxLifetime(sec.GetDuration("connMaxLifetime", time.Hour))
 
-	app.DB = dbi
 	app.DBS = dbs
+	app.GDB = gdb
+	app.SDB = sqlx.NewDB(db, "pgx")
 
 	return nil
 }
 
 func closeDatabase() {
-	if app.DB != nil {
-		db, err := app.DB.DB()
+	if app.GDB != nil {
+		db, err := app.GDB.DB()
 		if err != nil {
 			db.Close()
 		}
-		app.DB = nil
+		app.GDB = nil
+		app.SDB = nil
 	}
 }
 
@@ -130,7 +133,7 @@ func dbExecSQL(sqlfile string) error {
 
 		tsqls := str.FieldsRune(tsql, ';')
 
-		err := app.DB.Transaction(func(db *gorm.DB) error {
+		err := app.GDB.Transaction(func(db *gorm.DB) error {
 			for i, s := range tsqls {
 				s := str.Strip(s)
 				if s == "" || str.StartsWith(s, "--") {

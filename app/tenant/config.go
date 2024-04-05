@@ -32,7 +32,7 @@ func (tt Tenant) GetConfigMap() map[string]string {
 		return dcm.(map[string]string)
 	}
 
-	dcm, err := tt.loadConfigMap(app.DB)
+	dcm, err := tt.loadConfigMap(app.GDB)
 	if err != nil {
 		panic(err)
 	}

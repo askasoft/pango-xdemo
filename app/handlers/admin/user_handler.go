@@ -75,7 +75,7 @@ func filterUsers(c *xin.Context) func(tx *gorm.DB, uq *UserQuery) *gorm.DB {
 func countUsers(tt tenant.Tenant, uq *UserQuery, filter func(tx *gorm.DB, uq *UserQuery) *gorm.DB) (int, error) {
 	var total int64
 
-	tx := app.DB.Table(tt.TableUsers())
+	tx := app.GDB.Table(tt.TableUsers())
 
 	tx = filter(tx, uq)
 
@@ -87,7 +87,7 @@ func countUsers(tt tenant.Tenant, uq *UserQuery, filter func(tx *gorm.DB, uq *Us
 }
 
 func findUsers(tt tenant.Tenant, uq *UserQuery, filter func(tx *gorm.DB, uq *UserQuery) *gorm.DB) (usrs []*models.User, err error) {
-	tx := app.DB.Table(tt.TableUsers())
+	tx := app.GDB.Table(tt.TableUsers())
 
 	tx = filter(tx, uq)
 

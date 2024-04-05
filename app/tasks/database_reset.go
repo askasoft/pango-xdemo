@@ -21,8 +21,8 @@ func ResetDatabase() {
 
 func ResetShcemasData() error {
 	return tenant.Iterate(func(tt tenant.Tenant) error {
-		err := app.DB.Session(&gorm.Session{AllowGlobalUpdate: true}).Transaction(func(db *gorm.DB) error {
-			gfs := tt.FS(db)
+		err := app.GDB.Session(&gorm.Session{AllowGlobalUpdate: true}).Transaction(func(db *gorm.DB) error {
+			gfs := tt.GFS(db)
 			if _, err := gfs.DeletePrefix("/" + models.PrefixPetFile + "/"); err != nil {
 				return err
 			}
