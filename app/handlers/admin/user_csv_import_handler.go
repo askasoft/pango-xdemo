@@ -34,7 +34,7 @@ type UserCsvImportJobController struct {
 }
 
 func (ucijc *UserCsvImportJobController) Start(c *xin.Context) {
-	ff, err := c.FormFile("file")
+	mfh, err := c.FormFile("file")
 	if err != nil {
 		err = errors.New(tbs.GetText(c.Locale, "csv.error.required"))
 		c.AddError(err)
@@ -43,7 +43,7 @@ func (ucijc *UserCsvImportJobController) Start(c *xin.Context) {
 	}
 
 	tt := tenant.FromCtx(c)
-	if err = ucijc.SetFile(tt, ff); err != nil {
+	if err = ucijc.SetFile(tt, mfh); err != nil {
 		err = fmt.Errorf(tbs.GetText(c.Locale, "csv.error.read"), err)
 		c.AddError(err)
 		c.JSON(http.StatusBadRequest, handlers.E(c))

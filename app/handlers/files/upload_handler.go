@@ -10,6 +10,14 @@ import (
 	"github.com/askasoft/pango/xin"
 )
 
+func SaveUploadedFile(c *xin.Context, mfh *multipart.FileHeader) (*xfs.File, error) {
+	fid := models.MakeFileID(models.PrefixTmpFile, mfh.Filename)
+
+	tt := tenant.FromCtx(c)
+	tfs := tt.FS()
+	return xfs.SaveUploadedFile(tfs, fid, mfh)
+}
+
 func Upload(c *xin.Context) {
 	file, err := c.FormFile("file")
 	if err != nil {
@@ -25,14 +33,6 @@ func Upload(c *xin.Context) {
 
 	fr := &xfs.FileResult{File: fi}
 	c.JSON(http.StatusOK, fr)
-}
-
-func SaveUploadedFile(c *xin.Context, ff *multipart.FileHeader) (*xfs.File, error) {
-	fid := models.MakeFileID(models.PrefixTmpFile, ff.Filename)
-
-	tt := tenant.FromCtx(c)
-	tfs := tt.FS()
-	return xfs.SaveUploadedFile(tfs, fid, ff)
 }
 
 func Uploads(c *xin.Context) {

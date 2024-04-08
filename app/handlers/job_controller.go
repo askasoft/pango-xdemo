@@ -30,10 +30,10 @@ type JobController struct {
 	Template string
 }
 
-func (jc *JobController) SetFile(tt tenant.Tenant, ff *multipart.FileHeader) error {
-	fid := models.MakeFileID(models.PrefixJobFile, ff.Filename)
+func (jc *JobController) SetFile(tt tenant.Tenant, mfh *multipart.FileHeader) error {
+	fid := models.MakeFileID(models.PrefixJobFile, mfh.Filename)
 	tfs := tt.FS()
-	if _, err := xfs.SaveUploadedFile(tfs, fid, ff); err != nil {
+	if _, err := xfs.SaveUploadedFile(tfs, fid, mfh); err != nil {
 		return err
 	}
 
