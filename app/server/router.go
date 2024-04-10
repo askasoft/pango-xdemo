@@ -31,7 +31,7 @@ func initRouter() {
 	app.XAL = xmw.NewAccessLogger(nil)
 	app.XRL = xmw.NewRequestLimiter(0)
 	app.XHZ = xmw.DefaultHTTPGziper()
-	app.XHD = xmw.NewHTTPDumper(app.XIN.Logger.GetOutputer("XHD", log.LevelTrace))
+	app.XHD = xmw.NewHTTPDumper(app.XIN.Logger.GetOutputer("XHD", log.LevelInfo))
 	app.XSR = xmw.NewHTTPSRedirector()
 	app.XLL = xmw.NewLocalizer()
 	app.XTP = xmw.NewTokenProtector("")
