@@ -3,6 +3,7 @@ package server
 import (
 	"flag"
 	"fmt"
+	"io"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -16,6 +17,7 @@ import (
 	"github.com/askasoft/pango-xdemo/web"
 	"github.com/askasoft/pango/fsu"
 	"github.com/askasoft/pango/log"
+	"github.com/askasoft/pango/srv"
 )
 
 // -----------------------------------
@@ -26,9 +28,7 @@ func (s *service) Flag() {
 }
 
 // PrintCommand print custom command
-func (s *service) PrintCommand() {
-	out := flag.CommandLine.Output()
-
+func (s *service) PrintCommand(out io.Writer) {
 	fmt.Fprintln(out, "    migrate kind...     migrate database schemas or configurations.")
 	fmt.Fprintln(out, "      kind=schema       migrate database schemas.")
 	fmt.Fprintln(out, "      kind=config       migrate tenant configurations.")
@@ -38,6 +38,7 @@ func (s *service) PrintCommand() {
 	fmt.Fprintln(out, "    encrypt [key] <str> encrypt string.")
 	fmt.Fprintln(out, "    decrypt [key] <str> decrypt string.")
 	fmt.Fprintln(out, "    assets              export assets.")
+	srv.PrintDefaultCommand(out)
 }
 
 // Exec execute optional command except the internal command
