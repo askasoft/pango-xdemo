@@ -116,6 +116,10 @@ func configResponseHeader() {
 	} else {
 		err := json.Unmarshal(str.UnsafeBytes(hh), &hm)
 		if err == nil {
+			sr := str.NewReplacer("{{VERSION}}", app.Version, "{{REVISION}}", app.Revision, "{{BUILDTIME}}", app.BuildTime.Format(time.RFC3339))
+			for k, v := range hm {
+				hm[k] = sr.Replace(v)
+			}
 			app.XRH.Header = hm
 		} else {
 			log.Errorf("Invalid httpResponseHeader '%s': %v", hh, err)
