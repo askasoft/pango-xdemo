@@ -284,27 +284,25 @@ func addSelfHandlers(s *xin.RouterGroup) {
 }
 
 func addAdminHandlers(a *xin.RouterGroup) {
-	a.Use(tenant.CheckTenant) // schema protect
-	a.Use(app.XCA.Handler())  // cookie auth
-	a.Use(tenant.IPProtect)   // IP protect
-	a.Use(app.XTP.Handler())  // token protect
+	a.Use(tenant.CheckTenant)      // schema protect
+	a.Use(app.XCA.Handler())       // cookie auth
+	a.Use(tenant.IPProtect)        // IP protect
+	a.Use(tenant.RoleAdminProtect) // role protect
+	a.Use(app.XTP.Handler())       // token protect
 
 	a.GET("/", admin.Index)
 
 	addAdminConfigHandlers(a.Group("/config"))
 	addAdminUserHandlers(a.Group("/users"))
+	addAdminResetHandlers(a.Group("/reset"))
 }
 
 func addAdminConfigHandlers(rg *xin.RouterGroup) {
-	rg.Use(tenant.RoleAdminProtect) // role protect
-
 	rg.GET("/", admin.ConfigIndex)
 	rg.POST("/save", admin.ConfigSave)
 }
 
 func addAdminUserHandlers(rg *xin.RouterGroup) {
-	rg.Use(tenant.RoleAdminProtect) // role protect
-
 	rg.GET("/", admin.UserIndex)
 	rg.POST("/list", admin.UserList)
 	rg.GET("/new", admin.UserNew)
@@ -323,10 +321,22 @@ func addAdminUserHandlers(rg *xin.RouterGroup) {
 func addAdminUserImportHandlers(rg *xin.RouterGroup) {
 	rg.GET("/", xin.Redirector("./csv/"))
 
-	rg.GET("/csv/", admin.UserCsvImportJobCtrl.Index)
-	rg.POST("/csv/start", admin.UserCsvImportJobCtrl.Start)
-	rg.POST("/csv/abort", admin.UserCsvImportJobCtrl.Abort)
-	rg.GET("/csv/status", admin.UserCsvImportJobCtrl.Status)
-	rg.GET("/csv/list", admin.UserCsvImportJobCtrl.List)
-	rg.GET("/csv/sample", admin.UserCsvImportSample)
+	addAdminUserCsvImportHandlers(rg.Group("/csv"))
+}
+
+func addAdminUserCsvImportHandlers(rg *xin.RouterGroup) {
+	rg.GET("/", admin.UserCsvImportJobCtrl.Index)
+	rg.POST("/start", admin.UserCsvImportJobCtrl.Start)
+	rg.POST("/abort", admin.UserCsvImportJobCtrl.Abort)
+	rg.GET("/status", admin.UserCsvImportJobCtrl.Status)
+	rg.GET("/list", admin.UserCsvImportJobCtrl.List)
+	rg.GET("/sample", admin.UserCsvImportSample)
+}
+
+func addAdminResetHandlers(rg *xin.RouterGroup) {
+	rg.GET("/", admin.DatabaseResetJobCtrl.Index)
+	rg.POST("/start", admin.DatabaseResetJobCtrl.Start)
+	rg.POST("/abort", admin.DatabaseResetJobCtrl.Abort)
+	rg.GET("/status", admin.DatabaseResetJobCtrl.Status)
+	rg.GET("/list", admin.DatabaseResetJobCtrl.List)
 }

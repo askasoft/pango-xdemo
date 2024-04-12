@@ -225,8 +225,12 @@ $(function() {
 	}
 
 	function build_job_param(job) {
-		var $form = $('#job_form'), $legend = $form.prev('legend');
-		var $fset = $('<fieldset>', { 'class': "ui-fieldset collapsed" }).append($('<legend>').text($legend.text()));
+		var $form = $('#job_form'), legend = $form.prev('legend').text();
+		if (!legend) {
+			return $('<hr/>');
+		}
+
+		var $fset = $('<fieldset>', { 'class': "ui-fieldset collapsed" }).append($('<legend>').text(legend));
 
 		$form = $form.clone().attr('id', 'job_param_' + job.id);
 		$form.on('submit', function() { return false; });

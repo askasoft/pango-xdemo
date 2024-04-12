@@ -1,0 +1,27 @@
+{{MapSet .Ctx.Attrs "styles" (Array "admin/jobctrl.css")}}
+{{MapSet .Ctx.Attrs "scripts" (Array "admin/jobctrl.js")}}
+
+{{template "main_header" .}}
+
+<div class="s-section">
+	<div class="ui-headline">
+		<ol class="breadcrumb">
+			<li class="active"><i class="{{T .Locale "icon.admin.reset"}}"></i> {{T .Locale "menu.admin.reset"}}</li>
+		</ol>
+	</div>
+
+	<div class="well">{{T .Locale "admin.reset.well"}}</div>
+
+	<form id="job_form" class="hidden" enctype="multipart/form-data" autocomplete="off">
+		<input type="hidden" name="_token_" value="{{.Token}}"/>
+	</form>
+
+	<div class="text-center">
+		<button id="job_start" class="btn btn-primary" disabled><i class="fas fa-play"></i> {{T .Locale "button.start"}}</button>
+		<button id="job_abort" class="btn btn-danger"  disabled><i class="fas fa-stop"></i> {{T .Locale "button.stop"}}</button>
+	</div>
+
+	<div id="job_list"></div>
+</div>
+
+{{template "main_footer" .}}

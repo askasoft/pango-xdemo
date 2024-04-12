@@ -21,6 +21,7 @@ import (
 
 const (
 	JobNameUserCsvImport = "UserCsvImport"
+	JobNameDatabaseReset = "DatabaseReset"
 )
 
 var (
@@ -304,6 +305,8 @@ func startJob(tt tenant.Tenant, job *xjm.Job) {
 	switch job.Name {
 	case JobNameUserCsvImport:
 		run = NewUserCsvImporter(tt, job)
+	case JobNameDatabaseReset:
+		run = NewDatabaseReseter(tt, job)
 	}
 
 	if run != nil {
