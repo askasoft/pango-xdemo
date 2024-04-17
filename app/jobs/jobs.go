@@ -362,7 +362,7 @@ func CleanOutdatedJobs() {
 			gjm := tt.GJM(db)
 			_, _, err := gjm.CleanOutdatedJobs(before)
 			if err != nil {
-				tt.Logger("JOB").Errorf("Failed to CleanOutdatedJobs('%s', '%s')", string(tt), before.Format(time.RFC3339))
+				logger.Errorf("Failed to CleanOutdatedJobs('%s', '%s')", string(tt), before.Format(time.RFC3339))
 			}
 			return err
 		})

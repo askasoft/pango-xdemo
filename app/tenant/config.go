@@ -2,13 +2,33 @@ package tenant
 
 import (
 	"net"
+	"os"
 	"sync"
 
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/utils"
+	"github.com/askasoft/pango/log"
+	"github.com/gocarina/gocsv"
 	"gorm.io/gorm"
 )
+
+func ReadConfigFile() ([]*models.Config, error) {
+	log.Infof("Read config file '%s'", app.DBConfigFile)
+
+	cf, err := os.Open(app.DBConfigFile)
+	if err != nil {
+		return nil, err
+	}
+	defer cf.Close()
+
+	configs := []*models.Config{}
+	if err := gocsv.UnmarshalFile(cf, &configs); err != nil {
+		return nil, err
+	}
+
+	return configs, nil
+}
 
 // CONFS write lock
 var muCONFS sync.Mutex

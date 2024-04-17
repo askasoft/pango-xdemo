@@ -98,7 +98,7 @@ func dbMigrateSchemas() error {
 }
 
 func dbMigrateConfigs() error {
-	configs, err := tenant.LoadConfigFile()
+	configs, err := tenant.ReadConfigFile()
 	if err != nil {
 		return err
 	}

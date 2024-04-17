@@ -29,12 +29,12 @@ func (s *service) Flag() {
 
 // PrintCommand print custom command
 func (s *service) PrintCommand(out io.Writer) {
-	fmt.Fprintln(out, "    migrate kind...     migrate database schemas or configurations.")
+	fmt.Fprintln(out, "    migrate [kind]...")
 	fmt.Fprintln(out, "      kind=schema       migrate database schemas.")
 	fmt.Fprintln(out, "      kind=config       migrate tenant configurations.")
-	fmt.Fprintln(out, "      kind=super        migrate tenant super users.")
+	fmt.Fprintln(out, "      kind=super        migrate tenant super user.")
 	fmt.Fprintln(out, "    resetdb             reset database schemas data.")
-	fmt.Fprintln(out, "    execsql <file>      execute sql for all database schemas.")
+	fmt.Fprintln(out, "    execsql <file>      execute sql file.")
 	fmt.Fprintln(out, "    encrypt [key] <str> encrypt string.")
 	fmt.Fprintln(out, "    decrypt [key] <str> decrypt string.")
 	fmt.Fprintln(out, "    assets              export assets.")

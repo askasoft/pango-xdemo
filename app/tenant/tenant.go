@@ -112,7 +112,7 @@ func Create(name string) error {
 		return err
 	}
 
-	configs, err := LoadConfigFile()
+	configs, err := ReadConfigFile()
 	if err != nil {
 		return err
 	}

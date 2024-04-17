@@ -2,7 +2,6 @@ package tenant
 
 import (
 	"errors"
-	"os"
 	"time"
 
 	"github.com/askasoft/pango-xdemo/app"
@@ -12,7 +11,6 @@ import (
 	"github.com/askasoft/pango/log/gormlog"
 	"github.com/askasoft/pango/xfs"
 	"github.com/askasoft/pango/xjm"
-	"github.com/gocarina/gocsv"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
 )
@@ -71,23 +69,6 @@ func (tt Tenant) MigrateConfig(configs []*models.Config) error {
 	return nil
 }
 
-func LoadConfigFile() ([]*models.Config, error) {
-	log.Infof("Load config file '%s'", app.DBConfigFile)
-
-	cf, err := os.Open(app.DBConfigFile)
-	if err != nil {
-		return nil, err
-	}
-	defer cf.Close()
-
-	configs := []*models.Config{}
-	if err := gocsv.UnmarshalFile(cf, &configs); err != nil {
-		return nil, err
-	}
-
-	return configs, nil
-}
-
 func (tt Tenant) MigrateSuper() error {
 	suc := app.INI.GetSection("super")
 	if suc == nil {
@@ -95,6 +76,9 @@ func (tt Tenant) MigrateSuper() error {
 	}
 
 	superEmail := suc.GetString("email")
+	if superEmail == "" {
+		return errors.New("missing [super] email settings")
+	}
 
 	user := &models.User{}
 	r := app.GDB.Table(tt.TableUsers()).Where("email = ?", superEmail).Take(user)
