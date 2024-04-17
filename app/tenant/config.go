@@ -78,5 +78,5 @@ func (tt Tenant) loadConfigMap(db *gorm.DB) (map[string]string, error) {
 
 func (tt Tenant) GetCIDRs() []*net.IPNet {
 	dcm := tt.GetConfigMap()
-	return utils.ParseCIDRs(dcm["tenant_cidr"])
+	return utils.ParseCIDRs(dcm["secure_cidr"])
 }
