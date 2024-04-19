@@ -3,46 +3,39 @@
 
 {{template "main_header" .}}
 
-{{$au := .AuthUser}}
-{{$base := .Base}}
-{{$loc := .Locale}}
-{{$dcm := .DCM}}
-{{$usm := .StatusMap}}
-{{$urm := .RoleMap}}
-
 <div class="s-section">
 	<div class="ui-headline">
 		<ol class="breadcrumb">
-			<li class="active"><i class="{{T .Locale "icon.admin.users"}}"></i> {{T $loc "menu.admin.users"}}</li>
+			<li class="active"><i class="{{T .Loc "icon.admin.users"}}"></i> {{T .Loc "menu.admin.users"}}</li>
 		</ol>
 	</div>
 
 	<div class="row">
 		<div class="col-md-6 ui-toolbar">
 			<button class="btn btn-sm btn-outline-danger" popup-target="#users_delete_popup" enableby="#users_list td.check input">
-				<i class="{{T $loc "icon.delete"}}"></i> {{T $loc "button.delete"}}
+				<i class="{{T .Loc "icon.delete"}}"></i> {{T .Loc "button.delete"}}
 			</button>
 			<button class="btn btn-sm btn-outline-danger" popup-target="#users_clear_popup">
-				<i class="{{T $loc "icon.delete-all"}}"></i> {{T $loc "button.delete-all"}}
+				<i class="{{T .Loc "icon.delete-all"}}"></i> {{T .Loc "button.delete-all"}}
 			</button>
 			<button class="btn btn-sm btn-outline-success" popup-target="#users_enable_popup" enableby="#users_list td.check input">
-				<i class="{{T $loc "icon.user.enable"}}"></i> {{T $loc "button.enable"}}
+				<i class="{{T .Loc "icon.user.enable"}}"></i> {{T .Loc "button.enable"}}
 			</button>
 			<button class="btn btn-sm btn-outline-secondary" popup-target="#users_disable_popup" enableby="#users_list td.check input">
-				<i class="{{T $loc "icon.user.disable"}}"></i> {{T $loc "button.disable"}}
+				<i class="{{T .Loc "icon.user.disable"}}"></i> {{T .Loc "button.disable"}}
 			</button>
 		</div>
 		<div class="col-md-6 ui-toolbar text-end">
-			<button id="users_new" class="btn btn-sm btn-outline-primary"><i class="{{T $loc "icon.new"}}"></i> {{T $loc "button.new"}}</button>
-			<a class="btn btn-sm btn-outline-primary" href="./import/"><i class="{{T $loc "icon.upload"}}"></i> {{T $loc "button.import"}}</a>
-			<button id="users_export" class="btn btn-sm btn-outline-primary"><i class="{{T $loc "icon.dnload"}}"></i> {{T $loc "button.export"}}</button>
+			<button id="users_new" class="btn btn-sm btn-outline-primary"><i class="{{T .Loc "icon.new"}}"></i> {{T .Loc "button.new"}}</button>
+			<a class="btn btn-sm btn-outline-primary" href="./import/"><i class="{{T .Loc "icon.upload"}}"></i> {{T .Loc "button.import"}}</a>
+			<button id="users_export" class="btn btn-sm btn-outline-primary"><i class="{{T .Loc "icon.dnload"}}"></i> {{T .Loc "button.export"}}</button>
 		</div>
 	</div>
 
 	<div id="users_alert">{{template "alerts" .}}</div>
 	
 	<fieldset id="users_listfset" class="ui-fieldset collapsed" data-spy="fieldset">
-		<legend>{{T $loc "button.search"}}</legend>
+		<legend>{{T .Loc "button.search"}}</legend>
 		<form id="users_listform" class="form-horizontal grey" method="POST">
 			<input type="hidden" name="_token_" value="{{.Token}}"/>
 			<input type="hidden" name="p" value="{{.Q.Page}}"/>
@@ -51,45 +44,45 @@
 			<input type="hidden" name="d" value="{{.Q.Dir}}"/>
 
 			<div class="row py-1">
-				<label class="col-sm-2 col-form-label">{{T $loc "user.id"}}</label>
+				<label class="col-sm-2 col-form-label">{{T .Loc "user.id"}}</label>
 				<div class="col-sm-10">
 					<input name="id" type="text" class="form-control" textclear value="{{.Q.ID}}"/>
 				</div>
 			</div>
 			<div class="row py-1">
-				<label class="col-sm-2 col-form-label">{{T $loc "user.name"}}</label>
+				<label class="col-sm-2 col-form-label">{{T .Loc "user.name"}}</label>
 				<div class="col-sm-10">
 					<input name="name" type="text" class="form-control" textclear value="{{.Q.Name}}"/>
 				</div>
 			</div>
 			<div class="row py-1">
-				<label class="col-sm-2 col-form-label">{{T $loc "user.email"}}</label>
+				<label class="col-sm-2 col-form-label">{{T .Loc "user.email"}}</label>
 				<div class="col-sm-10">
 					<input name="email" type="text" class="form-control" textclear value="{{.Q.Email}}"/>
 				</div>
 			</div>
 			<div class="row py-1">
-				<label class="col-sm-2 col-form-label">{{T $loc "user.cidr"}}</label>
+				<label class="col-sm-2 col-form-label">{{T .Loc "user.cidr"}}</label>
 				<div class="col-sm-10">
 					<input name="cidr" type="text" class="form-control" textclear value="{{.Q.CIDR}}"/>
 				</div>
 			</div>
 			<div class="row py-1">
-				<label class="col-sm-2 col-form-label">{{T $loc "user.role"}}</label>
+				<label class="col-sm-2 col-form-label">{{T .Loc "user.role"}}</label>
 				<div class="col-sm-10">
-					{{Checks "List=" $urm.Iterator "Name=" "role" "Values=" .Q.Role}}
+					{{Checks "List=" .UserRoleMap.Iterator "Name=" "role" "Values=" .Q.Role}}
 				</div>
 			</div>
 			<div class="row py-1">
-				<label class="col-sm-2 col-form-label">{{T $loc "user.status"}}</label>
+				<label class="col-sm-2 col-form-label">{{T .Loc "user.status"}}</label>
 				<div class="col-sm-10">
-					{{Checks "List=" $usm.Iterator "Name=" "status" "Values=" .Q.Status}}
+					{{Checks "List=" .UserStatusMap.Iterator "Name=" "status" "Values=" .Q.Status}}
 				</div>
 			</div>
 			<div class="row py-1">
 				<div class="offset-sm-2 col-sm-10">
-					<button type="submit" class="btn btn-primary"><i class="{{T $loc "icon.search"}}"></i> {{T $loc "button.search"}}</button>
-					<button type="reset" class="btn btn-secondary"><i class="{{T $loc "icon.clear"}}"></i> {{T $loc "button.clear"}}</button>
+					<button type="submit" class="btn btn-primary"><i class="{{T .Loc "icon.search"}}"></i> {{T .Loc "button.search"}}</button>
+					<button type="reset" class="btn btn-secondary"><i class="{{T .Loc "icon.clear"}}"></i> {{T .Loc "button.clear"}}</button>
 				</div>
 			</div>
 		</form>
@@ -98,18 +91,18 @@
 	<div id="users_list"></div>
 </div>
 
-<div id="user_maps" class="hidden" data-status="{{JSON $usm}}" data-role="{{JSON $urm}}"></div>
+<div id="user_maps" class="hidden" data-status="{{JSON .UserStatusMap}}" data-role="{{JSON .UserRoleMap}}"></div>
 
 <div id="users_delete_popup" class="ui-popup s-popup-confirm" data-spy="popup" tabindex="-1"
 	popup-mask="true" popup-keyboard="false" popup-mouse="false">
 	<form>
 		<div class="ui-popup-body">
 			<i class="icon fas fa-2x fa-fw fa-circle-exclamation text-danger"></i>
-			<div class="msg">{{T $loc "user.confirm.delete"}}</div>
+			<div class="msg">{{T .Loc "user.confirm.delete"}}</div>
 		</div>
 		<div class="ui-popup-footer">
-			<button type="submit" class="btn btn-danger"><i class="fas fa-check"></i> {{T $loc "button.ok"}}</button>
-			<button type="button" class="btn btn-secondary" popup-dismiss="true"><i class="fas fa-times"></i> {{T $loc "button.cancel"}}</button>
+			<button type="submit" class="btn btn-danger"><i class="fas fa-check"></i> {{T .Loc "button.ok"}}</button>
+			<button type="button" class="btn btn-secondary" popup-dismiss="true"><i class="fas fa-times"></i> {{T .Loc "button.cancel"}}</button>
 		</div>
 	</form>
 </div>
@@ -119,11 +112,11 @@
 	<form>
 		<div class="ui-popup-body">
 			<i class="icon fas fa-2x fa-fw fa-exclamation-triangle text-danger"></i>
-			<div class="msg">{{T $loc "user.confirm.clear"}}</div>
+			<div class="msg">{{T .Loc "user.confirm.clear"}}</div>
 		</div>
 		<div class="ui-popup-footer">
-			<button type="submit" class="btn btn-danger"><i class="fas fa-check"></i> {{T $loc "button.ok"}}</button>
-			<button type="button" class="btn btn-secondary" popup-dismiss="true"><i class="fas fa-times"></i> {{T $loc "button.cancel"}}</button>
+			<button type="submit" class="btn btn-danger"><i class="fas fa-check"></i> {{T .Loc "button.ok"}}</button>
+			<button type="button" class="btn btn-secondary" popup-dismiss="true"><i class="fas fa-times"></i> {{T .Loc "button.cancel"}}</button>
 		</div>
 	</form>
 </div>
@@ -133,11 +126,11 @@
 	<form>
 		<div class="ui-popup-body">
 			<i class="icon fas fa-2x fa-fw fa-question-circle text-success"></i>
-			<div class="msg">{{T $loc "user.confirm.enable"}}</div>
+			<div class="msg">{{T .Loc "user.confirm.enable"}}</div>
 		</div>
 		<div class="ui-popup-footer">
-			<button type="submit" class="btn btn-success"><i class="fas fa-check"></i> {{T $loc "button.ok"}}</button>
-			<button type="button" class="btn btn-secondary" popup-dismiss="true"><i class="fas fa-times"></i> {{T $loc "button.cancel"}}</button>
+			<button type="submit" class="btn btn-success"><i class="fas fa-check"></i> {{T .Loc "button.ok"}}</button>
+			<button type="button" class="btn btn-secondary" popup-dismiss="true"><i class="fas fa-times"></i> {{T .Loc "button.cancel"}}</button>
 		</div>
 	</form>
 </div>
@@ -147,11 +140,11 @@
 	<form>
 		<div class="ui-popup-body">
 			<i class="icon fas fa-2x fa-fw fa-exclamation-triangle text-warning"></i>
-			<div class="msg">{{T $loc "user.confirm.disable"}}</div>
+			<div class="msg">{{T .Loc "user.confirm.disable"}}</div>
 		</div>
 		<div class="ui-popup-footer">
-			<button type="submit" class="btn btn-warning"><i class="fas fa-check"></i> {{T $loc "button.ok"}}</button>
-			<button type="button" class="btn btn-secondary" popup-dismiss="true"><i class="fas fa-times"></i> {{T $loc "button.cancel"}}</button>
+			<button type="submit" class="btn btn-warning"><i class="fas fa-check"></i> {{T .Loc "button.ok"}}</button>
+			<button type="button" class="btn btn-secondary" popup-dismiss="true"><i class="fas fa-times"></i> {{T .Loc "button.cancel"}}</button>
 		</div>
 	</form>
 </div>

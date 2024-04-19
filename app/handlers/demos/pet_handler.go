@@ -131,10 +131,10 @@ func petListArgs(c *xin.Context) (pq *PetQuery) {
 }
 
 func petAddMaps(c *xin.Context, h xin.H) {
-	h["GenderMap"] = utils.GetPetGenderMap(c.Locale)
-	h["OriginMap"] = utils.GetPetOriginMap(c.Locale)
-	h["TemperMap"] = utils.GetPetTemperMap(c.Locale)
-	h["HabitsMap"] = utils.GetPetHabitsMap(c.Locale)
+	h["PetGenderMap"] = utils.GetPetGenderMap(c.Locale)
+	h["PetOriginMap"] = utils.GetPetOriginMap(c.Locale)
+	h["PetTemperMap"] = utils.GetPetTemperMap(c.Locale)
+	h["PetHabitsMap"] = utils.GetPetHabitsMap(c.Locale)
 }
 
 func PetIndex(c *xin.Context) {

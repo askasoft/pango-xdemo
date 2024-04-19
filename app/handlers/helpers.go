@@ -13,20 +13,22 @@ import (
 func H(c *xin.Context) xin.H {
 	tt := tenant.FromCtx(c)
 
+	dcm := tt.GetConfigMap()
 	usr, _ := c.Get(xmw.AuthUserKey)
 
 	h := xin.H{
+		"DCM":      dcm,
 		"CFG":      app.CFG,
 		"INI":      app.INI,
 		"VER":      app.Version,
 		"REV":      app.Revision,
 		"Host":     c.Request.Host,
 		"Base":     app.Base,
-		"Tenant":   tt,
-		"Locale":   c.Locale,
 		"Now":      time.Now(),
 		"Ctx":      c,
+		"Loc":      c.Locale,
 		"Token":    app.XTP.RefreshToken(c),
+		"Tenant":   tt,
 		"AuthUser": usr,
 	}
 	return h

@@ -3,13 +3,13 @@
 
 	<div id="navi_demmos" class="card">
 		<div class="card-header">
-			<i class="fas fa-earth-asia"></i><span>{{T .Locale "menu.demos"}}</span>
+			<i class="fas fa-earth-asia"></i><span>{{T .Loc "menu.demos"}}</span>
 		</div>
 		<div class="card-body">
 			<ul class="nav flex-column">
-				<li class="nav-item"><a class="nav-link" href="{{.Base}}/demos/pets/"><i class="{{T .Locale "icon.demos.pets"}}"></i><span>{{T .Locale "menu.demos.pets"}}</span></a></li>
-				<li class="nav-item"><a class="nav-link" href="{{.Base}}/demos/tags/"><i class="{{T .Locale "icon.demos.tags"}}"></i><span>{{T .Locale "menu.demos.tags"}}</span></a></li>
-				<li class="nav-item"><a class="nav-link" href="{{.Base}}/demos/uploads/"><i class="{{T .Locale "icon.demos.uploads"}}"></i><span>{{T .Locale "menu.demos.uploads"}}</span></a></li>
+				<li class="nav-item"><a class="nav-link" href="{{.Base}}/demos/pets/"><i class="{{T .Loc "icon.demos.pets"}}"></i><span>{{T .Loc "menu.demos.pets"}}</span></a></li>
+				<li class="nav-item"><a class="nav-link" href="{{.Base}}/demos/tags/"><i class="{{T .Loc "icon.demos.tags"}}"></i><span>{{T .Loc "menu.demos.tags"}}</span></a></li>
+				<li class="nav-item"><a class="nav-link" href="{{.Base}}/demos/uploads/"><i class="{{T .Loc "icon.demos.uploads"}}"></i><span>{{T .Loc "menu.demos.uploads"}}</span></a></li>
 			</ul>
 		</div>
 	</div>
@@ -17,13 +17,13 @@
 {{if and .AuthUser .AuthUser.IsAdmin}}
 	<div id="navi_admin" class="card">
 		<div class="card-header">
-			<i class="{{T .Locale "icon.admin"}}"></i><span>{{T .Locale "menu.admin"}}</span>
+			<i class="{{T .Loc "icon.admin"}}"></i><span>{{T .Loc "menu.admin"}}</span>
 		</div>
 		<div class="card-body">
 			<ul class="nav flex-column">
-				<li class="nav-item"><a class="nav-link" href="{{.Base}}/a/config/"><i class="{{T .Locale "icon.config"}}"></i><span>{{T .Locale "menu.config"}}</span></a></li>
-				<li class="nav-item"><a class="nav-link" href="{{.Base}}/a/users/"><i class="{{T .Locale "icon.admin.users"}}"></i><span>{{T .Locale "menu.admin.users"}}</span></a></li>
-				<li class="nav-item"><a class="nav-link" href="{{.Base}}/a/reset/"><i class="{{T .Locale "icon.admin.reset"}}"></i><span>{{T .Locale "menu.admin.reset"}}</span></a></li>
+				<li class="nav-item"><a class="nav-link" href="{{.Base}}/a/config/"><i class="{{T .Loc "icon.config"}}"></i><span>{{T .Loc "menu.config"}}</span></a></li>
+				<li class="nav-item"><a class="nav-link" href="{{.Base}}/a/users/"><i class="{{T .Loc "icon.admin.users"}}"></i><span>{{T .Loc "menu.admin.users"}}</span></a></li>
+				<li class="nav-item"><a class="nav-link" href="{{.Base}}/a/reset/"><i class="{{T .Loc "icon.admin.reset"}}"></i><span>{{T .Loc "menu.admin.reset"}}</span></a></li>
 			</ul>
 		</div>
 	</div>

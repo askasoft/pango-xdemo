@@ -26,8 +26,8 @@ func UserNew(c *xin.Context) {
 
 	h := handlers.H(c)
 	h["User"] = usr
-	h["StatusMap"] = utils.GetUserStatusMap(c.Locale)
-	h["RoleMap"] = utils.GetUserRoleMap(c.Locale)
+	h["UserStatusMap"] = utils.GetUserStatusMap(c.Locale)
+	h["UserRoleMap"] = utils.GetUserRoleMap(c.Locale)
 
 	c.HTML(http.StatusOK, "admin/user_detail", h)
 }
@@ -57,13 +57,13 @@ func UserDetail(c *xin.Context) {
 
 	h := handlers.H(c)
 	h["User"] = usr
-	h["StatusMap"] = utils.GetUserStatusMap(c.Locale)
+	h["UserStatusMap"] = utils.GetUserStatusMap(c.Locale)
 
 	au := tenant.AuthUser(c)
 	if au.IsSuper() {
-		h["RoleMap"] = utils.GetSuperRoleMap(c.Locale)
+		h["UserRoleMap"] = utils.GetSuperRoleMap(c.Locale)
 	} else {
-		h["RoleMap"] = utils.GetUserRoleMap(c.Locale)
+		h["UserRoleMap"] = utils.GetUserRoleMap(c.Locale)
 	}
 
 	c.HTML(http.StatusOK, "admin/user_detail", h)

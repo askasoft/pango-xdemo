@@ -6,7 +6,7 @@
 <div class="s-section">
 	<div class="ui-headline">
 		<ol class="breadcrumb">
-			<li class="active"><i class="{{T .Locale "icon.self.pwdchg"}}"></i> {{T .Locale "menu.self.pwdchg"}}</li>
+			<li class="active"><i class="{{T .Loc "icon.self.pwdchg"}}"></i> {{T .Loc "menu.self.pwdchg"}}</li>
 		</ol>
 	</div>
 
@@ -17,19 +17,19 @@
 	<form id="pwdchg_form" class="form-horizontal" autocomplete="off">
 		<input type="hidden" name="_token_" value="{{.Token}}"/>
 		<div class="row py-3">
-			<label class="col-sm-2 col-form-label">{{T .Locale "pwdchg.oldpwd"}}</label>
+			<label class="col-sm-2 col-form-label">{{T .Loc "pwdchg.oldpwd"}}</label>
 			<div class="col-sm-10">
 				<input name="oldpwd" type="password" class="form-control" size="40" maxlength="16" textclear/>
 			</div>
 		</div>
 		<div class="row py-3">
-			<label class="col-sm-2 col-form-label">{{T .Locale "pwdchg.newpwd"}}</label>
+			<label class="col-sm-2 col-form-label">{{T .Loc "pwdchg.newpwd"}}</label>
 			<div class="col-sm-10">
 				<input name="newpwd" type="password" class="form-control" size="40" maxlength="16" textclear/>
 			</div>
 		</div>
 		<div class="row py-3">
-			<label class="col-sm-2 col-form-label">{{T .Locale "pwdchg.conpwd"}}</label>
+			<label class="col-sm-2 col-form-label">{{T .Loc "pwdchg.conpwd"}}</label>
 			<div class="col-sm-10">
 				<input name="conpwd" type="password" class="form-control" size="40" maxlength="16" textclear/>
 			</div>
@@ -38,7 +38,7 @@
 			<div class="offset-sm-2 col-sm-10">
 				<button type="submit" class="btn btn-primary">
 					<i class="fa fa-save"></i>
-					{{T .Locale "button.change"}}
+					{{T .Loc "button.change"}}
 				</button>
 			</div>
 		</div>

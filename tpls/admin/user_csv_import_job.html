@@ -6,23 +6,23 @@
 <div class="s-section">
 	<div class="ui-headline">
 		<ol class="breadcrumb">
-			<li class="active"><i class="{{T .Locale "icon.user.import"}}"></i> {{T .Locale "menu.user.import"}}</li>
+			<li class="active"><i class="{{T .Loc "icon.user.import"}}"></i> {{T .Loc "menu.user.import"}}</li>
 		</ol>
 	</div>
 
 	<div class="ui-toolbar text-end">
-		<a class="btn btn-sm btn-secondary" href="./sample" target="_blank"><i class="fa fa-download"></i> {{T .Locale "button.sample"}}</a>
+		<a class="btn btn-sm btn-secondary" href="./sample" target="_blank"><i class="fa fa-download"></i> {{T .Loc "button.sample"}}</a>
 	</div>
 
-	<div class="well">{{T .Locale "user.import.csv.well"}}</div>
+	<div class="well">{{T .Loc "user.import.csv.well"}}</div>
 
 	<fieldset data-spy="fieldset">
-		<legend>{{T .Locale "user.import.csv.legend"}}</legend>
+		<legend>{{T .Loc "user.import.csv.legend"}}</legend>
 		<form id="job_form" class="form-horizontal grey" enctype="multipart/form-data" autocomplete="off">
 			<input type="hidden" name="_token_" value="{{.Token}}"/>
 			<input type="hidden" name="source" value="csv"/>
 			<div class="row py-3">
-				<label class="col-sm-3 col-form-label">{{T .Locale "user.import.csv.file"}}</label>
+				<label class="col-sm-3 col-form-label">{{T .Loc "user.import.csv.file"}}</label>
 				<div class="col-sm-9">
 					<input type="file" name="file" accept=".csv" class="form-control">
 				</div>
@@ -31,8 +31,8 @@
 	</fieldset>
 
 	<div class="text-center">
-		<button id="job_start" class="btn btn-primary" disabled><i class="fas fa-play"></i> {{T .Locale "button.start"}}</button>
-		<button id="job_abort" class="btn btn-danger"  disabled><i class="fas fa-stop"></i> {{T .Locale "button.stop"}}</button>
+		<button id="job_start" class="btn btn-primary" disabled><i class="fas fa-play"></i> {{T .Loc "button.start"}}</button>
+		<button id="job_abort" class="btn btn-danger"  disabled><i class="fas fa-stop"></i> {{T .Loc "button.stop"}}</button>
 	</div>
 
 	<div id="job_list"></div>

@@ -6,19 +6,19 @@
 <div class="s-section">
 	<div class="ui-headline">
 		<ol class="breadcrumb">
-			<li class="active"><i class="{{T .Locale "icon.admin.reset"}}"></i> {{T .Locale "menu.admin.reset"}}</li>
+			<li class="active"><i class="{{T .Loc "icon.admin.reset"}}"></i> {{T .Loc "menu.admin.reset"}}</li>
 		</ol>
 	</div>
 
-	<div class="well">{{T .Locale "admin.reset.well"}}</div>
+	<div class="well">{{T .Loc "admin.reset.well"}}</div>
 
 	<form id="job_form" class="hidden" enctype="multipart/form-data" autocomplete="off">
 		<input type="hidden" name="_token_" value="{{.Token}}"/>
 	</form>
 
 	<div class="text-center">
-		<button id="job_start" class="btn btn-primary" disabled><i class="fas fa-play"></i> {{T .Locale "button.start"}}</button>
-		<button id="job_abort" class="btn btn-danger"  disabled><i class="fas fa-stop"></i> {{T .Locale "button.stop"}}</button>
+		<button id="job_start" class="btn btn-primary" disabled><i class="fas fa-play"></i> {{T .Loc "button.start"}}</button>
+		<button id="job_abort" class="btn btn-danger"  disabled><i class="fas fa-stop"></i> {{T .Loc "button.stop"}}</button>
 	</div>
 
 	<div id="job_list"></div>

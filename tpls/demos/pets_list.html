@@ -1,11 +1,4 @@
-{{$base := .Base}}
-{{$loc := .Locale}}
-{{$pgm := .GenderMap}}
-{{$pom := .OriginMap}}
-{{$ptm := .TemperMap}}
-{{$phm := .HabitsMap}}
-
-{{Pager .Q.Pager "Locale=" $loc}}
+{{Pager .Q.Pager "Locale=" .Loc}}
 
 <form autocomplete="off" class="table-responsive">
 <table id="pets_table" class="table table-striped ui-sortable s-table"
@@ -13,18 +6,18 @@
 	<thead>
 		<tr>
 			<th class="check"><input type="checkbox" checkall="#pets_table td.check > input"/></th>
-			<th class="id sortable" data-sort-col="id">{{T $loc "pet.id"}}</th>
-			<th class="name sortable" data-sort-col="name">{{T $loc "pet.name"}}</th>
-			<th class="gender sortable" data-sort-col="gender">{{T $loc "pet.gender"}}</th>
-			<th class="born_at sortable" data-sort-col="born_at">{{T $loc "pet.born_at"}}</th>
-			<th class="origin sortable" data-sort-col="origin">{{T $loc "pet.origin"}}</th>
-			<th class="temper sortable" data-sort-col="temper">{{T $loc "pet.temper"}}</th>
-			<th class="habits sortable" data-sort-col="habits">{{T $loc "pet.habits"}}</th>
-			<th class="amount sortable" data-sort-col="amount">{{T $loc "pet.amount"}}</th>
-			<th class="price sortable" data-sort-col="price">{{T $loc "pet.price"}}</th>
-			<th class="shop_name sortable" data-sort-col="shop_name">{{T $loc "pet.shop_name"}}</th>
-			<th class="created_at sortable" data-sort-col="created_at">{{T $loc "pet.created_at"}}</th>
-			<th class="updated_at sortable" data-sort-col="updated_at">{{T $loc "pet.updated_at"}}</th>
+			<th class="id sortable" data-sort-col="id">{{T .Loc "pet.id"}}</th>
+			<th class="name sortable" data-sort-col="name">{{T .Loc "pet.name"}}</th>
+			<th class="gender sortable" data-sort-col="gender">{{T .Loc "pet.gender"}}</th>
+			<th class="born_at sortable" data-sort-col="born_at">{{T .Loc "pet.born_at"}}</th>
+			<th class="origin sortable" data-sort-col="origin">{{T .Loc "pet.origin"}}</th>
+			<th class="temper sortable" data-sort-col="temper">{{T .Loc "pet.temper"}}</th>
+			<th class="habits sortable" data-sort-col="habits">{{T .Loc "pet.habits"}}</th>
+			<th class="amount sortable" data-sort-col="amount">{{T .Loc "pet.amount"}}</th>
+			<th class="price sortable" data-sort-col="price">{{T .Loc "pet.price"}}</th>
+			<th class="shop_name sortable" data-sort-col="shop_name">{{T .Loc "pet.shop_name"}}</th>
+			<th class="created_at sortable" data-sort-col="created_at">{{T .Loc "pet.created_at"}}</th>
+			<th class="updated_at sortable" data-sort-col="updated_at">{{T .Loc "pet.updated_at"}}</th>
 			<th class="actions"></th>
 		</tr>
 	</thead>
@@ -34,19 +27,19 @@
 			<td class="check"><input type="checkbox" value="{{$p.ID}}"/></td>
 			<td class="id ro">{{$p.ID}}</td>
 			<td class="name">{{$p.Name}}</td>
-			<td class="gender">{{$pgm.MustGet $p.Gender $p.Gender}}</td>
+			<td class="gender">{{$.PetGenderMap.MustGet $p.Gender $p.Gender}}</td>
 			<td class="born_at date">{{DATE $p.Born_at}}</td>
-			<td class="origin">{{$pom.MustGet $p.Origin $p.Origin}}</td>
-			<td class="temper">{{$ptm.MustGet $p.Temper $p.Temper}}</td>
-			<td class="habits">{{range $h := $p.Habits}}<b>{{$phm.MustGet $h $h}}</b>{{end}}</td>
+			<td class="origin">{{$.PetOriginMap.MustGet $p.Origin $p.Origin}}</td>
+			<td class="temper">{{$.PetTemperMap.MustGet $p.Temper $p.Temper}}</td>
+			<td class="habits">{{range $h := $p.Habits}}<b>{{$.PetHabitsMap.MustGet $h $h}}</b>{{end}}</td>
 			<td class="amount">{{$p.Amount}}</td>
 			<td class="price">{{$p.Price}}</td>
 			<td class="shop_name">{{$p.ShopName}}</td>
 			<td class="created_at ro">{{TIME $p.CreatedAt}}</td>
 			<td class="updated_at">{{TIME $p.UpdatedAt}}</td>
 			<td class="actions">
-				<button class="btn btn-outline-secondary view" title="{{T $loc "button.view"}}"><i class="{{T $loc "icon.view"}}"></i></button>
-				<button class="btn btn-outline-secondary edit" title="{{T $loc "button.edit"}}"><i class="{{T $loc "icon.edit"}}"></i></button>
+				<button class="btn btn-outline-secondary view" title="{{T $.Loc "button.view"}}"><i class="{{T $.Loc "icon.view"}}"></i></button>
+				<button class="btn btn-outline-secondary edit" title="{{T $.Loc "button.edit"}}"><i class="{{T $.Loc "icon.edit"}}"></i></button>
 			</td>
 		</tr>
 	{{end}}
@@ -65,12 +58,12 @@
 			<td class="created_at"></td>
 			<td class="updated_at"></td>
 			<td class="actions">
-				<button class="btn btn-outline-secondary view" title="{{T $loc "button.view"}}"><i class="{{T $loc "icon.view"}}"></i></button>
-				<button class="btn btn-secondary edit" title="{{T $loc "button.edit"}}"><i class="{{T $loc "icon.edit"}}"></i></button>
+				<button class="btn btn-outline-secondary view" title="{{T .Loc "button.view"}}"><i class="{{T .Loc "icon.view"}}"></i></button>
+				<button class="btn btn-secondary edit" title="{{T .Loc "button.edit"}}"><i class="{{T .Loc "icon.edit"}}"></i></button>
 			</td>
 		</tr>
 	</tbody>
 </table>
 </form>
 
-{{Pager .Q.Pager "Locale=" $loc}}
+{{Pager .Q.Pager "Locale=" .Loc}}
