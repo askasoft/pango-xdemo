@@ -2,22 +2,23 @@ $(function() {
 	function job_start() {
 		$('#job_start').prop('disabled', true);
 
+		var $f = $('#job_form');
 		$.ajaf({
 			url: './start',
 			type: 'POST',
-			data: $('#job_form').serializeArray(),
-			file: $('#job_form').find('input[type="file"]'),
+			data: $f.serializeArray(),
+			file: $f.find('input[type="file"]'),
 			dataType: 'json',
-			beforeSend: main.loadmask,
-			success: function(data, ts, xhr) {
+			beforeSend: main.form_ajax_start($f),
+			success: function(data) {
 				$.toast({
 					icon: 'info',
 					text: data.message
 				});
 			},
-			error: main.ajax_error,
+			error: main.form_ajax_error($f),
 			complete: function() {
-				main.unloadmask();
+				main.form_ajax_end($f)();
 				job_list();
 			}
 		});
@@ -25,9 +26,10 @@ $(function() {
 	}
 
 	function job_abort() {
-		var jid = $('#job_list').find('li.P, li.R').attr('id').replace('job_', '');
-
 		$('#job_abort').prop('disabled', true);
+
+		var $f = $('#job_form');
+		var jid = $('#job_list').find('li.P, li.R').attr('id').replace('job_', '');
 
 		$.ajax({
 			url: './abort',
@@ -37,16 +39,16 @@ $(function() {
 				jid: jid
 			},
 			dataType: 'json',
-			beforeSend: main.loadmask,
-			success: function(data, ts, xhr) {
+			beforeSend: main.form_ajax_start($f),
+			success: function(data) {
 				$.toast({
 					icon: 'info',
 					text: data.message
 				});
 			},
-			error: main.ajax_error,
+			error: main.form_ajax_error($f),
 			complete: function() {
-				main.unloadmask();
+				main.form_ajax_end($f)();
 				job_list();
 			}
 		});
@@ -55,6 +57,7 @@ $(function() {
 
 	function job_status(jid) {
 		var $job = $('#job_' + jid);
+
 		if ($job.data('timer')) {
 			clearTimeout($job.data('timer'));
 			$job.data('timer', null);
@@ -64,77 +67,109 @@ $(function() {
 			return;
 		}
 
-		var $logs = $('#job_logs_' + jid),
-			$tb = $logs.find('tbody'),
-			timeout = 0,
-			param = { jid: jid, skip: $tb.children().length, limit: 10000 };
+		var timeout = 0, param = { jid: jid, asc: false, limit: 1000 };
+		var $logs = $('#job_logs_' + jid), $tb = $logs.find('tbody'), $tr = $tb.children('tr:first-child');
+
+		if ($tr.length) {
+			param.min = parseInt($tr.data('lid')) + 1;
+			param.asc = true;
+		}
 
 		$.ajax({
 			url: './status',
 			data: param,
 			type: 'GET',
 			dataType: 'json',
-			success: function(data, ts, xhr) {
+			success: function(data) {
 				var job = data.job, logs = data.logs || [];
 
 				$job.data('job', job).removeClass('A C P R').addClass(job.status);
 				$job.find('i').attr('class', job_status_icon(job.status));
 
-				var jpr = (job.status == 'P' || job.status == 'R');
-				var next = jpr || logs.length >= param.limit;
+				job_btn_refresh();
 
-				var updated_at = new Date(job.updated_at);
-				if (next || (new Date().getTime() - updated_at.getTime() < 10000)) {
+				if (logs.length >= param.limit) {
+					// has next logs
+					timeout = 100;
+				} else if (job.status == 'P' || job.status == 'R' || new Date().getTime() - new Date(job.updated_at).getTime() < 10000) {
+					// running, pending or updated_at is in 10sec
 					timeout = 1000;
+				}
+				if (timeout) {
+					$job.data('timer', setTimeout(function() { job_status(jid); }, timeout));
 				}
 
 				if (logs.length > 0) {
 					var tb = $tb.get(0), c = document.createDocumentFragment();;
-					for (var i = logs.length - 1; i >= 0; i--) {
-						var lg = logs[i],
-							tr = document.createElement("tr"),
-							td1 = document.createElement("td"),
-							td2 = document.createElement("td"),
-							td3 = document.createElement("td");
-						tr.className = lg.level;
-						td1.textContent = main.format_time(lg.time);
-						td2.textContent = '[' + lg.level + ']';
-						td3.textContent = lg.message;
-						tr.append(td1, td2, td3);
-						if (i >= logs.length - 50) {
-							tr.className = lg.level + " hidden";
+					if (param.asc) {
+						for (var i = logs.length - 1; i >= 0; i--) {
+							c.append(build_log(logs[i]));
 						}
-						c.append(tr);
+					} else {
+						for (var i = 0; i < logs.length; i++) {
+							c.append(build_log(logs[i]));
+						}
 					}
 					tb.prepend(c);
 
-					if (!$logs.data('timer')) {
-						$logs.data('timer', setTimeout(function() { show_log(jid); }, 10));
+					if (!param.asc && logs.length >= param.limit) {
+						// first time to get latest logs
+						var $a = $('<a>', { href: '#' }).text('...').on('click', job_prev_logs);
+						var $i = $('<i>', { 'class': 'fas fa-spinner fa-spin-pulse fa-fw' }).hide();
+						$tb.append($('<tr>').append($('<td>'), $('<td>'), $('<td>').append($a, $i)));
 					}
-				}
-
-				job_btn_refresh();
-
-				if (timeout) {
-					$job.data('timer', setTimeout(function() { job_status(jid); }, timeout));
 				}
 			},
 			error: main.ajax_error
 		});
 	}
 
-	function show_log(jid) {
-		var $logs = $('#job_logs_' + jid), $trs = $logs.find('tr.hidden');
+	function job_prev_logs() {
+		var $a = $(this), $i = $a.next();
+		var $td = $a.closest('td'), $tr = $td.closest('tr'), $tb = $tr.closest('tbody');
+		var jid = $tb.closest('table').attr('id').replace('job_logs_', '');
+		var lid = parseInt($tr.prev().data('lid'));
+		var param = { jid: jid, asc: false, max: lid - 1, limit: 10000 };
 
-		$logs.data('timer', null);
-		if ($trs.length == 0) {
-			return;
-		}
+		$.ajax({
+			url: './logs',
+			data: param,
+			type: 'GET',
+			dataType: 'json',
+			beforeSend: function() { $a.hide(); $i.show(); },
+			success: function(logs) {
+				if (logs && logs.length > 0) {
+					var tb = $tb.get(0), c = document.createDocumentFragment();;
+					for (var i = 0; i < logs.length; i++) {
+						c.append(build_log(logs[i]));
+					}
+					tb.append(c);
+				}
 
-		$trs.last().removeClass('hidden');
-		if ($trs.length > 0) {
-			$logs.data('timer', setTimeout(function() { show_log(jid); }, 20));
-		}
+				if (logs && logs.length >= param.limit) {
+					$i.hide(); $a.show();
+					$tb.append($tr);
+				} else {
+					$tr.remove();
+				}
+			},
+			error: main.ajax_error
+		});
+		return false;
+	}
+
+	function build_log(lg) {
+		var tr = document.createElement("tr"),
+			td1 = document.createElement("td"),
+			td2 = document.createElement("td"),
+			td3 = document.createElement("td");
+		tr.className = lg.level;
+		tr.setAttribute('data-lid', lg.id);
+		td1.textContent = main.format_time(lg.time);
+		td2.textContent = '[' + lg.level + ']';
+		td3.textContent = lg.message;
+		tr.append(td1, td2, td3);
+		return tr;
 	}
 
 	function job_btn_refresh() {
@@ -258,7 +293,7 @@ $(function() {
 			}
 			$form.formValues(params);
 
-			var $a = $('<a>', { 'class': 'btn btn-outline-secondary ps', href: '#' });
+			var $a = $('<a>', { 'class': 'btn btn-secondary ps', href: '#' });
 			$a.append($('<i class="fa fa-arrow-up">'));
 			$a.append($('<span>').text('Copy'));
 			$a.click(job_copy_param);
@@ -275,16 +310,23 @@ $(function() {
 	}
 
 	function job_list() {
+		var $f = $('#job_form');
+
 		$.ajax({
 			url: './list',
 			type: 'GET',
 			dataType: 'json',
-			success: function(data, ts, xhr) {
-				build_job_list(data);
-				job_btn_refresh();
+			beforeSend: main.form_ajax_start($f),
+			success: function(data) {
+				setTimeout(function() {
+					build_job_list(data);
+					job_btn_refresh();
+				}, 10);
 			},
-			error: main.ajax_error
+			error: main.form_ajax_error($f),
+			complete: main.form_ajax_end($f)
 		});
+
 		return false;
 	}
 

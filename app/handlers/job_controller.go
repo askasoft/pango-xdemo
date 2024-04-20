@@ -9,6 +9,7 @@ import (
 	"github.com/askasoft/pango-xdemo/app/jobs"
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/tenant"
+	"github.com/askasoft/pango/bol"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/tbs"
@@ -145,14 +146,53 @@ func (jc *JobController) Status(c *xin.Context) {
 		return
 	}
 
-	var logs []*xjm.JobLog
+	logs, err := jc.logs(c, tjm)
+	if err != nil {
+		log.Errorf("Failed to get job logs #%d: %v", jid, err)
+		c.AddError(err)
+		c.JSON(http.StatusInternalServerError, E(c))
+		return
+	}
 
-	skip := num.Atoi(c.Query("skip"))
+	c.JSON(http.StatusOK, xin.H{
+		"job":  job,
+		"logs": logs,
+	})
+}
+
+func (jc *JobController) Logs(c *xin.Context) {
+	jid := num.Atol(c.Query("jid"))
+	if jid <= 0 {
+		c.AddError(errors.New(tbs.Format(c.Locale, "error.param.invalid", "jid")))
+		c.JSON(http.StatusBadRequest, E(c))
+		return
+	}
+
+	tt := tenant.FromCtx(c)
+	tjm := tt.JM()
+
+	logs, err := jc.logs(c, tjm)
+	if err != nil {
+		log.Errorf("Failed to get job logs #%d: %v", jid, err)
+		c.AddError(err)
+		c.JSON(http.StatusInternalServerError, E(c))
+		return
+	}
+
+	c.JSON(http.StatusOK, logs)
+}
+
+func (jc *JobController) logs(c *xin.Context, tjm xjm.JobManager) (logs []*xjm.JobLog, err error) {
+	jid := num.Atol(c.Query("jid"))
+	min := num.Atol(c.Query("min"))
+	max := num.Atol(c.Query("max"))
+	asc := bol.Atob(c.Query("asc"))
 	limit := num.Atoi(c.Query("limit"))
-	if limit > 0 {
-		max := app.INI.GetInt("job", "maxJobLogsFetch", 10000)
-		if limit > max {
-			limit = max
+
+	if jid > 0 && limit > 0 {
+		maxlogs := app.INI.GetInt("job", "maxJobLogsFetch", 10000)
+		if limit > maxlogs {
+			limit = maxlogs
 		}
 
 		lvls := []string{
@@ -162,17 +202,7 @@ func (jc *JobController) Status(c *xin.Context) {
 			log.LevelInfo.Prefix(),
 		}
 
-		logs, err = tjm.GetJobLogs(job.ID, skip, limit, lvls...)
-		if err != nil {
-			log.Errorf("Failed to get job logs #%d: %v", job.ID, err)
-			c.AddError(err)
-			c.JSON(http.StatusInternalServerError, E(c))
-			return
-		}
+		logs, err = tjm.GetJobLogs(jid, min, max, asc, limit, lvls...)
 	}
-
-	c.JSON(http.StatusOK, xin.H{
-		"job":  job,
-		"logs": logs,
-	})
+	return
 }

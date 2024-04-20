@@ -10,6 +10,7 @@ type JobCtrl interface {
 	Abort(*xin.Context)
 	Status(*xin.Context)
 	List(*xin.Context)
+	Logs(*xin.Context)
 }
 
 func NewJobHandler(create func() JobCtrl) *JobHandler {
@@ -40,4 +41,8 @@ func (jh *JobHandler) Status(c *xin.Context) {
 
 func (jh *JobHandler) List(c *xin.Context) {
 	jh.create().List(c)
+}
+
+func (jh *JobHandler) Logs(c *xin.Context) {
+	jh.create().Logs(c)
 }
