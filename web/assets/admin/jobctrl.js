@@ -2,18 +2,18 @@ $(function() {
 	function job_start() {
 		$('#job_start').prop('disabled', true);
 
-		var $f = $('#job_form');
+		var $jf = $('#job_form');
 		$.ajaf({
 			url: './start',
 			type: 'POST',
-			data: $f.serializeArray(),
-			file: $f.find('input[type="file"]'),
+			data: $jf.serializeArray(),
+			file: $jf.find('input[type="file"]'),
 			dataType: 'json',
-			beforeSend: main.form_ajax_start($f),
+			beforeSend: main.form_ajax_start($jf),
 			success: main.ajax_success,
-			error: main.form_ajax_error($f),
+			error: main.form_ajax_error($jf),
 			complete: function() {
-				main.form_ajax_end($f)();
+				main.form_ajax_end($jf)();
 				job_list();
 			}
 		});
@@ -23,7 +23,7 @@ $(function() {
 	function job_abort() {
 		$('#job_abort').prop('disabled', true);
 
-		var $f = $('#job_form');
+		var $jf = $('#job_form');
 		var jid = $('#job_list').find('li.P, li.R').attr('id').replace('job_', '');
 
 		$.ajax({
@@ -34,11 +34,11 @@ $(function() {
 				jid: jid
 			},
 			dataType: 'json',
-			beforeSend: main.form_ajax_start($f),
+			beforeSend: main.form_ajax_start($jf),
 			success: main.ajax_success,
-			error: main.form_ajax_error($f),
+			error: main.form_ajax_error($jf),
 			complete: function() {
-				main.form_ajax_end($f)();
+				main.form_ajax_end($jf)();
 				job_list();
 			}
 		});
@@ -239,31 +239,31 @@ $(function() {
 	}
 
 	function job_copy_param() {
-		var $form = $(this).closest('form');
+		var $cf = $(this).closest('form');
 
-		$form.find(':input').prop('disabled', false);
-		var vs = $form.formValues();
-		$form.find(':input').prop('disabled', true);
+		$cf.find(':input').prop('disabled', false);
+		var vs = $cf.formValues();
+		$cf.find(':input').prop('disabled', true);
 
 		$('#job_form').formValues(vs, true);
 		return false;
 	}
 
 	function build_job_param(job) {
-		var $form = $('#job_form'), legend = $form.prev('legend').text();
+		var $jf = $('#job_form'), legend = $jf.prev('legend').text();
 		if (!legend) {
 			return $('<hr/>');
 		}
 
 		var $fset = $('<fieldset>', { 'class': "ui-fieldset collapsed" }).append($('<legend>').text(legend));
 
-		$form = $form.clone().attr('id', 'job_param_' + job.id);
-		$form.on('submit', function() { return false; });
-		$form.find('[type=hidden]').remove();
-		$form.find(':input').prop('disabled', true);
-		$form.formClear();
+		var $cf = $jf.clone().attr('id', 'job_param_' + job.id);
+		$cf.on('submit', function() { return false; });
+		$cf.find('[type=hidden]').remove();
+		$cf.find(':input').prop('disabled', true);
+		$cf.formClear();
 
-		var $f = $form.find('[type=file]').hide();
+		var $f = $cf.find('[type=file]').hide();
 		if (job.file) {
 			$('<a>', { 'class': 'btn btn-secondary', href: main.base + '/files' + job.file })
 				.append($('<i>', { 'class': 'fas fa-download' }))
@@ -281,19 +281,20 @@ $(function() {
 					}
 				}
 			}
-			$form.formValues(params);
+			$cf.formValues(params);
 
-			var $a = $('<a>', { 'class': 'btn btn-secondary ps', href: '#' });
-			$a.append($('<i class="fas fa-arrow-up">'));
-			$a.append($('<span>').text('Copy'));
-			$a.click(job_copy_param);
-	
-			$form.append($a);
+			if (!$jf.data('nocopy')) {
+				var $a = $('<a>', { 'class': 'btn btn-secondary ps', href: '#' });
+				$a.append($('<i class="fas fa-arrow-up">'));
+				$a.append($('<span>').text('Copy'));
+				$a.click(job_copy_param);
+				$cf.append($a);
+			}
 		}
 
-		$form.find('select[data-spy="niceSelect"]').niceSelect();
+		$cf.find('select[data-spy="niceSelect"]').niceSelect();
 
-		$fset.append($form).fieldset().on('expanded.fieldset', function() {
+		$fset.append($cf).fieldset().on('expanded.fieldset', function() {
 			$(this).find('textarea').autosize();
 		});
 		return $fset;

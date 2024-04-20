@@ -18,7 +18,7 @@
 
 	<fieldset data-spy="fieldset">
 		<legend>{{T .Loc "user.import.csv.legend"}}</legend>
-		<form id="job_form" class="form-horizontal grey" enctype="multipart/form-data" autocomplete="off">
+		<form id="job_form" class="form-horizontal grey" enctype="multipart/form-data" autocomplete="off" data-nocopy="true">
 			<input type="hidden" name="_token_" value="{{.Token}}"/>
 			<input type="hidden" name="source" value="csv"/>
 			<div class="row py-3">
