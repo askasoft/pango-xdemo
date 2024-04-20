@@ -10,12 +10,7 @@ $(function() {
 			file: $f.find('input[type="file"]'),
 			dataType: 'json',
 			beforeSend: main.form_ajax_start($f),
-			success: function(data) {
-				$.toast({
-					icon: 'info',
-					text: data.message
-				});
-			},
+			success: main.ajax_success,
 			error: main.form_ajax_error($f),
 			complete: function() {
 				main.form_ajax_end($f)();
@@ -40,12 +35,7 @@ $(function() {
 			},
 			dataType: 'json',
 			beforeSend: main.form_ajax_start($f),
-			success: function(data) {
-				$.toast({
-					icon: 'info',
-					text: data.message
-				});
-			},
+			success: main.ajax_success,
 			error: main.form_ajax_error($f),
 			complete: function() {
 				main.form_ajax_end($f)();
@@ -294,7 +284,7 @@ $(function() {
 			$form.formValues(params);
 
 			var $a = $('<a>', { 'class': 'btn btn-secondary ps', href: '#' });
-			$a.append($('<i class="fa fa-arrow-up">'));
+			$a.append($('<i class="fas fa-arrow-up">'));
 			$a.append($('<span>').text('Copy'));
 			$a.click(job_copy_param);
 	

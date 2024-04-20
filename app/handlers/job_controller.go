@@ -78,7 +78,7 @@ func (jc *JobController) Start(c *xin.Context) {
 
 	jobs.Start()
 
-	c.JSON(http.StatusOK, xin.H{"jid": jid, "message": tbs.GetText(c.Locale, "job.started")})
+	c.JSON(http.StatusOK, xin.H{"jid": jid, "success": tbs.GetText(c.Locale, "job.started")})
 }
 
 func (jc *JobController) Abort(c *xin.Context) {
@@ -96,7 +96,7 @@ func (jc *JobController) Abort(c *xin.Context) {
 		}
 	}
 
-	c.JSON(http.StatusOK, xin.H{"message": tbs.GetText(c.Locale, "job.aborted")})
+	c.JSON(http.StatusOK, xin.H{"success": tbs.GetText(c.Locale, "job.aborted")})
 }
 
 func (jc *JobController) List(c *xin.Context) {
