@@ -1,6 +1,7 @@
 $(function() {
 	function config_save() {
 		var $f = $(this);
+
 		$.ajax({
 			url: './save',
 			type: 'POST',
