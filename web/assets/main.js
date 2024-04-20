@@ -167,7 +167,9 @@ var main = {
 	},
 	form_add_invalid: function($f, err) {
 		if ($f) {
-			$f.find('[name="' + err.param + '"]').addClass('is-invalid').closest('div').append($('<div class="verr">').text(err.message));
+			var $i = $f.find('[name="' + err.param + '"]');
+			$i.addClass('is-invalid');
+			$i.closest('div').append($('<div class="verr">').text(err.message));
 		}
 	},
 	form_ajax_error: function($f) {

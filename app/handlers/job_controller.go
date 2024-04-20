@@ -55,14 +55,14 @@ func (jc *JobController) Start(c *xin.Context) {
 	tt := tenant.FromCtx(c)
 
 	tjm := tt.JM()
-	job, err := tjm.FindJob(jc.Name)
+	job, err := tjm.FindJob(jc.Name, false, xjm.JobStatusRunning, xjm.JobStatusPending)
 	if err != nil {
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, E(c))
 		return
 	}
 
-	if job != nil && (job.IsRunning() || job.IsPending()) {
+	if job != nil {
 		c.AddError(errors.New(tbs.GetText(c.Locale, "job.existing")))
 		c.JSON(http.StatusBadRequest, E(c))
 		return
@@ -110,7 +110,7 @@ func (jc *JobController) List(c *xin.Context) {
 		limit = max
 	}
 
-	jobs, err := tjm.FindJobs(jc.Name, skip, limit)
+	jobs, err := tjm.FindJobs(jc.Name, skip, limit, false)
 	if err != nil {
 		c.Logger.Errorf("Failed to find jobs for '%s': %v", jc.Name, err)
 		c.AddError(err)

@@ -310,21 +310,21 @@ $(function() {
 	}
 
 	function job_list() {
-		var $f = $('#job_form');
+		var $ul = $('#job_list > ul');
 
 		$.ajax({
 			url: './list',
 			type: 'GET',
 			dataType: 'json',
-			beforeSend: main.form_ajax_start($f),
+			beforeSend: $ul.loadmask.delegate($ul),
 			success: function(data) {
 				setTimeout(function() {
 					build_job_list(data);
 					job_btn_refresh();
 				}, 10);
 			},
-			error: main.form_ajax_error($f),
-			complete: main.form_ajax_end($f)
+			error: main.ajax_error,
+			complete: $ul.unloadmask.delegate($ul)
 		});
 
 		return false;
