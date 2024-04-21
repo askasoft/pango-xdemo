@@ -51,6 +51,28 @@ func (jc *JobController) Index(c *xin.Context) {
 	c.HTML(http.StatusOK, jc.Template, h)
 }
 
+func (jc *JobController) List(c *xin.Context) {
+	tt := tenant.FromCtx(c)
+	tjm := tt.JM()
+
+	skip := num.Atoi(c.Query("skip"))
+	limit := num.Atoi(c.Query("limit"))
+	max := app.INI.GetInt("job", "maxJobList", 10)
+	if limit <= 0 || limit > max {
+		limit = max
+	}
+
+	jobs, err := tjm.FindJobs(jc.Name, skip, limit, false)
+	if err != nil {
+		c.Logger.Errorf("Failed to find jobs for '%s': %v", jc.Name, err)
+		c.AddError(err)
+		c.JSON(http.StatusInternalServerError, E(c))
+		return
+	}
+
+	c.JSON(http.StatusOK, jobs)
+}
+
 func (jc *JobController) Start(c *xin.Context) {
 	tt := tenant.FromCtx(c)
 
@@ -83,42 +105,24 @@ func (jc *JobController) Start(c *xin.Context) {
 
 func (jc *JobController) Abort(c *xin.Context) {
 	jid := num.Atol(c.PostForm("jid"))
-	if jid > 0 {
-		tt := tenant.FromCtx(c)
-
-		tjm := tt.JM()
-		err := tjm.AbortJob(jid, "User aborted")
-		if err != nil {
-			c.Logger.Errorf("Failed to abort job #%d: %v", jid, err)
-			c.AddError(err)
-			c.JSON(http.StatusInternalServerError, E(c))
-			return
-		}
+	if jid <= 0 {
+		c.AddError(errors.New(tbs.Format(c.Locale, "error.param.invalid", "jid")))
+		c.JSON(http.StatusBadRequest, E(c))
+		return
 	}
 
-	c.JSON(http.StatusOK, xin.H{"success": tbs.GetText(c.Locale, "job.aborted")})
-}
-
-func (jc *JobController) List(c *xin.Context) {
 	tt := tenant.FromCtx(c)
+
 	tjm := tt.JM()
-
-	skip := num.Atoi(c.Query("skip"))
-	limit := num.Atoi(c.Query("limit"))
-	max := app.INI.GetInt("job", "maxJobList", 10)
-	if limit <= 0 || limit > max {
-		limit = max
-	}
-
-	jobs, err := tjm.FindJobs(jc.Name, skip, limit, false)
+	err := tjm.AbortJob(jid, "User aborted")
 	if err != nil {
-		c.Logger.Errorf("Failed to find jobs for '%s': %v", jc.Name, err)
+		c.Logger.Errorf("Failed to abort job #%d: %v", jid, err)
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, E(c))
 		return
 	}
 
-	c.JSON(http.StatusOK, jobs)
+	c.JSON(http.StatusOK, xin.H{"success": tbs.GetText(c.Locale, "job.aborted")})
 }
 
 func (jc *JobController) Status(c *xin.Context) {

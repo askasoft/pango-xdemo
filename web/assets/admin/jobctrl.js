@@ -21,10 +21,9 @@ $(function() {
 	}
 
 	function job_abort() {
-		$('#job_abort').prop('disabled', true);
+		$(this).prop('disabled', true).find('i').addClass('fa-spinner fa-spin');
 
-		var $jf = $('#job_form');
-		var jid = $('#job_list').find('li.P, li.R').attr('id').replace('job_', '');
+		var jid = $(this).closest('.job').data('jid');
 
 		$.ajax({
 			url: './abort',
@@ -34,18 +33,18 @@ $(function() {
 				jid: jid
 			},
 			dataType: 'json',
-			beforeSend: main.form_ajax_start($jf),
 			success: main.ajax_success,
-			error: main.form_ajax_error($jf),
-			complete: function() {
-				main.form_ajax_end($jf)();
-				job_list();
-			}
+			error: main.ajax_error,
+			complete: job_list
 		});
 		return false;
 	}
 
 	function job_status(jid) {
+		if ($('#job_head_' + jid).find('a.active').length == 0) {
+			return;
+		}
+
 		var $job = $('#job_' + jid);
 
 		if ($job.data('timer')) {
@@ -53,12 +52,8 @@ $(function() {
 			$job.data('timer', null);
 		}
 
-		if ($job.find('a.active').length == 0) {
-			return;
-		}
-
 		var timeout = 0, param = { jid: jid, asc: false, limit: 1000 };
-		var $logs = $('#job_logs_' + jid), $tb = $logs.find('tbody'), $tr = $tb.children('tr:first-child');
+		var $tb = $job.find('tbody'), $tr = $tb.children('tr:first-child');
 
 		if ($tr.length) {
 			param.min = parseInt($tr.data('lid')) + 1;
@@ -73,10 +68,8 @@ $(function() {
 			success: function(data) {
 				var job = data.job, logs = data.logs || [];
 
-				$job.data('job', job).removeClass('A C P R').addClass(job.status);
-				$job.find('i').attr('class', job_status_icon(job.status));
-
-				job_btn_refresh();
+				job_info_refresh(job);
+				job_start_refresh();
 
 				if (logs.length >= param.limit) {
 					// has next logs
@@ -117,7 +110,7 @@ $(function() {
 	function job_prev_logs() {
 		var $a = $(this), $i = $a.next();
 		var $td = $a.closest('td'), $tr = $td.closest('tr'), $tb = $tr.closest('tbody');
-		var jid = $tb.closest('table').attr('id').replace('job_logs_', '');
+		var jid = $tb.closest('.job').data('jid');
 		var lid = parseInt($tr.prev().data('lid'));
 		var param = { jid: jid, asc: false, max: lid - 1, limit: 10000 };
 
@@ -149,10 +142,10 @@ $(function() {
 	}
 
 	function build_log(lg) {
-		var tr = document.createElement("tr"),
-			td1 = document.createElement("td"),
-			td2 = document.createElement("td"),
-			td3 = document.createElement("td");
+		var tr = document.createElement('tr'),
+			td1 = document.createElement('td'),
+			td2 = document.createElement('td'),
+			td3 = document.createElement('td');
 		tr.className = lg.level;
 		tr.setAttribute('data-lid', lg.id);
 		td1.textContent = main.format_time(lg.time);
@@ -162,10 +155,9 @@ $(function() {
 		return tr;
 	}
 
-	function job_btn_refresh() {
-		var $jobs = $('#job_list'), $ul = $jobs.children('ul'), jpr = $ul.find('li.P, li.R').length > 0;
+	function job_start_refresh() {
+		var $jlist = $('#job_list'), $jhs = $jlist.children('ul'), jpr = $jhs.find('li.P, li.R').length > 0;
 		$('#job_start').prop('disabled', jpr).find('i')[jpr ? 'addClass' : 'removeClass']('fa-spinner fa-spin');
-		$('#job_abort').prop('disabled', !jpr);
 	}
 
 	function job_status_icon(s) {
@@ -189,8 +181,7 @@ $(function() {
 	}
 
 	function job_tab_shown(e) {
-		var jid = $(e.target).attr('href').replace('#job_info_', '');
-		job_status(jid);
+		job_status($(e.target).data('jid'));
 		return false;
 	}
 
@@ -199,43 +190,57 @@ $(function() {
 			return;
 		}
 
-		var $jobs = $('#job_list'), $ul = $jobs.children('ul');
-		if ($ul.length == 0) {
-			$ul = $('<ul class="nav nav-pills">');
-			$jobs.append($ul);
-			$ul.on('click', 'a', job_tab_show);
-			$ul.on('shown.bs.tab', 'a', job_tab_shown);
+		var $jlist = $('#job_list'), $jhs = $jlist.children('ul');
+		if ($jhs.length == 0) {
+			$jhs = $('<ul class="nav nav-pills">');
+			$jhs.on('click', 'a', job_tab_show);
+			$jhs.on('shown.bs.tab', 'a', job_tab_shown);
+			$jlist.append($jhs);
 		}
 
-		var $tabs = $jobs.children('div');
-		if ($tabs.length == 0) {
-			$tabs = $('<div class="tab-content">');
-			$jobs.append($tabs);
+		var $jobs = $jlist.children('div');
+		if ($jobs.length == 0) {
+			$jobs = $('<div class="tab-content">');
+			$jlist.append($jobs);
 		}
 
 		for (var i = data.length - 1; i >= 0; i--) {
-			var job = data[i], $li = $ul.children('#job_' + job.id);
-			if ($li.length) {
+			var job = data[i], $jh = $jhs.children('#job_head_' + job.id);
+			if ($jh.length) {
+				job_info_refresh(job);
 				continue;
 			}
 
-			var $a = $('<a>', { href: '#job_info_' + job.id, 'class': 'nav-link' });
-			$a.append($('<i>', { 'class': job_status_icon(job.status) }));
-			$a.append($('<span>').text(main.format_time(job.created_at)));
-			
-			$li = $('<li>', { id: 'job_' + job.id, 'class': 'nav-item ' + job.status }).append($a);
-			$ul.prepend($li.data('job', job));
+			$jh = build_job_head(job);
+			$jhs.prepend($jh);
 
-			var $tab = $('<div>', { id: 'job_info_' + job.id, 'class': "tab-pane fade" });
-			if (job.file || job.param) {
-				$tab.append(build_job_param(job));
-			}
-			$tab.append($('<table>', { id: 'job_logs_' + job.id, 'class': "table table-striped"}).append($('<tbody>')));
+			var $job = $('<div>', { id: 'job_' + job.id, 'class': 'job tab-pane fade' }).data('jid', job.id);
 
-			$tabs.prepend($tab);
+			$job.append(build_job_param(job));
+
+			var $jt = $('<div>', { 'class': 'job-tools' });
+			build_job_abort($jt, job.status);
+			$job.append($jt);
+
+			$job.append($('<table>', { 'class': 'table table-striped' }).append($('<tbody>')));
+
+			$jobs.prepend($job);
 		}
 
-		$ul.find('a').first().trigger('click');
+		$jhs.find('a').first().trigger('click');
+	}
+
+	function build_job_head(job) {
+		var $jh = $('<li>', { id: 'job_head_' + job.id, 'class': 'nav-item ' + job.status });
+		$jh.data('jid', job.id);
+
+		var $a = $('<a>', { href: '#job_' + job.id, 'class': 'nav-link' });
+		$a.data('jid', job.id);
+		$a.append($('<i>', { 'class': job_status_icon(job.status) }));
+		$a.append($('<span>').text(main.format_time(job.created_at)));
+
+		$jh.append($a);
+		return $jh;
 	}
 
 	function job_copy_param() {
@@ -251,11 +256,11 @@ $(function() {
 
 	function build_job_param(job) {
 		var $jf = $('#job_form'), legend = $jf.prev('legend').text();
-		if (!legend) {
+		if (!legend || !(job.file || job.param)) {
 			return $('<hr/>');
 		}
 
-		var $fset = $('<fieldset>', { 'class': "ui-fieldset collapsed" }).append($('<legend>').text(legend));
+		var $fset = $('<fieldset>', { 'class': 'ui-fieldset collapsed' }).append($('<legend>').text(legend));
 
 		var $cf = $jf.clone().attr('id', 'job_param_' + job.id);
 		$cf.on('submit', function() { return false; });
@@ -283,10 +288,11 @@ $(function() {
 			}
 			$cf.formValues(params);
 
-			if (!$jf.data('nocopy')) {
+			var copy = $jf.data('copy');
+			if (copy) {
 				var $a = $('<a>', { 'class': 'btn btn-secondary ps', href: '#' });
 				$a.append($('<i class="fas fa-arrow-up">'));
-				$a.append($('<span>').text('Copy'));
+				$a.append($('<span>').text(copy));
 				$a.click(job_copy_param);
 				$cf.append($a);
 			}
@@ -300,22 +306,46 @@ $(function() {
 		return $fset;
 	}
 
+	function build_job_abort($jt, jst) {
+		if (jst == 'A' || jst == 'C') {
+			return;
+		}
+
+		var $jf = $('#job_form');
+
+		var $btn = $('<button>', { 'class': 'abort btn btn-danger' });
+		var $i = $('<i>', { 'class': 'fas fa-stop' });
+		var $t = $('<span>').text($jf.data('abort'));
+
+		$jt.append($btn.append($i, $t));
+	}
+
+	function job_info_refresh(job) {
+		var $jh = $('#job_head_' + job.id), $job = $('#job_' + job.id);
+
+		$jh.removeClass('A C P R').addClass(job.status);
+		$jh.find('i').attr('class', job_status_icon(job.status));
+
+		var $jt = $job.find('.job-tools').empty();
+		build_job_abort($jt, job.status);
+	}
+
 	function job_list() {
-		var $ul = $('#job_list > ul');
+		var $jhs = $('#job_list > ul');
 
 		$.ajax({
 			url: './list',
 			type: 'GET',
 			dataType: 'json',
-			beforeSend: $ul.loadmask.delegate($ul),
+			beforeSend: $jhs.loadmask.delegate($jhs),
 			success: function(data) {
 				setTimeout(function() {
 					build_job_list(data);
-					job_btn_refresh();
+					job_start_refresh();
 				}, 10);
 			},
 			error: main.ajax_error,
-			complete: $ul.unloadmask.delegate($ul)
+			complete: $jhs.unloadmask.delegate($jhs)
 		});
 
 		return false;
@@ -323,7 +353,7 @@ $(function() {
 
 	$('#job_form').submit(function() { return false; });
 	$('#job_start').click(job_start);
-	$('#job_abort').click(job_abort);
+	$('#job_list').on('click', 'button.abort', job_abort);
 
 	job_list();
 });

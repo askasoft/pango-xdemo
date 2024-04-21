@@ -18,7 +18,7 @@
 
 	<fieldset data-spy="fieldset">
 		<legend>{{T .Loc "user.import.csv.legend"}}</legend>
-		<form id="job_form" class="form-horizontal grey" enctype="multipart/form-data" autocomplete="off" data-nocopy="true">
+		<form id="job_form" class="form-horizontal grey" enctype="multipart/form-data" autocomplete="off" data-abort="{{T .Loc "button.stop"}}">
 			<input type="hidden" name="_token_" value="{{.Token}}"/>
 			<input type="hidden" name="source" value="csv"/>
 			<div class="row py-3">
@@ -32,7 +32,6 @@
 
 	<div class="text-center">
 		<button id="job_start" class="btn btn-primary" disabled><i class="fas fa-play"></i> {{T .Loc "button.start"}}</button>
-		<button id="job_abort" class="btn btn-danger"  disabled><i class="fas fa-stop"></i> {{T .Loc "button.stop"}}</button>
 	</div>
 
 	<div id="job_list"></div>

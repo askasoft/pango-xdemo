@@ -12,13 +12,12 @@
 
 	<div class="well">{{T .Loc "admin.reset.well"}}</div>
 
-	<form id="job_form" class="hidden" enctype="multipart/form-data" autocomplete="off">
+	<form id="job_form" class="hidden" autocomplete="off" data-abort="{{T .Loc "button.stop"}}">
 		<input type="hidden" name="_token_" value="{{.Token}}"/>
 	</form>
 
 	<div class="text-center">
 		<button id="job_start" class="btn btn-primary" disabled><i class="fas fa-play"></i> {{T .Loc "button.start"}}</button>
-		<button id="job_abort" class="btn btn-danger"  disabled><i class="fas fa-stop"></i> {{T .Loc "button.stop"}}</button>
 	</div>
 
 	<div id="job_list"></div>

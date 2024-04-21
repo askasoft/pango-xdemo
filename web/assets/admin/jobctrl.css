@@ -80,6 +80,14 @@ fieldset > form, fieldset > form#job_form {
 	margin-right: 7px;
 }
 
+#job_list .job-tools {
+	text-align: right;
+	margin-bottom: 15px;
+}
+.job-tools button > i {
+	margin-right: 8px;
+}
+
 #job_list table {
 	font-family: Menlo, Monaco, Consolas, monospace;
 }
