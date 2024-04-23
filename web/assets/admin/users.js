@@ -173,11 +173,11 @@ $(function() {
 				});
 
 				var usr = data.result;
-				var $tr = $('#usr_new').clone();
+				var $tb = $('#users_table > tbody'), $tr = $tb.children('tr.template').clone();
 
-				$tr.removeClass('hidden').attr('id', 'usr_' + usr.id);
+				$tr.attr({ 'class': '', 'id': 'usr_' + usr.id});
 				$tr.find('td.check').append($('<input type="checkbox"/>').val(usr.id));
-				$('#users_table > tbody').prepend($tr);
+				$tb.prepend($tr);
 
 				user_set_tr_values($tr, usr);
 				$tr.find('td.id, td.created_at').addClass('ro');

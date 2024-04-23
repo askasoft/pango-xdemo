@@ -182,11 +182,11 @@ $(function() {
 				});
 
 				var pet = data.result;
-				var $tr = $('#pet_new').clone();
+				var $tb = $('#pets_table > tbody'), $tr = $tb.children('tr.template').clone();
 
-				$tr.removeClass('hidden').attr('id', 'pet_' + pet.id);
+				$tr.attr({ 'class': '', 'id': 'pet_' + pet.id});
 				$tr.find('td.check').append($('<input type="checkbox"/>').val(pet.id));
-				$('#pets_table > tbody').prepend($tr);
+				$tb.prepend($tr);
 
 				pet_set_tr_values($tr, pet);
 				$tr.find('td.id, td.created_at').addClass('ro');
