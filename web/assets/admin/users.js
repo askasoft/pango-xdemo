@@ -283,7 +283,7 @@ $(function() {
 		var ids = main.get_table_checked_ids($('#users_table'));
 
 		$.ajax({
-			url: en ? 'enable' : 'disable',
+			url: en ? './enable' : './disable',
 			type: 'POST',
 			data: {
 				_token_: main.token,

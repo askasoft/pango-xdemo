@@ -42,22 +42,22 @@ fieldset > form, fieldset > form#job_form {
 	margin-right: 5px;
 	vertical-align: middle;
 }
-#job_list li.A i {
+#job_list li[status=A] i {
 	color: #a94442;
 }
-#job_list li.C i {
+#job_list li[status=C] i {
 	color: #3c763d;
 }
-#job_list li.P i {
+#job_list li[status=P] i {
 	color: #aaa;
 }
-#job_list li.R i {
+#job_list li[status=R] i {
 	color: #00f;
 }
-#job_list .nav-pills > li.A > a.active > i {
+#job_list .nav-pills > li[status=A] > a.active > i {
 	color: #f00;
 }
-#job_list .nav-pills > li.C > a.active > i {
+#job_list .nav-pills > li[status=C] > a.active > i {
 	color: #0f0;
 }
 

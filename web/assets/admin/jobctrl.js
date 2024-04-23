@@ -217,10 +217,7 @@ $(function() {
 			var $job = $('<div>', { id: 'job_' + job.id, 'class': 'job tab-pane fade' }).data('jid', job.id);
 
 			$job.append(build_job_param(job));
-
-			var $jt = $('<div>', { 'class': 'job-tools' });
-			build_job_abort($jt, job.status);
-			$job.append($jt);
+			$job.append(build_job_tools(job.status));
 
 			$job.append($('<table>', { 'class': 'table table-striped' }).append($('<tbody>')));
 
@@ -231,7 +228,7 @@ $(function() {
 	}
 
 	function build_job_head(job) {
-		var $jh = $('<li>', { id: 'job_head_' + job.id, 'class': 'nav-item ' + job.status });
+		var $jh = $('<li>', { id: 'job_head_' + job.id, 'class': 'nav-item' }).attr('status', job.status);
 		$jh.data('jid', job.id);
 
 		var $a = $('<a>', { href: '#job_' + job.id, 'class': 'nav-link' });
@@ -306,27 +303,38 @@ $(function() {
 		return $fset;
 	}
 
-	function build_job_abort($jt, jst) {
-		if (jst == 'A' || jst == 'C') {
-			return;
-		}
+	function build_job_tools(jst) {
+		var $jt = $('<div>', { 'class': 'job-tools' });
 
+		if (jst == 'P' || jst == 'R') {
+			$jt.append(build_job_abort());
+		}
+		return $jt;
+	}
+
+	function build_job_abort() {
 		var $jf = $('#job_form');
 
 		var $btn = $('<button>', { 'class': 'abort btn btn-danger' });
 		var $i = $('<i>', { 'class': 'fas fa-stop' });
 		var $t = $('<span>').text($jf.data('abort'));
 
-		$jt.append($btn.append($i, $t));
+		$btn.append($i, $t);
+		return $btn;
 	}
 
 	function job_info_refresh(job) {
-		var $jh = $('#job_head_' + job.id), $job = $('#job_' + job.id);
-
-		$jh.removeClass('A C P R').addClass(job.status);
+		var $jh = $('#job_head_' + job.id);
+		if ($jh.attr('status') != job.status) {
+			$jh.attr('status', job.status);
 		$jh.find('i').attr('class', job_status_icon(job.status));
 
-		var $jt = $job.find('.job-tools').empty();
+			var $jt = $('#job_' + job.id).find('.job-tools').empty();
+			if (job.status == 'P' || job.status == 'R') {
+				$jt.append(build_job_abort());
+			}
+		}
+
 		build_job_abort($jt, job.status);
 	}
 
