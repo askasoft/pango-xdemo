@@ -297,7 +297,7 @@ func (uci *UserCsvImporter) importRecord(rec *csvUserRecord) error {
 
 		if r.RowsAffected > 0 {
 			uci.Log.Infof(tbs.GetText(uci.arg.Locale, "user.import.csv.step.created"), uci.StepInfo(), usr.ID, usr.Name, usr.Email)
-			if uid == 0 {
+			if uid != 0 {
 				// reset sequence if create with ID
 				r := db.Exec(uci.Tenant.ResetSequence("users", models.UserStartID))
 				if r.Error != nil {
