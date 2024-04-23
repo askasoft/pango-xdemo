@@ -107,13 +107,7 @@ func userListArgs(c *xin.Context) (q *UserQuery) {
 	return
 }
 
-func UserIndex(c *xin.Context) {
-	h := handlers.H(c)
-
-	q := userListArgs(c)
-	q.Normalize(userSortables, pagerLimits)
-
-	h["Q"] = q
+func userAddMaps(c *xin.Context, h xin.H) {
 	h["UserStatusMap"] = utils.GetUserStatusMap(c.Locale)
 
 	au := tenant.AuthUser(c)
@@ -122,6 +116,17 @@ func UserIndex(c *xin.Context) {
 	} else {
 		h["UserRoleMap"] = utils.GetUserRoleMap(c.Locale)
 	}
+}
+
+func UserIndex(c *xin.Context) {
+	h := handlers.H(c)
+
+	q := userListArgs(c)
+	q.Normalize(userSortables, pagerLimits)
+
+	h["Q"] = q
+
+	userAddMaps(c, h)
 
 	c.HTML(http.StatusOK, "admin/users", h)
 }
@@ -151,14 +156,8 @@ func UserList(c *xin.Context) {
 	}
 
 	h["Q"] = q
-	h["UserStatusMap"] = utils.GetUserStatusMap(c.Locale)
 
-	au := tenant.AuthUser(c)
-	if au.IsSuper() {
-		h["UserRoleMap"] = utils.GetSuperRoleMap(c.Locale)
-	} else {
-		h["UserRoleMap"] = utils.GetUserRoleMap(c.Locale)
-	}
+	userAddMaps(c, h)
 
 	c.HTML(http.StatusOK, "admin/users_list", h)
 }
