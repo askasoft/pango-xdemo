@@ -19,7 +19,10 @@ $(function() {
 			url: './list',
 			type: 'POST',
 			data: $f.serialize(),
-			beforeSend: main.loadmask,
+			beforeSend: function() {
+				main.form_clear_invalid($f);
+				main.loadmask();
+			},
 			success: function(data, ts, xhr) {
 				$('#users_list').html(data);
 
@@ -27,7 +30,7 @@ $(function() {
 				$('#users_list [data-spy="pager"]').pager();
 				$('#users_list [data-spy="sortable"]').sortable();
 			},
-			error: main.ajax_error,
+			error: main.form_ajax_error($f),
 			complete: main.unloadmask
 		});
 		return false;

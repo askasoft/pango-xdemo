@@ -98,12 +98,12 @@ func findUsers(tt tenant.Tenant, uq *UserQuery, filter func(tx *gorm.DB, uq *Use
 	return
 }
 
-func userListArgs(c *xin.Context) (q *UserQuery) {
+func userListArgs(c *xin.Context) (q *UserQuery, err error) {
 	q = &UserQuery{
 		Sorter: args.Sorter{Col: "id", Dir: "asc"},
 	}
-	_ = c.Bind(q)
 
+	err = c.Bind(q)
 	return
 }
 
@@ -121,7 +121,7 @@ func userAddMaps(c *xin.Context, h xin.H) {
 func UserIndex(c *xin.Context) {
 	h := handlers.H(c)
 
-	q := userListArgs(c)
+	q, _ := userListArgs(c)
 	q.Normalize(userSortables, pagerLimits)
 
 	h["Q"] = q
@@ -137,21 +137,31 @@ func UserList(c *xin.Context) {
 	h := handlers.H(c)
 
 	f := filterUsers(c)
-	q := userListArgs(c)
+	q, err := userListArgs(c)
+	if err != nil {
+		utils.AddBindErrors(c, err, "user.")
+		c.JSON(http.StatusBadRequest, handlers.E(c))
+		return
+	}
 
-	var err error
 	q.Total, err = countUsers(tt, q, f)
 	q.Normalize(userSortables, pagerLimits)
 
 	if err != nil {
 		c.AddError(err)
-	} else if q.Total > 0 {
+		c.JSON(http.StatusBadRequest, handlers.E(c))
+		return
+	}
+
+	if q.Total > 0 {
 		results, err := findUsers(tt, q, f)
 		if err != nil {
 			c.AddError(err)
-		} else {
-			h["Users"] = results
+			c.JSON(http.StatusBadRequest, handlers.E(c))
+			return
 		}
+
+		h["Users"] = results
 		q.Count = len(results)
 	}
 

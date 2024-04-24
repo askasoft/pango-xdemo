@@ -2,8 +2,10 @@ package demos
 
 import (
 	"encoding/csv"
+	"net/http"
 
 	"github.com/askasoft/pango-xdemo/app"
+	"github.com/askasoft/pango-xdemo/app/handlers"
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango-xdemo/app/utils"
@@ -15,7 +17,12 @@ import (
 )
 
 func PetCsvExport(c *xin.Context) {
-	q := petListArgs(c)
+	q, err := petListArgs(c)
+	if err != nil {
+		utils.AddBindErrors(c, err, "pet.")
+		c.JSON(http.StatusBadRequest, handlers.E(c))
+		return
+	}
 
 	c.SetAttachmentHeader("pets.csv")
 

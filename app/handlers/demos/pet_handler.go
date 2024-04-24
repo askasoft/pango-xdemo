@@ -121,12 +121,12 @@ func findPets(tt tenant.Tenant, pq *PetQuery, filter func(tx *gorm.DB, pq *PetQu
 	return
 }
 
-func petListArgs(c *xin.Context) (pq *PetQuery) {
-	pq = &PetQuery{
+func petListArgs(c *xin.Context) (q *PetQuery, err error) {
+	q = &PetQuery{
 		Sorter: args.Sorter{Col: "updated_at", Dir: "desc"},
 	}
-	_ = c.Bind(pq)
 
+	err = c.Bind(q)
 	return
 }
 
@@ -140,10 +140,11 @@ func petAddMaps(c *xin.Context, h xin.H) {
 func PetIndex(c *xin.Context) {
 	h := handlers.H(c)
 
-	pq := petListArgs(c)
-	pq.Normalize(petSortables, pagerLimits)
+	q, _ := petListArgs(c)
+	q.Normalize(petSortables, pagerLimits)
 
-	h["Q"] = pq
+	h["Q"] = q
+
 	petAddMaps(c, h)
 
 	c.HTML(http.StatusOK, "demos/pets", h)
@@ -154,25 +155,36 @@ func PetList(c *xin.Context) {
 
 	h := handlers.H(c)
 
-	pq := petListArgs(c)
+	q, err := petListArgs(c)
+	if err != nil {
+		utils.AddBindErrors(c, err, "pet.")
+		c.JSON(http.StatusBadRequest, handlers.E(c))
+		return
+	}
 
-	var err error
-	pq.Total, err = countPets(tt, pq, filterPets)
-	pq.Normalize(petSortables, pagerLimits)
+	q.Total, err = countPets(tt, q, filterPets)
+	q.Normalize(petSortables, pagerLimits)
 
 	if err != nil {
 		c.AddError(err)
-	} else if pq.Total > 0 {
-		results, err := findPets(tt, pq, filterPets)
-		if err != nil {
-			c.AddError(err)
-		} else {
-			h["Pets"] = results
-		}
-		pq.Count = len(results)
+		c.JSON(http.StatusBadRequest, handlers.E(c))
+		return
 	}
 
-	h["Q"] = pq
+	if q.Total > 0 {
+		results, err := findPets(tt, q, filterPets)
+		if err != nil {
+			c.AddError(err)
+			c.JSON(http.StatusBadRequest, handlers.E(c))
+			return
+		}
+
+		h["Users"] = results
+		q.Count = len(results)
+	}
+
+	h["Q"] = q
+
 	petAddMaps(c, h)
 
 	c.HTML(http.StatusOK, "demos/pets_list", h)
