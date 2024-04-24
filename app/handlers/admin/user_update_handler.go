@@ -10,6 +10,7 @@ import (
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango-xdemo/app/utils"
+	"github.com/askasoft/pango-xdemo/app/utils/pgutil"
 	"github.com/askasoft/pango/cog"
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/str"
@@ -113,8 +114,13 @@ func UserCreate(c *xin.Context) {
 	usr.UpdatedAt = usr.CreatedAt
 
 	tt := tenant.FromCtx(c)
-	err := app.GDB.Table(tt.TableUsers()).Create(usr).Error
-	if err != nil {
+	if err := app.GDB.Table(tt.TableUsers()).Create(usr).Error; err != nil {
+		if pgutil.IsUniqueViolation(err) {
+			err = &utils.ParamError{
+				Param:   "email",
+				Message: tbs.Format(c.Locale, "user.error.email.dup", tbs.GetText(c.Locale, "user.email", "email"), usr.Email),
+			}
+		}
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return
@@ -143,6 +149,12 @@ func userUpdate(c *xin.Context, cols ...string) {
 		eu := &models.User{}
 		err := app.GDB.Table(tt.TableUsers()).Where("id = ?", usr.ID).Take(eu).Error
 		if err != nil {
+			if pgutil.IsUniqueViolation(err) {
+				err = &utils.ParamError{
+					Param:   "email",
+					Message: tbs.Format(c.Locale, "user.error.email.dup", tbs.GetText(c.Locale, "user.email", "email"), usr.Email),
+				}
+			}
 			c.AddError(err)
 			c.JSON(http.StatusInternalServerError, handlers.E(c))
 			return

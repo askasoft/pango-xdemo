@@ -35,6 +35,16 @@ func ErrInvalidID(c *xin.Context) error {
 	return errors.New(tbs.Format(c.Locale, "error.param.invalid", "ID"))
 }
 
+// AddBindErrors translate bind or validate errors
+// FieldBindErrors:
+//  1. {xxx}.error.{field}
+//  2. error.param.invalid
+//
+// ValidationErrors:
+//  1. {xxx}.error.{field}.{tag}
+//  2. {xxx}.error.param.{tag}
+//  3. error.param.{tag}
+//  4. error.param.invalid
 func AddBindErrors(c *xin.Context, err error, ns string) {
 	if fbes, ok := err.(binding.FieldBindErrors); ok { //nolint: errorlint
 		for _, fbe := range fbes {

@@ -198,7 +198,7 @@ func (uci *UserCsvImporter) checkRecord(rec *csvUserRecord) error {
 	var errs []string
 	if rec.ID != "" {
 		if num.Atol(rec.ID) < models.UserStartID {
-			errs = append(errs, tbs.GetText(uci.arg.Locale, "user.id")+tbs.Format(uci.arg.Locale, "user.id.range", models.UserStartID))
+			errs = append(errs, tbs.Format(uci.arg.Locale, "error.param.gte", tbs.GetText(uci.arg.Locale, "user.id", "ID"), num.Ltoa(models.UserStartID)))
 		}
 	}
 	if rec.Name == "" {
