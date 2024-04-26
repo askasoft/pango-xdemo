@@ -3,7 +3,7 @@ $(function() {
 
 	//----------------------------------------------------
 	// list: pager & sorter
-	//----------------------------------------------------
+	//
 	function users_reset() {
 		$('#users_listform [name="p"]').val(1);
 		$('#users_listform').formClear(true).submit();
@@ -36,18 +36,6 @@ $(function() {
 		return false;
 	}
 
-	function users_export() {
-		$.ajaf({
-			url: './export/csv',
-			type: 'POST',
-			data: $('#users_listform').serializeArray(),
-			beforeSend: main.loadmask,
-			error: main.ajax_error,
-			complete: main.unloadmask
-		});
-		return false;
-	}
-
 	if (!location.search) {
 		$('#users_listform').formValues(main.ssload(sskey));
 	}
@@ -71,12 +59,47 @@ $(function() {
 
 	$('#users_listform').on('submit', users_search).submit();
 	$('#users_listform').on('reset', users_reset);
+
+
+	//----------------------------------------------------
+	// export
+	//
+	function users_export() {
+		$.ajaf({
+			url: './export/csv',
+			type: 'POST',
+			data: $('#users_listform').serializeArray(),
+			beforeSend: main.loadmask,
+			error: main.ajax_error,
+			complete: main.unloadmask
+		});
+		return false;
+	}
+
 	$('#users_export').on('click', users_export);
 
 
 	//----------------------------------------------------
-	// detail
+	// new
+	//
+	function user_new() {
+		$('#users_detail_popup').popup({
+			loaded: false,
+			ajax: {
+				url: './new',
+				method: 'GET'
+			}
+		}).popup('show', this);
+
+		return false;
+	}
+
+	$('#users_new').on('click', user_new);
+
+
 	//----------------------------------------------------
+	// detail
+	//
 	function user_detail() {
 		var $tr = $(this).closest('tr');
 		var params = {
@@ -95,28 +118,30 @@ $(function() {
 		return false;
 	}
 
-	$('#users_list').on('click', 'button.edit', user_detail);
-
-	//----------------------------------------------------
-	// new
-	//----------------------------------------------------
-	function user_new() {
-		$('#users_detail_popup').popup({
-			loaded: false,
-			ajax: {
-				url: './new',
-				method: 'GET'
-			}
-		}).popup('show', this);
-
+	function user_detail_submit() {
+		$('#user_detail_id').val() == '0' ? user_create() : user_update();
 		return false;
 	}
 
-	$('#users_new').on('click', user_new);
+	$('#users_list').on('click', 'button.edit', user_detail);
+
+	$('#users_detail_popup')
+		.on('loaded.popup', function() {
+			$('#users_detail_popup')
+				.find('form').submit(user_detail_submit).end()
+				.find('.ui-popup-footer button[type=submit]').click(user_detail_submit);
+		}).on('shown.popup', function() {
+			$('#users_detail_popup')
+				.find('.ui-popup-body').prop('scrollTop', 0).end()
+				.find('input[type="text"]').textclear().end()
+				.find('textarea').autosize().textclear().enterfire();
+			$(window).trigger('resize');
+		});
+
 
 	//----------------------------------------------------
 	// update
-	//----------------------------------------------------
+	//
 	var USM = $('#user_maps').data('status');
 	var URM = $('#user_maps').data('role');
 
@@ -155,9 +180,10 @@ $(function() {
 		main.blink($tr);
 	}
 
+
 	//----------------------------------------------------
 	// create
-	//----------------------------------------------------
+	//
 	function user_create() {
 		var $p = $('#users_detail_popup');
 
@@ -191,30 +217,10 @@ $(function() {
 		return false;
 	}
 
-	//----------------------------------------------------
-	// detail popup
-	//----------------------------------------------------
-	function user_detail_submit() {
-		$('#user_detail_id').val() == '0' ? user_create() : user_update();
-		return false;
-	}
-
-	$('#users_detail_popup')
-		.on('loaded.popup', function() {
-			$('#users_detail_popup')
-				.find('form').submit(user_detail_submit).end()
-				.find('.ui-popup-footer button[type=submit]').click(user_detail_submit);
-		}).on('shown.popup', function() {
-			$('#users_detail_popup')
-				.find('.ui-popup-body').prop('scrollTop', 0).end()
-				.find('input[type="text"]').textclear().end()
-				.find('textarea').autosize().textclear().enterfire();
-			$(window).trigger('resize');
-		});
 
 	//----------------------------------------------------
 	// delete
-	//----------------------------------------------------
+	//
 	function users_delete() {
 		var $p = $('#users_delete_popup');
 		var ids = main.get_table_checked_ids($('#users_table'));
@@ -249,7 +255,7 @@ $(function() {
 
 	//----------------------------------------------------
 	// clear
-	//----------------------------------------------------
+	//
 	function users_clear() {
 		var $p = $('#users_clear_popup');
 		$.ajax({
@@ -278,9 +284,10 @@ $(function() {
 
 	$('#users_clear_popup form').submit(users_clear);
 
+
 	//----------------------------------------------------
 	// users enable/disable
-	//----------------------------------------------------
+	//
 	function users_enable(en) {
 		var $p = $(en ? '#users_enable_popup' : '#users_disable_popup');
 		var ids = main.get_table_checked_ids($('#users_table'));
