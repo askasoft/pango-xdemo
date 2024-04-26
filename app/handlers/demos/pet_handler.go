@@ -57,7 +57,9 @@ var petSortables = []string{
 	"updated_at",
 }
 
-func filterPets(tx *gorm.DB, pq *PetQuery) *gorm.DB {
+func filterPets(tt tenant.Tenant, pq *PetQuery) *gorm.DB {
+	tx := app.GDB.Table(tt.TablePets())
+
 	if pq.ID != 0 {
 		tx = tx.Where("id = ?", pq.ID)
 	}
@@ -94,12 +96,10 @@ func filterPets(tx *gorm.DB, pq *PetQuery) *gorm.DB {
 	return tx
 }
 
-func countPets(tt tenant.Tenant, pq *PetQuery, filter func(tx *gorm.DB, pq *PetQuery) *gorm.DB) (int, error) {
+func countPets(tt tenant.Tenant, pq *PetQuery, filter func(tenant.Tenant, *PetQuery) *gorm.DB) (int, error) {
 	var total int64
 
-	tx := app.GDB.Table(tt.TablePets())
-
-	tx = filter(tx, pq)
+	tx := filter(tt, pq)
 
 	r := tx.Count(&total)
 	if r.Error != nil {
@@ -109,10 +109,8 @@ func countPets(tt tenant.Tenant, pq *PetQuery, filter func(tx *gorm.DB, pq *PetQ
 	return int(total), nil
 }
 
-func findPets(tt tenant.Tenant, pq *PetQuery, filter func(tx *gorm.DB, pq *PetQuery) *gorm.DB) (arts []*models.Pet, err error) {
-	tx := app.GDB.Table(tt.TablePets())
-
-	tx = filter(tx, pq)
+func findPets(tt tenant.Tenant, pq *PetQuery, filter func(tenant.Tenant, *PetQuery) *gorm.DB) (arts []*models.Pet, err error) {
+	tx := filter(tt, pq)
 
 	ob := gormutil.Sorter2OrderBy(&pq.Sorter)
 	tx = tx.Offset(pq.Start()).Limit(pq.Limit).Order(ob)

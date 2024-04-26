@@ -4,10 +4,8 @@ import (
 	"encoding/csv"
 	"net/http"
 
-	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/handlers"
 	"github.com/askasoft/pango-xdemo/app/models"
-	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango-xdemo/app/utils"
 	"github.com/askasoft/pango/iox"
 	"github.com/askasoft/pango/num"
@@ -30,10 +28,7 @@ func UserCsvExport(c *xin.Context) {
 	cw := csv.NewWriter(c.Writer)
 	cw.UseCRLF = true
 
-	tt := tenant.FromCtx(c)
-
-	tx := app.GDB.Table(tt.TableUsers())
-	tx = filterUsers(c)(tx, uq).Order("id ASC")
+	tx := filterUsers(c, uq).Order("id ASC")
 
 	rows, err := tx.Rows()
 	if err != nil {

@@ -42,41 +42,41 @@ var userSortables = []string{
 	"updated_at",
 }
 
-func filterUsers(c *xin.Context) func(tx *gorm.DB, uq *UserQuery) *gorm.DB {
-	return func(tx *gorm.DB, uq *UserQuery) *gorm.DB {
-		if uq.ID != 0 {
-			tx = tx.Where("id = ?", uq.ID)
-		}
-		if uq.Name != "" {
-			tx = tx.Where("name LIKE ?", sqx.StringLike(uq.Name))
-		}
-		if uq.Email != "" {
-			tx = tx.Where("email LIKE ?", sqx.StringLike(uq.Email))
-		}
-		if uq.CIDR != "" {
-			tx = tx.Where("cidr LIKE ?", sqx.StringLike(uq.CIDR))
-		}
-		if len(uq.Role) > 0 {
-			tx = tx.Where("role IN ?", uq.Role)
-		}
-		if len(uq.Status) > 0 {
-			tx = tx.Where("status IN ?", uq.Status)
-		}
-
-		au := tenant.AuthUser(c)
-		if !au.IsSuper() {
-			tx = tx.Where("role > ?", models.RoleSuper)
-		}
-		return tx
-	}
-}
-
-func countUsers(tt tenant.Tenant, uq *UserQuery, filter func(tx *gorm.DB, uq *UserQuery) *gorm.DB) (int, error) {
-	var total int64
+func filterUsers(c *xin.Context, uq *UserQuery) *gorm.DB {
+	tt := tenant.FromCtx(c)
 
 	tx := app.GDB.Table(tt.TableUsers())
 
-	tx = filter(tx, uq)
+	if uq.ID != 0 {
+		tx = tx.Where("id = ?", uq.ID)
+	}
+	if uq.Name != "" {
+		tx = tx.Where("name LIKE ?", sqx.StringLike(uq.Name))
+	}
+	if uq.Email != "" {
+		tx = tx.Where("email LIKE ?", sqx.StringLike(uq.Email))
+	}
+	if uq.CIDR != "" {
+		tx = tx.Where("cidr LIKE ?", sqx.StringLike(uq.CIDR))
+	}
+	if len(uq.Role) > 0 {
+		tx = tx.Where("role IN ?", uq.Role)
+	}
+	if len(uq.Status) > 0 {
+		tx = tx.Where("status IN ?", uq.Status)
+	}
+
+	au := tenant.AuthUser(c)
+	if !au.IsSuper() {
+		tx = tx.Where("role > ?", models.RoleSuper)
+	}
+	return tx
+}
+
+func countUsers(c *xin.Context, uq *UserQuery, filter func(*xin.Context, *UserQuery) *gorm.DB) (int, error) {
+	var total int64
+
+	tx := filter(c, uq)
 
 	if err := tx.Count(&total).Error; err != nil {
 		return 0, err
@@ -85,10 +85,8 @@ func countUsers(tt tenant.Tenant, uq *UserQuery, filter func(tx *gorm.DB, uq *Us
 	return int(total), nil
 }
 
-func findUsers(tt tenant.Tenant, uq *UserQuery, filter func(tx *gorm.DB, uq *UserQuery) *gorm.DB) (usrs []*models.User, err error) {
-	tx := app.GDB.Table(tt.TableUsers())
-
-	tx = filter(tx, uq)
+func findUsers(c *xin.Context, uq *UserQuery, filter func(*xin.Context, *UserQuery) *gorm.DB) (usrs []*models.User, err error) {
+	tx := filter(c, uq)
 
 	ob := gormutil.Sorter2OrderBy(&uq.Sorter)
 	tx = tx.Offset(uq.Start()).Limit(uq.Limit).Order(ob)
@@ -131,11 +129,8 @@ func UserIndex(c *xin.Context) {
 }
 
 func UserList(c *xin.Context) {
-	tt := tenant.FromCtx(c)
-
 	h := handlers.H(c)
 
-	f := filterUsers(c)
 	uq, err := userListArgs(c)
 	if err != nil {
 		utils.AddBindErrors(c, err, "user.")
@@ -143,7 +138,7 @@ func UserList(c *xin.Context) {
 		return
 	}
 
-	uq.Total, err = countUsers(tt, uq, f)
+	uq.Total, err = countUsers(c, uq, filterUsers)
 	uq.Normalize(userSortables, pagerLimits)
 
 	if err != nil {
@@ -153,7 +148,7 @@ func UserList(c *xin.Context) {
 	}
 
 	if uq.Total > 0 {
-		results, err := findUsers(tt, uq, f)
+		results, err := findUsers(c, uq, filterUsers)
 		if err != nil {
 			c.AddError(err)
 			c.JSON(http.StatusBadRequest, handlers.E(c))

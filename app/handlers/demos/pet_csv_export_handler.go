@@ -4,7 +4,6 @@ import (
 	"encoding/csv"
 	"net/http"
 
-	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/handlers"
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/tenant"
@@ -33,8 +32,7 @@ func PetCsvExport(c *xin.Context) {
 
 	tt := tenant.FromCtx(c)
 
-	tx := app.GDB.Table(tt.TablePets())
-	tx = filterPets(tx, pq).Order("id ASC")
+	tx := filterPets(tt, pq).Order("id ASC")
 
 	rows, err := tx.Rows()
 	if err != nil {
