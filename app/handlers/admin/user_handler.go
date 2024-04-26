@@ -9,7 +9,6 @@ import (
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango-xdemo/app/utils"
 	"github.com/askasoft/pango-xdemo/app/utils/gormutil"
-	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/sqx"
 	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pango/xvw/args"
@@ -17,7 +16,7 @@ import (
 )
 
 type UserQuery struct {
-	ID     string   `form:"id,strip" json:"id"`
+	ID     int64    `form:"id,strip" json:"id"`
 	Name   string   `form:"name,strip" json:"name"`
 	Email  string   `form:"email,strip" json:"email"`
 	Role   []string `form:"role,strip" json:"role"`
@@ -45,8 +44,8 @@ var userSortables = []string{
 
 func filterUsers(c *xin.Context) func(tx *gorm.DB, uq *UserQuery) *gorm.DB {
 	return func(tx *gorm.DB, uq *UserQuery) *gorm.DB {
-		if id := num.Atoi(uq.ID); id != 0 {
-			tx = tx.Where("id = ?", id)
+		if uq.ID != 0 {
+			tx = tx.Where("id = ?", uq.ID)
 		}
 		if uq.Name != "" {
 			tx = tx.Where("name LIKE ?", sqx.StringLike(uq.Name))
@@ -98,12 +97,12 @@ func findUsers(tt tenant.Tenant, uq *UserQuery, filter func(tx *gorm.DB, uq *Use
 	return
 }
 
-func userListArgs(c *xin.Context) (q *UserQuery, err error) {
-	q = &UserQuery{
+func userListArgs(c *xin.Context) (uq *UserQuery, err error) {
+	uq = &UserQuery{
 		Sorter: args.Sorter{Col: "id", Dir: "asc"},
 	}
 
-	err = c.Bind(q)
+	err = c.Bind(uq)
 	return
 }
 
@@ -121,10 +120,10 @@ func userAddMaps(c *xin.Context, h xin.H) {
 func UserIndex(c *xin.Context) {
 	h := handlers.H(c)
 
-	q, _ := userListArgs(c)
-	q.Normalize(userSortables, pagerLimits)
+	uq, _ := userListArgs(c)
+	uq.Normalize(userSortables, pagerLimits)
 
-	h["Q"] = q
+	h["Q"] = uq
 
 	userAddMaps(c, h)
 
@@ -137,15 +136,15 @@ func UserList(c *xin.Context) {
 	h := handlers.H(c)
 
 	f := filterUsers(c)
-	q, err := userListArgs(c)
+	uq, err := userListArgs(c)
 	if err != nil {
 		utils.AddBindErrors(c, err, "user.")
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}
 
-	q.Total, err = countUsers(tt, q, f)
-	q.Normalize(userSortables, pagerLimits)
+	uq.Total, err = countUsers(tt, uq, f)
+	uq.Normalize(userSortables, pagerLimits)
 
 	if err != nil {
 		c.AddError(err)
@@ -153,8 +152,8 @@ func UserList(c *xin.Context) {
 		return
 	}
 
-	if q.Total > 0 {
-		results, err := findUsers(tt, q, f)
+	if uq.Total > 0 {
+		results, err := findUsers(tt, uq, f)
 		if err != nil {
 			c.AddError(err)
 			c.JSON(http.StatusBadRequest, handlers.E(c))
@@ -162,10 +161,10 @@ func UserList(c *xin.Context) {
 		}
 
 		h["Users"] = results
-		q.Count = len(results)
+		uq.Count = len(results)
 	}
 
-	h["Q"] = q
+	h["Q"] = uq
 
 	userAddMaps(c, h)
 

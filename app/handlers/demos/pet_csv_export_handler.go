@@ -17,7 +17,7 @@ import (
 )
 
 func PetCsvExport(c *xin.Context) {
-	q, err := petListArgs(c)
+	pq, err := petListArgs(c)
 	if err != nil {
 		utils.AddBindErrors(c, err, "pet.")
 		c.JSON(http.StatusBadRequest, handlers.E(c))
@@ -34,7 +34,7 @@ func PetCsvExport(c *xin.Context) {
 	tt := tenant.FromCtx(c)
 
 	tx := app.GDB.Table(tt.TablePets())
-	tx = filterPets(tx, q).Order("id ASC")
+	tx = filterPets(tx, pq).Order("id ASC")
 
 	rows, err := tx.Rows()
 	if err != nil {

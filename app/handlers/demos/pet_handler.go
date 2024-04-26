@@ -19,7 +19,7 @@ import (
 )
 
 type PetQuery struct {
-	ID        string    `form:"id,strip" json:"id"`
+	ID        int64     `form:"id,strip" json:"id"`
 	Name      string    `form:"name,strip" json:"name"`
 	BornFrom  time.Time `form:"born_from,strip" json:"born_from"`
 	BornTo    time.Time `form:"born_to,strip" json:"born_to"`
@@ -58,8 +58,8 @@ var petSortables = []string{
 }
 
 func filterPets(tx *gorm.DB, pq *PetQuery) *gorm.DB {
-	if id := num.Atoi(pq.ID); id != 0 {
-		tx = tx.Where("id = ?", id)
+	if pq.ID != 0 {
+		tx = tx.Where("id = ?", pq.ID)
 	}
 	if pq.Name != "" {
 		tx = tx.Where("name LIKE ?", sqx.StringLike(pq.Name))
@@ -121,12 +121,12 @@ func findPets(tt tenant.Tenant, pq *PetQuery, filter func(tx *gorm.DB, pq *PetQu
 	return
 }
 
-func petListArgs(c *xin.Context) (q *PetQuery, err error) {
-	q = &PetQuery{
+func petListArgs(c *xin.Context) (pq *PetQuery, err error) {
+	pq = &PetQuery{
 		Sorter: args.Sorter{Col: "updated_at", Dir: "desc"},
 	}
 
-	err = c.Bind(q)
+	err = c.Bind(pq)
 	return
 }
 
@@ -140,10 +140,10 @@ func petAddMaps(c *xin.Context, h xin.H) {
 func PetIndex(c *xin.Context) {
 	h := handlers.H(c)
 
-	q, _ := petListArgs(c)
-	q.Normalize(petSortables, pagerLimits)
+	pq, _ := petListArgs(c)
+	pq.Normalize(petSortables, pagerLimits)
 
-	h["Q"] = q
+	h["Q"] = pq
 
 	petAddMaps(c, h)
 
@@ -155,15 +155,15 @@ func PetList(c *xin.Context) {
 
 	h := handlers.H(c)
 
-	q, err := petListArgs(c)
+	pq, err := petListArgs(c)
 	if err != nil {
 		utils.AddBindErrors(c, err, "pet.")
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}
 
-	q.Total, err = countPets(tt, q, filterPets)
-	q.Normalize(petSortables, pagerLimits)
+	pq.Total, err = countPets(tt, pq, filterPets)
+	pq.Normalize(petSortables, pagerLimits)
 
 	if err != nil {
 		c.AddError(err)
@@ -171,8 +171,8 @@ func PetList(c *xin.Context) {
 		return
 	}
 
-	if q.Total > 0 {
-		results, err := findPets(tt, q, filterPets)
+	if pq.Total > 0 {
+		results, err := findPets(tt, pq, filterPets)
 		if err != nil {
 			c.AddError(err)
 			c.JSON(http.StatusBadRequest, handlers.E(c))
@@ -180,10 +180,10 @@ func PetList(c *xin.Context) {
 		}
 
 		h["Users"] = results
-		q.Count = len(results)
+		pq.Count = len(results)
 	}
 
-	h["Q"] = q
+	h["Q"] = pq
 
 	petAddMaps(c, h)
 

@@ -16,7 +16,7 @@ import (
 )
 
 func UserCsvExport(c *xin.Context) {
-	q, err := userListArgs(c)
+	uq, err := userListArgs(c)
 	if err != nil {
 		utils.AddBindErrors(c, err, "user.")
 		c.JSON(http.StatusBadRequest, handlers.E(c))
@@ -33,7 +33,7 @@ func UserCsvExport(c *xin.Context) {
 	tt := tenant.FromCtx(c)
 
 	tx := app.GDB.Table(tt.TableUsers())
-	tx = filterUsers(c)(tx, q).Order("id ASC")
+	tx = filterUsers(c)(tx, uq).Order("id ASC")
 
 	rows, err := tx.Rows()
 	if err != nil {
