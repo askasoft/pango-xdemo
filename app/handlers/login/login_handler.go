@@ -8,7 +8,7 @@ import (
 	"github.com/askasoft/pango-xdemo/app/handlers"
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/tenant"
-	"github.com/askasoft/pango-xdemo/app/utils"
+	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
 	"github.com/askasoft/pango/tbs"
 	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pango/xmw"
@@ -39,7 +39,7 @@ type UserPass struct {
 func Login(c *xin.Context) {
 	userpass := &UserPass{}
 	if err := c.Bind(userpass); err != nil {
-		utils.AddBindErrors(c, err, "login.")
+		vadutil.AddBindErrors(c, err, "login.")
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}

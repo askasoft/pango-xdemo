@@ -11,9 +11,9 @@ import (
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/tenant"
-	"github.com/askasoft/pango-xdemo/app/utils"
 	"github.com/askasoft/pango-xdemo/app/utils/csvutil"
 	"github.com/askasoft/pango-xdemo/app/utils/pgutil"
+	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
 	"github.com/askasoft/pango/cog"
 	"github.com/askasoft/pango/iox"
 	"github.com/askasoft/pango/num"
@@ -74,10 +74,10 @@ func (uci *UserCsvImporter) Run() {
 		return
 	}
 
-	uci.roleMap = utils.GetUserRoleMap(uci.arg.Locale)
-	uci.statusMap = utils.GetUserStatusMap(uci.arg.Locale)
-	uci.roleRevMap = utils.GetUserRoleReverseMap()
-	uci.statusRevMap = utils.GetUserStatusReverseMap()
+	uci.roleMap = tbsutil.GetUserRoleMap(uci.arg.Locale)
+	uci.statusMap = tbsutil.GetUserStatusMap(uci.arg.Locale)
+	uci.roleRevMap = tbsutil.GetUserRoleReverseMap()
+	uci.statusRevMap = tbsutil.GetUserStatusReverseMap()
 
 	total, err := uci.doCheckCsv()
 	if err != nil {

@@ -6,7 +6,8 @@ import (
 
 	"github.com/askasoft/pango-xdemo/app/handlers"
 	"github.com/askasoft/pango-xdemo/app/models"
-	"github.com/askasoft/pango-xdemo/app/utils"
+	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
+	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
 	"github.com/askasoft/pango/iox"
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/tbs"
@@ -16,7 +17,7 @@ import (
 func UserCsvExport(c *xin.Context) {
 	uq, err := userListArgs(c)
 	if err != nil {
-		utils.AddBindErrors(c, err, "user.")
+		vadutil.AddBindErrors(c, err, "user.")
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}
@@ -54,8 +55,8 @@ func UserCsvExport(c *xin.Context) {
 		return
 	}
 
-	sm := utils.GetUserStatusMap(c.Locale)
-	rm := utils.GetUserRoleMap(c.Locale)
+	sm := tbsutil.GetUserStatusMap(c.Locale)
+	rm := tbsutil.GetUserRoleMap(c.Locale)
 	for rows.Next() {
 		var usr models.User
 		err = tx.ScanRows(rows, &usr)

@@ -7,8 +7,9 @@ import (
 	"github.com/askasoft/pango-xdemo/app/handlers"
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/tenant"
-	"github.com/askasoft/pango-xdemo/app/utils"
 	"github.com/askasoft/pango-xdemo/app/utils/gormutil"
+	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
+	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
 	"github.com/askasoft/pango/sqx"
 	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pango/xvw/args"
@@ -105,13 +106,13 @@ func userListArgs(c *xin.Context) (uq *UserQuery, err error) {
 }
 
 func userAddMaps(c *xin.Context, h xin.H) {
-	h["UserStatusMap"] = utils.GetUserStatusMap(c.Locale)
+	h["UserStatusMap"] = tbsutil.GetUserStatusMap(c.Locale)
 
 	au := tenant.AuthUser(c)
 	if au.IsSuper() {
-		h["UserRoleMap"] = utils.GetSuperRoleMap(c.Locale)
+		h["UserRoleMap"] = tbsutil.GetSuperRoleMap(c.Locale)
 	} else {
-		h["UserRoleMap"] = utils.GetUserRoleMap(c.Locale)
+		h["UserRoleMap"] = tbsutil.GetUserRoleMap(c.Locale)
 	}
 }
 
@@ -119,7 +120,7 @@ func UserIndex(c *xin.Context) {
 	h := handlers.H(c)
 
 	uq, _ := userListArgs(c)
-	uq.Normalize(userSortables, pagerLimits)
+	uq.Normalize(userSortables, tbsutil.GetPagerLimits(c.Locale))
 
 	h["Q"] = uq
 
@@ -133,13 +134,13 @@ func UserList(c *xin.Context) {
 
 	uq, err := userListArgs(c)
 	if err != nil {
-		utils.AddBindErrors(c, err, "user.")
+		vadutil.AddBindErrors(c, err, "user.")
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}
 
 	uq.Total, err = countUsers(c, uq, filterUsers)
-	uq.Normalize(userSortables, pagerLimits)
+	uq.Normalize(userSortables, tbsutil.GetPagerLimits(c.Locale))
 
 	if err != nil {
 		c.AddError(err)

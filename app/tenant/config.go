@@ -7,7 +7,7 @@ import (
 
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/models"
-	"github.com/askasoft/pango-xdemo/app/utils"
+	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
 	"github.com/askasoft/pango/log"
 	"github.com/gocarina/gocsv"
 	"gorm.io/gorm"
@@ -78,5 +78,5 @@ func (tt Tenant) loadConfigMap(db *gorm.DB) (map[string]string, error) {
 
 func (tt Tenant) GetCIDRs() []*net.IPNet {
 	dcm := tt.GetConfigMap()
-	return utils.ParseCIDRs(dcm["secure_cidr"])
+	return vadutil.ParseCIDRs(dcm["secure_cidr"])
 }

@@ -7,7 +7,8 @@ import (
 	"github.com/askasoft/pango-xdemo/app/handlers"
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/tenant"
-	"github.com/askasoft/pango-xdemo/app/utils"
+	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
+	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
 	"github.com/askasoft/pango/iox"
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/str"
@@ -18,7 +19,7 @@ import (
 func PetCsvExport(c *xin.Context) {
 	pq, err := petListArgs(c)
 	if err != nil {
-		utils.AddBindErrors(c, err, "pet.")
+		vadutil.AddBindErrors(c, err, "pet.")
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}
@@ -66,10 +67,10 @@ func PetCsvExport(c *xin.Context) {
 		return
 	}
 
-	pgm := utils.GetPetGenderMap(c.Locale)
-	pom := utils.GetPetOriginMap(c.Locale)
-	ptm := utils.GetPetTemperMap(c.Locale)
-	phm := utils.GetPetHabitsMap(c.Locale)
+	pgm := tbsutil.GetPetGenderMap(c.Locale)
+	pom := tbsutil.GetPetOriginMap(c.Locale)
+	ptm := tbsutil.GetPetTemperMap(c.Locale)
+	phm := tbsutil.GetPetHabitsMap(c.Locale)
 
 	for rows.Next() {
 		var pet models.Pet

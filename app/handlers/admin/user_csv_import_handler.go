@@ -10,7 +10,7 @@ import (
 	"github.com/askasoft/pango-xdemo/app/jobs"
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/tenant"
-	"github.com/askasoft/pango-xdemo/app/utils"
+	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
 	"github.com/askasoft/pango/iox"
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/tbs"
@@ -77,8 +77,8 @@ func UserCsvImportSample(c *xin.Context) {
 		return
 	}
 
-	sm := utils.GetUserStatusMap(c.Locale)
-	rm := utils.GetUserRoleMap(c.Locale)
+	sm := tbsutil.GetUserStatusMap(c.Locale)
+	rm := tbsutil.GetUserRoleMap(c.Locale)
 
 	domain := c.Request.Host
 	data := [][]string{

@@ -1,4 +1,4 @@
-package utils
+package tbsutil
 
 import (
 	"encoding/json"
@@ -6,9 +6,19 @@ import (
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango/cog"
 	"github.com/askasoft/pango/mag"
+	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/tbs"
 )
+
+func GetPagerLimits(locale string) []int {
+	ss := str.Fields(tbs.GetText(locale, "pager.limits.list", "20 50 100"))
+	ps := make([]int, len(ss))
+	for i, s := range ss {
+		ps[i] = num.Atoi(s)
+	}
+	return ps
+}
 
 func GetPetGenderMap(locale string) *cog.LinkedHashMap[string, string] {
 	return GetLinkedHashMap(locale, "pet.map.gender")

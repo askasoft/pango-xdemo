@@ -8,8 +8,9 @@ import (
 	"github.com/askasoft/pango-xdemo/app/handlers"
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/tenant"
-	"github.com/askasoft/pango-xdemo/app/utils"
 	"github.com/askasoft/pango-xdemo/app/utils/gormutil"
+	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
+	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/sqx"
 	"github.com/askasoft/pango/sqx/pqx"
@@ -129,17 +130,17 @@ func petListArgs(c *xin.Context) (pq *PetQuery, err error) {
 }
 
 func petAddMaps(c *xin.Context, h xin.H) {
-	h["PetGenderMap"] = utils.GetPetGenderMap(c.Locale)
-	h["PetOriginMap"] = utils.GetPetOriginMap(c.Locale)
-	h["PetTemperMap"] = utils.GetPetTemperMap(c.Locale)
-	h["PetHabitsMap"] = utils.GetPetHabitsMap(c.Locale)
+	h["PetGenderMap"] = tbsutil.GetPetGenderMap(c.Locale)
+	h["PetOriginMap"] = tbsutil.GetPetOriginMap(c.Locale)
+	h["PetTemperMap"] = tbsutil.GetPetTemperMap(c.Locale)
+	h["PetHabitsMap"] = tbsutil.GetPetHabitsMap(c.Locale)
 }
 
 func PetIndex(c *xin.Context) {
 	h := handlers.H(c)
 
 	pq, _ := petListArgs(c)
-	pq.Normalize(petSortables, pagerLimits)
+	pq.Normalize(petSortables, tbsutil.GetPagerLimits(c.Locale))
 
 	h["Q"] = pq
 
@@ -155,13 +156,13 @@ func PetList(c *xin.Context) {
 
 	pq, err := petListArgs(c)
 	if err != nil {
-		utils.AddBindErrors(c, err, "pet.")
+		vadutil.AddBindErrors(c, err, "pet.")
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}
 
 	pq.Total, err = countPets(tt, pq, filterPets)
-	pq.Normalize(petSortables, pagerLimits)
+	pq.Normalize(petSortables, tbsutil.GetPagerLimits(c.Locale))
 
 	if err != nil {
 		c.AddError(err)

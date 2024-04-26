@@ -5,10 +5,14 @@ import (
 
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/tenant"
-	"github.com/askasoft/pango-xdemo/app/utils"
+	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
 	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pango/xmw"
 )
+
+type ArgIDs struct {
+	IDs []int64 `form:"id[]"`
+}
 
 func H(c *xin.Context) xin.H {
 	tt := tenant.FromCtx(c)
@@ -37,7 +41,7 @@ func H(c *xin.Context) xin.H {
 func E(c *xin.Context) xin.H {
 	errs := []any{}
 	for _, e := range c.Errors {
-		if pe, ok := e.(*utils.ParamError); ok { //nolint: errorlint
+		if pe, ok := e.(*vadutil.ParamError); ok { //nolint: errorlint
 			errs = append(errs, pe)
 		} else {
 			errs = append(errs, e.Error())

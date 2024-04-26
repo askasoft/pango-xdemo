@@ -7,7 +7,7 @@ import (
 
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/models"
-	"github.com/askasoft/pango-xdemo/app/utils"
+	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
 	"github.com/askasoft/pango/cog"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/num"
@@ -59,10 +59,10 @@ func initPets(logger log.Logger, db *gorm.DB, cid int64, cat string) error {
 	// 	imgs = append(imgs, fn)
 	// }
 
-	pgs := utils.GetPetGenderMap("").Keys()
-	pos := utils.GetPetOriginMap("").Keys()
-	pts := utils.GetPetTemperMap("").Keys()
-	phs := utils.GetPetHabitsMap("").Keys()
+	pgs := tbsutil.GetPetGenderMap("").Keys()
+	pos := tbsutil.GetPetOriginMap("").Keys()
+	pts := tbsutil.GetPetTemperMap("").Keys()
+	phs := tbsutil.GetPetHabitsMap("").Keys()
 
 	bd, _ := time.Parse(time.RFC3339, "2000-01-01T10:04:05+09:00")
 	for i := 0; i < 100; i++ {

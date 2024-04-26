@@ -1,7 +1,5 @@
 package admin
 
-var pagerLimits = []int{20, 50, 100}
+import "github.com/askasoft/pango-xdemo/app/handlers"
 
-type ArgIDs struct {
-	IDs []int64 `form:"id[]"`
-}
+type ArgIDs = handlers.ArgIDs

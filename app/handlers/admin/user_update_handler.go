@@ -9,8 +9,9 @@ import (
 	"github.com/askasoft/pango-xdemo/app/handlers"
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/tenant"
-	"github.com/askasoft/pango-xdemo/app/utils"
 	"github.com/askasoft/pango-xdemo/app/utils/pgutil"
+	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
+	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
 	"github.com/askasoft/pango/cog"
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/str"
@@ -27,8 +28,8 @@ func UserNew(c *xin.Context) {
 
 	h := handlers.H(c)
 	h["User"] = usr
-	h["UserStatusMap"] = utils.GetUserStatusMap(c.Locale)
-	h["UserRoleMap"] = utils.GetUserRoleMap(c.Locale)
+	h["UserStatusMap"] = tbsutil.GetUserStatusMap(c.Locale)
+	h["UserRoleMap"] = tbsutil.GetUserRoleMap(c.Locale)
 
 	c.HTML(http.StatusOK, "admin/user_detail", h)
 }
@@ -36,7 +37,7 @@ func UserNew(c *xin.Context) {
 func UserDetail(c *xin.Context) {
 	aid := num.Atol(c.Query("id"))
 	if aid == 0 {
-		c.AddError(utils.ErrInvalidID(c))
+		c.AddError(vadutil.ErrInvalidID(c))
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}
@@ -67,11 +68,11 @@ func UserDetail(c *xin.Context) {
 func userBind(c *xin.Context) *models.User {
 	usr := &models.User{}
 	if err := c.Bind(usr); err != nil {
-		utils.AddBindErrors(c, err, "user.")
+		vadutil.AddBindErrors(c, err, "user.")
 	}
 
-	if !utils.ValidateCIDRs(usr.CIDR) {
-		c.AddError(utils.ErrInvalidField(c, "user.", "cidr"))
+	if !vadutil.ValidateCIDRs(usr.CIDR) {
+		c.AddError(vadutil.ErrInvalidField(c, "user.", "cidr"))
 	}
 
 	if usr.Role != "" {
@@ -79,19 +80,19 @@ func userBind(c *xin.Context) *models.User {
 
 		au := tenant.AuthUser(c)
 		if au.IsSuper() {
-			rm = utils.GetSuperRoleMap(c.Locale)
+			rm = tbsutil.GetSuperRoleMap(c.Locale)
 		} else {
-			rm = utils.GetUserRoleMap(c.Locale)
+			rm = tbsutil.GetUserRoleMap(c.Locale)
 		}
 		if !rm.Contain(usr.Role) {
-			c.AddError(utils.ErrInvalidField(c, "user.", "role"))
+			c.AddError(vadutil.ErrInvalidField(c, "user.", "role"))
 		}
 	}
 
 	if usr.Status != "" {
-		sm := utils.GetUserStatusMap(c.Locale)
+		sm := tbsutil.GetUserStatusMap(c.Locale)
 		if !sm.Contain(usr.Status) {
-			c.AddError(utils.ErrInvalidField(c, "user.", "status"))
+			c.AddError(vadutil.ErrInvalidField(c, "user.", "status"))
 		}
 	}
 
@@ -116,7 +117,7 @@ func UserCreate(c *xin.Context) {
 	tt := tenant.FromCtx(c)
 	if err := app.GDB.Table(tt.TableUsers()).Create(usr).Error; err != nil {
 		if pgutil.IsUniqueViolation(err) {
-			err = &utils.ParamError{
+			err = &vadutil.ParamError{
 				Param:   "email",
 				Message: tbs.Format(c.Locale, "user.error.email.dup", tbs.GetText(c.Locale, "user.email", "email"), usr.Email),
 			}
@@ -136,7 +137,7 @@ func UserCreate(c *xin.Context) {
 func userUpdate(c *xin.Context, cols ...string) {
 	usr := userBind(c)
 	if usr.ID == 0 {
-		c.AddError(utils.ErrInvalidID(c))
+		c.AddError(vadutil.ErrInvalidID(c))
 	}
 	if len(c.Errors) > 0 {
 		c.JSON(http.StatusBadRequest, handlers.E(c))
@@ -150,7 +151,7 @@ func userUpdate(c *xin.Context, cols ...string) {
 		err := app.GDB.Table(tt.TableUsers()).Where("id = ?", usr.ID).Take(eu).Error
 		if err != nil {
 			if pgutil.IsUniqueViolation(err) {
-				err = &utils.ParamError{
+				err = &vadutil.ParamError{
 					Param:   "email",
 					Message: tbs.Format(c.Locale, "user.error.email.dup", tbs.GetText(c.Locale, "user.email", "email"), usr.Email),
 				}

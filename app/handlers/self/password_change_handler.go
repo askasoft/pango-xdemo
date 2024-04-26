@@ -8,7 +8,7 @@ import (
 	"github.com/askasoft/pango-xdemo/app/handlers"
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/tenant"
-	"github.com/askasoft/pango-xdemo/app/utils"
+	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
 	"github.com/askasoft/pango/tbs"
 	"github.com/askasoft/pango/xin"
 )
@@ -29,7 +29,7 @@ func PasswordChangeChange(c *xin.Context) {
 	pca := &PwdChgArg{}
 
 	if err := c.Bind(pca); err != nil {
-		utils.AddBindErrors(c, err, "pwdchg.")
+		vadutil.AddBindErrors(c, err, "pwdchg.")
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}
