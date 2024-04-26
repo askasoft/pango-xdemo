@@ -181,7 +181,7 @@ $(function() {
 					text: data.success
 				});
 
-				var pet = data.result, $tr = $('tr#pet_' + pet.id);
+				var pet = data.pet, $tr = $('tr#pet_' + pet.id);
 
 				pet_set_tr_values($tr, pet);
 			},
@@ -212,7 +212,7 @@ $(function() {
 					text: data.success
 				});
 
-				var pet = data.result;
+				var pet = data.pet;
 				var $tb = $('#pets_table > tbody'), $tr = $tb.children('tr.template').clone();
 
 				$tr.attr({ 'class': '', 'id': 'pet_' + pet.id});

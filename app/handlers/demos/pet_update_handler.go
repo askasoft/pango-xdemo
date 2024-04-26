@@ -124,7 +124,7 @@ func PetCreate(c *xin.Context) {
 	}
 
 	c.JSON(http.StatusOK, xin.H{
-		"result":  pet,
+		"pet":     pet,
 		"success": tbs.GetText(c.Locale, "success.created"),
 	})
 }
@@ -162,7 +162,7 @@ func petUpdate(c *xin.Context, cols ...string) {
 	}
 
 	c.JSON(http.StatusOK, xin.H{
-		"result":  pet,
+		"pet":     pet,
 		"success": tbs.GetText(c.Locale, "success.updated"),
 	})
 }

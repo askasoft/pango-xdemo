@@ -162,7 +162,7 @@ $(function() {
 					text: data.success
 				});
 
-				var usr = data.result, $tr = $('tr#usr_' + usr.id);
+				var usr = data.user, $tr = $('tr#usr_' + usr.id);
 
 				user_set_tr_values($tr, usr);
 			},
@@ -201,7 +201,7 @@ $(function() {
 					text: data.success
 				});
 
-				var usr = data.result;
+				var usr = data.user;
 				var $tb = $('#users_table > tbody'), $tr = $tb.children('tr.template').clone();
 
 				$tr.attr({ 'class': '', 'id': 'usr_' + usr.id});
