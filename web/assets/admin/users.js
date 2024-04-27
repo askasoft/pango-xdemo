@@ -37,7 +37,7 @@ $(function() {
 	}
 
 	if (!location.search) {
-		$('#users_listform').formValues(main.ssload(sskey));
+		$('#users_listform').formValues(main.ssload(sskey), true);
 	}
 	if (main.form_has_inputs($('#users_listform'))) {
 		$('#users_listfset').fieldset('expand', 'show');

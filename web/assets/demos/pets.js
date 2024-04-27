@@ -37,7 +37,7 @@ $(function() {
 	}
 
 	if (!location.search) {
-		$('#pets_listform').formValues(main.ssload(sskey));
+		$('#pets_listform').formValues(main.ssload(sskey), true);
 	}
 	if (main.form_has_inputs($('#pets_listform'))) {
 		$('#pets_listfset').fieldset('expand', 'show');

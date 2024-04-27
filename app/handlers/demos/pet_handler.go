@@ -152,8 +152,6 @@ func PetIndex(c *xin.Context) {
 func PetList(c *xin.Context) {
 	tt := tenant.FromCtx(c)
 
-	h := handlers.H(c)
-
 	pq, err := petListArgs(c)
 	if err != nil {
 		vadutil.AddBindErrors(c, err, "pet.")
@@ -169,6 +167,8 @@ func PetList(c *xin.Context) {
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}
+
+	h := handlers.H(c)
 
 	if pq.Total > 0 {
 		results, err := findPets(tt, pq, filterPets)

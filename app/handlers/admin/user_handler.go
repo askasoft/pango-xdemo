@@ -130,8 +130,6 @@ func UserIndex(c *xin.Context) {
 }
 
 func UserList(c *xin.Context) {
-	h := handlers.H(c)
-
 	uq, err := userListArgs(c)
 	if err != nil {
 		vadutil.AddBindErrors(c, err, "user.")
@@ -147,6 +145,8 @@ func UserList(c *xin.Context) {
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}
+
+	h := handlers.H(c)
 
 	if uq.Total > 0 {
 		results, err := findUsers(c, uq, filterUsers)
