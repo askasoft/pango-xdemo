@@ -211,7 +211,10 @@ var main = {
 				continue;
 			}
 
-			var $c = $td.children('a, pre'), v = vs[k] || '';
+			var $c = $td.children('a, pre'), v = vs[k];
+			if (typeof(v) == 'undefined') {
+				v = '';
+			}
 			if (v && k.endsWith("_at")) {
 				v = main[$td.hasClass('date') ? 'format_date' : 'format_time'](v);
 			}
