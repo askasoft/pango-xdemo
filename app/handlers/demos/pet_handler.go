@@ -178,7 +178,7 @@ func PetList(c *xin.Context) {
 			return
 		}
 
-		h["Users"] = results
+		h["Pets"] = results
 		pq.Count = len(results)
 	}
 
