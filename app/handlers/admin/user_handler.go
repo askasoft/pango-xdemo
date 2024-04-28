@@ -17,12 +17,12 @@ import (
 )
 
 type UserQuery struct {
-	ID     int64    `form:"id,strip" json:"id"`
-	Name   string   `form:"name,strip" json:"name"`
-	Email  string   `form:"email,strip" json:"email"`
-	Role   []string `form:"role,strip" json:"role"`
-	Status []string `form:"status,strip" json:"status"`
-	CIDR   string   `form:"cidr,strip" json:"cidr"`
+	ID     int64    `json:"id" form:"id,strip"`
+	Name   string   `json:"name" form:"name,strip"`
+	Email  string   `json:"email" form:"email,strip"`
+	Role   []string `json:"role" form:"role,strip"`
+	Status []string `json:"status" form:"status,strip"`
+	CIDR   string   `json:"cidr" form:"cidr,strip"`
 
 	args.Pager
 	args.Sorter

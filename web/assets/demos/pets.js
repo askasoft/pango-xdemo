@@ -233,7 +233,7 @@ $(function() {
 	// delete
 	//
 	function pets_delete() {
-		var $p = $('#pets_delete_popup');
+		var $p = $('#pets_deletesel_popup');
 		var ids = main.get_table_checked_ids($('#pets_table'));
 
 		$.ajax({
@@ -261,14 +261,14 @@ $(function() {
 		return false;
 	}
 
-	$('#pets_delete_popup form').submit(pets_delete);
+	$('#pets_deletesel_popup form').submit(pets_delete);
 
 
 	//----------------------------------------------------
 	// clear
 	//
-	function pets_clear() {
-		var $p = $('#pets_clear_popup');
+	function pets_deleteall() {
+		var $p = $('#pets_deleteall_popup');
 		$.ajax({
 			url: './clear',
 			type: 'POST',
@@ -293,5 +293,5 @@ $(function() {
 		return false;
 	}
 
-	$('#pets_clear_popup form').submit(pets_clear);
+	$('#pets_deleteall_popup form').submit(pets_deleteall);
 });

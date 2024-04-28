@@ -12,10 +12,10 @@
 
 	<div class="row">
 		<div class="col-md-6 ui-toolbar">
-			<button class="btn btn-sm btn-outline-danger" popup-target="#pets_delete_popup" enableby="#pets_list td.check input">
-				<i class="{{T .Loc "icon.delete"}}"></i> {{T .Loc "button.delete"}}
+			<button class="btn btn-sm btn-outline-danger" popup-target="#pets_deletesel_popup" enableby="#pets_list td.check input">
+				<i class="{{T .Loc "icon.delete"}}"></i> {{T .Loc "button.deletesel"}}
 			</button>
-			<button class="btn btn-sm btn-outline-danger" popup-target="#pets_clear_popup">
+			<button class="btn btn-sm btn-outline-danger" popup-target="#pets_deleteall_popup">
 				<i class="{{T .Loc "icon.deleteall"}}"></i> {{T .Loc "button.deleteall"}}
 			</button>
 		</div>
@@ -121,7 +121,7 @@
 	data-habits="{{JSON .PetHabitsMap}}"
 ></div>
 
-<div id="pets_delete_popup" class="ui-popup s-popup-confirm" data-spy="popup" tabindex="-1"
+<div id="pets_deletesel_popup" class="ui-popup s-popup-confirm" data-spy="popup" tabindex="-1"
 	popup-mask="true" popup-keyboard="false" popup-mouse="false">
 	<form>
 		<div class="ui-popup-body">
@@ -135,7 +135,7 @@
 	</form>
 </div>
 
-<div id="pets_clear_popup" class="ui-popup s-popup-confirm" data-spy="popup" tabindex="-1"
+<div id="pets_deleteall_popup" class="ui-popup s-popup-confirm" data-spy="popup" tabindex="-1"
 	popup-mask="true" popup-keyboard="false" popup-mouse="false">
 	<form>
 		<div class="ui-popup-body">

@@ -28,8 +28,7 @@ func UserNew(c *xin.Context) {
 
 	h := handlers.H(c)
 	h["User"] = usr
-	h["UserStatusMap"] = tbsutil.GetUserStatusMap(c.Locale)
-	h["UserRoleMap"] = tbsutil.GetUserRoleMap(c.Locale)
+	userAddMaps(c, h)
 
 	c.HTML(http.StatusOK, "admin/user_detail", h)
 }
@@ -65,17 +64,14 @@ func UserDetail(c *xin.Context) {
 	c.HTML(http.StatusOK, "admin/user_detail", h)
 }
 
-func userBind(c *xin.Context) *models.User {
-	usr := &models.User{}
-	if err := c.Bind(usr); err != nil {
-		vadutil.AddBindErrors(c, err, "user.")
-	}
-
-	if !vadutil.ValidateCIDRs(usr.CIDR) {
+func userValidateCIDR(c *xin.Context, cidr string) {
+	if !vadutil.ValidateCIDRs(cidr) {
 		c.AddError(vadutil.ErrInvalidField(c, "user.", "cidr"))
 	}
+}
 
-	if usr.Role != "" {
+func userValidateRole(c *xin.Context, role string) {
+	if role != "" {
 		var rm *cog.LinkedHashMap[string, string]
 
 		au := tenant.AuthUser(c)
@@ -84,17 +80,30 @@ func userBind(c *xin.Context) *models.User {
 		} else {
 			rm = tbsutil.GetUserRoleMap(c.Locale)
 		}
-		if !rm.Contain(usr.Role) {
+		if !rm.Contain(role) {
 			c.AddError(vadutil.ErrInvalidField(c, "user.", "role"))
 		}
 	}
+}
 
-	if usr.Status != "" {
+func userValidateStatus(c *xin.Context, status string) {
+	if status != "" {
 		sm := tbsutil.GetUserStatusMap(c.Locale)
-		if !sm.Contain(usr.Status) {
+		if !sm.Contain(status) {
 			c.AddError(vadutil.ErrInvalidField(c, "user.", "status"))
 		}
 	}
+}
+
+func userBind(c *xin.Context) *models.User {
+	usr := &models.User{}
+	if err := c.Bind(usr); err != nil {
+		vadutil.AddBindErrors(c, err, "user.")
+	}
+
+	userValidateCIDR(c, usr.CIDR)
+	userValidateRole(c, usr.Role)
+	userValidateStatus(c, usr.Status)
 
 	return usr
 }
@@ -134,7 +143,17 @@ func UserCreate(c *xin.Context) {
 	})
 }
 
-func userUpdate(c *xin.Context, cols ...string) {
+var userUpdatables = []string{
+	"name",
+	"email",
+	"password",
+	"role",
+	"status",
+	"cidr",
+	"updated_at",
+}
+
+func UserUpdate(c *xin.Context) {
 	usr := userBind(c)
 	if usr.ID == 0 {
 		c.AddError(vadutil.ErrInvalidID(c))
@@ -169,12 +188,7 @@ func userUpdate(c *xin.Context, cols ...string) {
 
 	usr.UpdatedAt = time.Now()
 
-	tx := app.GDB.Table(tt.TableUsers())
-	if len(cols) > 0 {
-		tx = tx.Select(cols)
-	}
-
-	r := tx.Updates(usr)
+	r := app.GDB.Table(tt.TableUsers()).Select(userUpdatables).Updates(usr)
 	if r.Error != nil {
 		c.AddError(r.Error)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
@@ -184,55 +198,122 @@ func userUpdate(c *xin.Context, cols ...string) {
 	usr.Password = ""
 	c.JSON(http.StatusOK, xin.H{
 		"user":    usr,
-		"success": tbs.GetText(c.Locale, "success.updated"),
+		"success": tbs.Format(c.Locale, "user.success.updates", r.RowsAffected),
 	})
 }
 
-func UserUpdate(c *xin.Context) {
-	userUpdate(c, "name", "email", "password", "role", "status", "cidr", "updated_at")
+type UserUpdatesArg struct {
+	ID     string `json:"id,omitempty" form:"id,strip"`
+	Role   string `json:"role" form:"role,strip"`
+	Status string `json:"status" form:"status,strip"`
+	CIDR   string `json:"cidr" form:"cidr,strip"`
+	Ucidr  bool   `json:"ucidr" form:"ucidr"`
 }
 
-func UserDelete(c *xin.Context) {
-	arg := &ArgIDs{}
+func UserUpdates(c *xin.Context) {
+	uua := &UserUpdatesArg{}
+	if err := c.Bind(uua); err != nil {
+		vadutil.AddBindErrors(c, err, "user.")
+	}
+	userValidateCIDR(c, uua.CIDR)
+	userValidateRole(c, uua.Role)
+	userValidateStatus(c, uua.Status)
 
-	err := c.Bind(arg)
-	if err != nil {
-		c.AddError(err)
+	if uua.Role == "" && uua.Status == "" && !uua.Ucidr {
+		c.AddError(errors.New(tbs.GetText(c.Locale, "error.request.invalid")))
+	}
+
+	if len(c.Errors) > 0 {
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}
 
-	cnt := len(arg.IDs)
-	if cnt > 0 {
-		au := tenant.AuthUser(c)
-		tt := tenant.FromCtx(c)
-
-		tx := app.GDB.Table(tt.TableUsers())
-		tx = tx.Where("role <> ? AND id <> ? AND id IN ?", models.RoleSuper, au.ID, arg.IDs)
-		r := tx.Delete(&models.User{})
-
-		err := r.Error
-		if err != nil {
-			c.AddError(err)
-			c.JSON(http.StatusInternalServerError, handlers.E(c))
-			return
-		}
-
-		cnt = int(r.RowsAffected)
+	ids := handlers.SplitIDs(uua.ID)
+	if uua.ID != "*" && len(ids) == 0 {
+		c.AddError(vadutil.ErrInvalidID(c))
+		c.JSON(http.StatusBadRequest, handlers.E(c))
+		return
 	}
 
-	c.JSON(http.StatusOK, xin.H{
-		"success": tbs.Format(c.Locale, "user.success.delete", cnt),
-	})
-}
-
-func UserClear(c *xin.Context) {
 	au := tenant.AuthUser(c)
 	tt := tenant.FromCtx(c)
 
 	var cnt int64
 	err := app.GDB.Transaction(func(db *gorm.DB) error {
-		r := db.Table(tt.TableUsers()).Where("role <> ? AND id <> ?", models.RoleSuper, au.ID).Delete(&models.User{})
+		tx := db.Table(tt.TableUsers())
+
+		tx = tx.Where("id <> ?", au.ID)
+		if !au.IsSuper() {
+			tx = tx.Where("role <> ?", models.RoleSuper)
+		}
+
+		if uua.ID != "*" {
+			tx = tx.Where("id IN ?", ids)
+		}
+
+		usr := &models.User{}
+
+		usr.UpdatedAt = time.Now()
+
+		cols := make([]string, 0, 8)
+		cols = append(cols, "updated_at")
+
+		if uua.Role != "" {
+			usr.Role = uua.Role
+			cols = append(cols, "role")
+		}
+		if uua.Status != "" {
+			usr.Status = uua.Status
+			cols = append(cols, "status")
+		}
+		if uua.Ucidr {
+			usr.CIDR = uua.CIDR
+			cols = append(cols, "cidr")
+		}
+
+		r := tx.Select(cols).Updates(usr)
+		cnt = r.RowsAffected
+		return r.Error
+	})
+
+	if err != nil {
+		c.AddError(err)
+		c.JSON(http.StatusInternalServerError, handlers.E(c))
+		return
+	}
+
+	c.JSON(http.StatusOK, xin.H{
+		"success": tbs.Format(c.Locale, "user.success.updates", cnt),
+		"updates": uua,
+	})
+}
+
+func UserDeletes(c *xin.Context) {
+	id := c.PostForm("id")
+	ids := handlers.SplitIDs(id)
+
+	if id != "*" && len(ids) == 0 {
+		c.AddError(vadutil.ErrInvalidID(c))
+		c.JSON(http.StatusBadRequest, handlers.E(c))
+		return
+	}
+
+	au := tenant.AuthUser(c)
+	tt := tenant.FromCtx(c)
+
+	var cnt int64
+	err := app.GDB.Transaction(func(db *gorm.DB) error {
+		tx := db.Table(tt.TableUsers())
+
+		tx = tx.Where("id <> ?", au.ID)
+		if !au.IsSuper() {
+			tx = tx.Where("role <> ?", models.RoleSuper)
+		}
+		if id != "*" {
+			tx = tx.Where("id IN ?", ids)
+		}
+
+		r := tx.Delete(&models.User{})
 		if r.Error != nil {
 			return r.Error
 		}
@@ -240,57 +321,14 @@ func UserClear(c *xin.Context) {
 
 		return db.Exec(tt.ResetSequence("users", models.UserStartID)).Error
 	})
+
 	if err != nil {
 		c.AddError(err)
-		c.JSON(http.StatusBadRequest, handlers.E(c))
+		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return
 	}
 
 	c.JSON(http.StatusOK, xin.H{
-		"success": tbs.Format(c.Locale, "user.success.delete", cnt),
+		"success": tbs.Format(c.Locale, "user.success.deletes", cnt),
 	})
-}
-
-func userStatusUpdate(c *xin.Context, enable bool) {
-	arg := &ArgIDs{}
-
-	err := c.Bind(arg)
-	if err != nil {
-		c.AddError(err)
-		c.JSON(http.StatusBadRequest, handlers.E(c))
-		return
-	}
-
-	cnt := len(arg.IDs)
-	if cnt > 0 {
-		au := tenant.AuthUser(c)
-		tt := tenant.FromCtx(c)
-
-		status := str.If(enable, models.UserActive, models.UserDisabled)
-		tx := app.GDB.Table(tt.TableUsers())
-		tx = tx.Where("role <> ? AND id <> ? AND id IN ?", models.RoleSuper, au.ID, arg.IDs)
-		r := tx.Update("status", status)
-
-		err := r.Error
-		if err != nil {
-			c.AddError(err)
-			c.JSON(http.StatusInternalServerError, handlers.E(c))
-			return
-		}
-
-		cnt = int(r.RowsAffected)
-	}
-
-	msg := str.If(enable, "user.success.enable", "user.success.disable")
-	c.JSON(http.StatusOK, xin.H{
-		"success": tbs.Format(c.Locale, msg, cnt),
-	})
-}
-
-func UserEnable(c *xin.Context) {
-	userStatusUpdate(c, true)
-}
-
-func UserDisable(c *xin.Context) {
-	userStatusUpdate(c, false)
 }

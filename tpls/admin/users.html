@@ -12,17 +12,17 @@
 
 	<div class="row">
 		<div class="col-md-6 ui-toolbar">
-			<button class="btn btn-sm btn-outline-danger" popup-target="#users_delete_popup" enableby="#users_list td.check input">
-				<i class="{{T .Loc "icon.delete"}}"></i> {{T .Loc "button.delete"}}
+			<button class="btn btn-sm btn-outline-danger" popup-target="#users_deletesel_popup" enableby="#users_list td.check input">
+				<i class="{{T .Loc "icon.delete"}}"></i> {{T .Loc "button.deletesel"}}
 			</button>
-			<button class="btn btn-sm btn-outline-danger" popup-target="#users_clear_popup">
+			<button class="btn btn-sm btn-outline-danger" popup-target="#users_deleteall_popup">
 				<i class="{{T .Loc "icon.deleteall"}}"></i> {{T .Loc "button.deleteall"}}
 			</button>
-			<button class="btn btn-sm btn-outline-success" popup-target="#users_enable_popup" enableby="#users_list td.check input">
-				<i class="{{T .Loc "icon.user.enable"}}"></i> {{T .Loc "button.enable"}}
+			<button class="btn btn-sm btn-outline-primary" id="users_editsel" enableby="#users_list td.check input">
+				<i class="{{T .Loc "icon.editsel"}}"></i> {{T .Loc "button.editsel"}}
 			</button>
-			<button class="btn btn-sm btn-outline-secondary" popup-target="#users_disable_popup" enableby="#users_list td.check input">
-				<i class="{{T .Loc "icon.user.disable"}}"></i> {{T .Loc "button.disable"}}
+			<button class="btn btn-sm btn-outline-primary" id="users_editall">
+				<i class="{{T .Loc "icon.editall"}}"></i> {{T .Loc "button.editall"}}
 			</button>
 		</div>
 		<div class="col-md-6 ui-toolbar text-end">
@@ -91,14 +91,17 @@
 	<div id="users_list"></div>
 </div>
 
-<div id="user_maps" class="hidden" data-status="{{JSON .UserStatusMap}}" data-role="{{JSON .UserRoleMap}}"></div>
+<div id="user_maps" class="hidden"
+	data-status="{{JSON .UserStatusMap}}"
+	data-role="{{JSON .UserRoleMap}}"
+></div>
 
-<div id="users_delete_popup" class="ui-popup s-popup-confirm" data-spy="popup" tabindex="-1"
+<div id="users_deletesel_popup" class="ui-popup s-popup-confirm" data-spy="popup" tabindex="-1"
 	popup-mask="true" popup-keyboard="false" popup-mouse="false">
 	<form>
 		<div class="ui-popup-body">
 			<i class="icon fas fa-2x fa-fw fa-circle-exclamation text-danger"></i>
-			<div class="msg">{{T .Loc "user.confirm.delete"}}</div>
+			<div class="msg">{{T .Loc "user.confirm.deletesel"}}</div>
 		</div>
 		<div class="ui-popup-footer">
 			<button type="submit" class="btn btn-danger"><i class="fas fa-check"></i> {{T .Loc "button.ok"}}</button>
@@ -107,12 +110,12 @@
 	</form>
 </div>
 
-<div id="users_clear_popup" class="ui-popup s-popup-confirm" data-spy="popup" tabindex="-1"
+<div id="users_deleteall_popup" class="ui-popup s-popup-confirm" data-spy="popup" tabindex="-1"
 	popup-mask="true" popup-keyboard="false" popup-mouse="false">
 	<form>
 		<div class="ui-popup-body">
 			<i class="icon fas fa-2x fa-fw fa-exclamation-triangle text-danger"></i>
-			<div class="msg">{{T .Loc "user.confirm.clear"}}</div>
+			<div class="msg">{{T .Loc "user.confirm.deleteall"}}</div>
 		</div>
 		<div class="ui-popup-footer">
 			<button type="submit" class="btn btn-danger"><i class="fas fa-check"></i> {{T .Loc "button.ok"}}</button>
@@ -121,36 +124,45 @@
 	</form>
 </div>
 
-<div id="users_enable_popup" class="ui-popup s-popup-confirm" data-spy="popup" tabindex="-1"
-	popup-mask="true" popup-keyboard="false" popup-mouse="false">
-	<form>
-		<div class="ui-popup-body">
-			<i class="icon fas fa-2x fa-fw fa-question-circle text-success"></i>
-			<div class="msg">{{T .Loc "user.confirm.enable"}}</div>
+<div id="users_bulkedit_popup" class="ui-popup s-popup-detail w800" data-spy="popup" tabindex="-1"
+	popup-position="center" popup-keyboard="false" popup-mouse="false" popup-mask="false" popup-closer="true">
+	<div class="ui-popup-body">
+		<h4><i class="{{T .Loc "icon.edit"}}"></i>
+			<span class="editsel">{{T .Loc "button.editsel"}}</span>
+			<span class="editall">{{T .Loc "button.editall"}}</span>
+		</h4>
+	</div>
+	<form class="ui-popup-body form-horizontal grey lined" autocomplete="off">
+		<input type="hidden" name="_token_" value="{{.Token}}"/>
+		<input type="hidden" name="id"/>
+		<div class="row py-3">
+			<label class="col-sm-2 col-form-label">{{T .Loc "user.role"}} <input type="checkbox"></label>
+			<div class="col-sm-10">
+				{{Radios "Name=" "role" "List=" .UserRoleMap.Iterator "Value=" "V" "Disabled=" true}}
+			</div>
 		</div>
-		<div class="ui-popup-footer">
-			<button type="submit" class="btn btn-success"><i class="fas fa-check"></i> {{T .Loc "button.ok"}}</button>
-			<button type="button" class="btn btn-secondary" popup-dismiss="true"><i class="fas fa-times"></i> {{T .Loc "button.cancel"}}</button>
+		<div class="row py-3">
+			<label class="col-sm-2 col-form-label">{{T .Loc "user.status"}} <input type="checkbox"></label>
+			<div class="col-sm-10">
+				{{Radios "Name=" "status" "List=" .UserStatusMap.Iterator "Value=" "A" "Disabled=" true}}
+			</div>
 		</div>
+		<div class="row py-3">
+			<label class="col-sm-2 col-form-label">{{T .Loc "user.cidr"}} <input type="checkbox" name="ucidr" value="true"></label>
+			<div class="col-sm-10">
+				<textarea name="cidr" class="form-control" rows="2" disabled enterfire textclear></textarea>
+			</div>
+		</div>
+		<button type="submit" class="hidden"></button>
 	</form>
-</div>
-
-<div id="users_disable_popup" class="ui-popup s-popup-confirm" data-spy="popup" tabindex="-1"
-	popup-mask="true" popup-keyboard="false" popup-mouse="false">
-	<form>
-		<div class="ui-popup-body">
-			<i class="icon fas fa-2x fa-fw fa-exclamation-triangle text-warning"></i>
-			<div class="msg">{{T .Loc "user.confirm.disable"}}</div>
-		</div>
-		<div class="ui-popup-footer">
-			<button type="submit" class="btn btn-warning"><i class="fas fa-check"></i> {{T .Loc "button.ok"}}</button>
-			<button type="button" class="btn btn-secondary" popup-dismiss="true"><i class="fas fa-times"></i> {{T .Loc "button.cancel"}}</button>
-		</div>
-	</form>
+	<div class="ui-popup-footer">
+		<button type="submit" class="btn btn-primary" enableby="#users_bulkedit_popup .col-form-label > input"><i class="fas fa-save"></i> {{T .Loc "button.update"}}</button>
+		<button type="button" class="btn btn-secondary" popup-dismiss="true"><i class="fas fa-times"></i> {{T .Loc "button.cancel"}}</button>
+	</div>
 </div>
 
 <div id="users_detail_popup" class="ui-popup s-popup-detail w800" data-spy="popup" tabindex="-1"
 	popup-position="center" popup-keyboard="false" popup-mouse="false" popup-mask="false" popup-closer="true" popup-loader="true"
-	popup-focus="#user_detail_title"></div>
+	popup-focus="#user_detail_name"></div>
 
 {{template "main_footer" .}}

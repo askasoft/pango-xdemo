@@ -145,6 +145,14 @@ $(function() {
 	var USM = $('#user_maps').data('status');
 	var URM = $('#user_maps').data('role');
 
+	function user_set_tr_values($tr, usr) {
+		main.set_table_tr_values($tr, usr);
+		$tr.attr('class', '').addClass(usr.status);
+		$tr.find('td.status').text(USM[usr.status]);
+		$tr.find('td.role').text(URM[usr.role]);
+		main.blink($tr);
+	}
+
 	function user_update() {
 		var $p = $('#users_detail_popup');
 
@@ -170,14 +178,6 @@ $(function() {
 			complete: main.form_ajax_end($p)
 		});
 		return false;
-	}
-
-	function user_set_tr_values($tr, usr) {
-		main.set_table_tr_values($tr, usr);
-		$tr.attr('class', '').addClass(usr.status);
-		$tr.find('td.status').text(USM[usr.status]);
-		$tr.find('td.role').text(URM[usr.role]);
-		main.blink($tr);
 	}
 
 
@@ -219,14 +219,14 @@ $(function() {
 
 
 	//----------------------------------------------------
-	// delete
+	// deletes (selected / all)
 	//
-	function users_delete() {
-		var $p = $('#users_delete_popup');
-		var ids = main.get_table_checked_ids($('#users_table'));
+	function users_deletes(all) {
+		var $p = $(all ? '#users_deleteall_popup' : '#users_deletesel_popup');
+		var ids = all ? '*' : main.get_table_checked_ids($('#users_table')).join(',');
 
 		$.ajax({
-			url: './delete',
+			url: './deletes',
 			type: 'POST',
 			data: {
 				_token_: main.token,
@@ -242,7 +242,7 @@ $(function() {
 					text: data.success
 				});
 
-				users_search();
+				(all ? users_reset : users_search)();
 			},
 			error: main.ajax_error,
 			complete: main.form_ajax_end($p)
@@ -250,20 +250,20 @@ $(function() {
 		return false;
 	}
 
-	$('#users_delete_popup form').submit(users_delete);
+	$('#users_deletesel_popup form').submit(function() { return users_deletes(false); });
+	$('#users_deleteall_popup form').submit(function() { return users_deletes(true); });
 
 
 	//----------------------------------------------------
-	// clear
+	// updates (selected / all)
 	//
-	function users_clear() {
-		var $p = $('#users_clear_popup');
+	function users_updates() {
+		var $p = $('#users_bulkedit_popup');
+
 		$.ajax({
-			url: './clear',
+			url: './updates',
 			type: 'POST',
-			data: {
-				_token_: main.token
-			},
+			data: $p.find('form').serialize(),
 			dataType: 'json',
 			beforeSend: main.form_ajax_start($p),
 			success: function(data, ts, xhr) {
@@ -274,53 +274,55 @@ $(function() {
 					text: data.success
 				});
 
-				users_reset();
+				if ($p.find('[name=id]').val() == '*') {
+					users_search();
+					return;
+				}
+
+				var us = data.updates;
+				if (us) {
+					var ids = main.get_table_checked_ids($('#users_table'));
+					var $trs = main.get_table_trs('#usr_', ids);
+
+					if (us.status) {
+						$trs.attr('class', '').addClass(us.status);
+						$trs.find('td.status').text(USM[us.status]);
+					}
+					if (us.role) {
+						$trs.find('td.role').text(URM[us.role]);
+					}
+					if (us.ucidr) {
+						$trs.find('td.cidr > pre').text(us.cidr);
+					}
+					main.blink($trs);
+				}
 			},
-			error: main.ajax_error,
+			error: main.form_ajax_error($p),
 			complete: main.form_ajax_end($p)
 		});
 		return false;
 	}
 
-	$('#users_clear_popup form').submit(users_clear);
-
-
-	//----------------------------------------------------
-	// users enable/disable
-	//
-	function users_enable(en) {
-		var $p = $(en ? '#users_enable_popup' : '#users_disable_popup');
+	$('#users_editsel').click(function() {
 		var ids = main.get_table_checked_ids($('#users_table'));
-
-		$.ajax({
-			url: en ? './enable' : './disable',
-			type: 'POST',
-			data: {
-				_token_: main.token,
-				id: ids
-			},
-			dataType: 'json',
-			beforeSend: main.form_ajax_start($p),
-			success: function(data, ts, xhr) {
-				$p.popup('hide');
-
-				$.toast({
-					icon: 'success',
-					text: data.success
-				});
-
-				var sts = en ? 'A' : 'D';
-				var $trs = main.get_table_trs('#usr_', ids);
-				$trs.attr('class', '').addClass(sts);
-				$trs.find('td.status').text(USM[sts]);
-				main.blink($trs);
-			},
-			error: main.ajax_error,
-			complete: main.form_ajax_end($p)
-		});
-		return false;
-	}
-
-	$('#users_enable_popup form').submit(function() { return users_enable(true); });
-	$('#users_disable_popup form').submit(function() { return users_enable(false); });
+		$('#users_bulkedit_popup')
+			.find('.editsel').show().end()
+			.find('.editall').hide().end()
+			.find('input[name=id]').val(ids.join(',')).end()
+			.popup('show');
+	});
+	$('#users_editall').click(function() {
+		$('#users_bulkedit_popup')
+			.find('.editsel').hide().end()
+			.find('.editall').show().end()
+			.find('input[name=id]').val('*').end()
+			.popup('show');
+	});
+	$('#users_bulkedit_popup')
+		.find('.col-form-label > input').change(function() {
+			var $t = $(this);
+			$t.parent().next().find(':input').prop('disabled', !$t.prop('checked'));
+		}).end()
+		.find('form').submit(users_updates).end()
+		.find('.ui-popup-footer button[type=submit]').click(users_updates);
 });

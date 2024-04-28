@@ -6,12 +6,26 @@ import (
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
+	"github.com/askasoft/pango/num"
+	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pango/xmw"
 )
 
-type ArgIDs struct {
-	IDs []int64 `form:"id[]"`
+func SplitIDs(id string) []int64 {
+	if id == "" || id == "*" {
+		return nil
+	}
+
+	ss := str.FieldsByte(id, ',')
+	ids := make([]int64, 0, len(ss))
+	for _, s := range ss {
+		id := num.Atol(s)
+		if id != 0 {
+			ids = append(ids, id)
+		}
+	}
+	return ids
 }
 
 func H(c *xin.Context) xin.H {

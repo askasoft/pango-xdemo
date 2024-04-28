@@ -29,8 +29,8 @@ func PetNew(c *xin.Context) {
 }
 
 func petDetail(c *xin.Context, edit bool) {
-	aid := num.Atol(c.Query("id"))
-	if aid == 0 {
+	pid := num.Atol(c.Query("id"))
+	if pid == 0 {
 		c.AddError(vadutil.ErrInvalidID(c))
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
@@ -39,7 +39,7 @@ func petDetail(c *xin.Context, edit bool) {
 	tt := tenant.FromCtx(c)
 
 	pet := &models.Pet{}
-	r := app.GDB.Table(tt.TablePets()).Where("id = ?", aid).Take(pet)
+	r := app.GDB.Table(tt.TablePets()).Where("id = ?", pid).Take(pet)
 	if errors.Is(r.Error, gorm.ErrRecordNotFound) {
 		c.AddError(r.Error)
 		c.JSON(http.StatusNotFound, handlers.E(c))
@@ -187,6 +187,10 @@ func PetUpdate(c *xin.Context) {
 	petUpdate(c, petUpdatables...)
 }
 
+type ArgIDs struct {
+	IDs []int64
+}
+
 func PetDelete(c *xin.Context) {
 	arg := &ArgIDs{}
 
@@ -245,6 +249,6 @@ func PetClear(c *xin.Context) {
 	}
 
 	c.JSON(http.StatusOK, xin.H{
-		"success": tbs.Format(c.Locale, "pet.success.clear"),
+		"success": tbs.Format(c.Locale, "pet.success.deleteall"),
 	})
 }
