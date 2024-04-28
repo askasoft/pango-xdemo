@@ -257,8 +257,17 @@ var main = {
 		// header theme switch
 		$('#header li.theme a').click(function() {
 			var $a = $(this), t = $a.attr('href').substring(1);
-			$('body').attr('data-bs-theme', t);
+
 			localStorage.theme = t;
+
+			$('body').attr('data-bs-theme', t);
+
+			var d = 'text-bg-dark', l = 'text-bg-light';
+			if (t == 'light') {
+				var s = d;
+				d = l; l = s;
+			}
+			$('#footer').replaceClass(l, d);
 			$('#header li.theme a').removeClass('active');
 			$a.addClass('active');
 			return false;

@@ -56,13 +56,14 @@ blockquote {
 
 #header {
 	border-radius: 0;
-	border-bottom: 1px solid #e7e7e7;	
+	box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15),inset 0 -1px 0 rgba(255,255,255,0.15);
 	margin: 0;
 	padding: 0;
 	height: 50px;
 	/* z-index: 1; */ /* set z-index if header is not fixed-top */
 }
 #header .navbar-brand {
+	color: inherit;
 	font-weight: bold;
 	font-size: 20px;
 	line-height: 50px;
@@ -104,11 +105,11 @@ blockquote {
 #sidenavi > .ui-sidenavi {
 	height: 100%;
 	overflow-y: auto;
-	padding: 25px 15px 5px 15px;
+	padding: 30px 15px 20px 15px;
 }
 
 #content {
-	padding: 20px 15px 20px 275px;
+	padding: 30px 15px 30px 275px;
 	margin: 0;
 }
 @media (max-width: 991px) {
@@ -213,8 +214,10 @@ form div.verr {
 }
 
 .s-table th.check, .s-table td.check,
+.s-table th.error, .s-table td.error,
 .s-table th.id, .s-table td.id {
 	width: 1%;
+	white-space: nowrap;
 }
 .s-table th.actions, .s-table td.actions {
 	width: 1%;
