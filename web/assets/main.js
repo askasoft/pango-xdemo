@@ -227,23 +227,8 @@ var main = {
 	},
 
 	init: function() {
-		// set cookie defaults
-		$.extend($.cookie.defaults, main.cookie);
-
-		// enable script cache
-		$.enableScriptCache();
-		
 		// get meta properties
 		$.extend(main, main.meta_props());
-
-		// set plugins defaults
-		$.extend($.toast.defaults, {
-			position: 'top center'
-		});
-
-		$.extend($.popup.defaults, {
-			transition: 'zoomIn'
-		});
 
 		// enable bootstrap UI
 		$('[data-toggle=offcanvas]').click(function() {
@@ -279,7 +264,25 @@ var main = {
 };
 
 //----------------------------------------------------
-$(function() {
-	main.init();
-});
+(function($) {
+	// enable script cache
+	$.enableScriptCache();
+
+	// set cookie defaults
+	$.extend($.cookie.defaults, main.cookie);
+
+	// set toast defaults
+	$.extend($.toast.defaults, {
+		position: 'top center'
+	});
+
+	// set popup defaults
+	$.extend($.popup.defaults, {
+		transition: 'zoomIn'
+	});
+
+	// load init
+	$(main.init);
+
+})(jQuery);
 
