@@ -230,17 +230,10 @@ var main = {
 		// get meta properties
 		$.extend(main, main.meta_props());
 
-		// enable bootstrap UI
-		$('[data-toggle=offcanvas]').click(function() {
-			$('.row-offcanvas').toggleClass('active');
-		});
-		$('[data-toggle=tooltip]').tooltip();
-		$('[data-toggle=popover]').popover();
-
 		// sidenavi
 		$('#sidenavi i').each(function() {
 			$(this).attr('title', $(this).next('span').text());
-		})
+		});
 
 		// header theme switch
 		$('#header li.theme a').click(function() {
