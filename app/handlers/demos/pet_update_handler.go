@@ -12,6 +12,7 @@ import (
 	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
 	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
 	"github.com/askasoft/pango/num"
+	"github.com/askasoft/pango/sqx/pqx"
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/tbs"
 	"github.com/askasoft/pango/xin"
@@ -130,44 +131,6 @@ func PetCreate(c *xin.Context) {
 	})
 }
 
-func petUpdate(c *xin.Context, cols ...string) {
-	pet := &models.Pet{}
-	err := c.Bind(pet)
-	if err != nil {
-		c.AddError(err)
-		c.JSON(http.StatusBadRequest, handlers.E(c))
-		return
-	}
-
-	if pet.ID == 0 {
-		c.AddError(vadutil.ErrInvalidID(c))
-		c.JSON(http.StatusBadRequest, handlers.E(c))
-		return
-	}
-
-	pet.UpdatedAt = time.Now()
-
-	tt := tenant.FromCtx(c)
-
-	tx := app.GDB.Table(tt.TablePets())
-
-	if len(cols) > 0 {
-		tx = tx.Select(cols)
-	}
-
-	r := tx.Updates(pet)
-	if r.Error != nil {
-		c.AddError(r.Error)
-		c.JSON(http.StatusInternalServerError, handlers.E(c))
-		return
-	}
-
-	c.JSON(http.StatusOK, xin.H{
-		"pet":     pet,
-		"success": tbs.GetText(c.Locale, "success.updated"),
-	})
-}
-
 var petUpdatables = []string{
 	"name",
 	"gender",
@@ -184,71 +147,177 @@ var petUpdatables = []string{
 }
 
 func PetUpdate(c *xin.Context) {
-	petUpdate(c, petUpdatables...)
-}
-
-type ArgIDs struct {
-	IDs []int64
-}
-
-func PetDelete(c *xin.Context) {
-	arg := &ArgIDs{}
-
-	err := c.Bind(arg)
-	if err != nil {
+	pet := &models.Pet{}
+	if err := c.Bind(pet); err != nil {
 		c.AddError(err)
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}
 
-	if len(arg.IDs) > 0 {
-		tt := tenant.FromCtx(c)
+	if pet.ID == 0 {
+		c.AddError(vadutil.ErrInvalidID(c))
+		c.JSON(http.StatusBadRequest, handlers.E(c))
+		return
+	}
 
-		err = app.GDB.Transaction(func(db *gorm.DB) error {
+	pet.UpdatedAt = time.Now()
+
+	tt := tenant.FromCtx(c)
+
+	r := app.GDB.Table(tt.TablePets()).Select(petUpdatables).Updates(pet)
+	if r.Error != nil {
+		c.AddError(r.Error)
+		c.JSON(http.StatusInternalServerError, handlers.E(c))
+		return
+	}
+
+	c.JSON(http.StatusOK, xin.H{
+		"pet":     pet,
+		"success": tbs.Format(c.Locale, "pet.success.updates", r.RowsAffected),
+	})
+}
+
+type PetUpdatesArg struct {
+	ID      string          `json:"id,omitempty" form:"id,strip"`
+	Gender  string          `json:"gender" form:"gender,strip"`
+	BornAt  time.Time       `json:"born_at" form:"born_at"`
+	UbornAt bool            `json:"uborn_at" form:"uborn_at"`
+	Origin  string          `json:"origin" form:"origin,strip"`
+	Temper  string          `json:"temper" form:"temper,strip"`
+	Habits  pqx.StringArray `json:"habits" form:"habits,strip"`
+	Uhabits bool            `json:"uhabits" form:"uhabits"`
+}
+
+func PetUpdates(c *xin.Context) {
+	pua := &PetUpdatesArg{}
+	if err := c.Bind(pua); err != nil {
+		vadutil.AddBindErrors(c, err, "pet.")
+	}
+	if pua.UbornAt && pua.BornAt.IsZero() {
+		c.AddError(&vadutil.ParamError{
+			Param:   "born_at",
+			Message: tbs.Format(c.Locale, "error.param.required", tbs.GetText(c.Locale, "pet.born_at")),
+		})
+	}
+	if pua.Gender == "" && !pua.UbornAt && pua.Origin == "" && pua.Temper == "" && !pua.Uhabits {
+		c.AddError(errors.New(tbs.GetText(c.Locale, "error.request.invalid")))
+	}
+
+	if len(c.Errors) > 0 {
+		c.JSON(http.StatusBadRequest, handlers.E(c))
+		return
+	}
+
+	ids := handlers.SplitIDs(pua.ID)
+	if pua.ID != "*" && len(ids) == 0 {
+		c.AddError(vadutil.ErrInvalidID(c))
+		c.JSON(http.StatusBadRequest, handlers.E(c))
+		return
+	}
+
+	tt := tenant.FromCtx(c)
+
+	var cnt int64
+	err := app.GDB.Session(&gorm.Session{AllowGlobalUpdate: true}).Transaction(func(db *gorm.DB) error {
+		tx := db.Table(tt.TablePets())
+
+		if pua.ID != "*" {
+			tx = tx.Where("id IN ?", ids)
+		}
+
+		pet := &models.Pet{}
+
+		pet.UpdatedAt = time.Now()
+
+		cols := make([]string, 0, 8)
+		cols = append(cols, "updated_at")
+
+		if pua.Gender != "" {
+			pet.Gender = pua.Gender
+			cols = append(cols, "gender")
+		}
+		if !pua.BornAt.IsZero() {
+			pet.BornAt = pua.BornAt
+			cols = append(cols, "born_at")
+		}
+		if pua.Origin != "" {
+			pet.Origin = pua.Origin
+			cols = append(cols, "origin")
+		}
+		if pua.Temper != "" {
+			pet.Temper = pua.Temper
+			cols = append(cols, "temper")
+		}
+		if pua.Uhabits {
+			pet.Habits = pua.Habits
+			cols = append(cols, "habits")
+		}
+
+		r := tx.Select(cols).Updates(pet)
+		cnt = r.RowsAffected
+		return r.Error
+	})
+	if err != nil {
+		c.AddError(err)
+		c.JSON(http.StatusInternalServerError, handlers.E(c))
+		return
+	}
+
+	c.JSON(http.StatusOK, xin.H{
+		"success": tbs.Format(c.Locale, "pet.success.updates", cnt),
+		"updates": pua,
+	})
+}
+
+func PetDeletes(c *xin.Context) {
+	id := c.PostForm("id")
+	ids := handlers.SplitIDs(id)
+
+	if id != "*" && len(ids) == 0 {
+		c.AddError(vadutil.ErrInvalidID(c))
+		c.JSON(http.StatusBadRequest, handlers.E(c))
+		return
+	}
+
+	tt := tenant.FromCtx(c)
+
+	var cnt int64
+	err := app.GDB.Session(&gorm.Session{AllowGlobalUpdate: true}).Transaction(func(db *gorm.DB) error {
+		if id == "*" {
+			gfs := tt.GFS(db)
+			if _, err := gfs.DeletePrefix("/" + models.PrefixPetFile + "/"); err != nil {
+				return err
+			}
+		} else {
+			//TODO
 			// sq := db.Table(tt.TablePets()).Where("id IN ?", arg.IDs)
 
 			// gfs := tt.FS(db)
 			// if _, err := gfs.DeleteWhere("id IN ?", sq); err != nil {
 			// 	return err
 			// }
-
-			return db.Table(tt.TablePets()).Where("id IN ?", arg.IDs).Delete(&models.Pet{}).Error
-		})
-
-		if err != nil {
-			c.AddError(err)
-			c.JSON(http.StatusInternalServerError, handlers.E(c))
-			return
-		}
-	}
-
-	c.JSON(http.StatusOK, xin.H{
-		"success": tbs.Format(c.Locale, "pet.success.delete", len(arg.IDs)),
-	})
-}
-
-func PetClear(c *xin.Context) {
-	tt := tenant.FromCtx(c)
-
-	err := app.GDB.Session(&gorm.Session{AllowGlobalUpdate: true}).Transaction(func(db *gorm.DB) error {
-		gfs := tt.GFS(db)
-		if _, err := gfs.DeletePrefix("/" + models.PrefixPetFile + "/"); err != nil {
-			return err
 		}
 
-		if err := db.Exec("TRUNCATE TABLE " + tt.TablePets()).Error; err != nil {
-			return err
+		tx := db.Table(tt.TablePets())
+		if id != "*" {
+			tx = tx.Where("id IN ?", ids)
 		}
+
+		r := tx.Delete(&models.Pet{})
+		if r.Error != nil {
+			return r.Error
+		}
+		cnt = r.RowsAffected
 
 		return db.Exec(tt.ResetSequence("pets")).Error
 	})
 	if err != nil {
 		c.AddError(err)
-		c.JSON(http.StatusBadRequest, handlers.E(c))
+		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return
 	}
 
 	c.JSON(http.StatusOK, xin.H{
-		"success": tbs.Format(c.Locale, "pet.success.deleteall"),
+		"success": tbs.Format(c.Locale, "pet.success.deletes", cnt),
 	})
 }

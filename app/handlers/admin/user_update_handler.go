@@ -275,7 +275,6 @@ func UserUpdates(c *xin.Context) {
 		cnt = r.RowsAffected
 		return r.Error
 	})
-
 	if err != nil {
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
@@ -321,7 +320,6 @@ func UserDeletes(c *xin.Context) {
 
 		return db.Exec(tt.ResetSequence("users", models.UserStartID)).Error
 	})
-
 	if err != nil {
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))

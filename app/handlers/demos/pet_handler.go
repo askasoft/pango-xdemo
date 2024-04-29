@@ -102,9 +102,8 @@ func countPets(tt tenant.Tenant, pq *PetQuery, filter func(tenant.Tenant, *PetQu
 
 	tx := filter(tt, pq)
 
-	r := tx.Count(&total)
-	if r.Error != nil {
-		return 0, r.Error
+	if err := tx.Count(&total).Error; err != nil {
+		return 0, err
 	}
 
 	return int(total), nil
@@ -122,7 +121,7 @@ func findPets(tt tenant.Tenant, pq *PetQuery, filter func(tenant.Tenant, *PetQue
 
 func petListArgs(c *xin.Context) (pq *PetQuery, err error) {
 	pq = &PetQuery{
-		Sorter: args.Sorter{Col: "updated_at", Dir: "desc"},
+		Sorter: args.Sorter{Col: "id", Dir: "desc"},
 	}
 
 	err = c.Bind(pq)
@@ -150,14 +149,14 @@ func PetIndex(c *xin.Context) {
 }
 
 func PetList(c *xin.Context) {
-	tt := tenant.FromCtx(c)
-
 	pq, err := petListArgs(c)
 	if err != nil {
 		vadutil.AddBindErrors(c, err, "pet.")
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}
+
+	tt := tenant.FromCtx(c)
 
 	pq.Total, err = countPets(tt, pq, filterPets)
 	pq.Normalize(petSortables, tbsutil.GetPagerLimits(c.Locale))

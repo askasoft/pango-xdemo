@@ -267,8 +267,8 @@ func addDemosPetsHandlers(rg *xin.RouterGroup) {
 	rg.GET("/edit", demos.PetEdit)
 	rg.POST("/create", demos.PetCreate)
 	rg.POST("/update", demos.PetUpdate)
-	rg.POST("/delete", demos.PetDelete)
-	rg.POST("/clear", demos.PetClear)
+	rg.POST("/updates", demos.PetUpdates)
+	rg.POST("/deletes", demos.PetDeletes)
 	rg.POST("/export/csv", demos.PetCsvExport)
 }
 

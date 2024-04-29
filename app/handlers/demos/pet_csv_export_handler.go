@@ -90,7 +90,7 @@ func PetCsvExport(c *xin.Context) {
 			num.Ltoa(pet.ID),
 			pet.Name,
 			pgm.MustGet(pet.Gender, pet.Gender),
-			models.FormatDate(pet.Born_at),
+			models.FormatDate(pet.BornAt),
 			pom.MustGet(pet.Origin, pet.Origin),
 			ptm.MustGet(pet.Temper, pet.Temper),
 			str.Join(habits, "\n"),

@@ -80,6 +80,25 @@ $(function() {
 
 
 	//----------------------------------------------------
+	// new
+	//
+	function pet_new() {
+		$('#pets_detail_popup').popup({
+			loaded: false,
+			keyboard: false,
+			ajax: {
+				url: './new',
+				method: 'GET'
+			}
+		}).popup('show', this);
+
+		return false;
+	}
+
+	$('#pets_new').on('click', pet_new);
+
+
+	//----------------------------------------------------
 	// detail
 	//
 	function pet_detail(self, edit) {
@@ -122,25 +141,6 @@ $(function() {
 				.find('textarea').autosize().textclear().enterfire();
 			$(window).trigger('resize');
 		});
-
-
-	//----------------------------------------------------
-	// new
-	//
-	function pet_new() {
-		$('#pets_detail_popup').popup({
-			loaded: false,
-			keyboard: false,
-			ajax: {
-				url: './new',
-				method: 'GET'
-			}
-		}).popup('show', this);
-
-		return false;
-	}
-
-	$('#pets_new').on('click', pet_new);
 
 
 	//----------------------------------------------------
@@ -230,14 +230,14 @@ $(function() {
 
 
 	//----------------------------------------------------
-	// delete
+	// deletes (selected / all)
 	//
-	function pets_delete() {
-		var $p = $('#pets_deletesel_popup');
-		var ids = main.get_table_checked_ids($('#pets_table'));
+	function pets_deletes(all) {
+		var $p = $(all ? '#pets_deleteall_popup' : '#pets_deletesel_popup');
+		var ids = all ? '*' : main.get_table_checked_ids($('#pets_table')).join(',');
 
 		$.ajax({
-			url: './delete',
+			url: './deletes',
 			type: 'POST',
 			data: {
 				_token_: main.token,
@@ -253,7 +253,7 @@ $(function() {
 					text: data.success
 				});
 
-				pets_search();
+				(all ? pets_reset : pets_search)();
 			},
 			error: main.ajax_error,
 			complete: main.form_ajax_end($p)
@@ -261,20 +261,20 @@ $(function() {
 		return false;
 	}
 
-	$('#pets_deletesel_popup form').submit(pets_delete);
+	$('#pets_deletesel_popup form').submit(function() { return pets_deletes(false); });
+	$('#pets_deleteall_popup form').submit(function() { return pets_deletes(true); });
 
 
 	//----------------------------------------------------
-	// clear
+	// updates (selected / all)
 	//
-	function pets_deleteall() {
-		var $p = $('#pets_deleteall_popup');
+	function pets_updates() {
+		var $p = $('#pets_bulkedit_popup');
+
 		$.ajax({
-			url: './clear',
+			url: './updates',
 			type: 'POST',
-			data: {
-				_token_: main.token
-			},
+			data: $p.find('form').serialize(),
 			dataType: 'json',
 			beforeSend: main.form_ajax_start($p),
 			success: function(data, ts, xhr) {
@@ -285,13 +285,67 @@ $(function() {
 					text: data.success
 				});
 
-				pets_reset();
+				if ($p.find('[name=id]').val() == '*') {
+					pets_search();
+					return;
+				}
+
+				var us = data.updates;
+				if (us) {
+					var ids = main.get_table_checked_ids($('#pets_table'));
+					var $trs = main.get_table_trs('#pet_', ids);
+
+					if (us.gender) {
+						$trs.find('td.gender').text(PGM[us.gender]);
+					}
+					if (us.uborn_at) {
+						$trs.find('td.born_at').text(main.format_date(us.born_at));
+					}
+					if (us.origin) {
+						$trs.find('td.origin').text(POM[us.origin]);
+					}
+					if (us.temper) {
+						$trs.find('td.temper').text(PTM[us.temper]);
+					}
+					if (us.uhabits) {
+						var hs = [];
+						$.each(us.habits, function(i, h) {
+							hs.push($('<b>').text(PHM[h]));
+						})
+						$trs.find('td.habits').empty().append(hs);
+					}
+					main.blink($trs);
+				}
 			},
-			error: main.ajax_error,
+			error: main.form_ajax_error($p),
 			complete: main.form_ajax_end($p)
 		});
 		return false;
 	}
 
-	$('#pets_deleteall_popup form').submit(pets_deleteall);
+	$('#pets_editsel').click(function() {
+		var ids = main.get_table_checked_ids($('#pets_table'));
+		$('#pets_bulkedit_popup')
+			.find('.editsel').show().end()
+			.find('.editall').hide().end()
+			.find('input[name=id]').val(ids.join(',')).end()
+			.popup('show');
+	});
+	$('#pets_editall').click(function() {
+		$('#pets_bulkedit_popup')
+			.find('.editsel').hide().end()
+			.find('.editall').show().end()
+			.find('input[name=id]').val('*').end()
+			.popup('show');
+	});
+	$('#pets_bulkedit_popup')
+		.find('.col-form-label > input').change(function() {
+			var $t = $(this), c = $t.prop('checked');
+			var $i = $t.parent().next().find(':input').prop('disabled', !c);
+			if ($t.data('niceselect')) {
+				$i.niceSelect('update');
+			}
+		}).end()
+		.find('form').submit(pets_updates).end()
+		.find('.ui-popup-footer button[type=submit]').click(pets_updates);
 });

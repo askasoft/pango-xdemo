@@ -10,7 +10,7 @@ type Pet struct {
 	ID            int64           `gorm:"not null;primaryKey;autoIncrement" json:"id" form:"id"`
 	Name          string          `gorm:"size:100;not null" json:"name" form:"name,strip" validate:"required,maxlen=100"`
 	Gender        string          `gorm:"size:1;not null" json:"gender" form:"gender,strip" validate:"required"`
-	Born_at       time.Time       `gorm:"not null" json:"born_at" form:"born_at" validate:"required"`
+	BornAt        time.Time       `gorm:"not null" json:"born_at" form:"born_at" validate:"required"`
 	Origin        string          `gorm:"size:10;not null" json:"origin" form:"origin,strip" validate:"required"`
 	Temper        string          `gorm:"size:1;not null" json:"temper" form:"temper,strip" validate:"required"`
 	Habits        pqx.StringArray `gorm:"type:char(1)[]" json:"habits" form:"habits,strip"`

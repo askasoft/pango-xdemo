@@ -28,7 +28,7 @@
 			<td class="id ro">{{$p.ID}}</td>
 			<td class="name">{{$p.Name}}</td>
 			<td class="gender">{{$.PetGenderMap.MustGet $p.Gender $p.Gender}}</td>
-			<td class="born_at date">{{DATE $p.Born_at}}</td>
+			<td class="born_at date">{{DATE $p.BornAt}}</td>
 			<td class="origin">{{$.PetOriginMap.MustGet $p.Origin $p.Origin}}</td>
 			<td class="temper">{{$.PetTemperMap.MustGet $p.Temper $p.Temper}}</td>
 			<td class="habits">{{range $h := $p.Habits}}<b>{{$.PetHabitsMap.MustGet $h $h}}</b>{{end}}</td>
