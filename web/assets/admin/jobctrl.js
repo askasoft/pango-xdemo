@@ -156,8 +156,12 @@ $(function() {
 	}
 
 	function job_start_refresh() {
-		var $jlist = $('#job_list'), $jhs = $jlist.children('ul'), jpr = $jhs.find('li.P, li.R').length > 0;
-		$('#job_start').prop('disabled', jpr).find('i')[jpr ? 'addClass' : 'removeClass']('fa-spinner fa-spin');
+		if ($('#job_form').data('multi')) {
+			$('#job_start').prop('disabled', false);
+		} else {
+			var $jhs = $('#job_list > ul'), jpr = $jhs.find('li.P, li.R').length > 0;
+			$('#job_start').prop('disabled', jpr).find('i')[jpr ? 'addClass' : 'removeClass']('fa-spinner fa-spin');
+		}
 	}
 
 	function job_status_icon(s) {
@@ -190,18 +194,18 @@ $(function() {
 			return;
 		}
 
-		var $jlist = $('#job_list'), $jhs = $jlist.children('ul');
+		var $jl = $('#job_list'), $jhs = $jl.children('ul');
 		if ($jhs.length == 0) {
 			$jhs = $('<ul class="nav nav-pills">');
 			$jhs.on('click', 'a', job_tab_show);
 			$jhs.on('shown.bs.tab', 'a', job_tab_shown);
-			$jlist.append($jhs);
+			$jl.append($jhs);
 		}
 
-		var $jobs = $jlist.children('div');
+		var $jobs = $jl.children('div');
 		if ($jobs.length == 0) {
 			$jobs = $('<div class="tab-content">');
-			$jlist.append($jobs);
+			$jl.append($jobs);
 		}
 
 		for (var i = data.length - 1; i >= 0; i--) {

@@ -28,6 +28,7 @@ type JobController struct {
 	Name     string
 	File     string
 	Param    string
+	Multi    bool
 	Template string
 }
 
@@ -75,19 +76,21 @@ func (jc *JobController) List(c *xin.Context) {
 
 func (jc *JobController) Start(c *xin.Context) {
 	tt := tenant.FromCtx(c)
-
 	tjm := tt.JM()
-	job, err := tjm.FindJob(jc.Name, false, xjm.JobStatusRunning, xjm.JobStatusPending)
-	if err != nil {
-		c.AddError(err)
-		c.JSON(http.StatusInternalServerError, E(c))
-		return
-	}
 
-	if job != nil {
-		c.AddError(errors.New(tbs.GetText(c.Locale, "job.existing")))
-		c.JSON(http.StatusBadRequest, E(c))
-		return
+	if !jc.Multi {
+		job, err := tjm.FindJob(jc.Name, false, xjm.JobStatusPending, xjm.JobStatusRunning)
+		if err != nil {
+			c.AddError(err)
+			c.JSON(http.StatusInternalServerError, E(c))
+			return
+		}
+
+		if job != nil {
+			c.AddError(errors.New(tbs.GetText(c.Locale, "job.existing")))
+			c.JSON(http.StatusBadRequest, E(c))
+			return
+		}
 	}
 
 	jid, err := tjm.AppendJob(jc.Name, jc.File, jc.Param)
