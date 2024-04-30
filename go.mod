@@ -3,14 +3,14 @@ module github.com/askasoft/pango-xdemo
 go 1.21
 
 require (
-	github.com/askasoft/pango v1.0.14
-	github.com/askasoft/pango-assets v1.0.8
+	github.com/askasoft/pango v1.0.15
+	github.com/askasoft/pango-assets v1.0.9
 	github.com/gocarina/gocsv v0.0.0-20231116093920-b87c2d0e983a
 	github.com/google/uuid v1.6.0
 	github.com/jackc/pgerrcode v0.0.0-20240316143900-6e2875d9b438
 	github.com/jackc/pgx/v5 v5.5.5
 	gorm.io/driver/postgres v1.5.7
-	gorm.io/gorm v1.25.9
+	gorm.io/gorm v1.25.10
 )
 
 require (
