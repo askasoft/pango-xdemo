@@ -10,10 +10,11 @@ import (
 )
 
 var schedules = cog.NewLinkedHashMap[string, func()](
-	cog.KV("tmpClean", tasks.CleanTemporaryFiles),
 	cog.KV("jobStart", jobs.Start),
 	cog.KV("jobReappend", jobs.Reappend),
 	cog.KV("jobClean", jobs.CleanOutdatedJobs),
+	cog.KV("tmpClean", tasks.CleanTemporaryFiles),
+	cog.KV("dbReset", tasks.ResetDatabase),
 )
 
 func initScheduler() {
