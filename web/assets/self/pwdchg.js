@@ -15,5 +15,5 @@ $(function() {
 		return false;
 	}
 
-	$('#pwdchg_form').submit(change);
+	$('#pwdchg_form').on('submit', change);
 });

@@ -131,8 +131,8 @@ $(function() {
 	$('#pets_detail_popup')
 		.on('loaded.popup', function() {
 			$('#pets_detail_popup')
-				.find('form').submit(pet_detail_submit).end()
-				.find('.ui-popup-footer button[type=submit]').click(pet_detail_submit);
+				.find('form').on('submit', pet_detail_submit).end()
+				.find('.ui-popup-footer button[type=submit]').on('click', pet_detail_submit);
 		}).on('shown.popup', function() {
 			$('#pets_detail_popup')
 				.find('.ui-popup-body').prop('scrollTop', 0).end()
@@ -263,8 +263,8 @@ $(function() {
 		return false;
 	}
 
-	$('#pets_deletesel_popup form').submit(function() { return pets_deletes(false); });
-	$('#pets_deleteall_popup form').submit(function() { return pets_deletes(true); });
+	$('#pets_deletesel_popup form').on('submit', function() { return pets_deletes(false); });
+	$('#pets_deleteall_popup form').on('submit', function() { return pets_deletes(true); });
 
 
 	//----------------------------------------------------
@@ -327,7 +327,7 @@ $(function() {
 		return false;
 	}
 
-	$('#pets_editsel').click(function() {
+	$('#pets_editsel').on('click', function() {
 		var ids = main.get_table_checked_ids($('#pets_table'));
 		$('#pets_bulkedit_popup')
 			.find('.editsel').show().end()
@@ -335,7 +335,7 @@ $(function() {
 			.find('input[name=id]').val(ids.join(',')).end()
 			.popup('show');
 	});
-	$('#pets_editall').click(function() {
+	$('#pets_editall').on('click', function() {
 		$('#pets_bulkedit_popup')
 			.find('.editsel').hide().end()
 			.find('.editall').show().end()
@@ -343,13 +343,13 @@ $(function() {
 			.popup('show');
 	});
 	$('#pets_bulkedit_popup')
-		.find('.col-form-label > input').change(function() {
+		.find('.col-form-label > input').on('change', function() {
 			var $t = $(this), c = $t.prop('checked');
 			var $i = $t.parent().next().find(':input').prop('disabled', !c);
 			if ($t.data('niceselect')) {
 				$i.niceSelect('update');
 			}
 		}).end()
-		.find('form').submit(pets_updates).end()
-		.find('.ui-popup-footer button[type=submit]').click(pets_updates);
+		.find('form').on('submit', pets_updates).end()
+		.find('.ui-popup-footer button[type=submit]').on('click', pets_updates);
 });

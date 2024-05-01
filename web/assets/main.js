@@ -236,7 +236,7 @@ var main = {
 		});
 
 		// header theme switch
-		$('#header li.theme a').click(function() {
+		$('#header li.theme a').on('click', function() {
 			var $a = $(this), t = $a.attr('href').substring(1);
 
 			localStorage.theme = t;

@@ -20,5 +20,5 @@ $(function() {
 		$($(e.target).attr('href')).find('textarea').autosize();
 	});
 
-	$('.cfgform').submit(config_save);
+	$('.cfgform').on('submit', config_save);
 });

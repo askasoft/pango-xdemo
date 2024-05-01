@@ -128,8 +128,8 @@ $(function() {
 	$('#users_detail_popup')
 		.on('loaded.popup', function() {
 			$('#users_detail_popup')
-				.find('form').submit(user_detail_submit).end()
-				.find('.ui-popup-footer button[type=submit]').click(user_detail_submit);
+				.find('form').on('submit', user_detail_submit).end()
+				.find('.ui-popup-footer button[type=submit]').on('click', user_detail_submit);
 		}).on('shown.popup', function() {
 			$('#users_detail_popup')
 				.find('.ui-popup-body').prop('scrollTop', 0).end()
@@ -252,8 +252,8 @@ $(function() {
 		return false;
 	}
 
-	$('#users_deletesel_popup form').submit(function() { return users_deletes(false); });
-	$('#users_deleteall_popup form').submit(function() { return users_deletes(true); });
+	$('#users_deletesel_popup form').on('submit', function() { return users_deletes(false); });
+	$('#users_deleteall_popup form').on('submit', function() { return users_deletes(true); });
 
 
 	//----------------------------------------------------
@@ -307,7 +307,7 @@ $(function() {
 		return false;
 	}
 
-	$('#users_editsel').click(function() {
+	$('#users_editsel').on('click', function() {
 		var ids = main.get_table_checked_ids($('#users_table'));
 		$('#users_bulkedit_popup')
 			.find('.editsel').show().end()
@@ -315,7 +315,7 @@ $(function() {
 			.find('input[name=id]').val(ids.join(',')).end()
 			.popup('show');
 	});
-	$('#users_editall').click(function() {
+	$('#users_editall').on('click', function() {
 		$('#users_bulkedit_popup')
 			.find('.editsel').hide().end()
 			.find('.editall').show().end()
@@ -323,10 +323,10 @@ $(function() {
 			.popup('show');
 	});
 	$('#users_bulkedit_popup')
-		.find('.col-form-label > input').change(function() {
+		.find('.col-form-label > input').on('change', function() {
 			var $t = $(this);
 			$t.parent().next().find(':input').prop('disabled', !$t.prop('checked'));
 		}).end()
-		.find('form').submit(users_updates).end()
-		.find('.ui-popup-footer button[type=submit]').click(users_updates);
+		.find('form').on('submit', users_updates).end()
+		.find('.ui-popup-footer button[type=submit]').on('click', users_updates);
 });

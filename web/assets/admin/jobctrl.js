@@ -296,7 +296,7 @@ $(function() {
 				var $a = $('<a>', { 'class': 'btn btn-secondary ps', href: '#' });
 				$a.append($('<i class="fas fa-arrow-up">'));
 				$a.append($('<span>').text(copy));
-				$a.click(job_copy_param);
+				$a.on('click', job_copy_param);
 				$cf.append($a);
 			}
 		}

@@ -25,5 +25,5 @@ $(function() {
 		return false;
 	}
 
-	$('#login_form').submit(login);
+	$('#login_form').on('submit', login);
 });
