@@ -166,7 +166,7 @@ var main = {
 		$f.find('.is-invalid').removeClass('is-invalid').end().find('.verr').remove();
 	},
 	form_add_invalid: function($f, err) {
-		if ($f) {
+		if ($f && $f.length) {
 			var $i = $f.find('[name="' + err.param + '"]');
 			$i.addClass('is-invalid');
 			$i.closest('div').append($('<div class="verr">').text(err.message));
