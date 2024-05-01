@@ -128,7 +128,7 @@
 ></div>
 
 <div id="pets_deletesel_popup" class="ui-popup s-popup-confirm" data-spy="popup" tabindex="-1"
-	popup-mask="true" popup-keyboard="false" popup-mouse="false">
+	popup-mask="true" popup-mouse="false">
 	<form>
 		<div class="ui-popup-body">
 			<i class="icon fas fa-2x fa-fw fa-circle-exclamation text-danger"></i>
@@ -142,7 +142,7 @@
 </div>
 
 <div id="pets_deleteall_popup" class="ui-popup s-popup-confirm" data-spy="popup" tabindex="-1"
-	popup-mask="true" popup-keyboard="false" popup-mouse="false">
+	popup-mask="true" popup-mouse="false">
 	<form>
 		<div class="ui-popup-body">
 			<i class="icon fas fa-2x fa-fw fa-exclamation-triangle text-danger"></i>
@@ -156,9 +156,9 @@
 </div>
 
 <div id="pets_bulkedit_popup" class="ui-popup s-popup-detail w800" data-spy="popup" tabindex="-1"
-	popup-position="center" popup-keyboard="false" popup-mouse="false" popup-mask="false" popup-closer="true">
+	popup-position="center" popup-mouse="false">
 	<div class="ui-popup-body">
-		<h4><i class="{{T .Loc "icon.edit"}}"></i>
+		<h4><i class="editsel {{T .Loc "icon.editsel"}}"></i><i class="editall {{T .Loc "icon.editall"}}"></i>
 			<span class="editsel">{{T .Loc "button.editsel"}}</span>
 			<span class="editall">{{T .Loc "button.editall"}}</span>
 		</h4>

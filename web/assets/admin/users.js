@@ -163,7 +163,7 @@ $(function() {
 			dataType: 'json',
 			beforeSend: main.form_ajax_start($p),
 			success: function(data, ts, xhr) {
-				$('#users_detail_popup').popup('hide');
+				$p.popup('hide');
 
 				$.toast({
 					icon: 'success',
@@ -222,7 +222,7 @@ $(function() {
 	// deletes (selected / all)
 	//
 	function users_deletes(all) {
-		var $p = $(all ? '#users_deleteall_popup' : '#users_deletesel_popup');
+		var $p = $(all ? '#users_deleteall_popup' : '#users_deletesel_popup').popup('update', { keyboard: false });
 		var ids = all ? '*' : main.get_table_checked_ids($('#users_table')).join(',');
 
 		$.ajax({
@@ -245,7 +245,9 @@ $(function() {
 				(all ? users_reset : users_search)();
 			},
 			error: main.ajax_error,
-			complete: main.form_ajax_end($p)
+			complete: function() {
+				$p.unloadmask().popup('update', { keyboard: true });
+			}
 		});
 		return false;
 	}
@@ -258,7 +260,7 @@ $(function() {
 	// updates (selected / all)
 	//
 	function users_updates() {
-		var $p = $('#users_bulkedit_popup');
+		var $p = $('#users_bulkedit_popup').popup({ keyboard: false });
 
 		$.ajax({
 			url: './updates',
@@ -298,7 +300,9 @@ $(function() {
 				}
 			},
 			error: main.form_ajax_error($p),
-			complete: main.form_ajax_end($p)
+			complete: function() {
+				$p.unloadmask().popup('update', { keyboard: true });
+			}
 		});
 		return false;
 	}

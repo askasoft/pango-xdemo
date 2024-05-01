@@ -233,7 +233,7 @@ $(function() {
 	// deletes (selected / all)
 	//
 	function pets_deletes(all) {
-		var $p = $(all ? '#pets_deleteall_popup' : '#pets_deletesel_popup');
+		var $p = $(all ? '#pets_deleteall_popup' : '#pets_deletesel_popup').popup('update', { keyboard: false });
 		var ids = all ? '*' : main.get_table_checked_ids($('#pets_table')).join(',');
 
 		$.ajax({
@@ -256,7 +256,9 @@ $(function() {
 				(all ? pets_reset : pets_search)();
 			},
 			error: main.ajax_error,
-			complete: main.form_ajax_end($p)
+			complete: function() {
+				$p.unloadmask().popup('update', { keyboard: true });
+			}
 		});
 		return false;
 	}
@@ -269,7 +271,7 @@ $(function() {
 	// updates (selected / all)
 	//
 	function pets_updates() {
-		var $p = $('#pets_bulkedit_popup');
+		var $p = $('#pets_bulkedit_popup').popup('update', { keyboard: false });
 
 		$.ajax({
 			url: './updates',
@@ -318,7 +320,9 @@ $(function() {
 				}
 			},
 			error: main.form_ajax_error($p),
-			complete: main.form_ajax_end($p)
+			complete:  function() {
+				$p.unloadmask().popup('update', { keyboard: true });
+			}
 		});
 		return false;
 	}
