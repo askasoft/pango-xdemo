@@ -62,20 +62,21 @@ blockquote {
 	height: 50px;
 	/* z-index: 1; */ /* set z-index if header is not fixed-top */
 }
-#header .navbar-brand {
+#header .brand {
 	color: inherit;
 	font-weight: bold;
 	font-size: 20px;
 	line-height: 50px;
-	margin: 0 10px;
-	padding: 0;
+	left: 20px;
+	position: absolute;
+	text-decoration: none;
 }
-#header .navbar-brand > img {
+#header .brand > img {
 	margin: 1px 12px 1px 0;
 	vertical-align: top;
 }
 @media (max-width: 767px) {
-	#header .navbar-brand > span {
+	#header .brand > span {
 		display: none;
 	}
 }
@@ -277,6 +278,9 @@ form div.verr {
 }
 .s-popup-detail.wide {
 	width: 90vw;
+}
+.s-popup-detail.w600 {
+	width: 600px;
 }
 .s-popup-detail.w800 {
 	width: 800px;

@@ -1,11 +1,9 @@
 {{define "footer"}}
-<div id="footer" class="navbar border-top text-bg-dark">
-	<div class="container-fluid">
-		<!--div id="footnavi"></div-->
-		<div id="footsite">
-			<span class="cpr">&copy; {{.Now.Year}} {{.Host}}</span>
-			<span class="ver">{{.VER}}.{{.REV}}</span>
-		</div>
+<div id="footer" class="border-top text-bg-dark">
+	{{/*<div id="footnavi"></div>*/}}
+	<div id="footsite">
+		<span class="cpr">&copy; {{.Now.Year}} {{.Host}}</span>
+		<span class="ver">{{.VER}}.{{.REV}}</span>
 	</div>
 	<div totop="true" class="ui-corner ui-corner-br" style="display:none"><i class="fa fa-angle-up"> </i></div>
 </div>

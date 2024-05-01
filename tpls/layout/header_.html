@@ -1,8 +1,6 @@
 {{define "header"}}
-<div id="header" class="navbar navbar-expand-lg fixed-top text-bg-primary">
-	<div class="container-fluid">
-		<a href="{{.Base}}/" class="navbar-brand"><img src="{{.Base}}/assets/img/logo.png"><span>{{T .Loc "title"}}</span></a>
-		{{template "headnavi" .}}
-	</div>
+<div id="header" class="fixed-top text-bg-primary text-end">
+	<a href="{{.Base}}/" class="brand"><img src="{{.Base}}/assets/img/logo.png"><span>{{T .Loc "title"}}</span></a>
+	{{template "headnavi" .}}
 </div>
 {{end}}
