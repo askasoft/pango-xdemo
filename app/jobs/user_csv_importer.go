@@ -260,7 +260,7 @@ func (uci *UserCsvImporter) importRecord(rec *csvUserRecord) error {
 				r = db.Table(uci.Tenant.TableUsers()).Updates(usr)
 				if r.Error != nil {
 					if pgutil.IsUniqueViolation(r.Error) {
-						uci.Log.Warnf(tbs.GetText(uci.arg.Locale, "user.import.csv.step.dup_email"), uci.StepInfo(), usr.ID, usr.Name, usr.Email)
+						uci.Log.Warnf(tbs.GetText(uci.arg.Locale, "user.import.csv.step.duplicated"), uci.StepInfo(), usr.ID, usr.Name, usr.Email)
 						return ErrItemSkip
 					}
 					return r.Error
@@ -289,7 +289,7 @@ func (uci *UserCsvImporter) importRecord(rec *csvUserRecord) error {
 		r := db.Table(uci.Tenant.TableUsers()).Create(usr)
 		if r.Error != nil {
 			if pgutil.IsUniqueViolation(r.Error) {
-				uci.Log.Warnf(tbs.GetText(uci.arg.Locale, "user.import.csv.step.dup_email"), uci.StepInfo(), usr.ID, usr.Name, usr.Email)
+				uci.Log.Warnf(tbs.GetText(uci.arg.Locale, "user.import.csv.step.duplicated"), uci.StepInfo(), usr.ID, usr.Name, usr.Email)
 				return ErrItemSkip
 			}
 			return r.Error
