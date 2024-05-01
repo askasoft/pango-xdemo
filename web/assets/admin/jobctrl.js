@@ -1,22 +1,24 @@
 $(function() {
 	function job_start() {
-		$('#job_start').prop('disabled', true);
+		if (!$('#job_start').prop('disabled')) {
+			$('#job_start').prop('disabled', true);
 
-		var $jf = $('#job_form');
-		$.ajaf({
-			url: './start',
-			type: 'POST',
-			data: $jf.serializeArray(),
-			file: $jf.find('input[type="file"]'),
-			dataType: 'json',
-			beforeSend: main.form_ajax_start($jf),
-			success: main.ajax_success,
-			error: main.form_ajax_error($jf),
-			complete: function() {
-				main.form_ajax_end($jf)();
-				job_list();
-			}
-		});
+			var $jf = $('#job_form');
+			$.ajaf({
+				url: './start',
+				type: 'POST',
+				data: $jf.serializeArray(),
+				file: $jf.find('input[type="file"]'),
+				dataType: 'json',
+				beforeSend: main.form_ajax_start($jf),
+				success: main.ajax_success,
+				error: main.form_ajax_error($jf),
+				complete: function() {
+					main.form_ajax_end($jf)();
+					job_list();
+				}
+			});
+		}
 		return false;
 	}
 
@@ -331,7 +333,7 @@ $(function() {
 		var $jh = $('#job_head_' + job.id);
 		if ($jh.attr('status') != job.status) {
 			$jh.attr('status', job.status);
-		$jh.find('i').attr('class', job_status_icon(job.status));
+			$jh.find('i').attr('class', job_status_icon(job.status));
 
 			var $jt = $('#job_' + job.id).find('.job-tools').empty();
 			if (job.status == 'P' || job.status == 'R') {
@@ -363,8 +365,8 @@ $(function() {
 		return false;
 	}
 
-	$('#job_form').submit(function() { return false; });
-	$('#job_start').click(job_start);
+	$('#job_form').on('submit', job_start);
+	$('#job_start').on('click', job_start);
 	$('#job_list').on('click', 'button.abort', job_abort);
 
 	job_list();
