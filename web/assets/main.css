@@ -1,6 +1,6 @@
 /* ----------------------------------------------------
- * bootstrap5
- */
+ * bootstrap5 (default)
+*/
 :root, [data-bs-theme=light] {
 	--blue: #1d6091;
 	--bs-primary: #1d6091;
@@ -29,6 +29,34 @@
 	--bs-pagination-active-bg: #337ab7;
 	--bs-pagination-active-border-color: #337ab7;
 }
+
+/* ----------------------------------------------------
+ * bootswatch5 (cosmo)
+[data-bs-theme=dark] .btn-outline-secondary {
+	--bs-btn-color: #aaa;
+	--bs-btn-border-color: #aaa;
+	--bs-btn-hover-bg: #aaa;
+	--bs-btn-hover-border-color: #aaa;
+	--bs-btn-active-bg: #aaa;
+	--bs-btn-active-border-color: #aaa;
+	--bs-btn-disabled-color: #aaa;
+	--bs-btn-disabled-border-color: #aaa;
+}
+ */
+
+/* ----------------------------------------------------
+ * bootswatch5 (pulse)
+[data-bs-theme=dark] .dropdown-menu {
+	--bs-dropdown-link-color: #ccc;
+}
+[data-bs-theme=dark] .btn-outline-primary {
+	--bs-btn-color: #ac8edb;
+	--bs-btn-border-color: #ac8edb;
+	--bs-btn-disabled-color: #ac8edb;
+	--bs-btn-disabled-border-color:#ac8edb;
+}
+ */
+
 
 /* copy from bootstrap3 */
 .dropdown-menu .divider {
