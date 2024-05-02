@@ -11,7 +11,7 @@
 	</div>
 
 	<div class="ui-toolbar text-end">
-		<a class="btn btn-sm btn-secondary" href="./sample" target="_blank"><i class="fa fa-download"></i> {{T .Loc "button.sample"}}</a>
+		<a class="btn btn-sm btn-outline-secondary" href="./sample" target="_blank"><i class="{{T .Loc "icon.dnload"}}"></i> {{T .Loc "button.sample"}}</a>
 	</div>
 
 	<div class="well">{{T .Loc "user.import.csv.well"}}</div>
@@ -20,7 +20,7 @@
 		<legend>{{T .Loc "user.import.csv.legend"}}</legend>
 		<form id="job_form" class="form-horizontal grey" enctype="multipart/form-data" autocomplete="off" data-abort="{{T .Loc "button.stop"}}">
 			<input type="hidden" name="_token_" value="{{.Token}}"/>
-			<div class="row py-3">
+			<div class="row py-2">
 				<label class="col-sm-3 col-form-label">{{T .Loc "user.import.csv.file"}}</label>
 				<div class="col-sm-9">
 					<input type="file" name="file" accept=".csv" class="form-control">
