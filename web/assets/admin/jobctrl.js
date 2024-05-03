@@ -230,7 +230,9 @@ $(function() {
 			$jobs.prepend($job);
 		}
 
-		$jhs.find('a').first().trigger('click');
+		if (!$jhs.find('a.active').length) {
+			$jhs.find('a:first').trigger('click');
+		}
 	}
 
 	function build_job_head(job) {
