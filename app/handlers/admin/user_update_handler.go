@@ -128,7 +128,7 @@ func UserCreate(c *xin.Context) {
 		if pgutil.IsUniqueViolation(err) {
 			err = &vadutil.ParamError{
 				Param:   "email",
-				Message: tbs.Format(c.Locale, "user.error.email.dup", tbs.GetText(c.Locale, "user.email", "email"), usr.Email),
+				Message: tbs.Format(c.Locale, "user.error.duplicated", tbs.GetText(c.Locale, "user.email", "email"), usr.Email),
 			}
 		}
 		c.AddError(err)
@@ -172,7 +172,7 @@ func UserUpdate(c *xin.Context) {
 			if pgutil.IsUniqueViolation(err) {
 				err = &vadutil.ParamError{
 					Param:   "email",
-					Message: tbs.Format(c.Locale, "user.error.email.dup", tbs.GetText(c.Locale, "user.email", "email"), usr.Email),
+					Message: tbs.Format(c.Locale, "user.error.duplicated", tbs.GetText(c.Locale, "user.email", "email"), usr.Email),
 				}
 			}
 			c.AddError(err)
