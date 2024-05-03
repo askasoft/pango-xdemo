@@ -24,7 +24,6 @@ sed -e "s;prefix =.*;prefix = ${PREFIX};g" \
 
 sed -e "s;DEBUG;${LOG_LEVEL};g" \
 	-e "s;HOSTNAME;${HOSTNAME};g" \
-	-e "s;filter = level:TRACE;filter = level:INFO;g" \
 	conf/log.ini > ${APPHOME}/conf/log.ini
 
 cp -a conf/config.csv ${APPHOME}/conf/

@@ -3,6 +3,10 @@ set APPHOME=C:\app\%APPNAME%
 set PREFIX=
 set LOG_WRITERS=stdout, file, dump, access
 
+@REM set LOG_OPENSEARCH_APPLOG=https://localhost:9200/xdemo_applog/_bulk
+@REM set LOG_OPENSEARCH_ACCESS=https://localhost:9200/xdemo_access/_bulk
+
+
 if "%LOG_LEVEL%." == "." set LOG_LEVEL=INFO
 
 mkdir %APPHOME%\conf
