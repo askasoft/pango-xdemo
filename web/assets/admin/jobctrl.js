@@ -3,7 +3,7 @@ $(function() {
 		if (!$('#job_start').prop('disabled')) {
 			$('#job_start').prop('disabled', true);
 
-			var $jf = $('#job_form');
+			var $jf = $('#job_form'), jid;
 			$.ajaf({
 				url: './start',
 				type: 'POST',
@@ -11,11 +11,14 @@ $(function() {
 				file: $jf.find('input[type="file"]'),
 				dataType: 'json',
 				beforeSend: main.form_ajax_start($jf),
-				success: main.ajax_success,
+				success: function(data) {
+					jid = data.jid;
+					main.ajax_success(data);
+				},
 				error: main.form_ajax_error($jf),
 				complete: function() {
 					main.form_ajax_end($jf)();
-					job_list();
+					job_list(jid);
 				}
 			});
 		}
@@ -37,7 +40,9 @@ $(function() {
 			dataType: 'json',
 			success: main.ajax_success,
 			error: main.ajax_error,
-			complete: job_list
+			complete: function() {
+				job_list(jid);
+			}
 		});
 		return false;
 	}
@@ -191,7 +196,7 @@ $(function() {
 		return false;
 	}
 
-	function build_job_list(data) {
+	function build_job_list(data, jid) {
 		if (!data || data.length == 0) {
 			return;
 		}
@@ -230,9 +235,7 @@ $(function() {
 			$jobs.prepend($job);
 		}
 
-		if (!$jhs.find('a.active').length) {
-			$jhs.find('a:first').trigger('click');
-		}
+		$jhs.find(jid ? '#job_head_' + jid + ' > a' : 'a:first').trigger('click');
 	}
 
 	function build_job_head(job) {
@@ -346,7 +349,7 @@ $(function() {
 		build_job_abort($jt, job.status);
 	}
 
-	function job_list() {
+	function job_list(jid) {
 		var $jhs = $('#job_list > ul');
 
 		$.ajax({
@@ -356,7 +359,7 @@ $(function() {
 			beforeSend: $jhs.loadmask.delegate($jhs),
 			success: function(data) {
 				setTimeout(function() {
-					build_job_list(data);
+					build_job_list(data, jid);
 					job_start_refresh();
 				}, 10);
 			},
