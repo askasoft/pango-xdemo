@@ -131,21 +131,6 @@ func PetCreate(c *xin.Context) {
 	})
 }
 
-var petUpdatables = []string{
-	"name",
-	"gender",
-	"born_at",
-	"origin",
-	"temper",
-	"habbits",
-	"amount",
-	"price",
-	"shop_name",
-	"shop_address",
-	"shop_telephone",
-	"updated_at",
-}
-
 func PetUpdate(c *xin.Context) {
 	pet := &models.Pet{}
 	if err := c.Bind(pet); err != nil {
@@ -164,7 +149,22 @@ func PetUpdate(c *xin.Context) {
 
 	tt := tenant.FromCtx(c)
 
-	r := app.GDB.Table(tt.TablePets()).Select(petUpdatables).Updates(pet)
+	tx := app.GDB.Table(tt.TablePets())
+	tx = tx.Select(
+		"name",
+		"gender",
+		"born_at",
+		"origin",
+		"temper",
+		"habbits",
+		"amount",
+		"price",
+		"shop_name",
+		"shop_address",
+		"shop_telephone",
+		"updated_at",
+	)
+	r := tx.Updates(pet)
 	if r.Error != nil {
 		c.AddError(r.Error)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))

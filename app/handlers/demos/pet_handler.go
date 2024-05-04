@@ -38,24 +38,23 @@ type PetQuery struct {
 	args.Sorter
 }
 
-func (pq *PetQuery) Normalize(columns []string, limits []int) {
-	pq.Sorter.Normalize(columns...)
-	pq.Pager.Normalize(limits...)
-}
+func (pq *PetQuery) Normalize(c *xin.Context) {
+	pq.Sorter.Normalize(
+		"id",
+		"name",
+		"gender",
+		"born_at",
+		"origin",
+		"temper",
+		"habbits",
+		"amount",
+		"price",
+		"shop_name",
+		"created_at",
+		"updated_at",
+	)
 
-var petSortables = []string{
-	"id",
-	"name",
-	"gender",
-	"born_at",
-	"origin",
-	"temper",
-	"habbits",
-	"amount",
-	"price",
-	"shop_name",
-	"created_at",
-	"updated_at",
+	pq.Pager.Normalize(tbsutil.GetPagerLimits(c.Locale)...)
 }
 
 func filterPets(tt tenant.Tenant, pq *PetQuery) *gorm.DB {
@@ -139,7 +138,7 @@ func PetIndex(c *xin.Context) {
 	h := handlers.H(c)
 
 	pq, _ := petListArgs(c)
-	pq.Normalize(petSortables, tbsutil.GetPagerLimits(c.Locale))
+	pq.Normalize(c)
 
 	h["Q"] = pq
 
@@ -159,7 +158,7 @@ func PetList(c *xin.Context) {
 	tt := tenant.FromCtx(c)
 
 	pq.Total, err = countPets(tt, pq, filterPets)
-	pq.Normalize(petSortables, tbsutil.GetPagerLimits(c.Locale))
+	pq.Normalize(c)
 
 	if err != nil {
 		c.AddError(err)
