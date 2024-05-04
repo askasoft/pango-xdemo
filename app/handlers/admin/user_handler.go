@@ -28,25 +28,27 @@ type UserQuery struct {
 	args.Sorter
 }
 
-func (uq *UserQuery) Normalize(columns []string, limits []int) {
-	uq.Sorter.Normalize(columns...)
-	uq.Pager.Normalize(limits...)
-}
+func (uq *UserQuery) Normalize(c *xin.Context) {
+	uq.Sorter.Normalize(
+		"id",
+		"name",
+		"email",
+		"role",
+		"status",
+		"created_at",
+		"updated_at",
+	)
 
-var userSortables = []string{
-	"id",
-	"name",
-	"email",
-	"role",
-	"status",
-	"created_at",
-	"updated_at",
+	uq.Pager.Normalize(tbsutil.GetPagerLimits(c.Locale)...)
 }
 
 func filterUsers(c *xin.Context, uq *UserQuery) *gorm.DB {
 	tt := tenant.FromCtx(c)
+	au := tenant.AuthUser(c)
 
 	tx := app.GDB.Table(tt.TableUsers())
+
+	tx = tx.Where("role >= ?", au.Role)
 
 	if uq.ID != 0 {
 		tx = tx.Where("id = ?", uq.ID)
@@ -67,10 +69,6 @@ func filterUsers(c *xin.Context, uq *UserQuery) *gorm.DB {
 		tx = tx.Where("status IN ?", uq.Status)
 	}
 
-	au := tenant.AuthUser(c)
-	if !au.IsSuper() {
-		tx = tx.Where("role > ?", models.RoleSuper)
-	}
 	return tx
 }
 
@@ -107,20 +105,14 @@ func userListArgs(c *xin.Context) (uq *UserQuery, err error) {
 
 func userAddMaps(c *xin.Context, h xin.H) {
 	h["UserStatusMap"] = tbsutil.GetUserStatusMap(c.Locale)
-
-	au := tenant.AuthUser(c)
-	if au.IsSuper() {
-		h["UserRoleMap"] = tbsutil.GetSuperRoleMap(c.Locale)
-	} else {
-		h["UserRoleMap"] = tbsutil.GetUserRoleMap(c.Locale)
-	}
+	h["UserRoleMap"] = tenant.GetUserRoleMap(c)
 }
 
 func UserIndex(c *xin.Context) {
 	h := handlers.H(c)
 
 	uq, _ := userListArgs(c)
-	uq.Normalize(userSortables, tbsutil.GetPagerLimits(c.Locale))
+	uq.Normalize(c)
 
 	h["Q"] = uq
 
@@ -138,7 +130,7 @@ func UserList(c *xin.Context) {
 	}
 
 	uq.Total, err = countUsers(c, uq, filterUsers)
-	uq.Normalize(userSortables, tbsutil.GetPagerLimits(c.Locale))
+	uq.Normalize(c)
 
 	if err != nil {
 		c.AddError(err)

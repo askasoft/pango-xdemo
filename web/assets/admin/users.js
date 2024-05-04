@@ -103,7 +103,7 @@ $(function() {
 	function user_detail() {
 		var $tr = $(this).closest('tr');
 		var params = {
-			id: $tr.attr('id').replace('usr_', '')
+			id: $tr.attr('id').replace('user_', '')
 		};
 
 		$('#users_detail_popup').popup({
@@ -145,11 +145,11 @@ $(function() {
 	var USM = $('#user_maps').data('status');
 	var URM = $('#user_maps').data('role');
 
-	function user_set_tr_values($tr, usr) {
-		main.set_table_tr_values($tr, usr);
-		$tr.attr('class', '').addClass(usr.status);
-		$tr.find('td.status').text(USM[usr.status]);
-		$tr.find('td.role').text(URM[usr.role]);
+	function user_set_tr_values($tr, user) {
+		main.set_table_tr_values($tr, user);
+		$tr.attr('class', '').addClass(user.status);
+		$tr.find('td.status').text(USM[user.status]);
+		$tr.find('td.role').text(URM[user.role]);
 		main.blink($tr);
 	}
 
@@ -170,9 +170,9 @@ $(function() {
 					text: data.success
 				});
 
-				var usr = data.user, $tr = $('tr#usr_' + usr.id);
+				var user = data.user, $tr = $('tr#user_' + user.id);
 
-				user_set_tr_values($tr, usr);
+				user_set_tr_values($tr, user);
 			},
 			error: main.form_ajax_error($p),
 			complete: main.form_ajax_end($p)
@@ -201,14 +201,14 @@ $(function() {
 					text: data.success
 				});
 
-				var usr = data.user;
+				var user = data.user;
 				var $tb = $('#users_table > tbody'), $tr = $tb.children('tr.template').clone();
 
-				$tr.attr({ 'class': '', 'id': 'usr_' + usr.id});
-				$tr.find('td.check').append($('<input type="checkbox"/>').val(usr.id));
+				$tr.attr({ 'class': '', 'id': 'user_' + user.id});
+				$tr.find('td.check').append($('<input type="checkbox"/>').val(user.id));
 				$tb.prepend($tr);
 
-				user_set_tr_values($tr, usr);
+				user_set_tr_values($tr, user);
 				$tr.find('td.id, td.created_at').addClass('ro');
 			},
 			error: main.form_ajax_error($p),
@@ -284,7 +284,7 @@ $(function() {
 				var us = data.updates;
 				if (us) {
 					var ids = main.get_table_checked_ids($('#users_table'));
-					var $trs = main.get_table_trs('#usr_', ids);
+					var $trs = main.get_table_trs('#user_', ids);
 
 					if (us.status) {
 						$trs.attr('class', '').addClass(us.status);

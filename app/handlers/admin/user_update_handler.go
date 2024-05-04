@@ -12,7 +12,6 @@ import (
 	"github.com/askasoft/pango-xdemo/app/utils/pgutil"
 	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
 	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
-	"github.com/askasoft/pango/cog"
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/tbs"
@@ -21,13 +20,13 @@ import (
 )
 
 func UserNew(c *xin.Context) {
-	usr := &models.User{
+	user := &models.User{
 		Role:   models.RoleViewer,
 		Status: models.UserActive,
 	}
 
 	h := handlers.H(c)
-	h["User"] = usr
+	h["User"] = user
 	userAddMaps(c, h)
 
 	c.HTML(http.StatusOK, "admin/user_detail", h)
@@ -43,8 +42,8 @@ func UserDetail(c *xin.Context) {
 
 	tt := tenant.FromCtx(c)
 
-	usr := &models.User{}
-	r := app.GDB.Table(tt.TableUsers()).Where("id = ?", aid).Take(usr)
+	user := &models.User{}
+	r := app.GDB.Table(tt.TableUsers()).Where("id = ?", aid).Take(user)
 	if errors.Is(r.Error, gorm.ErrRecordNotFound) {
 		c.AddError(r.Error)
 		c.JSON(http.StatusNotFound, handlers.E(c))
@@ -57,7 +56,7 @@ func UserDetail(c *xin.Context) {
 	}
 
 	h := handlers.H(c)
-	h["User"] = usr
+	h["User"] = user
 
 	userAddMaps(c, h)
 
@@ -72,15 +71,8 @@ func userValidateCIDR(c *xin.Context, cidr string) {
 
 func userValidateRole(c *xin.Context, role string) {
 	if role != "" {
-		var rm *cog.LinkedHashMap[string, string]
-
-		au := tenant.AuthUser(c)
-		if au.IsSuper() {
-			rm = tbsutil.GetSuperRoleMap(c.Locale)
-		} else {
-			rm = tbsutil.GetUserRoleMap(c.Locale)
-		}
-		if !rm.Contain(role) {
+		urm := tenant.GetUserRoleMap(c)
+		if !urm.Contain(role) {
 			c.AddError(vadutil.ErrInvalidField(c, "user.", "role"))
 		}
 	}
@@ -96,39 +88,39 @@ func userValidateStatus(c *xin.Context, status string) {
 }
 
 func userBind(c *xin.Context) *models.User {
-	usr := &models.User{}
-	if err := c.Bind(usr); err != nil {
+	user := &models.User{}
+	if err := c.Bind(user); err != nil {
 		vadutil.AddBindErrors(c, err, "user.")
 	}
 
-	userValidateCIDR(c, usr.CIDR)
-	userValidateRole(c, usr.Role)
-	userValidateStatus(c, usr.Status)
+	userValidateCIDR(c, user.CIDR)
+	userValidateRole(c, user.Role)
+	userValidateStatus(c, user.Status)
 
-	return usr
+	return user
 }
 
 func UserCreate(c *xin.Context) {
-	usr := userBind(c)
+	user := userBind(c)
 	if len(c.Errors) > 0 {
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}
 
-	usr.ID = 0
-	if usr.Password == "" {
-		usr.Password = str.RandLetterNumbers(16)
+	user.ID = 0
+	if user.Password == "" {
+		user.Password = str.RandLetterNumbers(16)
 	}
-	usr.SetPassword(usr.Password)
-	usr.CreatedAt = time.Now()
-	usr.UpdatedAt = usr.CreatedAt
+	user.SetPassword(user.Password)
+	user.CreatedAt = time.Now()
+	user.UpdatedAt = user.CreatedAt
 
 	tt := tenant.FromCtx(c)
-	if err := app.GDB.Table(tt.TableUsers()).Create(usr).Error; err != nil {
+	if err := app.GDB.Table(tt.TableUsers()).Create(user).Error; err != nil {
 		if pgutil.IsUniqueViolation(err) {
 			err = &vadutil.ParamError{
 				Param:   "email",
-				Message: tbs.Format(c.Locale, "user.error.duplicated", tbs.GetText(c.Locale, "user.email", "email"), usr.Email),
+				Message: tbs.Format(c.Locale, "user.error.duplicated", tbs.GetText(c.Locale, "user.email", "email"), user.Email),
 			}
 		}
 		c.AddError(err)
@@ -136,26 +128,16 @@ func UserCreate(c *xin.Context) {
 		return
 	}
 
-	usr.Password = ""
+	user.Password = ""
 	c.JSON(http.StatusOK, xin.H{
-		"user":    usr,
+		"user":    user,
 		"success": tbs.GetText(c.Locale, "success.created"),
 	})
 }
 
-var userUpdatables = []string{
-	"name",
-	"email",
-	"password",
-	"role",
-	"status",
-	"cidr",
-	"updated_at",
-}
-
 func UserUpdate(c *xin.Context) {
-	usr := userBind(c)
-	if usr.ID == 0 {
+	user := userBind(c)
+	if user.ID == 0 {
 		c.AddError(vadutil.ErrInvalidID(c))
 	}
 	if len(c.Errors) > 0 {
@@ -164,15 +146,16 @@ func UserUpdate(c *xin.Context) {
 	}
 
 	tt := tenant.FromCtx(c)
+	au := tenant.AuthUser(c)
 
-	if usr.Password == "" {
+	if user.Password == "" {
 		eu := &models.User{}
-		err := app.GDB.Table(tt.TableUsers()).Where("id = ?", usr.ID).Take(eu).Error
+		err := app.GDB.Table(tt.TableUsers()).Where("id = ?", user.ID).Take(eu).Error
 		if err != nil {
 			if pgutil.IsUniqueViolation(err) {
 				err = &vadutil.ParamError{
 					Param:   "email",
-					Message: tbs.Format(c.Locale, "user.error.duplicated", tbs.GetText(c.Locale, "user.email", "email"), usr.Email),
+					Message: tbs.Format(c.Locale, "user.error.duplicated", tbs.GetText(c.Locale, "user.email", "email"), user.Email),
 				}
 			}
 			c.AddError(err)
@@ -181,23 +164,36 @@ func UserUpdate(c *xin.Context) {
 		}
 
 		// NOTE: we need reencrypt password, because password is encrypted by email
-		usr.SetPassword(eu.GetPassword())
+		user.SetPassword(eu.GetPassword())
 	} else {
-		usr.SetPassword(usr.Password)
+		user.SetPassword(user.Password)
 	}
 
-	usr.UpdatedAt = time.Now()
+	user.UpdatedAt = time.Now()
 
-	r := app.GDB.Table(tt.TableUsers()).Select(userUpdatables).Updates(usr)
+	tx := app.GDB.Table(tt.TableUsers())
+	tx = tx.Where("id = ?", user.ID)
+	tx = tx.Where("role >= ?", au.Role)
+	tx = tx.Select(
+		"name",
+		"email",
+		"password",
+		"role",
+		"status",
+		"cidr",
+		"updated_at",
+	)
+
+	r := tx.Updates(user)
 	if r.Error != nil {
 		c.AddError(r.Error)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return
 	}
 
-	usr.Password = ""
+	user.Password = ""
 	c.JSON(http.StatusOK, xin.H{
-		"user":    usr,
+		"user":    user,
 		"success": tbs.Format(c.Locale, "user.success.updates", r.RowsAffected),
 	})
 }
@@ -243,35 +239,33 @@ func UserUpdates(c *xin.Context) {
 		tx := db.Table(tt.TableUsers())
 
 		tx = tx.Where("id <> ?", au.ID)
-		if !au.IsSuper() {
-			tx = tx.Where("role <> ?", models.RoleSuper)
-		}
+		tx = tx.Where("role >= ?", au.Role)
 
 		if uua.ID != "*" {
 			tx = tx.Where("id IN ?", ids)
 		}
 
-		usr := &models.User{}
+		user := &models.User{}
 
-		usr.UpdatedAt = time.Now()
+		user.UpdatedAt = time.Now()
 
-		cols := make([]string, 0, 8)
+		cols := make([]string, 0, 4)
 		cols = append(cols, "updated_at")
 
 		if uua.Role != "" {
-			usr.Role = uua.Role
+			user.Role = uua.Role
 			cols = append(cols, "role")
 		}
 		if uua.Status != "" {
-			usr.Status = uua.Status
+			user.Status = uua.Status
 			cols = append(cols, "status")
 		}
 		if uua.Ucidr {
-			usr.CIDR = uua.CIDR
+			user.CIDR = uua.CIDR
 			cols = append(cols, "cidr")
 		}
 
-		r := tx.Select(cols).Updates(usr)
+		r := tx.Select(cols).Updates(user)
 		cnt = r.RowsAffected
 		return r.Error
 	})
@@ -305,9 +299,8 @@ func UserDeletes(c *xin.Context) {
 		tx := db.Table(tt.TableUsers())
 
 		tx = tx.Where("id <> ?", au.ID)
-		if !au.IsSuper() {
-			tx = tx.Where("role <> ?", models.RoleSuper)
-		}
+		tx = tx.Where("role >= ?", au.Role)
+
 		if id != "*" {
 			tx = tx.Where("id IN ?", ids)
 		}

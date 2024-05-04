@@ -52,10 +52,6 @@ func GetUserRoleReverseMap() map[string]string {
 	return GetAllReverseMap("user.map.role")
 }
 
-func GetSuperRoleMap(locale string) *cog.LinkedHashMap[string, string] {
-	return GetLinkedHashMap(locale, "user.map.srole")
-}
-
 func GetLinkedHashMap(locale, name string) *cog.LinkedHashMap[string, string] {
 	m := &cog.LinkedHashMap[string, string]{}
 	err := m.UnmarshalJSON(str.UnsafeBytes(tbs.GetText(locale, name)))

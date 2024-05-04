@@ -235,7 +235,7 @@ func (uci *UserCsvImporter) importRecord(rec *csvUserRecord) error {
 		return xjm.ErrJobAborted
 	}
 
-	usr := &models.User{
+	user := &models.User{
 		ID:        num.Atol(rec.ID),
 		Name:      rec.Name,
 		Email:     rec.Email,
@@ -246,30 +246,30 @@ func (uci *UserCsvImporter) importRecord(rec *csvUserRecord) error {
 	}
 
 	err := app.GDB.Transaction(func(db *gorm.DB) error {
-		if usr.ID != 0 {
+		if user.ID != 0 {
 			eu := &models.User{}
-			r := db.Table(uci.Tenant.TableUsers()).Where("id = ?", usr.ID).Take(eu)
+			r := db.Table(uci.Tenant.TableUsers()).Where("id = ?", user.ID).Take(eu)
 			if r.Error == nil {
 				if rec.Password == "" {
 					// NOTE: we need reencrypt password, because password is encrypted by email
-					usr.SetPassword(eu.GetPassword())
+					user.SetPassword(eu.GetPassword())
 				} else {
-					usr.SetPassword(rec.Password)
+					user.SetPassword(rec.Password)
 				}
 
-				r = db.Table(uci.Tenant.TableUsers()).Updates(usr)
+				r = db.Table(uci.Tenant.TableUsers()).Updates(user)
 				if r.Error != nil {
 					if pgutil.IsUniqueViolation(r.Error) {
-						uci.Log.Warnf(tbs.GetText(uci.arg.Locale, "user.import.csv.step.duplicated"), uci.StepInfo(), usr.ID, usr.Name, usr.Email)
+						uci.Log.Warnf(tbs.GetText(uci.arg.Locale, "user.import.csv.step.duplicated"), uci.StepInfo(), user.ID, user.Name, user.Email)
 						return ErrItemSkip
 					}
 					return r.Error
 				}
 
 				if r.RowsAffected > 0 {
-					uci.Log.Infof(tbs.GetText(uci.arg.Locale, "user.import.csv.step.updated"), uci.StepInfo(), usr.ID, usr.Name, usr.Email)
+					uci.Log.Infof(tbs.GetText(uci.arg.Locale, "user.import.csv.step.updated"), uci.StepInfo(), user.ID, user.Name, user.Email)
 				} else {
-					uci.Log.Warnf(tbs.GetText(uci.arg.Locale, "user.import.csv.step.ufailed"), uci.StepInfo(), usr.ID, usr.Name, usr.Email)
+					uci.Log.Warnf(tbs.GetText(uci.arg.Locale, "user.import.csv.step.ufailed"), uci.StepInfo(), user.ID, user.Name, user.Email)
 				}
 				return nil
 			}
@@ -279,24 +279,24 @@ func (uci *UserCsvImporter) importRecord(rec *csvUserRecord) error {
 			}
 		}
 
-		uid := usr.ID
+		uid := user.ID
 		pwd := rec.Password
 		if pwd == "" {
 			pwd = str.RandLetterNumbers(16)
 		}
-		usr.SetPassword(pwd)
+		user.SetPassword(pwd)
 
-		r := db.Table(uci.Tenant.TableUsers()).Create(usr)
+		r := db.Table(uci.Tenant.TableUsers()).Create(user)
 		if r.Error != nil {
 			if pgutil.IsUniqueViolation(r.Error) {
-				uci.Log.Warnf(tbs.GetText(uci.arg.Locale, "user.import.csv.step.duplicated"), uci.StepInfo(), usr.ID, usr.Name, usr.Email)
+				uci.Log.Warnf(tbs.GetText(uci.arg.Locale, "user.import.csv.step.duplicated"), uci.StepInfo(), user.ID, user.Name, user.Email)
 				return ErrItemSkip
 			}
 			return r.Error
 		}
 
 		if r.RowsAffected > 0 {
-			uci.Log.Infof(tbs.GetText(uci.arg.Locale, "user.import.csv.step.created"), uci.StepInfo(), usr.ID, usr.Name, usr.Email)
+			uci.Log.Infof(tbs.GetText(uci.arg.Locale, "user.import.csv.step.created"), uci.StepInfo(), user.ID, user.Name, user.Email)
 			if uid != 0 {
 				// reset sequence if create with ID
 				r := db.Exec(uci.Tenant.ResetSequence("users", models.UserStartID))
@@ -305,7 +305,7 @@ func (uci *UserCsvImporter) importRecord(rec *csvUserRecord) error {
 				}
 			}
 		} else {
-			uci.Log.Warnf(tbs.GetText(uci.arg.Locale, "user.import.csv.step.cfailed"), uci.StepInfo(), usr.ID, usr.Name, usr.Email)
+			uci.Log.Warnf(tbs.GetText(uci.arg.Locale, "user.import.csv.step.cfailed"), uci.StepInfo(), user.ID, user.Name, user.Email)
 		}
 		return nil
 	})

@@ -140,7 +140,7 @@ var main = {
 			afterHidden: afterHidden
 		});
 	},
-	ajax_success: function(data, ts, xhr) {
+	ajax_success: function(data) {
 		$.toast({
 			icon: 'success',
 			text: data.success

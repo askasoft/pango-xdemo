@@ -60,9 +60,9 @@ func Login(c *xin.Context) {
 	reason := "login.failed.userpass"
 
 	if au != nil && userpass.Password == au.GetPassword() {
-		usr := au.(*models.User)
-		if usr.HasRole(models.RoleViewer) {
-			if tenant.CheckClientIP(c, usr) {
+		user := au.(*models.User)
+		if user.HasRole(models.RoleViewer) {
+			if tenant.CheckClientIP(c, user) {
 				err := app.XCA.SaveUserPassToCookie(c, userpass.Username, userpass.Password)
 				if err != nil {
 					c.AddError(err)

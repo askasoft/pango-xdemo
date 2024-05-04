@@ -6,6 +6,8 @@ import (
 
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/models"
+	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
+	"github.com/askasoft/pango/cog"
 	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pango/xmw"
 	"gorm.io/gorm"
@@ -56,14 +58,21 @@ func FindUser(c *xin.Context, username string) (xmw.AuthUser, error) {
 	return u, nil
 }
 
-// AuthUser get authenticated user
-func AuthUser(c *xin.Context) *models.User {
+func GetAuthUser(c *xin.Context) *models.User {
 	au, ok := c.Get(app.XCA.AuthUserKey)
 	if ok {
 		return au.(*models.User)
 	}
+	return nil
+}
 
-	panic("Invalid Authenticate User!")
+// AuthUser get authenticated user
+func AuthUser(c *xin.Context) *models.User {
+	au := GetAuthUser(c)
+	if au == nil {
+		panic("Invalid Authenticate User!")
+	}
+	return au
 }
 
 func DeleteAuthUser(c *xin.Context) {
@@ -88,4 +97,15 @@ func CheckClientAndFindUser(c *xin.Context, username string) (xmw.AuthUser, erro
 		return nil, nil
 	}
 	return FindUser(c, username)
+}
+
+func GetUserRoleMap(c *xin.Context) *cog.LinkedHashMap[string, string] {
+	au := AuthUser(c)
+	urm := tbsutil.GetUserRoleMap(c.Locale)
+	for it := urm.Iterator(); it.Next(); {
+		if it.Key() < au.Role {
+			it.Remove()
+		}
+	}
+	return urm
 }

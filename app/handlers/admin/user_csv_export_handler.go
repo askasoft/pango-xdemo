@@ -58,8 +58,8 @@ func UserCsvExport(c *xin.Context) {
 	sm := tbsutil.GetUserStatusMap(c.Locale)
 	rm := tbsutil.GetUserRoleMap(c.Locale)
 	for rows.Next() {
-		var usr models.User
-		err = tx.ScanRows(rows, &usr)
+		var user models.User
+		err = tx.ScanRows(rows, &user)
 		if err != nil {
 			_ = cw.Write([]string{err.Error()})
 			cw.Flush()
@@ -67,14 +67,14 @@ func UserCsvExport(c *xin.Context) {
 		}
 
 		err = cw.Write([]string{
-			num.Ltoa(usr.ID),
-			usr.Name,
-			usr.Email,
-			rm.MustGet(usr.Role, usr.Role),
-			sm.MustGet(usr.Status, usr.Status),
-			usr.CIDR,
-			models.FormatTime(usr.CreatedAt),
-			models.FormatTime(usr.UpdatedAt),
+			num.Ltoa(user.ID),
+			user.Name,
+			user.Email,
+			rm.MustGet(user.Role, user.Role),
+			sm.MustGet(user.Status, user.Status),
+			user.CIDR,
+			models.FormatTime(user.CreatedAt),
+			models.FormatTime(user.UpdatedAt),
 		})
 		if err != nil {
 			c.Logger.Error(err)

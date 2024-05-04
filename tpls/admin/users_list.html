@@ -19,7 +19,7 @@
 	</thead>
 	<tbody>
 	{{range $i, $u := .Users}}
-		<tr class="{{$u.Status}}" id="usr_{{$u.ID}}">
+		<tr class="{{$u.Status}}" id="user_{{$u.ID}}">
 			<td class="check">{{if ne $u.ID $.AuthUser.ID}}<input type="checkbox" value="{{$u.ID}}"/>{{end}}</td>
 			<td class="id ro">{{$u.ID}}</td>
 			<td class="name">{{$u.Name}}</td>

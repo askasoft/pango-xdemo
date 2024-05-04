@@ -9,7 +9,6 @@ import (
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/xin"
-	"github.com/askasoft/pango/xmw"
 )
 
 func SplitIDs(id string) []int64 {
@@ -30,9 +29,9 @@ func SplitIDs(id string) []int64 {
 
 func H(c *xin.Context) xin.H {
 	tt := tenant.FromCtx(c)
+	au := tenant.GetAuthUser(c)
 
 	dcm := tt.GetConfigMap()
-	usr, _ := c.Get(xmw.AuthUserKey)
 
 	h := xin.H{
 		"DCM":      dcm,
@@ -47,7 +46,7 @@ func H(c *xin.Context) xin.H {
 		"Loc":      c.Locale,
 		"Token":    app.XTP.RefreshToken(c),
 		"Tenant":   tt,
-		"AuthUser": usr,
+		"AuthUser": au,
 	}
 	return h
 }
