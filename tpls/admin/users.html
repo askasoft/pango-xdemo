@@ -104,8 +104,8 @@
 			<div class="msg">{{T .Loc "user.confirm.deletesel"}}</div>
 		</div>
 		<div class="ui-popup-footer">
-			<button type="submit" class="btn btn-danger"><i class="fas fa-check"></i> {{T .Loc "button.ok"}}</button>
-			<button type="button" class="btn btn-secondary" popup-dismiss="true"><i class="fas fa-times"></i> {{T .Loc "button.cancel"}}</button>
+			<button type="submit" class="btn btn-danger"><i class="{{T .Loc "icon.ok"}}"></i> {{T .Loc "button.ok"}}</button>
+			<button type="button" class="btn btn-secondary" popup-dismiss="true"><i class="{{T .Loc "icon.cancel"}}"></i> {{T .Loc "button.cancel"}}</button>
 		</div>
 	</form>
 </div>
@@ -118,15 +118,15 @@
 			<div class="msg">{{T .Loc "user.confirm.deleteall"}}</div>
 		</div>
 		<div class="ui-popup-footer">
-			<button type="submit" class="btn btn-danger"><i class="fas fa-check"></i> {{T .Loc "button.ok"}}</button>
-			<button type="button" class="btn btn-secondary" popup-dismiss="true"><i class="fas fa-times"></i> {{T .Loc "button.cancel"}}</button>
+			<button type="submit" class="btn btn-danger"><i class="{{T .Loc "icon.ok"}}"></i> {{T .Loc "button.ok"}}</button>
+			<button type="button" class="btn btn-secondary" popup-dismiss="true"><i class="{{T .Loc "icon.cancel"}}"></i> {{T .Loc "button.cancel"}}</button>
 		</div>
 	</form>
 </div>
 
 <div id="users_bulkedit_popup" class="ui-popup s-popup-detail w800" data-spy="popup" tabindex="-1"
 	popup-position="center" popup-mouse="false">
-	<div class="ui-popup-body">
+	<div class="ui-popup-header">
 		<h4><i class="editsel {{T .Loc "icon.editsel"}}"></i><i class="editall {{T .Loc "icon.editall"}}"></i>
 			<span class="editsel">{{T .Loc "button.editsel"}}</span>
 			<span class="editall">{{T .Loc "button.editall"}}</span>
@@ -156,8 +156,8 @@
 		<button type="submit" class="hidden" enableby="#users_bulkedit_popup .col-form-label > input"></button>
 	</form>
 	<div class="ui-popup-footer">
-		<button type="submit" class="btn btn-primary" enableby="#users_bulkedit_popup .col-form-label > input"><i class="fas fa-save"></i> {{T .Loc "button.update"}}</button>
-		<button type="button" class="btn btn-secondary" popup-dismiss="true"><i class="fas fa-times"></i> {{T .Loc "button.cancel"}}</button>
+		<button type="submit" class="btn btn-primary" enableby="#users_bulkedit_popup .col-form-label > input"><i class="{{T .Loc "icon.save"}}"></i> {{T .Loc "button.update"}}</button>
+		<button type="button" class="btn btn-secondary" popup-dismiss="true"><i class="{{T .Loc "icon.cancel"}}"></i> {{T .Loc "button.cancel"}}</button>
 	</div>
 </div>
 

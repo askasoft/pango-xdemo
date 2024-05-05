@@ -4,7 +4,7 @@
 	<button type="button" class="close" data-dismiss="alert">&times;</button>
 	<ul class="fa-ul">
 		{{range $i, $e := .Ctx.Errors}}
-		<li class="text-danger"><i class="fa-li fa fa-exclamation-circle"></i><span>{{$e}}</span></li>
+		<li class="text-danger"><i class="fa-li fas fa-circle-exclamation"></i><span>{{$e}}</span></li>
 		{{end}}
 	</ul>
 </div>
