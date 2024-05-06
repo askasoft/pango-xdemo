@@ -224,8 +224,8 @@ func UserUpdates(c *xin.Context) {
 		return
 	}
 
-	ids := handlers.SplitIDs(uua.ID)
-	if uua.ID != "*" && len(ids) == 0 {
+	ids, ida := handlers.SplitIDs(uua.ID)
+	if len(ids) == 0 && !ida {
 		c.AddError(vadutil.ErrInvalidID(c))
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
@@ -241,7 +241,7 @@ func UserUpdates(c *xin.Context) {
 		tx = tx.Where("id <> ?", au.ID)
 		tx = tx.Where("role >= ?", au.Role)
 
-		if uua.ID != "*" {
+		if len(ids) > 0 {
 			tx = tx.Where("id IN ?", ids)
 		}
 
@@ -282,10 +282,8 @@ func UserUpdates(c *xin.Context) {
 }
 
 func UserDeletes(c *xin.Context) {
-	id := c.PostForm("id")
-	ids := handlers.SplitIDs(id)
-
-	if id != "*" && len(ids) == 0 {
+	ids, ida := handlers.SplitIDs(c.PostForm("id"))
+	if len(ids) == 0 && !ida {
 		c.AddError(vadutil.ErrInvalidID(c))
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
@@ -301,7 +299,7 @@ func UserDeletes(c *xin.Context) {
 		tx = tx.Where("id <> ?", au.ID)
 		tx = tx.Where("role >= ?", au.Role)
 
-		if id != "*" {
+		if len(ids) > 0 {
 			tx = tx.Where("id IN ?", ids)
 		}
 

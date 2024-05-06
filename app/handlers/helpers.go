@@ -11,9 +11,12 @@ import (
 	"github.com/askasoft/pango/xin"
 )
 
-func SplitIDs(id string) []int64 {
-	if id == "" || id == "*" {
-		return nil
+func SplitIDs(id string) ([]int64, bool) {
+	if id == "" {
+		return nil, false
+	}
+	if id == "*" {
+		return nil, true
 	}
 
 	ss := str.FieldsByte(id, ',')
@@ -24,7 +27,7 @@ func SplitIDs(id string) []int64 {
 			ids = append(ids, id)
 		}
 	}
-	return ids
+	return ids, false
 }
 
 func H(c *xin.Context) xin.H {

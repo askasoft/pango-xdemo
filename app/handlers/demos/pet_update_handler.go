@@ -208,8 +208,8 @@ func PetUpdates(c *xin.Context) {
 		return
 	}
 
-	ids := handlers.SplitIDs(pua.ID)
-	if pua.ID != "*" && len(ids) == 0 {
+	ids, ida := handlers.SplitIDs(pua.ID)
+	if len(ids) == 0 && !ida {
 		c.AddError(vadutil.ErrInvalidID(c))
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
@@ -221,7 +221,7 @@ func PetUpdates(c *xin.Context) {
 	err := app.GDB.Session(&gorm.Session{AllowGlobalUpdate: true}).Transaction(func(db *gorm.DB) error {
 		tx := db.Table(tt.TablePets())
 
-		if pua.ID != "*" {
+		if len(ids) > 0 {
 			tx = tx.Where("id IN ?", ids)
 		}
 
@@ -270,10 +270,8 @@ func PetUpdates(c *xin.Context) {
 }
 
 func PetDeletes(c *xin.Context) {
-	id := c.PostForm("id")
-	ids := handlers.SplitIDs(id)
-
-	if id != "*" && len(ids) == 0 {
+	ids, ida := handlers.SplitIDs(c.PostForm("id"))
+	if len(ids) == 0 && !ida {
 		c.AddError(vadutil.ErrInvalidID(c))
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
@@ -283,7 +281,7 @@ func PetDeletes(c *xin.Context) {
 
 	var cnt int64
 	err := app.GDB.Session(&gorm.Session{AllowGlobalUpdate: true}).Transaction(func(db *gorm.DB) error {
-		if id == "*" {
+		if len(ids) > 0 {
 			gfs := tt.GFS(db)
 			if _, err := gfs.DeletePrefix("/" + models.PrefixPetFile + "/"); err != nil {
 				return err
@@ -299,7 +297,7 @@ func PetDeletes(c *xin.Context) {
 		}
 
 		tx := db.Table(tt.TablePets())
-		if id != "*" {
+		if len(ids) > 0 {
 			tx = tx.Where("id IN ?", ids)
 		}
 
