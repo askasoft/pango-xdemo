@@ -23,13 +23,7 @@ $(function() {
 				main.form_clear_invalid($f);
 				main.loadmask();
 			},
-			success: function(data, ts, xhr) {
-				$('#pets_list').html(data);
-
-				$('#pets_list [checkall]').checkall();
-				$('#pets_list [data-spy="pager"]').pager();
-				$('#pets_list [data-spy="sortable"]').sortable();
-			},
+			success: main.list_builder($('#pets_list')),
 			error: main.form_ajax_error($f),
 			complete: main.unloadmask
 		});
@@ -43,19 +37,7 @@ $(function() {
 		$('#pets_listfset').fieldset('expand', 'show');
 	}
 
-	$('#pets_list')
-		.on('goto.pager', '.ui-pager', function(evt, pno) {
-			$('#pets_listform').find('input[name="p"]').val(pno).end().submit();
-		})
-		.on('change', '.ui-pager select', function() {
-			$('#pets_listform').find('input[name="l"]').val($(this).val()).end().submit();
-		})
-		.on('sort.sortable', '#pets_table', function(evt, col, dir) {
-			$('#pets_listform')
-				.find('input[name="c"]').val(col).end()
-				.find('input[name="d"]').val(dir).end()
-				.submit();
-		});
+	main.list_events('pets');
 
 	$('#pets_listform').on('submit', pets_search).submit();
 	$('#pets_listform').on('reset', pets_reset);

@@ -23,13 +23,7 @@ $(function() {
 				main.form_clear_invalid($f);
 				main.loadmask();
 			},
-			success: function(data, ts, xhr) {
-				$('#users_list').html(data);
-
-				$('#users_list [checkall]').checkall();
-				$('#users_list [data-spy="pager"]').pager();
-				$('#users_list [data-spy="sortable"]').sortable();
-			},
+			success: main.list_builder($('#users_list')),
 			error: main.form_ajax_error($f),
 			complete: main.unloadmask
 		});
@@ -43,19 +37,7 @@ $(function() {
 		$('#users_listfset').fieldset('expand', 'show');
 	}
 
-	$('#users_list')
-		.on('goto.pager', '.ui-pager', function(evt, pno) {
-			$('#users_listform').find('input[name="p"]').val(pno).end().submit();
-		})
-		.on('change', '.ui-pager select', function() {
-			$('#users_listform').find('input[name="l"]').val($(this).val()).end().submit();
-		})
-		.on('sort.sortable', '#users_table', function(evt, col, dir) {
-			$('#users_listform')
-				.find('input[name="c"]').val(col).end()
-				.find('input[name="d"]').val(dir).end()
-				.submit();
-		});
+	main.list_events('users');
 
 	$('#users_listform').on('submit', users_search).submit();
 	$('#users_listform').on('reset', users_reset);

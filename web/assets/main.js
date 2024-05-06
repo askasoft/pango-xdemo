@@ -147,6 +147,32 @@ var main = {
 		});
 	},
 
+	// list
+	list_events: function(name) {
+		var $l = $('#' + name + '_list'), $f = $('#' + name + '_listform'), tb = '#' + name + '_table';
+
+		$l.on('goto.pager', '.ui-pager', function(evt, pno) {
+			$f.find('input[name="p"]').val(pno).end().submit();
+		});
+		$l.on('change', '.ui-pager select', function() {
+			$f.find('input[name="l"]').val($(this).val()).end().submit();
+		});
+		$l.on('sort.sortable', tb, function(evt, col, dir) {
+			$f.find('input[name="c"]').val(col);
+			$f.find('input[name="d"]').val(dir);
+			$f.submit();
+		});
+	},
+	list_builder: function($l) {
+		return function(data) {
+			$l.html(data);
+
+			$l.find('[checkall]').checkall();
+			$l.find('[data-spy="pager"]').pager();
+			$l.find('[data-spy="sortable"]').sortable();
+		};
+	},
+
 	// form input (not hidden) values
 	form_input_values: function($f) {
 		var vs = $f.formValues();
