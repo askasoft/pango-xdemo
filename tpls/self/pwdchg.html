@@ -17,25 +17,25 @@
 	<form id="pwdchg_form" class="form-horizontal" autocomplete="off">
 		<input type="hidden" name="_token_" value="{{.Token}}"/>
 		<div class="row py-3">
-			<label class="col-sm-2 col-form-label">{{T .Loc "pwdchg.oldpwd"}}</label>
-			<div class="col-sm-10">
+			<label class="col-md-2 col-form-label">{{T .Loc "pwdchg.oldpwd"}}</label>
+			<div class="col-md-10">
 				<input name="oldpwd" type="password" class="form-control" size="40" maxlength="16" textclear/>
 			</div>
 		</div>
 		<div class="row py-3">
-			<label class="col-sm-2 col-form-label">{{T .Loc "pwdchg.newpwd"}}</label>
-			<div class="col-sm-10">
+			<label class="col-md-2 col-form-label">{{T .Loc "pwdchg.newpwd"}}</label>
+			<div class="col-md-10">
 				<input name="newpwd" type="password" class="form-control" size="40" maxlength="16" textclear/>
 			</div>
 		</div>
 		<div class="row py-3">
-			<label class="col-sm-2 col-form-label">{{T .Loc "pwdchg.conpwd"}}</label>
-			<div class="col-sm-10">
+			<label class="col-md-2 col-form-label">{{T .Loc "pwdchg.conpwd"}}</label>
+			<div class="col-md-10">
 				<input name="conpwd" type="password" class="form-control" size="40" maxlength="16" textclear/>
 			</div>
 		</div>
 		<div class="row py-3">
-			<div class="offset-sm-2 col-sm-10">
+			<div class="offset-md-2 col-md-10">
 				<button type="submit" class="btn btn-primary">
 					<i class="{{T .Loc "icon.save"}}"></i>
 					{{T .Loc "button.change"}}

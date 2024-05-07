@@ -8,80 +8,80 @@
 	<input type="hidden" name="_token_" value="{{.Token}}"/>
 	<input type="hidden" id="pet_detail_id" name="id" value="{{.Pet.ID}}"/>
 	<div class="row py-3">
-		<label class="col-sm-2 col-form-label required">{{T .Loc "pet.name"}}</label>
-		<div class="col-sm-10">
+		<label class="col-md-2 col-form-label required">{{T .Loc "pet.name"}}</label>
+		<div class="col-md-10">
 			<input id="pet_detail_name" name="name" type="text" class="form-control" maxlength="100" value="{{.Pet.Name}}">
 		</div>
 	</div>
 	<div class="row py-3">
-		<label class="col-sm-2 col-form-label required">{{T .Loc "pet.gender"}}</label>
-		<div class="col-sm-10">
+		<label class="col-md-2 col-form-label required">{{T .Loc "pet.gender"}}</label>
+		<div class="col-md-10">
 			{{Radios "Name=" "gender" "List=" .PetGenderMap.Iterator "Value=" .Pet.Gender}}
 		</div>
 	</div>
 	<div class="row py-3">
-		<label class="col-sm-2 col-form-label required">{{T .Loc "pet.born_at"}}</label>
-		<div class="col-sm-10">
+		<label class="col-md-2 col-form-label required">{{T .Loc "pet.born_at"}}</label>
+		<div class="col-md-10">
 			<input name="born_at" type="date" class="form-control" value="{{DATE .Pet.BornAt}}">
 		</div>
 	</div>
 	<div class="row py-3">
-		<label class="col-sm-2 col-form-label required">{{T .Loc "pet.origin"}}</label>
-		<div class="col-sm-10">
+		<label class="col-md-2 col-form-label required">{{T .Loc "pet.origin"}}</label>
+		<div class="col-md-10">
 			{{Select "Name=" "origin" "List=" .PetOriginMap.Iterator "Value=" .Pet.Origin "class=" "wide col2" "data-spy=" "niceSelect"}}
 		</div>
 	</div>
 	<div class="row py-3">
-		<label class="col-sm-2 col-form-label">{{T .Loc "pet.temper"}}</label>
-		<div class="col-sm-10">
+		<label class="col-md-2 col-form-label">{{T .Loc "pet.temper"}}</label>
+		<div class="col-md-10">
 			{{Radios "Name=" "temper" "List=" .PetTemperMap.Iterator "Value=" .Pet.Temper}}
 		</div>
 	</div>
 	<div class="row py-3">
-		<label class="col-sm-2 col-form-label">{{T .Loc "pet.habits"}}</label>
-		<div class="col-sm-10">
+		<label class="col-md-2 col-form-label">{{T .Loc "pet.habits"}}</label>
+		<div class="col-md-10">
 			{{Checks "Name=" "habits" "List=" .PetHabitsMap.Iterator "Values=" .Pet.Habits}}
 		</div>
 	</div>
 	<div class="row py-3">
-		<label class="col-sm-2 col-form-label">{{T .Loc "pet.amount"}}</label>
-		<div class="col-sm-10">
+		<label class="col-md-2 col-form-label">{{T .Loc "pet.amount"}}</label>
+		<div class="col-md-10">
 			<input name="amount" type="number" class="form-control" size="20" value="{{.Pet.Amount}}">
 		</div>
 	</div>
 	<div class="row py-3">
-		<label class="col-sm-2 col-form-label">{{T .Loc "pet.price"}}</label>
-		<div class="col-sm-10">
+		<label class="col-md-2 col-form-label">{{T .Loc "pet.price"}}</label>
+		<div class="col-md-10">
 			<input name="price" type="number" class="form-control" size="20" value="{{.Pet.Price}}">
 		</div>
 	</div>
 	<div class="row py-3">
-		<label class="col-sm-2 col-form-label">{{T .Loc "pet.shop_name"}}</label>
-		<div class="col-sm-10">
+		<label class="col-md-2 col-form-label">{{T .Loc "pet.shop_name"}}</label>
+		<div class="col-md-10">
 			<input name="shop_name" type="text" class="form-control" maxlength="200" value="{{.Pet.ShopName}}">
 		</div>
 	</div>
 	<div class="row py-3">
-		<label class="col-sm-2 col-form-label">{{T .Loc "pet.shop_address"}}</label>
-		<div class="col-sm-10">
+		<label class="col-md-2 col-form-label">{{T .Loc "pet.shop_address"}}</label>
+		<div class="col-md-10">
 			<input name="shop_address" type="text" class="form-control" maxlength="200" value="{{.Pet.ShopAddress}}">
 		</div>
 	</div>
 	<div class="row py-3">
-		<label class="col-sm-2 col-form-label">{{T .Loc "pet.shop_telephone"}}</label>
-		<div class="col-sm-10">
+		<label class="col-md-2 col-form-label">{{T .Loc "pet.shop_telephone"}}</label>
+		<div class="col-md-10">
 			<input name="shop_telephone" type="text" class="form-control" size="20" maxlength="20" value="{{.Pet.ShopTelephone}}">
 		</div>
 	</div>
 	<div class="row py-3">
-		<label class="col-sm-2 col-form-label">{{T .Loc "pet.shop_link"}}</label>
-		<div class="col-sm-10">
+		<label class="col-md-2 col-form-label">{{T .Loc "pet.shop_link"}}</label>
+		<div class="col-md-10">
 			<input name="shop_link" type="text" class="form-control" maxlength="1000" value="{{.Pet.ShopLink}}">
 		</div>
 	</div>
 	<div class="row py-3">
-		<label class="col-sm-2 col-form-label">{{T .Loc "pet.description"}}</label>
-		<div class="col-sm-10">
+		<label class="col-md-2 col-form-label">{{T .Loc "pet.description"}}</label>
+		<div class="col-md-10">
 			<textarea name="description" class="form-control" rows="2">{{.Pet.Description}}</textarea>
 		</div>
 	</div>
