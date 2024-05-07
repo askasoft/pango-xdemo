@@ -40,14 +40,14 @@ func petDetail(c *xin.Context, edit bool) {
 	tt := tenant.FromCtx(c)
 
 	pet := &models.Pet{}
-	r := app.GDB.Table(tt.TablePets()).Where("id = ?", pid).Take(pet)
-	if errors.Is(r.Error, gorm.ErrRecordNotFound) {
-		c.AddError(r.Error)
+	err := app.GDB.Table(tt.TablePets()).Where("id = ?", pid).Take(pet).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		c.AddError(err)
 		c.JSON(http.StatusNotFound, handlers.E(c))
 		return
 	}
-	if r.Error != nil {
-		c.AddError(r.Error)
+	if err != nil {
+		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return
 	}
@@ -300,7 +300,6 @@ func PetDeletes(c *xin.Context) {
 		if len(ids) > 0 {
 			tx = tx.Where("id IN ?", ids)
 		}
-
 		r := tx.Delete(&models.Pet{})
 		if r.Error != nil {
 			return r.Error

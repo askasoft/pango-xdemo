@@ -57,7 +57,7 @@
 			<div class="row py-1">
 				<label class="col-sm-2 col-form-label">{{T .Loc "pet.gender"}}</label>
 				<div class="col-sm-10">
-					{{Checks "List=" .PetGenderMap.Iterator "Name=" "gender" "Values=" .Q.Gender}}
+					{{Checks "Name=" "gender" "List=" .PetGenderMap.Iterator "Values=" .Q.Gender}}
 				</div>
 			</div>
 			<div class="row py-1">
@@ -71,19 +71,19 @@
 			<div class="row py-1">
 				<label class="col-sm-2 col-form-label">{{T .Loc "pet.origin"}}</label>
 				<div class="col-sm-10">
-					{{Select "List=" .PetOriginMap.Iterator "Name=" "origin" "Values=" .Q.Origin "Multiple=" true "class=" "col2 wide" "data-spy=" "niceSelect"}}
+					{{Select "Name=" "origin" "List=" .PetOriginMap.Iterator "Values=" .Q.Origin "Multiple=" true "class=" "col2 wide" "data-spy=" "niceSelect"}}
 				</div>
 			</div>
 			<div class="row py-1">
 				<label class="col-sm-2 col-form-label">{{T .Loc "pet.temper"}}</label>
 				<div class="col-sm-10">
-					{{Checks "List=" .PetTemperMap.Iterator "Name=" "temper" "Values=" .Q.Temper}}
+					{{Checks "Name=" "temper" "List=" .PetTemperMap.Iterator "Values=" .Q.Temper}}
 				</div>
 			</div>
 			<div class="row py-1">
 				<label class="col-sm-2 col-form-label">{{T .Loc "pet.habits"}}</label>
 				<div class="col-sm-10">
-					{{Checks "List=" .PetHabitsMap.Iterator "Name=" "habits" "Values=" .Q.Habits}}
+					{{Checks "Name=" "habits" "List=" .PetHabitsMap.Iterator "Values=" .Q.Habits}}
 				</div>
 			</div>
 			<div class="row py-1">

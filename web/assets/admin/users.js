@@ -152,7 +152,7 @@ $(function() {
 					text: data.success
 				});
 
-				var user = data.user, $tr = $('tr#user_' + user.id);
+				var user = data.user, $tr = $('#user_' + user.id);
 
 				user_set_tr_values($tr, user);
 			},

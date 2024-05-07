@@ -70,13 +70,13 @@
 			<div class="row py-1">
 				<label class="col-sm-2 col-form-label">{{T .Loc "user.role"}}</label>
 				<div class="col-sm-10">
-					{{Checks "List=" .UserRoleMap.Iterator "Name=" "role" "Values=" .Q.Role}}
+					{{Checks "Name=" "role" "List=" .UserRoleMap.Iterator "Values=" .Q.Role}}
 				</div>
 			</div>
 			<div class="row py-1">
 				<label class="col-sm-2 col-form-label">{{T .Loc "user.status"}}</label>
 				<div class="col-sm-10">
-					{{Checks "List=" .UserStatusMap.Iterator "Name=" "status" "Values=" .Q.Status}}
+					{{Checks "Name=" "status" "List=" .UserStatusMap.Iterator "Values=" .Q.Status}}
 				</div>
 			</div>
 			<div class="row py-1">

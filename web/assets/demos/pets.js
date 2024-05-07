@@ -163,7 +163,7 @@ $(function() {
 					text: data.success
 				});
 
-				var pet = data.pet, $tr = $('tr#pet_' + pet.id);
+				var pet = data.pet, $tr = $('#pet_' + pet.id);
 
 				pet_set_tr_values($tr, pet);
 			},

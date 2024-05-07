@@ -43,14 +43,14 @@ func UserDetail(c *xin.Context) {
 	tt := tenant.FromCtx(c)
 
 	user := &models.User{}
-	r := app.GDB.Table(tt.TableUsers()).Where("id = ?", aid).Take(user)
-	if errors.Is(r.Error, gorm.ErrRecordNotFound) {
-		c.AddError(r.Error)
+	err := app.GDB.Table(tt.TableUsers()).Where("id = ?", aid).Take(user).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		c.AddError(err)
 		c.JSON(http.StatusNotFound, handlers.E(c))
 		return
 	}
-	if r.Error != nil {
-		c.AddError(r.Error)
+	if err != nil {
+		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return
 	}
@@ -295,14 +295,11 @@ func UserDeletes(c *xin.Context) {
 	var cnt int64
 	err := app.GDB.Transaction(func(db *gorm.DB) error {
 		tx := db.Table(tt.TableUsers())
-
 		tx = tx.Where("id <> ?", au.ID)
 		tx = tx.Where("role >= ?", au.Role)
-
 		if len(ids) > 0 {
 			tx = tx.Where("id IN ?", ids)
 		}
-
 		r := tx.Delete(&models.User{})
 		if r.Error != nil {
 			return r.Error
