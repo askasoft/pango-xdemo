@@ -18,6 +18,7 @@ import (
 	"github.com/askasoft/pango/fsu"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/srv"
+	"github.com/askasoft/pango/str"
 )
 
 // -----------------------------------
@@ -37,7 +38,7 @@ func (s *service) PrintCommand(out io.Writer) {
 	fmt.Fprintln(out, "    execsql <file>      execute sql file.")
 	fmt.Fprintln(out, "    encrypt [key] <str> encrypt string.")
 	fmt.Fprintln(out, "    decrypt [key] <str> decrypt string.")
-	fmt.Fprintln(out, "    assets              export assets.")
+	fmt.Fprintln(out, "    assets  [dir]       export assets to directory.")
 	srv.PrintDefaultCommand(out)
 }
 
@@ -116,7 +117,7 @@ func (s *service) Exec(cmd string) {
 		fmt.Println(utils.Decrypt(k, v))
 		app.Exit(0)
 	case "assets":
-		exportAssets()
+		exportAssets(flag.Arg(1))
 		app.Exit(0)
 	default:
 		flag.CommandLine.SetOutput(os.Stdout)
@@ -139,25 +140,26 @@ func cryptFlags() (k, v string) {
 //-------------------------------------------
 // assets
 
-func exportAssets() {
+func exportAssets(dir string) {
+	dir = str.IfEmpty(dir, ".")
 	mt := app.BuildTime
 
-	if err := saveFS(txts.FS, "txts", mt); err != nil {
+	if err := saveFS(txts.FS, filepath.Join(dir, "txts"), mt); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		return
 	}
-	if err := saveFS(tpls.FS, "tpls", mt); err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		return
-	}
-
-	if err := saveFS(web.FS, "web", mt); err != nil {
+	if err := saveFS(tpls.FS, filepath.Join(dir, "tpls"), mt); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		return
 	}
 
-	for path, fs := range web.Statics {
-		if err := saveFS(fs, "web/static/"+path, mt); err != nil {
+	if err := saveFS(web.FS, filepath.Join(dir, "web"), mt); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		return
+	}
+
+	for key, fs := range web.Statics {
+		if err := saveFS(fs, filepath.Join(dir, "web", "static", key), mt); err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			return
 		}
