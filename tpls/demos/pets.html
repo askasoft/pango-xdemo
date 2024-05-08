@@ -158,13 +158,11 @@
 		<input type="hidden" name="id"/>
 		<div class="row py-3">
 			<label class="col-md-2 col-form-label required">{{T .Loc "pet.gender"}} <input type="checkbox"></label>
-			<div class="col-md-10">
+			<div class="col-md-4">
 				{{Radios "Name=" "gender" "List=" .PetGenderMap.Iterator "Value=" "M" "Disabled=" true}}
 			</div>
-		</div>
-		<div class="row py-3">
 			<label class="col-md-2 col-form-label required">{{T .Loc "pet.born_at"}} <input type="checkbox" name="uborn_at" value="true"></label>
-			<div class="col-md-10">
+			<div class="col-md-4">
 				<input name="born_at" type="date" class="form-control" disabled>
 			</div>
 		</div>
@@ -194,7 +192,7 @@
 	</div>
 </div>
 
-<div id="pets_detail_popup" class="ui-popup s-popup-detail w800" data-spy="popup" tabindex="-1"
+<div id="pets_detail_popup" class="ui-popup s-popup-detail mw1000" data-spy="popup" tabindex="-1"
 	popup-position="center" popup-keyboard="false" popup-mouse="false" popup-mask="false" popup-closer="true" popup-loader="true"
 	popup-focus="#pet_detail_name"></div>
 

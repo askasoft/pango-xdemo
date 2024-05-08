@@ -6,56 +6,54 @@
 </div>
 <div class="ui-popup-body ui-view lined grey">
 	<div class="row py-3">
-		<label class="col-md-2 ui-label">{{T .Loc "pet.name"}}</label>
-		<div class="col-md-10 ui-value">{{.Pet.Name}}</div>
+		<label class="col ui-label">{{T .Loc "pet.name"}}</label>
+		<div class="col-10 ui-value">{{.Pet.Name}}</div>
 	</div>
 	<div class="row py-3">
-		<label class="col-md-2 ui-label">{{T .Loc "pet.gender"}}</label>
-		<div class="col-md-10 ui-value">{{.PetGenderMap.MustGet .Pet.Gender .Pet.Gender}}</div>
+		<label class="col ui-label">{{T .Loc "pet.photo"}}</label>
+		<div class="col-10 ui-value"><img src="{{.Base}}/files{{.Pet.PhotoURI}}"></div>
 	</div>
 	<div class="row py-3">
-		<label class="col-md-2 ui-label">{{T .Loc "pet.born_at"}}</label>
-		<div class="col-md-10 ui-value">{{DATE .Pet.BornAt}}</div>
+		<label class="col ui-label">{{T .Loc "pet.gender"}}</label>
+		<div class="col-4 ui-value">{{.PetGenderMap.MustGet .Pet.Gender .Pet.Gender}}</div>
+		<label class="col ui-label">{{T .Loc "pet.born_at"}}</label>
+		<div class="col-4 ui-value">{{DATE .Pet.BornAt}}</div>
 	</div>
 	<div class="row py-3">
-		<label class="col-md-2 ui-label">{{T .Loc "pet.origin"}}</label>
-		<div class="col-md-10 ui-value">{{.PetOriginMap.MustGet .Pet.Origin .Pet.Origin}}</div>
+		<label class="col ui-label">{{T .Loc "pet.origin"}}</label>
+		<div class="col-10 ui-value">{{.PetOriginMap.MustGet .Pet.Origin .Pet.Origin}}</div>
 	</div>
 	<div class="row py-3">
-		<label class="col-md-2 ui-label">{{T .Loc "pet.temper"}}</label>
-		<div class="col-md-10 ui-value">{{.PetTemperMap.MustGet .Pet.Temper .Pet.Temper}}</div>
+		<label class="col ui-label">{{T .Loc "pet.temper"}}</label>
+		<div class="col-4 ui-value">{{.PetTemperMap.MustGet .Pet.Temper .Pet.Temper}}</div>
+		<label class="col ui-label">{{T .Loc "pet.habits"}}</label>
+		<div class="col-4 ui-value">{{range $h := .Pet.Habits}}<b>{{$.PetHabitsMap.MustGet $h $h}}</b>{{end}}</div>
 	</div>
 	<div class="row py-3">
-		<label class="col-md-2 ui-label">{{T .Loc "pet.habits"}}</label>
-		<div class="col-md-10 ui-value">{{range $h := .Pet.Habits}}<b>{{$.PetHabitsMap.MustGet $h $h}}</b>{{end}}</div>
+		<label class="col ui-label">{{T .Loc "pet.amount"}}</label>
+		<div class="col-4 ui-value">{{.Pet.Amount}}</div>
+		<label class="col ui-label">{{T .Loc "pet.price"}}</label>
+		<div class="col-4 ui-value">{{.Pet.Price}}</div>
 	</div>
 	<div class="row py-3">
-		<label class="col-md-2 ui-label">{{T .Loc "pet.amount"}}</label>
-		<div class="col-md-10 ui-value">{{.Pet.Amount}}</div>
+		<label class="col ui-label">{{T .Loc "pet.shop_name"}}</label>
+		<div class="col-10 ui-value">{{.Pet.ShopName}}</div>
 	</div>
 	<div class="row py-3">
-		<label class="col-md-2 ui-label">{{T .Loc "pet.price"}}</label>
-		<div class="col-md-10 ui-value">{{.Pet.Price}}</div>
+		<label class="col ui-label">{{T .Loc "pet.shop_address"}}</label>
+		<div class="col-10 ui-value">{{.Pet.ShopAddress}}</div>
 	</div>
 	<div class="row py-3">
-		<label class="col-md-2 ui-label">{{T .Loc "pet.shop_name"}}</label>
-		<div class="col-md-10 ui-value">{{.Pet.ShopName}}</div>
+		<label class="col ui-label">{{T .Loc "pet.shop_telephone"}}</label>
+		<div class="col-10 ui-value">{{.Pet.ShopTelephone}}</div>
 	</div>
 	<div class="row py-3">
-		<label class="col-md-2 ui-label">{{T .Loc "pet.shop_address"}}</label>
-		<div class="col-md-10 ui-value">{{.Pet.ShopAddress}}</div>
+		<label class="col ui-label">{{T .Loc "pet.shop_link"}}</label>
+		<div class="col-10 ui-value">{{if .Pet.ShopLink}}<a href="{{.Pet.ShopLink}}" taret="_blank">{{.Pet.ShopLink}}</a>{{end}}</div>
 	</div>
 	<div class="row py-3">
-		<label class="col-md-2 ui-label">{{T .Loc "pet.shop_telephone"}}</label>
-		<div class="col-md-10 ui-value">{{.Pet.ShopTelephone}}</div>
-	</div>
-	<div class="row py-3">
-		<label class="col-md-2 ui-label">{{T .Loc "pet.shop_link"}}</label>
-		<div class="col-md-10 ui-value">{{if .Pet.ShopLink}}<a href="{{.Pet.ShopLink}}" taret="_blank">{{.Pet.ShopLink}}</a>{{end}}</div>
-	</div>
-	<div class="row py-3">
-		<label class="col-md-2 ui-label">{{T .Loc "pet.description"}}</label>
-		<div class="col-md-10 ui-value">{{.Pet.Description}}</div>
+		<label class="col ui-label">{{T .Loc "pet.description"}}</label>
+		<div class="col-10 ui-value">{{.Pet.Description}}</div>
 	</div>
 </div>
 <div class="ui-popup-footer">

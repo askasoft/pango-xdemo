@@ -119,6 +119,7 @@ $(function() {
 			$('#pets_detail_popup')
 				.find('.ui-popup-body').prop('scrollTop', 0).end()
 				.find('[data-spy="niceSelect"]').niceSelect().end()
+				.find('[data-spy="uploader"]').uploader().end()
 				.find('input[type="text"]').textclear().end()
 				.find('textarea').autosize().textclear().enterfire();
 			$(window).trigger('resize');

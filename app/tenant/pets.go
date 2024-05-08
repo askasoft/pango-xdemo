@@ -1,7 +1,9 @@
 package tenant
 
 import (
+	"fmt"
 	"math/rand"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -9,16 +11,18 @@ import (
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
 	"github.com/askasoft/pango/cog"
+	"github.com/askasoft/pango/fsu"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/str"
+	"github.com/askasoft/pango/xfs"
 	"gorm.io/gorm"
 )
 
 func (tt Tenant) ResetPets(logger log.Logger) error {
 	err := app.GDB.Session(&gorm.Session{AllowGlobalUpdate: true}).Transaction(func(db *gorm.DB) error {
-		gfs := tt.GFS(db)
 		logger.Infof("Delete Pet Files: /%s", models.PrefixPetFile)
+		gfs := tt.GFS(db)
 		if _, err := gfs.DeletePrefix("/" + models.PrefixPetFile + "/"); err != nil {
 			return err
 		}
@@ -33,11 +37,11 @@ func (tt Tenant) ResetPets(logger log.Logger) error {
 			return err
 		}
 
-		if err := initPets(logger, db, 1000, "dog"); err != nil {
+		if err := tt.initPets(logger, db, 1000, "dog"); err != nil {
 			return err
 		}
 
-		if err := initPets(logger, db, 2000, "cat"); err != nil {
+		if err := tt.initPets(logger, db, 2000, "cat"); err != nil {
 			return err
 		}
 
@@ -47,17 +51,19 @@ func (tt Tenant) ResetPets(logger log.Logger) error {
 	return err
 }
 
-func initPets(logger log.Logger, db *gorm.DB, cid int64, cat string) error {
-	// ipath := "./pets/"
+func (tt Tenant) initPets(logger log.Logger, db *gorm.DB, cid int64, cat string) error {
+	ipath := "./data/pets/"
 
-	// imgs := []string{}
-	// for i := 1; ; i++ {
-	// 	fn := filepath.Join(ipath, cat+str.PadLeft(num.Itoa(i), 2, "0")+".jpg")
-	// 	if err := fsu.FileExists(fn); err != nil {
-	// 		break
-	// 	}
-	// 	imgs = append(imgs, fn)
-	// }
+	imgs := []string{}
+	for i := 1; ; i++ {
+		fn := filepath.Join(ipath, fmt.Sprintf("%s%02d.jpg", cat, i))
+		if err := fsu.FileExists(fn); err != nil {
+			break
+		}
+		imgs = append(imgs, fn)
+	}
+
+	gfs := tt.GFS(db)
 
 	pgs := tbsutil.GetPetGenderMap("").Keys()
 	pos := tbsutil.GetPetOriginMap("").Keys()
@@ -66,8 +72,6 @@ func initPets(logger log.Logger, db *gorm.DB, cid int64, cat string) error {
 
 	bd, _ := time.Parse(time.RFC3339, "2000-01-01T10:04:05+09:00")
 	for i := 0; i < 100; i++ {
-		//		File f = files.get(Randoms.randInt(files.size()));
-
 		pet := &models.Pet{
 			ID:          cid*1000 + int64(i),
 			Name:        cat + " " + str.PadLeft(num.Itoa(i), 2, "0") + " " + petRandText(5),
@@ -80,24 +84,21 @@ func initPets(logger log.Logger, db *gorm.DB, cid int64, cat string) error {
 			Price:       rand.Float64() * 10000,                                                              //nolint: gosec
 			ShopName:    petRandText(10),
 			Description: petRandText(64),
+			CreatedAt:   time.Now(),
+			UpdatedAt:   time.Now(),
 		}
 
 		logger.Infof("Create Pet: #%d %s", pet.ID, pet.Name)
 		if err := db.Create(pet).Error; err != nil {
 			return err
 		}
-		// // Pet Image
-		// PetImage pi = new PetImage();
-		// pi.setId(p.getId());
-		// pi.setPid(p.getId());
-		// pi.setImageName(f.getName());
-		// pi.setImageSize((int)f.length());
-		// pi.setImageData(Files.readToBytes(f));
-		// assist().setCreatedByFields(pi);
 
-		// dao.insert(pi);
-		// status.count++;
-		// printInfo("Add PetImage: " + pi.getId() + " / " + pi.getImageName());
+		if len(imgs) > 0 {
+			img := imgs[rand.Intn(len(imgs))] //nolint: gosec
+			if _, err := xfs.SaveLocalFile(gfs, pet.PhotoPath(), img); err != nil {
+				return err
+			}
+		}
 	}
 
 	return nil

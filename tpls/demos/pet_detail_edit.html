@@ -14,14 +14,27 @@
 		</div>
 	</div>
 	<div class="row py-3">
-		<label class="col-md-2 col-form-label required">{{T .Loc "pet.gender"}}</label>
+		<label class="col-md-2 col-form-label">{{T .Loc "pet.photo"}}</label>
+	{{if ne .Pet.ID 0}}
+		<div class="col-md-5"><img src="{{.Base}}/files{{.Pet.PhotoURI}}"></div>
+		<div class="col-md-5">
+	{{else}}
 		<div class="col-md-10">
-			{{Radios "Name=" "gender" "List=" .PetGenderMap.Iterator "Value=" .Pet.Gender}}
+	{{end}}
+			<div data-spy="uploader" data-upload-remover="true" data-dnload-view="true"
+				data-upload-url="{{.Base}}/files/upload" data-dnload-url="{{.Base}}/files$">
+				<input type="file" name="file" class="ui-uploader-file" accept="image/*" style="display:none"/>
+				<a class="btn btn-sm btn-secondary ui-uploader-btn">{{T .Loc "button.browse"}}...</a>
+			</div>
 		</div>
 	</div>
 	<div class="row py-3">
+		<label class="col-md-2 col-form-label required">{{T .Loc "pet.gender"}}</label>
+		<div class="col-md-4">
+			{{Radios "Name=" "gender" "List=" .PetGenderMap.Iterator "Value=" .Pet.Gender}}
+		</div>
 		<label class="col-md-2 col-form-label required">{{T .Loc "pet.born_at"}}</label>
-		<div class="col-md-10">
+		<div class="col-md-4">
 			<input name="born_at" type="date" class="form-control" value="{{DATE .Pet.BornAt}}">
 		</div>
 	</div>
@@ -45,37 +58,31 @@
 	</div>
 	<div class="row py-3">
 		<label class="col-md-2 col-form-label">{{T .Loc "pet.amount"}}</label>
-		<div class="col-md-10">
+		<div class="col-md-4">
 			<input name="amount" type="number" class="form-control" size="20" value="{{.Pet.Amount}}">
 		</div>
-	</div>
-	<div class="row py-3">
 		<label class="col-md-2 col-form-label">{{T .Loc "pet.price"}}</label>
-		<div class="col-md-10">
+		<div class="col-md-4">
 			<input name="price" type="number" class="form-control" size="20" value="{{.Pet.Price}}">
 		</div>
 	</div>
 	<div class="row py-3">
 		<label class="col-md-2 col-form-label">{{T .Loc "pet.shop_name"}}</label>
-		<div class="col-md-10">
+		<div class="col-md-4">
 			<input name="shop_name" type="text" class="form-control" maxlength="200" value="{{.Pet.ShopName}}">
 		</div>
-	</div>
-	<div class="row py-3">
 		<label class="col-md-2 col-form-label">{{T .Loc "pet.shop_address"}}</label>
-		<div class="col-md-10">
+		<div class="col-md-4">
 			<input name="shop_address" type="text" class="form-control" maxlength="200" value="{{.Pet.ShopAddress}}">
 		</div>
 	</div>
 	<div class="row py-3">
 		<label class="col-md-2 col-form-label">{{T .Loc "pet.shop_telephone"}}</label>
-		<div class="col-md-10">
+		<div class="col-md-4">
 			<input name="shop_telephone" type="text" class="form-control" size="20" maxlength="20" value="{{.Pet.ShopTelephone}}">
 		</div>
-	</div>
-	<div class="row py-3">
 		<label class="col-md-2 col-form-label">{{T .Loc "pet.shop_link"}}</label>
-		<div class="col-md-10">
+		<div class="col-md-4">
 			<input name="shop_link" type="text" class="form-control" maxlength="1000" value="{{.Pet.ShopLink}}">
 		</div>
 	</div>

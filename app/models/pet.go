@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/askasoft/pango/sqx/pqx"
@@ -27,4 +28,12 @@ type Pet struct {
 
 func (p *Pet) String() string {
 	return toString(p)
+}
+
+func (p *Pet) PhotoPath() string {
+	return fmt.Sprintf("/%s/%d/i.jpg", PrefixPetFile, p.ID)
+}
+
+func (p *Pet) PhotoURI() string {
+	return fmt.Sprintf("/%s/%d/i.jpg?%d", PrefixPetFile, p.ID, p.UpdatedAt.UnixMilli())
 }

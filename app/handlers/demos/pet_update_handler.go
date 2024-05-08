@@ -2,6 +2,7 @@ package demos
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -18,6 +19,11 @@ import (
 	"github.com/askasoft/pango/xin"
 	"gorm.io/gorm"
 )
+
+type PetWithFile struct {
+	models.Pet
+	File string `json:"file" form:"file,strip"`
+}
 
 func PetNew(c *xin.Context) {
 	pet := &models.Pet{}
@@ -67,8 +73,8 @@ func PetEdit(c *xin.Context) {
 	petDetail(c, true)
 }
 
-func petBind(c *xin.Context) *models.Pet {
-	pet := &models.Pet{}
+func petBind(c *xin.Context) *PetWithFile {
+	pet := &PetWithFile{}
 	if err := c.Bind(pet); err != nil {
 		vadutil.AddBindErrors(c, err, "pet.")
 	}
@@ -119,7 +125,21 @@ func PetCreate(c *xin.Context) {
 	pet.UpdatedAt = pet.CreatedAt
 
 	tt := tenant.FromCtx(c)
-	if err := app.GDB.Table(tt.TablePets()).Create(pet).Error; err != nil {
+	err := app.GDB.Transaction(func(db *gorm.DB) error {
+		if err := db.Table(tt.TablePets()).Create(&pet.Pet).Error; err != nil {
+			return err
+		}
+		if pet.File != "" {
+			fid := pet.PhotoPath()
+			gfs := tt.GFS(db)
+			if err := gfs.DeleteFile(fid); err != nil {
+				return err
+			}
+			return gfs.MoveFile(pet.File, fid)
+		}
+		return nil
+	})
+	if err != nil {
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return
@@ -132,15 +152,11 @@ func PetCreate(c *xin.Context) {
 }
 
 func PetUpdate(c *xin.Context) {
-	pet := &models.Pet{}
-	if err := c.Bind(pet); err != nil {
-		c.AddError(err)
-		c.JSON(http.StatusBadRequest, handlers.E(c))
-		return
-	}
-
+	pet := petBind(c)
 	if pet.ID == 0 {
 		c.AddError(vadutil.ErrInvalidID(c))
+	}
+	if len(c.Errors) > 0 {
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}
@@ -149,31 +165,48 @@ func PetUpdate(c *xin.Context) {
 
 	tt := tenant.FromCtx(c)
 
-	tx := app.GDB.Table(tt.TablePets())
-	tx = tx.Select(
-		"name",
-		"gender",
-		"born_at",
-		"origin",
-		"temper",
-		"habbits",
-		"amount",
-		"price",
-		"shop_name",
-		"shop_address",
-		"shop_telephone",
-		"updated_at",
-	)
-	r := tx.Updates(pet)
-	if r.Error != nil {
-		c.AddError(r.Error)
+	var cnt int64
+	err := app.GDB.Transaction(func(db *gorm.DB) error {
+		tx := db.Table(tt.TablePets()).Select(
+			"name",
+			"gender",
+			"born_at",
+			"origin",
+			"temper",
+			"habbits",
+			"amount",
+			"price",
+			"shop_name",
+			"shop_address",
+			"shop_telephone",
+			"updated_at",
+		)
+		r := tx.Updates(&pet.Pet)
+		if r.Error != nil {
+			return r.Error
+		}
+
+		cnt = r.RowsAffected
+
+		if pet.File != "" {
+			fid := pet.PhotoPath()
+			gfs := tt.GFS(db)
+			if err := gfs.DeleteFile(fid); err != nil {
+				return err
+			}
+			return gfs.MoveFile(pet.File, fid)
+		}
+		return nil
+	})
+	if err != nil {
+		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return
 	}
 
 	c.JSON(http.StatusOK, xin.H{
 		"pet":     pet,
-		"success": tbs.Format(c.Locale, "pet.success.updates", r.RowsAffected),
+		"success": tbs.Format(c.Locale, "pet.success.updates", cnt),
 	})
 }
 
@@ -281,19 +314,17 @@ func PetDeletes(c *xin.Context) {
 
 	var cnt int64
 	err := app.GDB.Session(&gorm.Session{AllowGlobalUpdate: true}).Transaction(func(db *gorm.DB) error {
+		gfs := tt.GFS(db)
 		if len(ids) > 0 {
-			gfs := tt.GFS(db)
+			for _, id := range ids {
+				if _, err := gfs.DeletePrefix(fmt.Sprintf("/%s/%d/", models.PrefixPetFile, id)); err != nil {
+					return err
+				}
+			}
+		} else {
 			if _, err := gfs.DeletePrefix("/" + models.PrefixPetFile + "/"); err != nil {
 				return err
 			}
-		} else {
-			//TODO
-			// sq := db.Table(tt.TablePets()).Where("id IN ?", arg.IDs)
-
-			// gfs := tt.FS(db)
-			// if _, err := gfs.DeleteWhere("id IN ?", sq); err != nil {
-			// 	return err
-			// }
 		}
 
 		tx := db.Table(tt.TablePets())
