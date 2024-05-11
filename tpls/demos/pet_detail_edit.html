@@ -45,7 +45,7 @@
 		</div>
 	</div>
 	<div class="row py-3">
-		<label class="col-md-2 col-form-label">{{T .Loc "pet.temper"}}</label>
+		<label class="col-md-2 col-form-label required">{{T .Loc "pet.temper"}}</label>
 		<div class="col-md-10">
 			{{Radios "Name=" "temper" "List=" .PetTemperMap.Iterator "Value=" .Pet.Temper}}
 		</div>

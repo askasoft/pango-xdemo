@@ -26,7 +26,11 @@ type PetWithFile struct {
 }
 
 func PetNew(c *xin.Context) {
-	pet := &models.Pet{}
+	pet := &models.Pet{
+		BornAt: time.Now(),
+		Gender: "M",
+		Temper: "N",
+	}
 
 	h := handlers.H(c)
 	h["Pet"] = pet
