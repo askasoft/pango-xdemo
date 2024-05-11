@@ -29,10 +29,10 @@ func UserNew(c *xin.Context) {
 	h["User"] = user
 	userAddMaps(c, h)
 
-	c.HTML(http.StatusOK, "admin/user_detail", h)
+	c.HTML(http.StatusOK, "admin/user_detail_edit", h)
 }
 
-func UserDetail(c *xin.Context) {
+func userDetail(c *xin.Context, edit bool) {
 	aid := num.Atol(c.Query("id"))
 	if aid == 0 {
 		c.AddError(vadutil.ErrInvalidID(c))
@@ -60,7 +60,15 @@ func UserDetail(c *xin.Context) {
 
 	userAddMaps(c, h)
 
-	c.HTML(http.StatusOK, "admin/user_detail", h)
+	c.HTML(http.StatusOK, str.If(edit, "admin/user_detail_edit", "admin/user_detail_view"), h)
+}
+
+func UserView(c *xin.Context) {
+	userDetail(c, false)
+}
+
+func UserEdit(c *xin.Context) {
+	userDetail(c, true)
 }
 
 func userValidateCIDR(c *xin.Context, cidr string) {

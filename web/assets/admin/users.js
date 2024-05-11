@@ -67,6 +67,7 @@ $(function() {
 	function user_new() {
 		$('#users_detail_popup').popup({
 			loaded: false,
+			keyboard: false,
 			ajax: {
 				url: './new',
 				method: 'GET'
@@ -82,16 +83,17 @@ $(function() {
 	//----------------------------------------------------
 	// detail
 	//
-	function user_detail() {
-		var $tr = $(this).closest('tr');
+	function user_detail(self, edit) {
+		var $tr = $(self).closest('tr');
 		var params = {
 			id: $tr.attr('id').replace('user_', '')
 		};
 
 		$('#users_detail_popup').popup({
 			loaded: false,
+			keyboard: !edit,
 			ajax: {
-				url: './detail',
+				url: edit ? "edit" : "view",
 				method: 'GET',
 				data: params
 			}
@@ -105,7 +107,8 @@ $(function() {
 		return false;
 	}
 
-	$('#users_list').on('click', 'button.edit', user_detail);
+	$('#users_list').on('click', 'button.view', function(evt) { return user_detail(this, false); });
+	$('#users_list').on('click', 'button.edit', function(evt) { return user_detail(this, true); });
 
 	$('#users_detail_popup')
 		.on('loaded.popup', function() {
@@ -115,6 +118,8 @@ $(function() {
 		}).on('shown.popup', function() {
 			$('#users_detail_popup')
 				.find('.ui-popup-body').prop('scrollTop', 0).end()
+				.find('[data-spy="niceSelect"]').niceSelect().end()
+				.find('[data-spy="uploader"]').uploader().end()
 				.find('input[type="text"]').textclear().end()
 				.find('textarea').autosize().textclear().enterfire();
 			$(window).trigger('resize');
