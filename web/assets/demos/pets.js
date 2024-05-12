@@ -1,4 +1,4 @@
-$(function() {
+(function($) {
 	var sskey = "d.pets";
 
 	//----------------------------------------------------
@@ -30,18 +30,6 @@ $(function() {
 		return false;
 	}
 
-	if (!location.search) {
-		$('#pets_listform').formValues(main.ssload(sskey), true);
-	}
-	if (main.form_has_inputs($('#pets_listform'))) {
-		$('#pets_listfset').fieldset('expand', 'show');
-	}
-
-	main.list_events('pets');
-
-	$('#pets_listform').on('submit', pets_search).submit();
-	$('#pets_listform').on('reset', pets_reset);
-
 
 	//----------------------------------------------------
 	// export
@@ -57,8 +45,6 @@ $(function() {
 		});
 		return false;
 	}
-
-	$('#pets_export').on('click', pets_export);
 
 
 	//----------------------------------------------------
@@ -76,8 +62,6 @@ $(function() {
 
 		return false;
 	}
-
-	$('#pets_new').on('click', pet_new);
 
 
 	//----------------------------------------------------
@@ -107,23 +91,21 @@ $(function() {
 		return false;
 	}
 
-	$('#pets_list').on('click', 'button.view', function(evt) { return pet_detail(this, false); });
-	$('#pets_list').on('click', 'button.edit', function(evt) { return pet_detail(this, true); });
+	function pets_detail_popup_loaded() {
+		$('#pets_detail_popup')
+			.find('form').on('submit', pet_detail_submit).end()
+			.find('.ui-popup-footer button[type=submit]').on('click', pet_detail_submit);
+	}
 
-	$('#pets_detail_popup')
-		.on('loaded.popup', function() {
-			$('#pets_detail_popup')
-				.find('form').on('submit', pet_detail_submit).end()
-				.find('.ui-popup-footer button[type=submit]').on('click', pet_detail_submit);
-		}).on('shown.popup', function() {
-			$('#pets_detail_popup')
-				.find('.ui-popup-body').prop('scrollTop', 0).end()
-				.find('[data-spy="niceSelect"]').niceSelect().end()
-				.find('[data-spy="uploader"]').uploader().end()
-				.find('input[type="text"]').textclear().end()
-				.find('textarea').autosize().textclear().enterfire();
-			$(window).trigger('resize');
-		});
+	function pets_detail_popup_shown() {
+		$('#pets_detail_popup')
+			.find('.ui-popup-body').prop('scrollTop', 0).end()
+			.find('[data-spy="niceSelect"]').niceSelect().end()
+			.find('[data-spy="uploader"]').uploader().end()
+			.find('input[type="text"]').textclear().end()
+			.find('textarea').autosize().textclear().enterfire();
+		$(window).trigger('resize');
+	}
 
 
 	//----------------------------------------------------
@@ -246,9 +228,6 @@ $(function() {
 		return false;
 	}
 
-	$('#pets_deletesel_popup form').on('submit', function() { return pets_deletes(false); });
-	$('#pets_deleteall_popup form').on('submit', function() { return pets_deletes(true); });
-
 
 	//----------------------------------------------------
 	// updates (selected / all)
@@ -310,29 +289,72 @@ $(function() {
 		return false;
 	}
 
-	$('#pets_editsel').on('click', function() {
+	function pets_editsel_click() {
 		var ids = main.get_table_checked_ids($('#pets_table'));
 		$('#pets_bulkedit_popup')
 			.find('.editsel').show().end()
 			.find('.editall').hide().end()
 			.find('input[name=id]').val(ids.join(',')).end()
 			.popup('show');
-	});
-	$('#pets_editall').on('click', function() {
+	}
+
+	function pets_editall_click() {
 		$('#pets_bulkedit_popup')
 			.find('.editsel').hide().end()
 			.find('.editall').show().end()
 			.find('input[name=id]').val('*').end()
 			.popup('show');
-	});
-	$('#pets_bulkedit_popup')
-		.find('.col-form-label > input').on('change', function() {
-			var $t = $(this), c = $t.prop('checked');
-			var $i = $t.parent().next().find(':input').prop('disabled', !c);
-			if ($t.data('niceselect')) {
-				$i.niceSelect('update');
-			}
-		}).end()
-		.find('form').on('submit', pets_updates).end()
-		.find('.ui-popup-footer button[type=submit]').on('click', pets_updates);
-});
+	}
+
+	function pets_bulkedit_input_change() {
+		var $t = $(this), c = $t.prop('checked');
+		var $i = $t.parent().next().find(':input').prop('disabled', !c);
+		if ($t.data('niceselect')) {
+			$i.niceSelect('update');
+		}
+	}
+
+
+	//----------------------------------------------------
+	// init
+	//
+	function pets_init() {
+		if (!location.search) {
+			$('#pets_listform').formValues(main.ssload(sskey), true);
+		}
+		if (main.form_has_inputs($('#pets_listform'))) {
+			$('#pets_listfset').fieldset('expand', 'show');
+		}
+	
+		main.list_events('pets');
+	
+		$('#pets_listform')
+			.on('reset', pets_reset)
+			.on('submit', pets_search)
+			.submit();
+
+		$('#pets_export').on('click', pets_export);
+		$('#pets_new').on('click', pet_new);
+	
+		$('#pets_list')
+			.on('click', 'button.view', function() { return pet_detail(this, false); })
+			.on('click', 'button.edit', function() { return pet_detail(this, true); });
+
+		$('#pets_detail_popup')
+			.on('loaded.popup', pets_detail_popup_loaded)
+			.on('shown.popup', pets_detail_popup_shown);
+
+		$('#pets_deletesel_popup form').on('submit', function() { return pets_deletes(false); });
+		$('#pets_deleteall_popup form').on('submit', function() { return pets_deletes(true); });
+			
+		$('#pets_editsel').on('click', pets_editsel_click);
+		$('#pets_editall').on('click', pets_editall_click);
+
+		$('#pets_bulkedit_popup')
+			.find('.col-form-label > input').on('change', pets_bulkedit_input_change).end()
+			.find('form').on('submit', pets_updates).end()
+			.find('.ui-popup-footer button[type=submit]').on('click', pets_updates);
+	}
+
+	$(window).on('load', pets_init);
+})(jQuery);

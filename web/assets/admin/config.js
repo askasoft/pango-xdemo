@@ -1,4 +1,4 @@
-$(function() {
+(function($) {
 	function config_save() {
 		var $f = $(this);
 
@@ -16,9 +16,13 @@ $(function() {
 		return false;
 	}
 
-	$('a[data-bs-toggle="tab"]').on('shown.bs.tab', function(e) {
-		$($(e.target).attr('href')).find('textarea').autosize();
-	});
+	function config_init() {
+		$('a[data-bs-toggle="tab"]').on('shown.bs.tab', function(e) {
+			$($(e.target).attr('href')).find('textarea').autosize();
+		});
+	
+		$('.cfgform').on('submit', config_save);
+	}
 
-	$('.cfgform').on('submit', config_save);
-});
+	$(window).on('load', config_init);
+})(jQuery);

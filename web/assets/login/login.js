@@ -1,4 +1,4 @@
-$(function() {
+(function($) {
 	function login() {
 		var $f = $('#login_form');
 		
@@ -25,5 +25,9 @@ $(function() {
 		return false;
 	}
 
-	$('#login_form').on('submit', login);
-});
+	function init() {
+		$('#login_form').on('submit', login);
+	}
+
+	$(window).on('load', init);
+})(jQuery);

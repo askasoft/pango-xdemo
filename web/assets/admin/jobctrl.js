@@ -1,4 +1,4 @@
-$(function() {
+(function($) {
 	function job_start() {
 		if (!$('#job_start').prop('disabled')) {
 			$('#job_start').prop('disabled', true);
@@ -370,9 +370,13 @@ $(function() {
 		return false;
 	}
 
-	$('#job_form').on('submit', job_start);
-	$('#job_start').on('click', job_start);
-	$('#job_list').on('click', 'button.abort', job_abort);
+	function job_init() {
+		$('#job_form').on('submit', job_start);
+		$('#job_start').on('click', job_start);
+		$('#job_list').on('click', 'button.abort', job_abort);
 
-	job_list();
-});
+		job_list();
+	}
+
+	$(window).on('load', job_init);
+})(jQuery);
