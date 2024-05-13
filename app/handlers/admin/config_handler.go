@@ -65,19 +65,24 @@ func ConfigIndex(c *xin.Context) {
 	categories := []*ConfigCategory{}
 	cks := tbs.GetBundle(c.Locale).GetSection("config.category").Keys()
 	for _, ck := range cks {
-		cc := &ConfigCategory{Name: ck}
-
+		cgs := []*ConfigGroup{}
 		gks := str.Fields(tbs.GetText(c.Locale, "config.category."+ck))
 		for _, gk := range gks {
-			cg := &ConfigGroup{Name: gk}
+			items := []*models.Config{}
 			for _, cfg := range configs {
 				if str.StartsWith(cfg.Name, gk) {
-					cg.Items = append(cg.Items, cfg)
+					items = append(items, cfg)
 				}
 			}
-			cc.Groups = append(cc.Groups, cg)
+			if len(items) > 0 {
+				cg := &ConfigGroup{Name: gk, Items: items}
+				cgs = append(cgs, cg)
+			}
 		}
-		categories = append(categories, cc)
+		if len(cgs) > 0 {
+			cc := &ConfigCategory{Name: ck, Groups: cgs}
+			categories = append(categories, cc)
+		}
 	}
 
 	h["Configs"] = categories
