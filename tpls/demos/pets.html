@@ -55,7 +55,7 @@
 			<div class="row py-1">
 				<label class="col-md-2 col-form-label">{{T .Loc "pet.gender"}}</label>
 				<div class="col-md-4">
-					{{Checks "Name=" "gender" "List=" .PetGenderMap.Iterator "Values=" .Q.Gender}}
+					{{Checks "Name=" "gender" "List=" .PetGenderMap "Values=" .Q.Gender}}
 				</div>
 				<label class="col-md-2 col-form-label">{{T .Loc "pet.born_at"}}</label>
 				<div class="col-md-4">
@@ -67,11 +67,11 @@
 			<div class="row py-1">
 				<label class="col-md-2 col-form-label">{{T .Loc "pet.temper"}}</label>
 				<div class="col-md-4">
-					{{Select "Name=" "temper" "List=" .PetTemperMap.Iterator "Values=" .Q.Temper "Multiple=" true "class=" "wide" "data-spy=" "niceSelect"}}
+					{{Select "Name=" "temper" "List=" .PetTemperMap "Values=" .Q.Temper "Multiple=" true "class=" "wide" "data-spy=" "niceSelect"}}
 				</div>
 				<label class="col-md-2 col-form-label">{{T .Loc "pet.habits"}}</label>
 				<div class="col-md-4">
-					{{Select "Name=" "habits" "List=" .PetHabitsMap.Iterator "Values=" .Q.Habits "Multiple=" true "class=" "wide" "data-spy=" "niceSelect"}}
+					{{Select "Name=" "habits" "List=" .PetHabitsMap "Values=" .Q.Habits "Multiple=" true "class=" "wide" "data-spy=" "niceSelect"}}
 				</div>
 			</div>
 			<div class="row py-1">
@@ -91,7 +91,7 @@
 			<div class="row py-1">
 				<label class="col-md-2 col-form-label">{{T .Loc "pet.origin"}}</label>
 				<div class="col-md-4">
-					{{Select "Name=" "origin" "List=" .PetOriginMap.Iterator "Values=" .Q.Origin "Multiple=" true "class=" "col2 wide" "data-spy=" "niceSelect"}}
+					{{Select "Name=" "origin" "List=" .PetOriginMap "Values=" .Q.Origin "Multiple=" true "class=" "col2 wide" "data-spy=" "niceSelect"}}
 				</div>
 				<label class="col-md-2 col-form-label">{{T .Loc "pet.shop_name"}}</label>
 				<div class="col-md-4">
@@ -159,7 +159,7 @@
 		<div class="row py-3">
 			<label class="col-md-2 col-form-label required">{{T .Loc "pet.gender"}} <input type="checkbox"></label>
 			<div class="col-md-4">
-				{{Radios "Name=" "gender" "List=" .PetGenderMap.Iterator "Value=" "M" "Disabled=" true}}
+				{{Radios "Name=" "gender" "List=" .PetGenderMap "Value=" "M" "Disabled=" true}}
 			</div>
 			<label class="col-md-2 col-form-label required">{{T .Loc "pet.born_at"}} <input type="checkbox" name="uborn_at" value="true"></label>
 			<div class="col-md-4">
@@ -169,19 +169,19 @@
 		<div class="row py-3">
 			<label class="col-md-2 col-form-label required">{{T .Loc "pet.origin"}} <input type="checkbox" data-niceselect="true"></label>
 			<div class="col-md-10">
-				{{Select "Name=" "origin" "List=" .PetOriginMap.Iterator "class=" "wide col2" "data-spy=" "niceSelect" "Disabled=" true}}
+				{{Select "Name=" "origin" "List=" .PetOriginMap "class=" "wide col2" "data-spy=" "niceSelect" "Disabled=" true}}
 			</div>
 		</div>
 		<div class="row py-3">
 			<label class="col-md-2 col-form-label">{{T .Loc "pet.temper"}} <input type="checkbox"></label>
 			<div class="col-md-10">
-				{{Radios "Name=" "temper" "List=" .PetTemperMap.Iterator "Value=" "N" "Disabled=" true}}
+				{{Radios "Name=" "temper" "List=" .PetTemperMap "Value=" "N" "Disabled=" true}}
 			</div>
 		</div>
 		<div class="row py-3">
 			<label class="col-md-2 col-form-label">{{T .Loc "pet.habits"}} <input type="checkbox" name="uhabits" value="true"></label>
 			<div class="col-md-10">
-				{{Checks "Name=" "habits" "List=" .PetHabitsMap.Iterator "Disabled=" true}}
+				{{Checks "Name=" "habits" "List=" .PetHabitsMap "Disabled=" true}}
 			</div>
 		</div>
 		<button type="submit" class="hidden"></button>

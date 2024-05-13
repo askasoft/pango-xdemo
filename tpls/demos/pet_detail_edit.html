@@ -31,7 +31,7 @@
 	<div class="row py-3">
 		<label class="col-md-2 col-form-label required">{{T .Loc "pet.gender"}}</label>
 		<div class="col-md-4">
-			{{Radios "Name=" "gender" "List=" .PetGenderMap.Iterator "Value=" .Pet.Gender}}
+			{{Radios "Name=" "gender" "List=" .PetGenderMap "Value=" .Pet.Gender}}
 		</div>
 		<label class="col-md-2 col-form-label required">{{T .Loc "pet.born_at"}}</label>
 		<div class="col-md-4">
@@ -41,19 +41,19 @@
 	<div class="row py-3">
 		<label class="col-md-2 col-form-label required">{{T .Loc "pet.origin"}}</label>
 		<div class="col-md-10">
-			{{Select "Name=" "origin" "List=" .PetOriginMap.Iterator "Value=" .Pet.Origin "class=" "wide col2" "data-spy=" "niceSelect"}}
+			{{Select "Name=" "origin" "List=" .PetOriginMap "Value=" .Pet.Origin "class=" "wide col2" "data-spy=" "niceSelect"}}
 		</div>
 	</div>
 	<div class="row py-3">
 		<label class="col-md-2 col-form-label required">{{T .Loc "pet.temper"}}</label>
 		<div class="col-md-10">
-			{{Radios "Name=" "temper" "List=" .PetTemperMap.Iterator "Value=" .Pet.Temper}}
+			{{Radios "Name=" "temper" "List=" .PetTemperMap "Value=" .Pet.Temper}}
 		</div>
 	</div>
 	<div class="row py-3">
 		<label class="col-md-2 col-form-label">{{T .Loc "pet.habits"}}</label>
 		<div class="col-md-10">
-			{{Checks "Name=" "habits" "List=" .PetHabitsMap.Iterator "Values=" .Pet.Habits}}
+			{{Checks "Name=" "habits" "List=" .PetHabitsMap "Values=" .Pet.Habits}}
 		</div>
 	</div>
 	<div class="row py-3">

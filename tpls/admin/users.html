@@ -66,11 +66,11 @@
 			<div class="row py-1">
 				<label class="col-md-2 col-form-label">{{T .Loc "user.role"}}</label>
 				<div class="col-md-4">
-					{{Checks "Name=" "role" "List=" .UserRoleMap.Iterator "Values=" .Q.Role}}
+					{{Checks "Name=" "role" "List=" .UserRoleMap "Values=" .Q.Role}}
 				</div>
 				<label class="col-md-2 col-form-label">{{T .Loc "user.status"}}</label>
 				<div class="col-md-4">
-					{{Checks "Name=" "status" "List=" .UserStatusMap.Iterator "Values=" .Q.Status}}
+					{{Checks "Name=" "status" "List=" .UserStatusMap "Values=" .Q.Status}}
 				</div>
 			</div>
 			<div class="row py-1">
@@ -132,13 +132,13 @@
 		<div class="row py-3">
 			<label class="col-md-2 col-form-label">{{T .Loc "user.role"}} <input type="checkbox"></label>
 			<div class="col-md-10">
-				{{Radios "Name=" "role" "List=" .UserRoleMap.Iterator "Value=" "V" "Disabled=" true}}
+				{{Radios "Name=" "role" "List=" .UserRoleMap "Value=" "V" "Disabled=" true}}
 			</div>
 		</div>
 		<div class="row py-3">
 			<label class="col-md-2 col-form-label">{{T .Loc "user.status"}} <input type="checkbox"></label>
 			<div class="col-md-10">
-				{{Radios "Name=" "status" "List=" .UserStatusMap.Iterator "Value=" "A" "Disabled=" true}}
+				{{Radios "Name=" "status" "List=" .UserStatusMap "Value=" "A" "Disabled=" true}}
 			</div>
 		</div>
 		<div class="row py-3">

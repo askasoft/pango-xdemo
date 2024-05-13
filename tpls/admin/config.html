@@ -30,13 +30,13 @@
 					{{if eq $c.Style "T"}}
 						<textarea name="{{$c.Name}}" class="form-control" rows="2" textclear{{if $c.Readonly}} disabled{{end}}>{{$c.DisplayValue}}</textarea>
 					{{else if eq $c.Style "C"}}
-						{{Checks "Name=" $c.Name "List=" (MapGet $.Values $c.Name).Iterator "Values=" $c.Values "Disabled=" $c.Readonly}}
+						{{Checks "Name=" $c.Name "List=" (MapGet $.Values $c.Name) "Values=" $c.Values "Disabled=" $c.Readonly}}
 					{{else if eq $c.Style "R"}}
-						{{Radios "Name=" $c.Name "List=" (MapGet $.Values $c.Name).Iterator "Value=" $c.Value "Disabled=" $c.Readonly}}
+						{{Radios "Name=" $c.Name "List=" (MapGet $.Values $c.Name) "Value=" $c.Value "Disabled=" $c.Readonly}}
 					{{else if eq $c.Style "S"}}
-						{{Select "Name=" $c.Name "List=" (MapGet $.Values $c.Name).Iterator "Value=" $c.Value "Disabled=" $c.Readonly}}
+						{{Select "Name=" $c.Name "List=" (MapGet $.Values $c.Name) "Value=" $c.Value "Disabled=" $c.Readonly}}
 					{{else if eq $c.Style "M"}}
-						{{Select "Name=" $c.Name "List=" (MapGet $.Values $c.Name).Iterator "Values=" $c.Values "Multiple=" true "Disabled=" $c.Readonly}}
+						{{Select "Name=" $c.Name "List=" (MapGet $.Values $c.Name) "Values=" $c.Values "Multiple=" true "Disabled=" $c.Readonly}}
 					{{else if eq $c.Style "N"}}
 						<input name="{{$c.Name}}" type="number" size="20" class="form-control" textclear value="{{$c.DisplayValue}}"{{if $c.Readonly}} disabled{{end}}/>
 					{{else}}
