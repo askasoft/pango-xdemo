@@ -15,12 +15,12 @@
 	</div>
 	<div class="row py-3">
 		<label class="col-md-2 col-form-label">{{T .Loc "pet.photo"}}</label>
-	{{if ne .Pet.ID 0}}
+		{{if ne .Pet.ID 0}}
 		<div class="col-md-5"><img src="{{.Base}}/files{{.Pet.PhotoURI}}"></div>
 		<div class="col-md-5">
-	{{else}}
+		{{else}}
 		<div class="col-md-10">
-	{{end}}
+		{{end}}
 			<div data-spy="uploader" data-upload-remover="true" data-dnload-view="true"
 				data-upload-url="{{.Base}}/files/upload" data-dnload-url="{{.Base}}/files$">
 				<input type="file" name="file" class="ui-uploader-file" accept="image/*" style="display:none"/>

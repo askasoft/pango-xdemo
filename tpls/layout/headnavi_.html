@@ -7,24 +7,24 @@
 				<a class="btn btn-primary active" href="#dark" title="{{T .Loc "theme.dark"}}"><i class="fa-fw fas fa-moon"></i></a>
 			</div>
 		</li>
-{{if .AuthUser}}
+		{{if .AuthUser}}
 		<li><div class="dropdown">
 			<button class="btn btn-primary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
 				<i class="fas fa-user-circle"></i> {{.AuthUser.Name}} <span class="caret"></span>
 			</button>
 			<ul class="dropdown-menu dropdown-menu-end">
-			{{if .AuthUser.IsAdmin}}
+				{{if .AuthUser.IsAdmin}}
 				<li><a class="dropdown-item" href="{{.Base}}/a/config/"><i class="{{T .Loc "icon.config"}}"></i><span>{{T .Loc "menu.config"}}</span></a></li>
 				<li><a class="dropdown-item" href="{{.Base}}/a/users/"><i class="{{T .Loc "icon.admin.users"}}"></i><span>{{T .Loc "menu.admin.users"}}</span></a></li>
 				<li class="divider"></li>
-			{{end}}
+				{{end}}
 				<li><a class="dropdown-item" href="{{.Base}}/s/pwdchg/"><i class="{{T .Loc "icon.self.pwdchg"}}"></i><span>{{T .Loc "menu.self.pwdchg"}}</span></a></li>
 				<li><a class="dropdown-item" href="{{.Base}}/login/logout"><i class="{{T .Loc "icon.logout"}}"></i><span>{{T .Loc "menu.logout"}}</span></a></li>
 			</ul>
 		</div></li>
-{{else}}
+		{{else}}
 		<li><a href="{{.Base}}/login/"><i class="{{T .Loc "icon.login"}}"></i><span>{{T .Loc "menu.login"}}</span></a></li>
-{{end}}
+		{{end}}
 	</ul>
 </div>
 {{end}}

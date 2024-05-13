@@ -6,15 +6,15 @@
 {{template "header" .}}
 
 {{if ne .Ctx.Attrs.sidenavi false}}
-	{{template "sidenavi" .}}
-	<div id="content" class="container-fluid">
+{{template "sidenavi" .}}
+<div id="content" class="container-fluid">
 {{else}}
-	<div id="content" class="container-fluid nosidenavi">
+<div id="content" class="container-fluid nosidenavi">
 {{end}}
 {{end}}
 
 {{define "main_footer"}}
-	</div>
+</div>
 
 {{template "footer" .}}
 

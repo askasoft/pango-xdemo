@@ -22,7 +22,7 @@
 		</tr>
 	</thead>
 	<tbody>
-	{{range $i, $p := .Pets}}
+		{{range $i, $p := .Pets}}
 		<tr id="pet_{{$p.ID}}">
 			<td class="check"><input type="checkbox" value="{{$p.ID}}"/></td>
 			<td class="id ro">{{$p.ID}}</td>
@@ -42,7 +42,7 @@
 				<button class="btn btn-outline-secondary edit" title="{{T $.Loc "button.edit"}}"><i class="{{T $.Loc "icon.edit"}}"></i></button>
 			</td>
 		</tr>
-	{{end}}
+		{{end}}
 		<tr class="hidden template">
 			<td class="check"></td>
 			<td class="id"></td>

@@ -14,7 +14,7 @@
 		</div>
 	</div>
 
-{{if and .AuthUser .AuthUser.IsAdmin}}
+	{{if and .AuthUser .AuthUser.IsAdmin}}
 	<div id="navi_admin" class="card">
 		<div class="card-header">
 			<i class="{{T .Loc "icon.admin"}}"></i><span>{{T .Loc "menu.admin"}}</span>
@@ -27,7 +27,7 @@
 			</ul>
 		</div>
 	</div>
-{{end}}
+	{{end}}
 
 </div></div>
 {{end}}

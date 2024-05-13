@@ -10,20 +10,20 @@
 	</div>
 
 	<ul class="nav nav-tabs">
-	{{range $i, $cc := .Configs}}
+		{{range $i, $cc := .Configs}}
 		<li class="nav-item"><a class="nav-link{{if eq $i 0}} active{{end}}" href="#cc_{{$cc.Name}}" data-bs-toggle="tab">{{T $.Loc (print "config.category.label." $cc.Name)}}</a></li>
-	{{end}}
+		{{end}}
 	</ul>
 
 	<div class="tab-content">
-	{{range $i, $cc := .Configs}}
+		{{range $i, $cc := .Configs}}
 		<div class="tab-pane{{if eq $i 0}} active{{end}}" id="cc_{{$cc.Name}}">
 		<form class="cfgform form-horizontal lined" method="POST" autocomplete="off">
 			<input type="hidden" name="_token_" value="{{$.Token}}"/>
-		{{range $cg := $cc.Groups}}
+			{{range $cg := $cc.Groups}}
 			<fieldset id="cg_{{$cg.Name}}" data-spy="fieldset">
 				<legend>{{T $.Loc (print "config.group.label." $cg.Name)}}</legend>
-			{{range $c := $cg.Items}}
+				{{range $c := $cg.Items}}
 				<div class="row py-3">
 					<label class="col-md-3 col-form-label{{if $c.Required}} required {{end}}">{{T $.Loc (print "config." $c.Name)}}</label>
 					<div class="col-md-9">
@@ -48,9 +48,9 @@
 					{{end}}
 					</div>
 				</div>
-			{{end}}
+				{{end}}
 			</fieldset>
-		{{end}}
+			{{end}}
 			<div class="row py-3">
 				<div class="offset-md-3 col-md-9">
 					<button class="btn btn-primary"><i class="{{T $.Loc "icon.save"}}"></i> {{T $.Loc "button.save"}}</button>
@@ -58,7 +58,7 @@
 			</div>
 		</form>
 		</div>
-	{{end}}
+		{{end}}
 	</div>
 </div>
 

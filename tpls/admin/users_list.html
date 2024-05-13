@@ -18,7 +18,7 @@
 		</tr>
 	</thead>
 	<tbody>
-	{{range $i, $u := .Users}}
+		{{range $i, $u := .Users}}
 		<tr class="{{$u.Status}}" id="user_{{$u.ID}}">
 			<td class="check">{{if ne $u.ID $.AuthUser.ID}}<input type="checkbox" value="{{$u.ID}}"/>{{end}}</td>
 			<td class="id ro">{{$u.ID}}</td>
@@ -33,7 +33,7 @@
 				<button class="btn btn-outline-secondary edit" title="{{T $.Loc "button.edit"}}"><i class="{{T $.Loc "icon.edit"}}"></i></button>
 			</td>
 		</tr>
-	{{end}}
+		{{end}}
 		<tr class="hidden template">
 			<td class="check"></td>
 			<td class="id"></td>
