@@ -38,5 +38,5 @@ func (c *Config) DisplayValue() string {
 }
 
 func (c *Config) Values() []string {
-	return str.FieldsAny(c.Value, "\r\n")
+	return str.FieldsByte(c.Value, '\t')
 }

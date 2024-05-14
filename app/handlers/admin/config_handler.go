@@ -107,7 +107,7 @@ func ConfigSave(c *xin.Context) {
 		if cfg.Style == models.StyleChecks {
 			vs, ok = c.GetPostFormArray(cfg.Name)
 			if ok {
-				v = str.Join(vs, "\n")
+				v = str.Join(vs, "\t")
 			}
 		} else {
 			v, ok = c.GetPostForm(cfg.Name)
