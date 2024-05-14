@@ -122,11 +122,18 @@ type JobRunner struct {
 }
 
 func newJobRunner(tt tenant.Tenant, jid int64) *JobRunner {
+	rid := time.Now().UnixMilli()
+	rsx := app.INI.GetString("job", "ridSuffix")
+	if rsx != "" {
+		sx := int64(math.Pow10(len(rsx)))
+		rid = rid*sx + num.Atol(str.TrimLeft(rsx, "0"))
+	}
+
 	jr := &JobRunner{
 		JobRunner: xjm.NewJobRunner(
 			tt.JM(),
 			jid,
-			time.Now().UnixMilli(),
+			rid,
 			tt.Logger("JOB"),
 		),
 		Tenant: tt,
