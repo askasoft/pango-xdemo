@@ -3,6 +3,7 @@ package jobs
 import (
 	"errors"
 	"fmt"
+	"math"
 	"strings"
 	"sync"
 	"time"
@@ -12,6 +13,7 @@ import (
 	"github.com/askasoft/pango/asg"
 	"github.com/askasoft/pango/cog"
 	"github.com/askasoft/pango/log"
+	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/xfs"
 	"github.com/askasoft/pango/xin"
@@ -53,7 +55,7 @@ type JobStep struct {
 	Total int `json:"total,omitempty"`
 }
 
-func (js *JobStep) StepInfo() string {
+func (js *JobStep) Progress() string {
 	return js.String()
 }
 
@@ -69,56 +71,41 @@ func (js *JobStep) String() string {
 
 type JobState struct {
 	JobStep
+	Skips  int   `json:"skips,omitempty"`
 	LastID int64 `json:"last_id,omitempty"`
 }
 
 func (js *JobState) String() string {
-	return fmt.Sprintf("%s (%d)", js.StepInfo(), js.LastID)
+	return fmt.Sprintf("#%d %s", js.LastID, js.Progress())
 }
 
-type ItemSkip struct {
+type SkipItem struct {
 	ID     int64  `json:"id"`
 	Title  string `json:"title"`
 	Reason string `json:"reason"`
 }
 
-func (is *ItemSkip) String() string {
-	return fmt.Sprintf("#%d %s - %s", is.ID, is.Title, is.Reason)
+func (si *SkipItem) Quoted() string {
+	return fmt.Sprintf("%d\t%q\t%q\n", si.ID, si.Title, si.Reason)
 }
 
-type JobResult struct {
-	Skips []*ItemSkip `json:"skips,omitempty"`
-}
-
-func (jr *JobResult) AddSkipItem(id int64, title, reason string) {
-	jr.Skips = append(jr.Skips, &ItemSkip{
-		ID:     id,
-		Title:  title,
-		Reason: reason,
-	})
-}
-
-func (jr *JobResult) SkipInfo() string {
-	if len(jr.Skips) == 0 {
-		return ""
-	}
-
-	sb := &strings.Builder{}
-	for _, i := range jr.Skips {
-		sb.WriteString(i.String())
-		sb.WriteByte('\n')
-	}
-	return sb.String()
-}
-
-func (jr *JobResult) String() string {
-	return jr.SkipInfo()
+func (si *SkipItem) String() string {
+	return fmt.Sprintf("#%d %s - %s", si.ID, si.Title, si.Reason)
 }
 
 type JobRunner struct {
 	*xjm.JobRunner
 
 	Tenant tenant.Tenant
+}
+
+func (jr *JobRunner) AddSkipItem(id int64, title, reason string) {
+	si := SkipItem{
+		ID:     id,
+		Title:  title,
+		Reason: reason,
+	}
+	_ = jr.AddResult(si.Quoted())
 }
 
 func newJobRunner(tt tenant.Tenant, jid int64) *JobRunner {
@@ -165,7 +152,7 @@ func doneJob(jr *JobRunner, err error) {
 		return
 	}
 
-	err = jr.Complete("")
+	err = jr.Complete()
 	if err != nil {
 		jr.Log.Error(err)
 	}

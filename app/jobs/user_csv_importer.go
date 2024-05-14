@@ -229,7 +229,7 @@ func (uci *UserCsvImporter) doImportCsv() error {
 
 func (uci *UserCsvImporter) importRecord(rec *csvUserRecord) error {
 	uci.Step = rec.Line - 1
-	uci.Log.Infof(tbs.GetText(uci.arg.Locale, "user.import.csv.step.info"), uci.StepInfo(), rec.ID, rec.Name, rec.Email)
+	uci.Log.Infof(tbs.GetText(uci.arg.Locale, "user.import.csv.step.info"), uci.Progress(), rec.ID, rec.Name, rec.Email)
 
 	if uci.PingAborted() {
 		return xjm.ErrJobAborted
@@ -260,16 +260,16 @@ func (uci *UserCsvImporter) importRecord(rec *csvUserRecord) error {
 				r = db.Table(uci.Tenant.TableUsers()).Updates(user)
 				if r.Error != nil {
 					if pgutil.IsUniqueViolation(r.Error) {
-						uci.Log.Warnf(tbs.GetText(uci.arg.Locale, "user.import.csv.step.duplicated"), uci.StepInfo(), user.ID, user.Name, user.Email)
+						uci.Log.Warnf(tbs.GetText(uci.arg.Locale, "user.import.csv.step.duplicated"), uci.Progress(), user.ID, user.Name, user.Email)
 						return ErrItemSkip
 					}
 					return r.Error
 				}
 
 				if r.RowsAffected > 0 {
-					uci.Log.Infof(tbs.GetText(uci.arg.Locale, "user.import.csv.step.updated"), uci.StepInfo(), user.ID, user.Name, user.Email)
+					uci.Log.Infof(tbs.GetText(uci.arg.Locale, "user.import.csv.step.updated"), uci.Progress(), user.ID, user.Name, user.Email)
 				} else {
-					uci.Log.Warnf(tbs.GetText(uci.arg.Locale, "user.import.csv.step.ufailed"), uci.StepInfo(), user.ID, user.Name, user.Email)
+					uci.Log.Warnf(tbs.GetText(uci.arg.Locale, "user.import.csv.step.ufailed"), uci.Progress(), user.ID, user.Name, user.Email)
 				}
 				return nil
 			}
@@ -289,14 +289,14 @@ func (uci *UserCsvImporter) importRecord(rec *csvUserRecord) error {
 		r := db.Table(uci.Tenant.TableUsers()).Create(user)
 		if r.Error != nil {
 			if pgutil.IsUniqueViolation(r.Error) {
-				uci.Log.Warnf(tbs.GetText(uci.arg.Locale, "user.import.csv.step.duplicated"), uci.StepInfo(), user.ID, user.Name, user.Email)
+				uci.Log.Warnf(tbs.GetText(uci.arg.Locale, "user.import.csv.step.duplicated"), uci.Progress(), user.ID, user.Name, user.Email)
 				return ErrItemSkip
 			}
 			return r.Error
 		}
 
 		if r.RowsAffected > 0 {
-			uci.Log.Infof(tbs.GetText(uci.arg.Locale, "user.import.csv.step.created"), uci.StepInfo(), user.ID, user.Name, user.Email)
+			uci.Log.Infof(tbs.GetText(uci.arg.Locale, "user.import.csv.step.created"), uci.Progress(), user.ID, user.Name, user.Email)
 			if uid != 0 {
 				// reset sequence if create with ID
 				r := db.Exec(uci.Tenant.ResetSequence("users", models.UserStartID))
@@ -305,7 +305,7 @@ func (uci *UserCsvImporter) importRecord(rec *csvUserRecord) error {
 				}
 			}
 		} else {
-			uci.Log.Warnf(tbs.GetText(uci.arg.Locale, "user.import.csv.step.cfailed"), uci.StepInfo(), user.ID, user.Name, user.Email)
+			uci.Log.Warnf(tbs.GetText(uci.arg.Locale, "user.import.csv.step.cfailed"), uci.Progress(), user.ID, user.Name, user.Email)
 		}
 		return nil
 	})
