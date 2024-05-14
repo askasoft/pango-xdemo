@@ -46,7 +46,7 @@ func ConfigIndex(c *xin.Context) {
 		}
 	}
 
-	values := map[string]any{}
+	lists := map[string]any{}
 	for _, cfg := range configs {
 		list := tbs.GetText(c.Locale, "config.list."+cfg.Name)
 		if list != "" {
@@ -55,14 +55,11 @@ func ConfigIndex(c *xin.Context) {
 			if err != nil {
 				c.Logger.Errorf("Invalid JSON config.list.%s: %v", cfg.Name, err)
 			}
-			values[cfg.Name] = lhm
+			lists[cfg.Name] = lhm
 		}
 	}
 
-	h := handlers.H(c)
-	h["Values"] = values
-
-	categories := []*ConfigCategory{}
+	ccs := []*ConfigCategory{}
 	cks := tbs.GetBundle(c.Locale).GetSection("config.category").Keys()
 	for _, ck := range cks {
 		cgs := []*ConfigGroup{}
@@ -81,11 +78,14 @@ func ConfigIndex(c *xin.Context) {
 		}
 		if len(cgs) > 0 {
 			cc := &ConfigCategory{Name: ck, Groups: cgs}
-			categories = append(categories, cc)
+			ccs = append(ccs, cc)
 		}
 	}
 
-	h["Configs"] = categories
+	h := handlers.H(c)
+	h["Lists"] = lists
+	h["Configs"] = ccs
+
 	c.HTML(http.StatusOK, "admin/config", h)
 }
 
