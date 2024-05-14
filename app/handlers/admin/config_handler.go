@@ -104,12 +104,13 @@ func ConfigSave(c *xin.Context) {
 
 	db := app.GDB.Begin()
 	for _, cfg := range configs {
-		if cfg.Style == models.StyleChecks {
+		switch cfg.Style {
+		case models.StyleChecks, models.StyleOrders:
 			vs, ok = c.GetPostFormArray(cfg.Name)
 			if ok {
 				v = str.Join(vs, "\t")
 			}
-		} else {
+		default:
 			v, ok = c.GetPostForm(cfg.Name)
 		}
 

@@ -8,6 +8,7 @@ import (
 
 const (
 	StyleChecks   = "C"
+	StyleOrders   = "O"
 	StyleRadios   = "R"
 	StyleTextarea = "T"
 	StyleNumber   = "N"

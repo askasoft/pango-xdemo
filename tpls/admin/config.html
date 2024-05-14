@@ -31,6 +31,8 @@
 						<textarea name="{{$c.Name}}" class="form-control" rows="2" textclear{{if $c.Readonly}} disabled{{end}}>{{$c.DisplayValue}}</textarea>
 					{{else if eq $c.Style "C"}}
 						{{Checks "Name=" $c.Name "List=" (MapGet $.Values $c.Name) "Values=" $c.Values "Disabled=" $c.Readonly}}
+					{{else if eq $c.Style "O"}}
+						{{Checks "Name=" $c.Name "List=" (MapGet $.Values $c.Name) "Values=" $c.Values "Ordered=" true "Disabled=" $c.Readonly "class=" "vertical"}}
 					{{else if eq $c.Style "R"}}
 						{{Radios "Name=" $c.Name "List=" (MapGet $.Values $c.Name) "Value=" $c.Value "Disabled=" $c.Readonly}}
 					{{else if eq $c.Style "S"}}
