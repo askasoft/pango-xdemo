@@ -245,6 +245,8 @@ func (tj *TenantJobs) Stats() string {
 // -----------------------------
 var mu sync.Mutex
 
+var ErrJobOverflow = errors.New("Job Overflow")
+
 // Job start
 func Start() {
 	mu.Lock()
@@ -253,36 +255,41 @@ func Start() {
 	mar := app.INI.GetInt("job", "maxTotalRunnings", 10)
 	mtr := app.INI.GetInt("job", "maxTenantRunnings", 10)
 
-	_ = tenant.Iterate(func(tt tenant.Tenant) error {
-		a := mar - ttjobs.Total()
-		if a <= 0 {
-			return nil
-		}
+	if mar-ttjobs.Total() > 0 {
+		err := tenant.Iterate(func(tt tenant.Tenant) error {
+			a := mar - ttjobs.Total()
+			if a <= 0 {
+				return ErrJobOverflow
+			}
 
-		c := mtr - ttjobs.Count(tt)
-		if c <= 0 {
-			return nil
-		}
+			c := mtr - ttjobs.Count(tt)
+			if c <= 0 {
+				return nil
+			}
 
-		if c > a {
-			c = a
-		}
+			if c > a {
+				c = a
+			}
 
-		tjm := tt.JM()
-		return tjm.StartJobs(c, func(job *xjm.Job) {
-			logger := tt.Logger("JOB")
+			tjm := tt.JM()
+			return tjm.StartJobs(c, func(job *xjm.Job) {
+				logger := tt.Logger("JOB")
 
-			defer func() {
-				if err := recover(); err != nil {
-					logger.Errorf("Job #%d '%s' panic: %v", job.ID, job.Name, err)
-				}
-			}()
+				defer func() {
+					if err := recover(); err != nil {
+						logger.Errorf("Job #%d '%s' panic: %v", job.ID, job.Name, err)
+					}
+				}()
 
-			logger.Debugf("Start job #%d '%s'", job.ID, job.Name)
+				logger.Debugf("Start job #%d '%s'", job.ID, job.Name)
 
-			startJob(tt, job)
+				startJob(tt, job)
+			})
 		})
-	})
+		if err != nil && !errors.Is(err, ErrJobOverflow) {
+			log.Errorf("jobs.Start(): %v", err)
+		}
+	}
 
 	st := ttjobs.Stats()
 	if st != "" {
