@@ -1,8 +1,6 @@
 package jobs
 
 import (
-	"fmt"
-
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango/xjm"
 )
@@ -20,10 +18,7 @@ func NewDatabaseReseter(tt tenant.Tenant, job *xjm.Job) iRunner {
 
 	dr.JobRunner = newJobRunner(tt, job.ID)
 
-	if err := xjm.Decode(job.Param, &dr.arg); err != nil {
-		dr.Abort(fmt.Sprintf("invalid params: %v", err)) //nolint: errcheck
-		return nil
-	}
+	xjm.MustDecode(job.Param, &dr.arg)
 
 	return dr
 }

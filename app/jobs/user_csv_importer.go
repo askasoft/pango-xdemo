@@ -48,10 +48,7 @@ func NewUserCsvImporter(tt tenant.Tenant, job *xjm.Job) iRunner {
 
 	uci.JobRunner = newJobRunner(tt, job.ID)
 
-	if err := xjm.Decode(job.Param, &uci.arg); err != nil {
-		uci.Abort(fmt.Sprintf("invalid params: %v", err)) //nolint: errcheck
-		return nil
-	}
+	xjm.MustDecode(job.Param, &uci.arg)
 
 	uci.file = job.File
 

@@ -41,7 +41,7 @@ func (ja *JobArg) SetFile(tt tenant.Tenant, mfh *multipart.FileHeader) error {
 }
 
 func (ja *JobArg) SetParam(v any) {
-	ja.Param = xjm.Encode(v)
+	ja.Param = xjm.MustEncode(v)
 }
 
 // JobController job controller base struct
