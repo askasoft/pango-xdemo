@@ -123,7 +123,7 @@ func (jc *JobController) Abort(c *xin.Context) {
 
 	tjm := tt.JM()
 	err := tjm.AbortJob(jid, "User aborted")
-	if err != nil {
+	if err != nil && !errors.Is(err, xjm.ErrJobMissing) {
 		c.Logger.Errorf("Failed to abort job #%d: %v", jid, err)
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, E(c))
