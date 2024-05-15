@@ -46,7 +46,7 @@ type UserCsvImporter struct {
 func NewUserCsvImporter(tt tenant.Tenant, job *xjm.Job) iRunner {
 	uci := &UserCsvImporter{}
 
-	uci.JobRunner = newJobRunner(tt, job.ID)
+	uci.JobRunner = newJobRunner(tt, job.Name, job.ID)
 
 	xjm.MustDecode(job.Param, &uci.arg)
 

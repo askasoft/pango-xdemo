@@ -114,7 +114,7 @@ type JobRunner struct {
 	Tenant tenant.Tenant
 }
 
-func newJobRunner(tt tenant.Tenant, jid int64) *JobRunner {
+func newJobRunner(tt tenant.Tenant, jnm string, jid int64) *JobRunner {
 	rid := time.Now().UnixMilli()
 	rsx := app.INI.GetString("job", "ridSuffix")
 	if rsx != "" {
@@ -125,6 +125,7 @@ func newJobRunner(tt tenant.Tenant, jid int64) *JobRunner {
 	jr := &JobRunner{
 		JobRunner: xjm.NewJobRunner(
 			tt.JM(),
+			jnm,
 			jid,
 			rid,
 			tt.Logger("JOB"),
@@ -141,6 +142,10 @@ func (jr *JobRunner) AddSkipItem(id int64, title, reason string) {
 		Reason: reason,
 	}
 	_ = jr.AddResult(si.Quoted())
+}
+
+func (jr *JobRunner) Running(state any) error {
+	return jr.JobRunner.Running(xjm.MustEncode(state))
 }
 
 func (jr *JobRunner) Done(err error) {

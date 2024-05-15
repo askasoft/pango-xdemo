@@ -16,7 +16,7 @@ type DatabaseReseter struct {
 func NewDatabaseReseter(tt tenant.Tenant, job *xjm.Job) iRunner {
 	dr := &DatabaseReseter{}
 
-	dr.JobRunner = newJobRunner(tt, job.ID)
+	dr.JobRunner = newJobRunner(tt, job.Name, job.ID)
 
 	xjm.MustDecode(job.Param, &dr.arg)
 
