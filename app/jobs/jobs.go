@@ -266,45 +266,12 @@ var mu sync.Mutex
 
 var ErrJobOverflow = errors.New("Job Overflow")
 
-// Job start
-func Start() {
-	mu.Lock()
-	defer mu.Unlock()
-
+// Starts iterate tenants to start jobs
+func Starts() {
 	mar := app.INI.GetInt("job", "maxTotalRunnings", 10)
-	mtr := app.INI.GetInt("job", "maxTenantRunnings", 10)
 
 	if mar-ttjobs.Total() > 0 {
-		err := tenant.Iterate(func(tt tenant.Tenant) error {
-			a := mar - ttjobs.Total()
-			if a <= 0 {
-				return ErrJobOverflow
-			}
-
-			c := mtr - ttjobs.Count(tt)
-			if c <= 0 {
-				return nil
-			}
-
-			if c > a {
-				c = a
-			}
-
-			tjm := tt.JM()
-			return tjm.StartJobs(c, func(job *xjm.Job) {
-				logger := tt.Logger("JOB")
-
-				defer func() {
-					if err := recover(); err != nil {
-						logger.Errorf("Job #%d '%s' panic: %v", job.ID, job.Name, err)
-					}
-				}()
-
-				logger.Debugf("Start job #%d '%s'", job.ID, job.Name)
-
-				startJob(tt, job)
-			})
-		})
+		err := tenant.Iterate(StartJobs)
 		if err != nil && !errors.Is(err, ErrJobOverflow) {
 			log.Errorf("jobs.Start(): %v", err)
 		}
@@ -316,21 +283,56 @@ func Start() {
 	}
 }
 
-func startJob(tt tenant.Tenant, job *xjm.Job) {
-	if rc, ok := creators[job.Name]; ok {
-		run := rc(tt, job)
-		runJob(tt, job, run)
-	} else {
-		log.Errorf("No Job Runner Creator %q", job.Name)
+// StartJobs start tenant jobs
+func StartJobs(tt tenant.Tenant) error {
+	mu.Lock()
+	defer mu.Unlock()
+
+	mar := app.INI.GetInt("job", "maxTotalRunnings", 10)
+	mtr := app.INI.GetInt("job", "maxTenantRunnings", 10)
+
+	a := mar - ttjobs.Total()
+	if a <= 0 {
+		return ErrJobOverflow
 	}
+
+	c := mtr - ttjobs.Count(tt)
+	if c <= 0 {
+		return nil
+	}
+
+	if c > a {
+		c = a
+	}
+
+	tjm := tt.JM()
+	return tjm.StartJobs(c, func(job *xjm.Job) {
+		startJob(tt, job)
+	})
 }
 
-func runJob(tt tenant.Tenant, job *xjm.Job, run iRunner) {
-	ttjobs.Add(tt, job)
+func startJob(tt tenant.Tenant, job *xjm.Job) {
+	logger := tt.Logger("JOB")
 
-	defer ttjobs.Del(tt, job)
+	defer func() {
+		if err := recover(); err != nil {
+			logger.Errorf("Job #%d '%s' panic: %v", job.ID, job.Name, err)
+		}
+	}()
 
-	run.Run()
+	if jrc, ok := creators[job.Name]; ok {
+		logger.Debugf("Start job #%d '%s'", job.ID, job.Name)
+
+		run := jrc(tt, job)
+
+		ttjobs.Add(tt, job)
+
+		defer ttjobs.Del(tt, job)
+
+		run.Run()
+	} else {
+		logger.Errorf("No Job Runner Creator %q", job.Name)
+	}
 }
 
 // ------------------------------------

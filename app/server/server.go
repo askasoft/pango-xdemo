@@ -121,7 +121,7 @@ func Run() {
 
 	// Start jobs (Resume interrupted jobs)
 	if app.INI.GetBool("job", "startAtStartup") {
-		go jobs.Start()
+		go jobs.Starts()
 	}
 }
 
