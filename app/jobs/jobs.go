@@ -65,16 +65,13 @@ func (af *ArgFilter) Bind(c *xin.Context, a any) error {
 	return err
 }
 
-type JobStep struct {
+type JobState struct {
 	Step  int `json:"step,omitempty"`
 	Total int `json:"total,omitempty"`
+	Skips int `json:"skips,omitempty"`
 }
 
-func (js *JobStep) Progress() string {
-	return js.String()
-}
-
-func (js *JobStep) String() string {
+func (js *JobState) Progress() string {
 	if js.Total > 0 {
 		return fmt.Sprintf("[%d/%d]", js.Step, js.Total)
 	}
@@ -84,14 +81,25 @@ func (js *JobStep) String() string {
 	return ""
 }
 
-type JobState struct {
-	JobStep
-	Skips  int   `json:"skips,omitempty"`
+func (js *JobState) String() string {
+	var sk string
+	if js.Skips > 0 {
+		sk = fmt.Sprintf("<%d>", js.Skips)
+	}
+	return js.Progress() + sk
+}
+
+func (js *JobState) State() JobState {
+	return *js
+}
+
+type JobStateEx struct {
+	JobState
 	LastID int64 `json:"last_id,omitempty"`
 }
 
-func (js *JobState) String() string {
-	return fmt.Sprintf("#%d %s", js.LastID, js.Progress())
+func (jse *JobStateEx) String() string {
+	return fmt.Sprintf("#%d %s", jse.LastID, jse.Progress())
 }
 
 type SkipItem struct {

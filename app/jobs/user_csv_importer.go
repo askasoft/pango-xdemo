@@ -28,7 +28,7 @@ type UserCsvImportArg ArgLocale
 type UserCsvImporter struct {
 	*JobRunner
 
-	JobStep
+	JobState
 
 	arg UserCsvImportArg
 
