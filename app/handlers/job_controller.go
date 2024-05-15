@@ -106,7 +106,7 @@ func (jc *JobController) Start(c *xin.Context) {
 		return
 	}
 
-	jobs.Start()
+	go jobs.Start()
 
 	c.JSON(http.StatusOK, xin.H{"jid": jid, "success": tbs.GetText(c.Locale, "job.started")})
 }
