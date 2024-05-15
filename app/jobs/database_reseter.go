@@ -31,10 +31,10 @@ func NewDatabaseReseter(tt tenant.Tenant, job *xjm.Job) *DatabaseReseter {
 func (dr *DatabaseReseter) Run() {
 	err := dr.Checkout()
 	if err != nil {
-		doneJob(dr.JobRunner, err)
+		dr.Done(err)
 		return
 	}
 
 	err = dr.Tenant.ResetPets(dr.Log)
-	doneJob(dr.JobRunner, err)
+	dr.Done(err)
 }

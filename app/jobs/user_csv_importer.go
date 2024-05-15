@@ -63,14 +63,14 @@ func NewUserCsvImporter(tt tenant.Tenant, job *xjm.Job) *UserCsvImporter {
 func (uci *UserCsvImporter) Run() {
 	err := uci.Checkout()
 	if err != nil {
-		doneJob(uci.JobRunner, err)
+		uci.Done(err)
 		return
 	}
 
 	tfs := uci.Tenant.FS()
 	uci.data, err = tfs.ReadFile(uci.file)
 	if err != nil {
-		doneJob(uci.JobRunner, err)
+		uci.Done(err)
 		return
 	}
 
@@ -81,7 +81,7 @@ func (uci *UserCsvImporter) Run() {
 
 	total, err := uci.doCheckCsv()
 	if err != nil {
-		doneJob(uci.JobRunner, err)
+		uci.Done(err)
 		return
 	}
 
@@ -89,7 +89,7 @@ func (uci *UserCsvImporter) Run() {
 	uci.Step = 0
 
 	err = uci.doImportCsv()
-	doneJob(uci.JobRunner, err)
+	uci.Done(err)
 }
 
 type csvUserHeader struct {

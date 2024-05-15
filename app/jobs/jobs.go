@@ -99,15 +99,6 @@ type JobRunner struct {
 	Tenant tenant.Tenant
 }
 
-func (jr *JobRunner) AddSkipItem(id int64, title, reason string) {
-	si := SkipItem{
-		ID:     id,
-		Title:  title,
-		Reason: reason,
-	}
-	_ = jr.AddResult(si.Quoted())
-}
-
 func newJobRunner(tt tenant.Tenant, jid int64) *JobRunner {
 	rid := time.Now().UnixMilli()
 	rsx := app.INI.GetString("job", "ridSuffix")
@@ -128,7 +119,30 @@ func newJobRunner(tt tenant.Tenant, jid int64) *JobRunner {
 	return jr
 }
 
-func doneJob(jr *JobRunner, err error) {
+func (jr *JobRunner) Checkout() error {
+	if err := jr.JobRunner.Checkout(); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (jr *JobRunner) Abort(reason string) error {
+	if err := jr.JobRunner.Abort(reason); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (jr *JobRunner) AddSkipItem(id int64, title, reason string) {
+	si := SkipItem{
+		ID:     id,
+		Title:  title,
+		Reason: reason,
+	}
+	_ = jr.AddResult(si.Quoted())
+}
+
+func (jr *JobRunner) Done(err error) {
 	defer jr.Log.Close()
 
 	if err != nil && !errors.Is(err, xjm.ErrJobAborted) && !errors.Is(err, xjm.ErrJobCompleted) && !errors.Is(err, xjm.ErrJobMissing) {
