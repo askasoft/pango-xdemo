@@ -43,7 +43,7 @@ type UserCsvImporter struct {
 	statusRevMap map[string]string
 }
 
-func NewUserCsvImporter(tt tenant.Tenant, job *xjm.Job) *UserCsvImporter {
+func NewUserCsvImporter(tt tenant.Tenant, job *xjm.Job) iRunner {
 	uci := &UserCsvImporter{}
 
 	uci.JobRunner = newJobRunner(tt, job.ID)

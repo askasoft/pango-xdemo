@@ -21,14 +21,29 @@ import (
 	"gorm.io/gorm"
 )
 
+var (
+	ErrItemSkip = errors.New("item skip")
+)
+
 const (
 	JobNameUserCsvImport = "UserCsvImport"
 	JobNameDatabaseReset = "DatabaseReset"
 )
 
-var (
-	ErrItemSkip = errors.New("item skip")
-)
+var hasFileJobs = []string{
+	JobNameUserCsvImport,
+}
+
+type iRunner interface {
+	Run()
+}
+
+type JobRunnerCreator func(tenant.Tenant, *xjm.Job) iRunner
+
+var creators = map[string]JobRunnerCreator{
+	JobNameUserCsvImport: NewUserCsvImporter,
+	JobNameDatabaseReset: NewDatabaseReseter,
+}
 
 type ArgLocale struct {
 	Locale string `json:"locale,omitempty"`
@@ -119,20 +134,6 @@ func newJobRunner(tt tenant.Tenant, jid int64) *JobRunner {
 	return jr
 }
 
-func (jr *JobRunner) Checkout() error {
-	if err := jr.JobRunner.Checkout(); err != nil {
-		return err
-	}
-	return nil
-}
-
-func (jr *JobRunner) Abort(reason string) error {
-	if err := jr.JobRunner.Abort(reason); err != nil {
-		return err
-	}
-	return nil
-}
-
 func (jr *JobRunner) AddSkipItem(id int64, title, reason string) {
 	si := SkipItem{
 		ID:     id,
@@ -166,8 +167,7 @@ func (jr *JobRunner) Done(err error) {
 		return
 	}
 
-	err = jr.Complete()
-	if err != nil {
+	if err := jr.Complete(); err != nil {
 		jr.Log.Error(err)
 	}
 	jr.Log.Info("DONE.")
@@ -311,26 +311,18 @@ func Start() {
 	}
 }
 
-type runner interface {
-	Run()
-}
-
 func startJob(tt tenant.Tenant, job *xjm.Job) {
-	var run runner
-	switch job.Name {
-	case JobNameUserCsvImport:
-		run = NewUserCsvImporter(tt, job)
-	case JobNameDatabaseReset:
-		run = NewDatabaseReseter(tt, job)
-	}
-
-	if run != nil {
-		ttjobs.Add(tt, job)
+	if rc, ok := creators[job.Name]; ok {
+		run := rc(tt, job)
 		runJob(tt, job, run)
+	} else {
+		log.Errorf("No Job Runner Creator %q", job.Name)
 	}
 }
 
-func runJob(tt tenant.Tenant, job *xjm.Job, run runner) {
+func runJob(tt tenant.Tenant, job *xjm.Job, run iRunner) {
+	ttjobs.Add(tt, job)
+
 	defer ttjobs.Del(tt, job)
 
 	run.Run()
@@ -359,19 +351,20 @@ func CleanOutdatedJobs() {
 		return app.GDB.Transaction(func(db *gorm.DB) error {
 			logger := tt.Logger("JOB")
 
-			jobTable := tt.TableJobs()
+			if len(hasFileJobs) > 0 {
+				where := "id IN (SELECT file FROM " + tt.TableJobs() + " WHERE name IN ? AND status IN ? AND updated_at < ?)"
 
-			jns := []string{JobNameUserCsvImport}
-			jss := xjm.JobAbortedCompleted
-			where := "id IN (SELECT file FROM " + jobTable + " WHERE name IN ? AND status IN ? AND updated_at < ?)"
+				tx := db.Table(tt.TableFiles())
+				tx = tx.Where(where, hasFileJobs, xjm.JobAbortedCompleted, before)
 
-			r := db.Table(tt.TableFiles()).Where(where, jns, jss, before).Delete(&xfs.File{})
-			if r.Error != nil {
-				logger.Errorf("Failed to delete outdated job files: %v", r.Error)
-				return r.Error
-			}
-			if r.RowsAffected > 0 {
-				logger.Infof("Delete outdated job files: %d", r.RowsAffected)
+				r := tx.Delete(&xfs.File{})
+				if r.Error != nil {
+					logger.Errorf("Failed to delete outdated job files: %v", r.Error)
+					return r.Error
+				}
+				if r.RowsAffected > 0 {
+					logger.Infof("Delete outdated job files: %d", r.RowsAffected)
+				}
 			}
 
 			gjm := tt.GJM(db)

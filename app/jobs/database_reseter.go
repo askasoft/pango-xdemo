@@ -15,7 +15,7 @@ type DatabaseReseter struct {
 	arg DatabaseResetArg
 }
 
-func NewDatabaseReseter(tt tenant.Tenant, job *xjm.Job) *DatabaseReseter {
+func NewDatabaseReseter(tt tenant.Tenant, job *xjm.Job) iRunner {
 	dr := &DatabaseReseter{}
 
 	dr.JobRunner = newJobRunner(tt, job.ID)

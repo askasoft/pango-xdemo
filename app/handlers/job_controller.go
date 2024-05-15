@@ -23,28 +23,33 @@ func NewJobController(name, tpl string) *JobController {
 	return jc
 }
 
-// JobController job controller base struct
-type JobController struct {
-	Name     string
-	File     string
-	Param    string
-	Multi    bool
-	Template string
+// JobArg job argument struct
+type JobArg struct {
+	File  string
+	Param string
 }
 
-func (jc *JobController) SetFile(tt tenant.Tenant, mfh *multipart.FileHeader) error {
+func (ja *JobArg) SetFile(tt tenant.Tenant, mfh *multipart.FileHeader) error {
 	fid := models.MakeFileID(models.PrefixJobFile, mfh.Filename)
 	tfs := tt.FS()
 	if _, err := xfs.SaveUploadedFile(tfs, fid, mfh); err != nil {
 		return err
 	}
 
-	jc.File = fid
+	ja.File = fid
 	return nil
 }
 
-func (jc *JobController) SetParam(v any) {
-	jc.Param = xjm.Encode(v)
+func (ja *JobArg) SetParam(v any) {
+	ja.Param = xjm.Encode(v)
+}
+
+// JobController job controller base struct
+type JobController struct {
+	JobArg
+	Name     string
+	Multi    bool
+	Template string
 }
 
 func (jc *JobController) Index(c *xin.Context) {
