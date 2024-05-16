@@ -5,7 +5,8 @@
 
 #pets_table th.born_at, #pets_table td.born_at,
 #pets_table th.gender, #pets_table td.gender,
-#pets_table th.origin, #pets_table td.origin,
+#pets_table th.origin,
+#pets_table th.shop_name,
 #pets_table th.temper, #pets_table td.temper,
 #pets_table th.habits, #pets_table td.habits,
 #pets_table th.amount, #pets_table td.amount,
