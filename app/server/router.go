@@ -325,19 +325,19 @@ func addAdminUserImportHandlers(rg *xin.RouterGroup) {
 
 func addAdminUserCsvImportHandlers(rg *xin.RouterGroup) {
 	rg.GET("/", admin.UserCsvImportJobCtrl.Index)
-	rg.POST("/start", admin.UserCsvImportJobCtrl.Start)
-	rg.POST("/abort", admin.UserCsvImportJobCtrl.Abort)
-	rg.GET("/status", admin.UserCsvImportJobCtrl.Status)
 	rg.GET("/list", admin.UserCsvImportJobCtrl.List)
 	rg.GET("/logs", admin.UserCsvImportJobCtrl.Logs)
+	rg.GET("/status", admin.UserCsvImportJobCtrl.Status)
+	rg.POST("/start", admin.UserCsvImportJobCtrl.Start)
+	rg.POST("/abort", admin.UserCsvImportJobCtrl.Abort)
 	rg.GET("/sample", admin.UserCsvImportSample)
 }
 
 func addAdminResetHandlers(rg *xin.RouterGroup) {
 	rg.GET("/", admin.DatabaseResetJobCtrl.Index)
-	rg.POST("/start", admin.DatabaseResetJobCtrl.Start)
-	rg.POST("/abort", admin.DatabaseResetJobCtrl.Abort)
-	rg.GET("/status", admin.DatabaseResetJobCtrl.Status)
 	rg.GET("/list", admin.DatabaseResetJobCtrl.List)
 	rg.GET("/logs", admin.DatabaseResetJobCtrl.Logs)
+	rg.GET("/status", admin.DatabaseResetJobCtrl.Status)
+	rg.POST("/start", admin.DatabaseResetJobCtrl.Start)
+	rg.POST("/abort", admin.DatabaseResetJobCtrl.Abort)
 }

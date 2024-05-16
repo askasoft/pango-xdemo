@@ -324,12 +324,12 @@ func startJob(tt tenant.Tenant, job *xjm.Job) {
 
 	defer func() {
 		if err := recover(); err != nil {
-			logger.Errorf("Job #%d '%s' panic: %v", job.ID, job.Name, err)
+			logger.Errorf("Job %s#%d panic: %v", job.Name, job.ID, err)
 		}
 	}()
 
 	if jrc, ok := creators[job.Name]; ok {
-		logger.Debugf("Start job #%d '%s'", job.ID, job.Name)
+		logger.Debugf("Start job %s#%d", job.Name, job.ID)
 
 		run := jrc(tt, job)
 

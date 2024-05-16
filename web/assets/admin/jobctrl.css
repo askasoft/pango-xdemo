@@ -36,29 +36,28 @@ fieldset > form, fieldset > form#job_form {
 #job_list > ul.nav-pills > li {
 	margin-left: 2px;
 }
-
-#job_list li i {
+#job_list > ul > li i {
 	font-size: 150%;
 	margin-right: 5px;
 	vertical-align: middle;
 }
-#job_list li[status=A] i {
+#job_list > ul > li[status=A] i {
 	color: #a94442;
 }
-#job_list li[status=C] i {
+#job_list > ul > li[status=C] i {
 	color: #3c763d;
 }
-#job_list li[status=P] i {
+#job_list > ul > li[status=P] i {
 	color: #aaa;
 }
-#job_list li[status=R] i {
+#job_list > ul > li[status=R] i {
 	color: #00f;
 }
-#job_list .nav-pills > li[status=A] > a.active > i {
+#job_list > ul.nav-pills > li[status=A] > a.active > i {
 	color: #f00;
 }
-#job_list .nav-pills > li[status=C] > a.active > i {
-	color: #0f0;
+#job_list > ul.nav-pills > li[status=C] > a.active > i {
+	color: #15c7a8;
 }
 
 #job_list .tab-content {
@@ -69,22 +68,22 @@ fieldset > form, fieldset > form#job_form {
 	margin-bottom: 20px;
 	position: relative;
 }
-#job_list form a.ps {
+#job_list form button.copy {
 	position: absolute;
 	top: -30px;
 	left: 50%;
 	margin-left: -50px;
 	width: 100px;
 }
-#job_list form a.ps > i {
+#job_list form button.copy > i {
 	margin-right: 7px;
 }
 
-#job_list .job-tools {
+.jobtools {
 	text-align: right;
 	margin-bottom: 15px;
 }
-.job-tools button > i {
+.jobtools button > i {
 	margin-right: 8px;
 }
 
@@ -118,7 +117,9 @@ fieldset > form, fieldset > form#job_form {
 }
 #job_list tr.D td {
 	color: #333;
+	display: none;
 }
 #job_list tr.T td {
 	color: #888;
+	display: none;
 }

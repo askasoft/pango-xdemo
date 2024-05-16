@@ -18,11 +18,6 @@ import (
 	"github.com/askasoft/pango/xjm"
 )
 
-func NewJobController(name, tpl string) *JobController {
-	jc := &JobController{Name: name, Template: tpl}
-	return jc
-}
-
 // JobArg job argument struct
 type JobArg struct {
 	File  string
@@ -52,6 +47,11 @@ type JobController struct {
 	Template string
 }
 
+func NewJobController(name, tpl string) *JobController {
+	jc := &JobController{Name: name, Template: tpl}
+	return jc
+}
+
 func (jc *JobController) Index(c *xin.Context) {
 	h := H(c)
 	c.HTML(http.StatusOK, jc.Template, h)
@@ -77,6 +77,92 @@ func (jc *JobController) List(c *xin.Context) {
 	}
 
 	c.JSON(http.StatusOK, jobs)
+}
+
+func (jc *JobController) Logs(c *xin.Context) {
+	jid := num.Atol(c.Query("jid"))
+	if jid <= 0 {
+		c.AddError(errors.New(tbs.Format(c.Locale, "error.param.invalid", "jid")))
+		c.JSON(http.StatusBadRequest, E(c))
+		return
+	}
+
+	tt := tenant.FromCtx(c)
+	tjm := tt.JM()
+
+	logs, err := jc.logs(c, tjm)
+	if err != nil {
+		log.Errorf("Failed to get job logs %s#%d: %v", jc.Name, jid, err)
+		c.AddError(err)
+		c.JSON(http.StatusInternalServerError, E(c))
+		return
+	}
+
+	c.JSON(http.StatusOK, logs)
+}
+
+func (jc *JobController) logs(c *xin.Context, tjm xjm.JobManager) (logs []*xjm.JobLog, err error) {
+	jid := num.Atol(c.Query("jid"))
+	min := num.Atol(c.Query("min"))
+	max := num.Atol(c.Query("max"))
+	asc := bol.Atob(c.Query("asc"))
+	limit := num.Atoi(c.Query("limit"))
+
+	if jid > 0 && limit > 0 {
+		maxlogs := app.INI.GetInt("job", "maxJobLogsFetch", 10000)
+		if limit > maxlogs {
+			limit = maxlogs
+		}
+
+		lvls := []string{
+			log.LevelFatal.Prefix(),
+			log.LevelError.Prefix(),
+			log.LevelWarn.Prefix(),
+			log.LevelInfo.Prefix(),
+		}
+
+		logs, err = tjm.GetJobLogs(jid, min, max, asc, limit, lvls...)
+	}
+	return
+}
+
+func (jc *JobController) Status(c *xin.Context) {
+	jid := num.Atol(c.Query("jid"))
+	if jid <= 0 {
+		c.AddError(errors.New(tbs.Format(c.Locale, "error.param.invalid", "jid")))
+		c.JSON(http.StatusBadRequest, E(c))
+		return
+	}
+
+	tt := tenant.FromCtx(c)
+	tjm := tt.JM()
+
+	job, err := tjm.GetJob(jid)
+	if err != nil {
+		c.Logger.Errorf("Failed to get job %s#%d: %v", jc.Name, jid, err)
+		c.AddError(err)
+		c.JSON(http.StatusInternalServerError, E(c))
+		return
+	}
+
+	if job == nil {
+		c.AddError(errors.New(tbs.GetText(c.Locale, "job.notfound")))
+		c.JSON(http.StatusBadRequest, E(c))
+		return
+	}
+
+	logs, err := jc.logs(c, tjm)
+	if err != nil {
+		log.Errorf("Failed to get job logs #%d: %v", jid, err)
+		c.AddError(err)
+		c.JSON(http.StatusInternalServerError, E(c))
+		return
+	}
+
+	c.JSON(http.StatusOK, xin.H{
+		"job":  job,
+		"logs": logs,
+	})
 }
 
 func (jc *JobController) Start(c *xin.Context) {
@@ -131,90 +217,4 @@ func (jc *JobController) Abort(c *xin.Context) {
 	}
 
 	c.JSON(http.StatusOK, xin.H{"success": tbs.GetText(c.Locale, "job.aborted")})
-}
-
-func (jc *JobController) Status(c *xin.Context) {
-	jid := num.Atol(c.Query("jid"))
-	if jid <= 0 {
-		c.AddError(errors.New(tbs.Format(c.Locale, "error.param.invalid", "jid")))
-		c.JSON(http.StatusBadRequest, E(c))
-		return
-	}
-
-	tt := tenant.FromCtx(c)
-	tjm := tt.JM()
-
-	job, err := tjm.GetJob(jid)
-	if err != nil {
-		c.Logger.Errorf("Failed to get job #%d: %v", jid, err)
-		c.AddError(err)
-		c.JSON(http.StatusInternalServerError, E(c))
-		return
-	}
-
-	if job == nil {
-		c.AddError(errors.New(tbs.GetText(c.Locale, "job.notfound")))
-		c.JSON(http.StatusBadRequest, E(c))
-		return
-	}
-
-	logs, err := jc.logs(c, tjm)
-	if err != nil {
-		log.Errorf("Failed to get job logs #%d: %v", jid, err)
-		c.AddError(err)
-		c.JSON(http.StatusInternalServerError, E(c))
-		return
-	}
-
-	c.JSON(http.StatusOK, xin.H{
-		"job":  job,
-		"logs": logs,
-	})
-}
-
-func (jc *JobController) Logs(c *xin.Context) {
-	jid := num.Atol(c.Query("jid"))
-	if jid <= 0 {
-		c.AddError(errors.New(tbs.Format(c.Locale, "error.param.invalid", "jid")))
-		c.JSON(http.StatusBadRequest, E(c))
-		return
-	}
-
-	tt := tenant.FromCtx(c)
-	tjm := tt.JM()
-
-	logs, err := jc.logs(c, tjm)
-	if err != nil {
-		log.Errorf("Failed to get job logs #%d: %v", jid, err)
-		c.AddError(err)
-		c.JSON(http.StatusInternalServerError, E(c))
-		return
-	}
-
-	c.JSON(http.StatusOK, logs)
-}
-
-func (jc *JobController) logs(c *xin.Context, tjm xjm.JobManager) (logs []*xjm.JobLog, err error) {
-	jid := num.Atol(c.Query("jid"))
-	min := num.Atol(c.Query("min"))
-	max := num.Atol(c.Query("max"))
-	asc := bol.Atob(c.Query("asc"))
-	limit := num.Atoi(c.Query("limit"))
-
-	if jid > 0 && limit > 0 {
-		maxlogs := app.INI.GetInt("job", "maxJobLogsFetch", 10000)
-		if limit > maxlogs {
-			limit = maxlogs
-		}
-
-		lvls := []string{
-			log.LevelFatal.Prefix(),
-			log.LevelError.Prefix(),
-			log.LevelWarn.Prefix(),
-			log.LevelInfo.Prefix(),
-		}
-
-		logs, err = tjm.GetJobLogs(jid, min, max, asc, limit, lvls...)
-	}
-	return
 }

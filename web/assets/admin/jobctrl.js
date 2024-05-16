@@ -48,20 +48,19 @@
 	}
 
 	function job_status(jid) {
-		if ($('#job_head_' + jid).find('a.active').length == 0) {
+		var $jh = $('#job_head_' + jid);
+		if ($jh.find('a.active').length == 0 || $jh.hasClass('done')) {
 			return;
 		}
 
-		var $job = $('#job_' + jid);
-
-		if ($job.data('timer')) {
-			clearTimeout($job.data('timer'));
-			$job.data('timer', null);
+		if ($jh.data('timer')) {
+			clearTimeout($jh.data('timer'));
+			$jh.data('timer', null);
 		}
 
-		var timeout = 0, param = { jid: jid, asc: false, limit: 1000 };
-		var $tb = $job.find('tbody'), $tr = $tb.children('tr:first-child');
+		var param = { jid: jid, asc: false, limit: 1000 };
 
+		var $tb = $('#job_' + jid).find('tbody'), $tr = $tb.children('tr:first-child');
 		if ($tr.length) {
 			param.min = parseInt($tr.data('lid')) + 1;
 			param.asc = true;
@@ -75,9 +74,10 @@
 			success: function(data) {
 				var job = data.job, logs = data.logs || [];
 
-				job_info_refresh(job);
-				job_start_refresh();
+				refresh_job_info(job);
+				refresh_job_start();
 
+				var timeout;
 				if (logs.length >= param.limit) {
 					// has next logs
 					timeout = 100;
@@ -86,7 +86,9 @@
 					timeout = 1000;
 				}
 				if (timeout) {
-					$job.data('timer', setTimeout(function() { job_status(jid); }, timeout));
+					$jh.data('timer', setTimeout(function() { job_status(jid); }, timeout));
+				} else {
+					$jh.addClass('done');
 				}
 
 				if (logs.length > 0) {
@@ -162,13 +164,14 @@
 		return tr;
 	}
 
-	function job_start_refresh() {
+	function refresh_job_start() {
 		if ($('#job_form').data('multi')) {
 			$('#job_start').prop('disabled', false);
-		} else {
-			var $jhs = $('#job_list > ul'), jpr = $jhs.find('li.P, li.R').length > 0;
-			$('#job_start').prop('disabled', jpr).find('i')[jpr ? 'addClass' : 'removeClass']('fa-spinner fa-spin');
+			return;
 		}
+
+		var $jhs = $('#job_list > ul'), jpr = $jhs.find('li[status=P], li[status=R]').length > 0;
+		$('#job_start').prop('disabled', jpr).find('i')[jpr ? 'addClass' : 'removeClass']('fa-spinner fa-spin');
 	}
 
 	function job_status_icon(s) {
@@ -218,7 +221,7 @@
 		for (var i = data.length - 1; i >= 0; i--) {
 			var job = data[i], $jh = $jhs.children('#job_head_' + job.id);
 			if ($jh.length) {
-				job_info_refresh(job);
+				refresh_job_info(job);
 				continue;
 			}
 
@@ -239,8 +242,7 @@
 	}
 
 	function build_job_head(job) {
-		var $jh = $('<li>', { id: 'job_head_' + job.id, 'class': 'nav-item' }).attr('status', job.status);
-		$jh.data('jid', job.id);
+		var $jh = $('<li>', { id: 'job_head_' + job.id, 'class': 'nav-item' }).attr('status', job.status).data('jid', job.id);
 
 		var $a = $('<a>', { href: '#job_' + job.id, 'class': 'nav-link' });
 		$a.data('jid', job.id);
@@ -298,11 +300,11 @@
 
 			var copy = $jf.data('copy');
 			if (copy) {
-				var $a = $('<a>', { 'class': 'btn btn-secondary ps', href: '#' });
-				$a.append($('<i class="fas fa-arrow-up">'));
-				$a.append($('<span>').text(copy));
-				$a.on('click', job_copy_param);
-				$cf.append($a);
+				var $b = $('<button>', { 'class': 'btn btn-secondary copy' });
+				$b.append($('<i class="fas fa-arrow-up">'));
+				$b.append($('<span>').text(copy));
+				$b.on('click', job_copy_param);
+				$cf.append($b);
 			}
 		}
 
@@ -315,7 +317,7 @@
 	}
 
 	function build_job_tools(jst) {
-		var $jt = $('<div>', { 'class': 'job-tools' });
+		var $jt = $('<div>', { 'class': 'jobtools' });
 
 		if (jst == 'P' || jst == 'R') {
 			$jt.append(build_job_abort());
@@ -334,19 +336,17 @@
 		return $btn;
 	}
 
-	function job_info_refresh(job) {
+	function refresh_job_info(job) {
 		var $jh = $('#job_head_' + job.id);
 		if ($jh.attr('status') != job.status) {
 			$jh.attr('status', job.status);
 			$jh.find('i').attr('class', job_status_icon(job.status));
 
-			var $jt = $('#job_' + job.id).find('.job-tools').empty();
+			var $jt = $('#job_' + job.id).find('.jobtools').empty();
 			if (job.status == 'P' || job.status == 'R') {
 				$jt.append(build_job_abort());
 			}
 		}
-
-		build_job_abort($jt, job.status);
 	}
 
 	function job_list(jid) {
@@ -360,7 +360,7 @@
 			success: function(data) {
 				setTimeout(function() {
 					build_job_list(data, jid);
-					job_start_refresh();
+					refresh_job_start();
 				}, 10);
 			},
 			error: main.ajax_error,
