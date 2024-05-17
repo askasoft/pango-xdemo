@@ -66,14 +66,23 @@ func (af *ArgFilter) Bind(c *xin.Context, a any) error {
 }
 
 type JobState struct {
-	Step  int `json:"step,omitempty"`
-	Total int `json:"total,omitempty"`
-	Skips int `json:"skips,omitempty"`
+	Step    int `json:"step,omitempty"`
+	Total   int `json:"total,omitempty"`
+	Limit   int `json:"limit,omitempty"`
+	Skipped int `json:"skipped,omitempty"`
+	Success int `json:"success,omitempty"`
+	Failure int `json:"failure,omitempty"`
 }
 
 func (js *JobState) Progress() string {
 	if js.Total > 0 {
 		return fmt.Sprintf("[%d/%d]", js.Step, js.Total)
+	}
+	if js.Limit > 0 {
+		return fmt.Sprintf("[%d/%d]", js.Success, js.Limit)
+	}
+	if js.Success > 0 {
+		return fmt.Sprintf("[%d/%d]", js.Success, js.Step)
 	}
 	if js.Step > 0 {
 		return fmt.Sprintf("[%d]", js.Step)
@@ -82,11 +91,17 @@ func (js *JobState) Progress() string {
 }
 
 func (js *JobState) String() string {
-	var sk string
-	if js.Skips > 0 {
-		sk = fmt.Sprintf("<%d>", js.Skips)
+	s := js.Progress()
+	if js.Skipped > 0 {
+		s += fmt.Sprintf(" -%d", js.Skipped)
 	}
-	return js.Progress() + sk
+	if js.Success > 0 {
+		s += fmt.Sprintf(" +%d", js.Success)
+	}
+	if js.Failure > 0 {
+		s += fmt.Sprintf(" !%d", js.Failure)
+	}
+	return s
 }
 
 func (js *JobState) State() JobState {
@@ -102,18 +117,18 @@ func (jse *JobStateEx) String() string {
 	return fmt.Sprintf("#%d %s", jse.LastID, jse.Progress())
 }
 
-type SkipItem struct {
-	ID     int64  `json:"id"`
-	Title  string `json:"title"`
-	Reason string `json:"reason"`
+type FailedItem struct {
+	ID    int64  `json:"id"`
+	Title string `json:"title"`
+	Error string `json:"error"`
 }
 
-func (si *SkipItem) Quoted() string {
-	return fmt.Sprintf("%d\t%q\t%q\n", si.ID, si.Title, si.Reason)
+func (si *FailedItem) Quoted() string {
+	return fmt.Sprintf("%d\t%q\t%q\n", si.ID, si.Title, si.Error)
 }
 
-func (si *SkipItem) String() string {
-	return fmt.Sprintf("#%d %s - %s", si.ID, si.Title, si.Reason)
+func (si *FailedItem) String() string {
+	return fmt.Sprintf("#%d %s - %s", si.ID, si.Title, si.Error)
 }
 
 type JobRunner struct {
@@ -143,11 +158,11 @@ func newJobRunner(tt tenant.Tenant, jnm string, jid int64) *JobRunner {
 	return jr
 }
 
-func (jr *JobRunner) AddSkipItem(id int64, title, reason string) {
-	si := SkipItem{
-		ID:     id,
-		Title:  title,
-		Reason: reason,
+func (jr *JobRunner) AddFailedItem(id int64, title, reason string) {
+	si := FailedItem{
+		ID:    id,
+		Title: title,
+		Error: reason,
 	}
 	_ = jr.AddResult(si.Quoted())
 }

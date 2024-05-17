@@ -170,7 +170,7 @@
 			return;
 		}
 
-		var $jhs = $('#job_list > ul'), jpr = $jhs.find('li[status=P], li[status=R]').length > 0;
+		var jpr = $('#job_list > ul').children('li[status=P], li[status=R]').length > 0;
 		$('#job_start').prop('disabled', jpr).find('i')[jpr ? 'addClass' : 'removeClass']('fa-spinner fa-spin');
 	}
 
