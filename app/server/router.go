@@ -269,6 +269,7 @@ func addDemosPetsHandlers(rg *xin.RouterGroup) {
 	rg.POST("/update", demos.PetUpdate)
 	rg.POST("/updates", demos.PetUpdates)
 	rg.POST("/deletes", demos.PetDeletes)
+	rg.POST("/deleteb", demos.PetDeleteBatch)
 	rg.POST("/export/csv", demos.PetCsvExport)
 }
 

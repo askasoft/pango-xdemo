@@ -138,7 +138,7 @@
 			data: $p.find('form').serialize(),
 			dataType: 'json',
 			beforeSend: main.form_ajax_start($p),
-			success: function(data, ts, xhr) {
+			success: function(data) {
 				$('#pets_detail_popup').popup('hide');
 
 				$.toast({
@@ -169,7 +169,7 @@
 			data: $p.find('form').serialize(),
 			dataType: 'json',
 			beforeSend: main.form_ajax_start($p),
-			success: function(data, ts, xhr) {
+			success: function(data) {
 				$p.popup('hide');
 
 				$.toast({
@@ -210,7 +210,7 @@
 			},
 			dataType: 'json',
 			beforeSend: main.form_ajax_start($p),
-			success: function(data, ts, xhr) {
+			success: function(data) {
 				$p.popup('hide');
 
 				$.toast({
@@ -221,6 +221,37 @@
 				(all ? pets_reset : pets_search)();
 			},
 			error: main.ajax_error,
+			complete: function() {
+				$p.unloadmask().popup('update', { keyboard: true });
+			}
+		});
+		return false;
+	}
+
+
+	//----------------------------------------------------
+	// deletes (batch)
+	//
+	function pets_deletebat(all) {
+		var $p = $('#pets_deletebat_popup').popup('update', { keyboard: false });
+
+		$.ajax({
+			url: './deleteb',
+			type: 'POST',
+			data: $p.find('form').serialize(),
+			dataType: 'json',
+			beforeSend: main.form_ajax_start($p),
+			success: function(data) {
+				$p.popup('hide');
+
+				$.toast({
+					icon: 'success',
+					text: data.success
+				});
+
+				pets_search();
+			},
+			error: main.form_ajax_error($p),
 			complete: function() {
 				$p.unloadmask().popup('update', { keyboard: true });
 			}
@@ -241,7 +272,7 @@
 			data: $p.find('form').serialize(),
 			dataType: 'json',
 			beforeSend: main.form_ajax_start($p),
-			success: function(data, ts, xhr) {
+			success: function(data) {
 				$p.popup('hide');
 
 				$.toast({
@@ -325,7 +356,7 @@
 		if (main.form_has_inputs($('#pets_listform'))) {
 			$('#pets_listfset').fieldset('expand', 'show');
 		}
-	
+
 		main.list_events('pets');
 	
 		$('#pets_listform')
@@ -346,8 +377,12 @@
 
 		$('#pets_deletesel_popup form').on('submit', function() { return pets_deletes(false); });
 		$('#pets_deleteall_popup form').on('submit', function() { return pets_deletes(true); });
-			
-		$('#pets_editsel').on('click', pets_editsel_click);
+
+		$('#pets_deletebat_popup')
+			.find('form').on('submit', pets_deletebat).end()
+			.find('.ui-popup-footer button[type=submit]').on('click', pets_deletebat);
+
+			$('#pets_editsel').on('click', pets_editsel_click);
 		$('#pets_editall').on('click', pets_editall_click);
 
 		$('#pets_bulkedit_popup')

@@ -57,9 +57,21 @@ func (pq *PetQuery) Normalize(c *xin.Context) {
 	pq.Pager.Normalize(tbsutil.GetPagerLimits(c.Locale)...)
 }
 
-func filterPets(tt tenant.Tenant, pq *PetQuery) *gorm.DB {
-	tx := app.GDB.Table(tt.TablePets())
+func (pq *PetQuery) HasFilter() bool {
+	return pq.ID != 0 ||
+		pq.Name != "" ||
+		len(pq.Gender) > 0 ||
+		len(pq.Origin) > 0 ||
+		len(pq.Temper) > 0 ||
+		len(pq.Habits) > 0 ||
+		pq.AmountMin != "" ||
+		pq.AmountMax != "" ||
+		pq.PriceMin != "" ||
+		pq.PriceMax != "" ||
+		pq.ShopName != ""
+}
 
+func (pq *PetQuery) AddWhere(tx *gorm.DB) *gorm.DB {
 	if pq.ID != 0 {
 		tx = tx.Where("id = ?", pq.ID)
 	}
@@ -94,6 +106,10 @@ func filterPets(tt tenant.Tenant, pq *PetQuery) *gorm.DB {
 		tx = tx.Where("shop_name LIKE ?", sqx.StringLike(pq.ShopName))
 	}
 	return tx
+}
+
+func filterPets(tt tenant.Tenant, pq *PetQuery) *gorm.DB {
+	return pq.AddWhere(app.GDB.Table(tt.TablePets()))
 }
 
 func countPets(tt tenant.Tenant, pq *PetQuery) (int, error) {

@@ -353,3 +353,42 @@ func PetDeletes(c *xin.Context) {
 		"success": tbs.Format(c.Locale, "pet.success.deletes", cnt),
 	})
 }
+
+func PetDeleteBatch(c *xin.Context) {
+	pq, err := petListArgs(c)
+	if err != nil {
+		vadutil.AddBindErrors(c, err, "pet.")
+		c.JSON(http.StatusBadRequest, handlers.E(c))
+		return
+	}
+
+	if !pq.HasFilter() {
+		c.AddError(errors.New(tbs.GetText(c.Locale, "error.param.nofilter")))
+		c.JSON(http.StatusBadRequest, handlers.E(c))
+		return
+	}
+
+	tt := tenant.FromCtx(c)
+
+	var cnt int64
+	err = app.GDB.Transaction(func(db *gorm.DB) (err error) {
+		tx := db.Table(tt.TablePets())
+		tx = pq.AddWhere(tx)
+		r := tx.Delete(&models.Pet{})
+		if err = r.Error; err != nil {
+			return
+		}
+		cnt = r.RowsAffected
+
+		return db.Exec(tt.ResetSequence("pets")).Error
+	})
+	if err != nil {
+		c.AddError(err)
+		c.JSON(http.StatusBadRequest, handlers.E(c))
+		return
+	}
+
+	c.JSON(http.StatusOK, xin.H{
+		"success": tbs.Format(c.Locale, "pet.success.deletes", cnt),
+	})
+}

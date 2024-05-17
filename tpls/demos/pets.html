@@ -15,6 +15,9 @@
 			<button class="btn btn-sm btn-outline-danger" popup-target="#pets_deletesel_popup" enableby="#pets_list td.check input">
 				<i class="{{T .Loc "icon.deletesel"}}"></i> {{T .Loc "button.deletesel"}}
 			</button>
+			<button class="btn btn-sm btn-outline-danger" popup-target="#pets_deletebat_popup">
+				<i class="{{T .Loc "icon.deletebat"}}"></i> {{T .Loc "button.deletebat"}}
+			</button>
 			<button class="btn btn-sm btn-outline-danger" popup-target="#pets_deleteall_popup">
 				<i class="{{T .Loc "icon.deleteall"}}"></i> {{T .Loc "button.deleteall"}}
 			</button>
@@ -143,6 +146,84 @@
 			<button type="button" class="btn btn-secondary" popup-dismiss="true"><i class="{{T .Loc "icon.cancel"}}"></i> {{T .Loc "button.cancel"}}</button>
 		</div>
 	</form>
+</div>
+
+<div id="pets_deletebat_popup" class="ui-popup s-popup-detail w800" data-spy="popup" tabindex="-1"
+	popup-mask="true" popup-mouse="false" popup-focus="#pets_deletebat_popup [name=name]">
+	<div class="ui-popup-header">
+		<h4><i class="{{T .Loc "icon.deletebat"}}"></i>
+			{{T .Loc "button.deletebat"}}
+		</h4>
+	</div>
+	<form class="ui-popup-body form-horizontal grey lined">
+		<input type="hidden" name="_token_" value="{{.Token}}"/>
+
+		<div class="well">{{T .Loc "pet.deletebat.well"}}</div>
+
+		<div class="row py-1">
+			<label class="col-md-2 col-form-label">{{T .Loc "pet.name"}}</label>
+			<div class="col-md-10">
+				<input name="name" type="text" class="form-control" textclear value="{{.Q.Name}}"/>
+			</div>
+		</div>
+		<div class="row py-1">
+			<label class="col-md-2 col-form-label">{{T .Loc "pet.gender"}}</label>
+			<div class="col-md-10">
+				{{Checks "Name=" "gender" "List=" .PetGenderMap "Values=" .Q.Gender}}
+			</div>
+		</div>
+		<div class="row py-1">
+			<label class="col-md-2 col-form-label">{{T .Loc "pet.born_at"}}</label>
+			<div class="col-md-10">
+				<input type="date" class="form-control" name="born_from">
+				～
+				<input type="date" class="form-control" name="born_to">
+			</div>
+		</div>
+		<div class="row py-1">
+			<label class="col-md-2 col-form-label">{{T .Loc "pet.origin"}}</label>
+			<div class="col-md-10">
+				{{Select "Name=" "origin" "List=" .PetOriginMap "Values=" .Q.Origin "Multiple=" true "class=" "col2 wide" "data-spy=" "niceSelect"}}
+			</div>
+		</div>
+		<div class="row py-1">
+			<label class="col-md-2 col-form-label">{{T .Loc "pet.temper"}}</label>
+			<div class="col-md-4">
+				{{Select "Name=" "temper" "List=" .PetTemperMap "Values=" .Q.Temper "Multiple=" true "class=" "wide" "data-spy=" "niceSelect"}}
+			</div>
+			<label class="col-md-2 col-form-label">{{T .Loc "pet.habits"}}</label>
+			<div class="col-md-4">
+				{{Select "Name=" "habits" "List=" .PetHabitsMap "Values=" .Q.Habits "Multiple=" true "class=" "wide" "data-spy=" "niceSelect"}}
+			</div>
+		</div>
+		<div class="row py-1">
+			<label class="col-md-2 col-form-label">{{T .Loc "pet.amount"}}</label>
+			<div class="col-md-10">
+				<input type="number" class="form-control" name="amount_min" size="16">
+				～
+				<input type="number" class="form-control" name="amount_max" size="16">
+			</div>
+		</div>
+		<div class="row py-1">
+			<label class="col-md-2 col-form-label">{{T .Loc "pet.price"}}</label>
+			<div class="col-md-10">
+				<input type="number" class="form-control" name="price_min" size="16">
+				～
+				<input type="number" class="form-control" name="price_max" size="16">
+			</div>
+		</div>
+		<div class="row py-1">
+			<label class="col-md-2 col-form-label">{{T .Loc "pet.shop_name"}}</label>
+			<div class="col-md-10">
+				<input name="shop_name" type="text" class="form-control" textclear value="{{.Q.ShopName}}"/>
+			</div>
+		</div>
+		<button type="submit" class="hidden"></button>
+	</form>
+	<div class="ui-popup-footer">
+		<button type="submit" class="btn btn-danger"><i class="{{T .Loc "icon.deletebat"}}"></i> {{T .Loc "button.deletebat"}}</button>
+		<button type="button" class="btn btn-secondary" popup-dismiss="true"><i class="{{T .Loc "icon.cancel"}}"></i> {{T .Loc "button.cancel"}}</button>
+	</div>
 </div>
 
 <div id="pets_bulkedit_popup" class="ui-popup s-popup-detail w800" data-spy="popup" tabindex="-1"
