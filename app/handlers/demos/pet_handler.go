@@ -96,11 +96,10 @@ func filterPets(tt tenant.Tenant, pq *PetQuery) *gorm.DB {
 	return tx
 }
 
-func countPets(tt tenant.Tenant, pq *PetQuery, filter func(tenant.Tenant, *PetQuery) *gorm.DB) (int, error) {
+func countPets(tt tenant.Tenant, pq *PetQuery) (int, error) {
 	var total int64
 
-	tx := filter(tt, pq)
-
+	tx := filterPets(tt, pq)
 	if err := tx.Count(&total).Error; err != nil {
 		return 0, err
 	}
@@ -108,8 +107,8 @@ func countPets(tt tenant.Tenant, pq *PetQuery, filter func(tenant.Tenant, *PetQu
 	return int(total), nil
 }
 
-func findPets(tt tenant.Tenant, pq *PetQuery, filter func(tenant.Tenant, *PetQuery) *gorm.DB) (arts []*models.Pet, err error) {
-	tx := filter(tt, pq)
+func findPets(tt tenant.Tenant, pq *PetQuery) (arts []*models.Pet, err error) {
+	tx := filterPets(tt, pq)
 
 	ob := gormutil.Sorter2OrderBy(&pq.Sorter)
 	tx = tx.Offset(pq.Start()).Limit(pq.Limit).Order(ob)
@@ -157,7 +156,7 @@ func PetList(c *xin.Context) {
 
 	tt := tenant.FromCtx(c)
 
-	pq.Total, err = countPets(tt, pq, filterPets)
+	pq.Total, err = countPets(tt, pq)
 	pq.Normalize(c)
 
 	if err != nil {
@@ -169,7 +168,7 @@ func PetList(c *xin.Context) {
 	h := handlers.H(c)
 
 	if pq.Total > 0 {
-		results, err := findPets(tt, pq, filterPets)
+		results, err := findPets(tt, pq)
 		if err != nil {
 			c.AddError(err)
 			c.JSON(http.StatusBadRequest, handlers.E(c))

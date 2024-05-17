@@ -72,11 +72,10 @@ func filterUsers(c *xin.Context, uq *UserQuery) *gorm.DB {
 	return tx
 }
 
-func countUsers(c *xin.Context, uq *UserQuery, filter func(*xin.Context, *UserQuery) *gorm.DB) (int, error) {
+func countUsers(c *xin.Context, uq *UserQuery) (int, error) {
 	var total int64
 
-	tx := filter(c, uq)
-
+	tx := filterUsers(c, uq)
 	if err := tx.Count(&total).Error; err != nil {
 		return 0, err
 	}
@@ -84,8 +83,8 @@ func countUsers(c *xin.Context, uq *UserQuery, filter func(*xin.Context, *UserQu
 	return int(total), nil
 }
 
-func findUsers(c *xin.Context, uq *UserQuery, filter func(*xin.Context, *UserQuery) *gorm.DB) (usrs []*models.User, err error) {
-	tx := filter(c, uq)
+func findUsers(c *xin.Context, uq *UserQuery) (usrs []*models.User, err error) {
+	tx := filterUsers(c, uq)
 
 	ob := gormutil.Sorter2OrderBy(&uq.Sorter)
 	tx = tx.Offset(uq.Start()).Limit(uq.Limit).Order(ob)
@@ -129,7 +128,7 @@ func UserList(c *xin.Context) {
 		return
 	}
 
-	uq.Total, err = countUsers(c, uq, filterUsers)
+	uq.Total, err = countUsers(c, uq)
 	uq.Normalize(c)
 
 	if err != nil {
@@ -141,7 +140,7 @@ func UserList(c *xin.Context) {
 	h := handlers.H(c)
 
 	if uq.Total > 0 {
-		results, err := findUsers(c, uq, filterUsers)
+		results, err := findUsers(c, uq)
 		if err != nil {
 			c.AddError(err)
 			c.JSON(http.StatusBadRequest, handlers.E(c))
