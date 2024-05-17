@@ -8,7 +8,7 @@
 			data: $f.serialize(),
 			dataType: 'json',
 			beforeSend: main.form_ajax_start($f),
-			success: function(data, ts, xhr) {
+			success: function(data) {
 				$.toast({
 					icon: 'success',
 					text: data.success

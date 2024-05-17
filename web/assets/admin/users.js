@@ -131,7 +131,7 @@
 			data: $p.find('form').serialize(),
 			dataType: 'json',
 			beforeSend: main.form_ajax_start($p),
-			success: function(data, ts, xhr) {
+			success: function(data) {
 				$p.popup('hide');
 
 				$.toast({
@@ -162,7 +162,7 @@
 			data: $p.find('form').serialize(),
 			dataType: 'json',
 			beforeSend: main.form_ajax_start($p),
-			success: function(data, ts, xhr) {
+			success: function(data) {
 				$p.popup('hide');
 
 				$.toast({
@@ -203,7 +203,7 @@
 			},
 			dataType: 'json',
 			beforeSend: main.form_ajax_start($p),
-			success: function(data, ts, xhr) {
+			success: function(data) {
 				$p.popup('hide');
 
 				$.toast({
@@ -214,6 +214,37 @@
 				(all ? users_reset : users_search)();
 			},
 			error: main.ajax_error,
+			complete: function() {
+				$p.unloadmask().popup('update', { keyboard: true });
+			}
+		});
+		return false;
+	}
+
+
+	//----------------------------------------------------
+	// deletes (batch)
+	//
+	function users_deletebat(all) {
+		var $p = $('#users_deletebat_popup').popup('update', { keyboard: false });
+
+		$.ajax({
+			url: './deleteb',
+			type: 'POST',
+			data: $p.find('form').serialize(),
+			dataType: 'json',
+			beforeSend: main.form_ajax_start($p),
+			success: function(data) {
+				$p.popup('hide');
+
+				$.toast({
+					icon: 'success',
+					text: data.success
+				});
+
+				users_search();
+			},
+			error: main.form_ajax_error($p),
 			complete: function() {
 				$p.unloadmask().popup('update', { keyboard: true });
 			}
@@ -234,7 +265,7 @@
 			data: $p.find('form').serialize(),
 			dataType: 'json',
 			beforeSend: main.form_ajax_start($p),
-			success: function(data, ts, xhr) {
+			success: function(data) {
 				$p.popup('hide');
 
 				$.toast({
@@ -326,9 +357,13 @@
 		$('#users_detail_popup')
 			.on('loaded.popup', user_detail_popup_loaded)
 			.on('shown.popup', user_detail_popup_shown);
-	
+
 		$('#users_deletesel_popup form').on('submit', function() { return users_deletes(false); });
 		$('#users_deleteall_popup form').on('submit', function() { return users_deletes(true); });
+
+		$('#users_deletebat_popup')
+			.find('form').on('submit', users_deletebat).end()
+			.find('.ui-popup-footer button[type=submit]').on('click', users_deletebat);
 
 		$('#users_bulkedit_popup')
 			.find('.col-form-label > input').on('change', users_bulkedit_input_change).end()

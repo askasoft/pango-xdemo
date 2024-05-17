@@ -42,12 +42,17 @@ func (uq *UserQuery) Normalize(c *xin.Context) {
 	uq.Pager.Normalize(tbsutil.GetPagerLimits(c.Locale)...)
 }
 
-func filterUsers(c *xin.Context, uq *UserQuery) *gorm.DB {
-	tt := tenant.FromCtx(c)
+func (uq *UserQuery) HasFilter() bool {
+	return uq.ID != 0 ||
+		uq.Name != "" ||
+		uq.Email != "" ||
+		len(uq.Role) > 0 ||
+		len(uq.Status) > 0 ||
+		uq.CIDR != ""
+}
+
+func (uq *UserQuery) AddWhere(c *xin.Context, tx *gorm.DB) *gorm.DB {
 	au := tenant.AuthUser(c)
-
-	tx := app.GDB.Table(tt.TableUsers())
-
 	tx = tx.Where("role >= ?", au.Role)
 
 	if uq.ID != 0 {
@@ -68,7 +73,12 @@ func filterUsers(c *xin.Context, uq *UserQuery) *gorm.DB {
 	if len(uq.Status) > 0 {
 		tx = tx.Where("status IN ?", uq.Status)
 	}
+	return tx
+}
 
+func filterUsers(c *xin.Context, uq *UserQuery) *gorm.DB {
+	tt := tenant.FromCtx(c)
+	tx := uq.AddWhere(c, app.GDB.Table(tt.TableUsers()))
 	return tx
 }
 

@@ -312,6 +312,7 @@ func addAdminUserHandlers(rg *xin.RouterGroup) {
 	rg.POST("/update", admin.UserUpdate)
 	rg.POST("/updates", admin.UserUpdates)
 	rg.POST("/deletes", admin.UserDeletes)
+	rg.POST("/deleteb", admin.UserDeleteBatch)
 	rg.POST("/export/csv", admin.UserCsvExport)
 
 	addAdminUserImportHandlers(rg.Group("/import"))

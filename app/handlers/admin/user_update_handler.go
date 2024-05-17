@@ -326,3 +326,44 @@ func UserDeletes(c *xin.Context) {
 		"success": tbs.Format(c.Locale, "user.success.deletes", cnt),
 	})
 }
+
+func UserDeleteBatch(c *xin.Context) {
+	uq, err := userListArgs(c)
+	if err != nil {
+		vadutil.AddBindErrors(c, err, "user.")
+		c.JSON(http.StatusBadRequest, handlers.E(c))
+		return
+	}
+
+	if !uq.HasFilter() {
+		c.AddError(errors.New(tbs.GetText(c.Locale, "error.param.nofilter")))
+		c.JSON(http.StatusBadRequest, handlers.E(c))
+		return
+	}
+
+	tt := tenant.FromCtx(c)
+	au := tenant.AuthUser(c)
+
+	var cnt int64
+	err = app.GDB.Transaction(func(db *gorm.DB) (err error) {
+		tx := db.Table(tt.TableUsers())
+		tx = tx.Where("id <> ?", au.ID)
+		tx = uq.AddWhere(c, tx)
+		r := tx.Delete(&models.User{})
+		if err = r.Error; err != nil {
+			return
+		}
+		cnt = r.RowsAffected
+
+		return db.Exec(tt.ResetSequence("users", models.UserStartID)).Error
+	})
+	if err != nil {
+		c.AddError(err)
+		c.JSON(http.StatusBadRequest, handlers.E(c))
+		return
+	}
+
+	c.JSON(http.StatusOK, xin.H{
+		"success": tbs.Format(c.Locale, "user.success.deletes", cnt),
+	})
+}

@@ -15,6 +15,9 @@
 			<button class="btn btn-sm btn-outline-danger" popup-target="#users_deletesel_popup" enableby="#users_list td.check input">
 				<i class="{{T .Loc "icon.deletesel"}}"></i> {{T .Loc "button.deletesel"}}
 			</button>
+			<button class="btn btn-sm btn-outline-danger" popup-target="#users_deletebat_popup">
+				<i class="{{T .Loc "icon.deletebat"}}"></i> {{T .Loc "button.deletebat"}}
+			</button>
 			<button class="btn btn-sm btn-outline-danger" popup-target="#users_deleteall_popup">
 				<i class="{{T .Loc "icon.deleteall"}}"></i> {{T .Loc "button.deleteall"}}
 			</button>
@@ -116,6 +119,56 @@
 			<button type="button" class="btn btn-secondary" popup-dismiss="true"><i class="{{T .Loc "icon.cancel"}}"></i> {{T .Loc "button.cancel"}}</button>
 		</div>
 	</form>
+</div>
+
+<div id="users_deletebat_popup" class="ui-popup s-popup-detail w800" data-spy="popup" tabindex="-1"
+	popup-mask="true" popup-mouse="false" popup-focus="#users_deletebat_popup [name=name]">
+	<div class="ui-popup-header">
+		<h4><i class="{{T .Loc "icon.deletebat"}}"></i>
+			{{T .Loc "button.deletebat"}}
+		</h4>
+	</div>
+	<form class="ui-popup-body form-horizontal grey lined">
+		<input type="hidden" name="_token_" value="{{.Token}}"/>
+
+		<div class="well">{{T .Loc "user.deletebat.well"}}</div>
+
+		<div class="row py-1">
+			<label class="col-md-2 col-form-label">{{T .Loc "user.name"}}</label>
+			<div class="col-md-10">
+				<input name="name" type="text" class="form-control" textclear value="{{.Q.Name}}"/>
+			</div>
+		</div>
+		<div class="row py-1">
+			<label class="col-md-2 col-form-label">{{T .Loc "user.email"}}</label>
+			<div class="col-md-10">
+				<input name="email" type="text" class="form-control" textclear value="{{.Q.Email}}"/>
+			</div>
+		</div>
+		<div class="row py-1">
+			<label class="col-md-2 col-form-label">{{T .Loc "user.cidr"}}</label>
+			<div class="col-md-10">
+				<input name="cidr" type="text" class="form-control" textclear value="{{.Q.CIDR}}"/>
+			</div>
+		</div>
+		<div class="row py-1">
+			<label class="col-md-2 col-form-label">{{T .Loc "user.role"}}</label>
+			<div class="col-md-10">
+				{{Checks "Name=" "role" "List=" .UserRoleMap "Values=" .Q.Role}}
+			</div>
+		</div>
+		<div class="row py-1">
+			<label class="col-md-2 col-form-label">{{T .Loc "user.status"}}</label>
+			<div class="col-md-10">
+				{{Checks "Name=" "status" "List=" .UserStatusMap "Values=" .Q.Status}}
+			</div>
+		</div>
+		<button type="submit" class="hidden"></button>
+	</form>
+	<div class="ui-popup-footer">
+		<button type="submit" class="btn btn-danger"><i class="{{T .Loc "icon.deletebat"}}"></i> {{T .Loc "button.deletebat"}}</button>
+		<button type="button" class="btn btn-secondary" popup-dismiss="true"><i class="{{T .Loc "icon.cancel"}}"></i> {{T .Loc "button.cancel"}}</button>
+	</div>
 </div>
 
 <div id="users_bulkedit_popup" class="ui-popup s-popup-detail w800" data-spy="popup" tabindex="-1"
