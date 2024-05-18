@@ -7,14 +7,14 @@ import (
 
 type DatabaseResetArg ArgLocale
 
-type DatabaseReseter struct {
+type DatabaseResetJob struct {
 	*JobRunner
 
 	arg DatabaseResetArg
 }
 
-func NewDatabaseReseter(tt tenant.Tenant, job *xjm.Job) iRunner {
-	dr := &DatabaseReseter{}
+func NewDatabaseResetJob(tt tenant.Tenant, job *xjm.Job) iRunner {
+	dr := &DatabaseResetJob{}
 
 	dr.JobRunner = newJobRunner(tt, job.Name, job.ID)
 
@@ -23,7 +23,7 @@ func NewDatabaseReseter(tt tenant.Tenant, job *xjm.Job) iRunner {
 	return dr
 }
 
-func (dr *DatabaseReseter) Run() {
+func (dr *DatabaseResetJob) Run() {
 	err := dr.Checkout()
 	if err != nil {
 		dr.Done(err)

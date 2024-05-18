@@ -41,8 +41,8 @@ type iRunner interface {
 type JobRunnerCreator func(tenant.Tenant, *xjm.Job) iRunner
 
 var creators = map[string]JobRunnerCreator{
-	JobNameUserCsvImport: NewUserCsvImporter,
-	JobNameDatabaseReset: NewDatabaseReseter,
+	JobNameUserCsvImport: NewUserCsvImportJob,
+	JobNameDatabaseReset: NewDatabaseResetJob,
 }
 
 type ArgLocale struct {

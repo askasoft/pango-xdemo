@@ -25,7 +25,7 @@ import (
 
 type UserCsvImportArg ArgLocale
 
-type UserCsvImporter struct {
+type UserCsvImportJob struct {
 	*JobRunner
 
 	JobState
@@ -43,8 +43,8 @@ type UserCsvImporter struct {
 	statusRevMap map[string]string
 }
 
-func NewUserCsvImporter(tt tenant.Tenant, job *xjm.Job) iRunner {
-	uci := &UserCsvImporter{}
+func NewUserCsvImportJob(tt tenant.Tenant, job *xjm.Job) iRunner {
+	uci := &UserCsvImportJob{}
 
 	uci.JobRunner = newJobRunner(tt, job.Name, job.ID)
 
@@ -57,7 +57,7 @@ func NewUserCsvImporter(tt tenant.Tenant, job *xjm.Job) iRunner {
 	return uci
 }
 
-func (uci *UserCsvImporter) Run() {
+func (uci *UserCsvImportJob) Run() {
 	err := uci.Checkout()
 	if err != nil {
 		uci.Done(err)
@@ -124,7 +124,7 @@ type csvUserRecord struct {
 	Others   map[string]string
 }
 
-func (uci *UserCsvImporter) doReadCsv(callback func(rec *csvUserRecord) error) error {
+func (uci *UserCsvImportJob) doReadCsv(callback func(rec *csvUserRecord) error) error {
 	fp := bytes.NewReader(uci.data)
 
 	bp, err := iox.SkipBOM(fp)
@@ -167,7 +167,7 @@ func (uci *UserCsvImporter) doReadCsv(callback func(rec *csvUserRecord) error) e
 	return nil
 }
 
-func (uci *UserCsvImporter) doCheckCsv() (total int, err error) {
+func (uci *UserCsvImportJob) doCheckCsv() (total int, err error) {
 	uci.Log.Info(tbs.GetText(uci.arg.Locale, "csv.info.checking"))
 
 	valid := true
@@ -191,7 +191,7 @@ func (uci *UserCsvImporter) doCheckCsv() (total int, err error) {
 	return
 }
 
-func (uci *UserCsvImporter) checkRecord(rec *csvUserRecord) error {
+func (uci *UserCsvImportJob) checkRecord(rec *csvUserRecord) error {
 	var errs []string
 	if rec.ID != "" {
 		if num.Atol(rec.ID) < models.UserStartID {
@@ -218,13 +218,13 @@ func (uci *UserCsvImporter) checkRecord(rec *csvUserRecord) error {
 	return nil
 }
 
-func (uci *UserCsvImporter) doImportCsv() error {
+func (uci *UserCsvImportJob) doImportCsv() error {
 	uci.Log.Info(tbs.GetText(uci.arg.Locale, "csv.info.importing"))
 
 	return uci.doReadCsv(uci.importRecord)
 }
 
-func (uci *UserCsvImporter) importRecord(rec *csvUserRecord) error {
+func (uci *UserCsvImportJob) importRecord(rec *csvUserRecord) error {
 	uci.Step = rec.Line - 1
 	uci.Log.Infof(tbs.GetText(uci.arg.Locale, "user.import.csv.step.info"), uci.Progress(), rec.ID, rec.Name, rec.Email)
 
@@ -309,7 +309,7 @@ func (uci *UserCsvImporter) importRecord(rec *csvUserRecord) error {
 	return err
 }
 
-func (uci *UserCsvImporter) parseHead(row []string) error {
+func (uci *UserCsvImportJob) parseHead(row []string) error {
 	h := &uci.head
 	h.ParseHead(row)
 
@@ -320,7 +320,7 @@ func (uci *UserCsvImporter) parseHead(row []string) error {
 	return nil
 }
 
-func (uci *UserCsvImporter) parseData(row []string) *csvUserRecord {
+func (uci *UserCsvImportJob) parseData(row []string) *csvUserRecord {
 	h := &uci.head
 
 	rec := &csvUserRecord{}
