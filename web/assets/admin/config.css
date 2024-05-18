@@ -1,0 +1,16 @@
+.ccc {
+	display: flex;
+	margin-top: 20px;
+}
+.ccc ul.nav {
+	margin-right: 20px;
+	min-width: 180px;
+	max-width: 180px;
+}
+.ccc .tab-content {
+	width: 100%;
+}
+
+label.cihide {
+	font-style: italic;
+}
