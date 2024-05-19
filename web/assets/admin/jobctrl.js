@@ -92,7 +92,7 @@
 				}
 
 				if (logs.length > 0) {
-					var tb = $tb.get(0), c = document.createDocumentFragment();;
+					var tb = $tb.get(0), c = document.createDocumentFragment();
 					if (param.asc) {
 						for (var i = logs.length - 1; i >= 0; i--) {
 							c.append(build_log(logs[i]));
@@ -131,7 +131,7 @@
 			beforeSend: function() { $a.hide(); $i.show(); },
 			success: function(logs) {
 				if (logs && logs.length > 0) {
-					var tb = $tb.get(0), c = document.createDocumentFragment();;
+					var tb = $tb.get(0), c = document.createDocumentFragment();
 					for (var i = 0; i < logs.length; i++) {
 						c.append(build_log(logs[i]));
 					}

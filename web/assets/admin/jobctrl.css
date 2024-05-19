@@ -90,14 +90,25 @@ fieldset > form, fieldset > form#job_form {
 #job_list table {
 	font-family: Menlo, Monaco, Consolas, monospace;
 }
-#job_list tr>td {
+#job_list tr > td {
 	padding: 1px 5px;
 	vertical-align: top;
 }
-#job_list tr>td:first-child {
+#job_list tr > td:first-child {
+	width: 1px;
 	white-space: nowrap;
 }
-#job_list tr>td:last-child {
+@media (max-width: 767px) {
+	#job_list tr > td:first-child {
+		width: 1%;
+		white-space: normal;
+	}
+}
+#job_list tr > td:nth-child(2) {
+	width: 1px;
+	white-space: nowrap;
+}
+#job_list tr > td:last-child {
 	width: 100%;
 	white-space: pre-wrap;
 	word-break: break-all;
