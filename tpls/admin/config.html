@@ -19,7 +19,7 @@
 	<div class="tab-content">
 		{{range $i, $cc := .Configs}}
 		<div class="tab-pane{{if eq $i 0}} active{{end}}" id="cc_{{$cc.Name}}"><div class="ccc">
-			<ul class="nav nav-pills flex-column">
+			<ul class="nav nav-pills">
 				{{range $j, $cg := $cc.Groups}}
 				<li class="nav-item"><a class="nav-link{{if eq $j 0}} active{{end}}" href="#cg_{{$cg.Name}}" data-bs-toggle="tab">{{T $.Loc (print "config.group.label." $cg.Name)}}</a></li>
 				{{end}}
