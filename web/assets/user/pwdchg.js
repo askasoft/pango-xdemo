@@ -1,4 +1,4 @@
-$(function() {
+(function($) {
 	function change() {
 		var $f = $('#pwdchg_form');
 

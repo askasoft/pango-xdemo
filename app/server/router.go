@@ -12,7 +12,7 @@ import (
 	"github.com/askasoft/pango-xdemo/app/handlers/demos"
 	"github.com/askasoft/pango-xdemo/app/handlers/files"
 	"github.com/askasoft/pango-xdemo/app/handlers/login"
-	"github.com/askasoft/pango-xdemo/app/handlers/self"
+	"github.com/askasoft/pango-xdemo/app/handlers/user"
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango-xdemo/web"
 	"github.com/askasoft/pango/log"
@@ -60,7 +60,6 @@ func bodyTooLarge(c *xin.Context, limit int64) {
 
 func configMiddleware() {
 	svc := app.INI.Section("server")
-	prefix := svc.GetString("prefix")
 
 	app.XRL.DrainBody = svc.GetBool("httpDrainRequestBody", false)
 	app.XRL.MaxBodySize = svc.GetSize("httpMaxRequestBodySize", 8<<20)
@@ -80,16 +79,16 @@ func configMiddleware() {
 
 	app.XCC.CacheControl = svc.GetString("staticCacheControl", "public, max-age=31536000, immutable")
 
-	app.XCA.RedirectURL = prefix + "/login/"
+	app.XCA.RedirectURL = app.Base + "/login/"
 	app.XCA.CookieMaxAge = app.INI.GetDuration("login", "cookieMaxAge", time.Minute*30)
-	app.XCA.CookiePath = str.IfEmpty(prefix, "/")
+	app.XCA.CookiePath = str.IfEmpty(app.Base, "/")
 	app.XCA.CookieSecure = app.INI.GetBool("login", "cookieSecure", true)
 
 	app.XCN.CookieMaxAge = app.XCA.CookieMaxAge
 	app.XCN.CookiePath = app.XCA.CookiePath
 	app.XCN.CookieSecure = app.XCA.CookieSecure
 
-	app.XTP.CookiePath = str.IfEmpty(prefix, "/")
+	app.XTP.CookiePath = str.IfEmpty(app.Base, "/")
 	app.XTP.SetSecret(app.Secret())
 
 	configResponseHeader()
@@ -162,8 +161,7 @@ func configAccessLogger() {
 }
 
 func configHandlers() {
-	cp := app.INI.GetString("server", "prefix")
-	log.Infof("Context Path: %s", cp)
+	log.Infof("Context Path: %s", app.Base)
 
 	r := app.XIN
 
@@ -178,7 +176,7 @@ func configHandlers() {
 	r.Use(app.XLL.Handler())
 	r.Use(app.XRH.Handler())
 
-	rg := r.Group(cp)
+	rg := r.Group(app.Base)
 	rg.GET("/", app.XCN.Handler(), handlers.Index)
 	rg.HEAD("/healthcheck", handlers.HealthCheck)
 	rg.GET("/healthcheck", handlers.HealthCheck)
@@ -188,9 +186,9 @@ func configHandlers() {
 
 	addAPIHandlers(rg.Group("/api"))
 	addFilesHandlers(rg.Group("/files"))
-	addLoginHandlers(rg.Group("/login"))
 	addDemosHandlers(rg.Group("/demos"))
-	addSelfHandlers(rg.Group("/s"))
+	addLoginHandlers(rg.Group("/login"))
+	addUserHandlers(rg.Group("/u"))
 	addAdminHandlers(rg.Group("/a"))
 }
 
@@ -211,11 +209,11 @@ func addStaticHandlers(rg *xin.RouterGroup) {
 	xin.StaticFSFuncFile(rg, "/favicon.ico", wfsc, "favicon.ico", xcch)
 }
 
-func addAPIHandlers(a *xin.RouterGroup) {
-	a.Use(app.XAC.Handler()) // access control
-	a.OPTIONS("/*path", xin.Next)
+func addAPIHandlers(rg *xin.RouterGroup) {
+	rg.Use(app.XAC.Handler()) // access control
+	rg.OPTIONS("/*path", xin.Next)
 
-	rg := a.Group("")
+	rg = rg.Group("")
 	rg.Use(tenant.CheckTenant) // schema protect
 	rg.Use(app.XBA.Handler())  // Basic auth
 	rg.Use(tenant.IPProtect)   // IP protect
@@ -273,29 +271,32 @@ func addDemosPetsHandlers(rg *xin.RouterGroup) {
 	rg.POST("/export/csv", demos.PetCsvExport)
 }
 
-func addSelfHandlers(s *xin.RouterGroup) {
-	s.Use(tenant.CheckTenant) // schema protect
-	s.Use(app.XCA.Handler())  // cookie auth
-	s.Use(tenant.IPProtect)   // IP protect
-	s.Use(app.XTP.Handler())  // token protect
+func addUserHandlers(rg *xin.RouterGroup) {
+	rg.Use(tenant.CheckTenant) // schema protect
+	rg.Use(app.XCA.Handler())  // cookie auth
+	rg.Use(tenant.IPProtect)   // IP protect
+	rg.Use(app.XTP.Handler())  // token protect
 
-	rg := s.Group("/pwdchg")
-	rg.GET("/", self.PasswordChangeIndex)
-	rg.POST("/change", self.PasswordChangeChange)
+	addUserPwdchgHandlers(rg.Group("/pwdchg"))
 }
 
-func addAdminHandlers(a *xin.RouterGroup) {
-	a.Use(tenant.CheckTenant)      // schema protect
-	a.Use(app.XCA.Handler())       // cookie auth
-	a.Use(tenant.IPProtect)        // IP protect
-	a.Use(tenant.RoleAdminProtect) // role protect
-	a.Use(app.XTP.Handler())       // token protect
+func addUserPwdchgHandlers(rg *xin.RouterGroup) {
+	rg.GET("/", user.PasswordChangeIndex)
+	rg.POST("/change", user.PasswordChangeChange)
+}
 
-	a.GET("/", admin.Index)
+func addAdminHandlers(rg *xin.RouterGroup) {
+	rg.Use(tenant.CheckTenant)      // schema protect
+	rg.Use(app.XCA.Handler())       // cookie auth
+	rg.Use(tenant.IPProtect)        // IP protect
+	rg.Use(tenant.RoleAdminProtect) // role protect
+	rg.Use(app.XTP.Handler())       // token protect
 
-	addAdminConfigHandlers(a.Group("/config"))
-	addAdminUserHandlers(a.Group("/users"))
-	addAdminResetHandlers(a.Group("/reset"))
+	rg.GET("/", admin.Index)
+
+	addAdminConfigHandlers(rg.Group("/config"))
+	addAdminUserHandlers(rg.Group("/users"))
+	addAdminResetHandlers(rg.Group("/reset"))
 }
 
 func addAdminConfigHandlers(rg *xin.RouterGroup) {

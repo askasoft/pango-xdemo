@@ -1,4 +1,4 @@
-package self
+package user
 
 import (
 	"errors"
@@ -16,7 +16,7 @@ import (
 func PasswordChangeIndex(c *xin.Context) {
 	h := handlers.H(c)
 
-	c.HTML(http.StatusOK, "self/pwdchg", h)
+	c.HTML(http.StatusOK, "user/pwdchg", h)
 }
 
 type PwdChgArg struct {
