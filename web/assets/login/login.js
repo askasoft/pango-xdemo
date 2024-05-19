@@ -4,7 +4,7 @@
 		
 		$.ajax({
 			url: './login',
-			type: 'POST',
+			method: 'POST',
 			data: $f.serialize(),
 			dataType: 'json',
 			beforeSend: main.form_ajax_start($f),

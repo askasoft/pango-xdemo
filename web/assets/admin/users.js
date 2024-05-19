@@ -17,7 +17,7 @@
 
 		$.ajax({
 			url: './list',
-			type: 'POST',
+			method: 'POST',
 			data: $f.serialize(),
 			beforeSend: function() {
 				main.form_clear_invalid($f);
@@ -37,7 +37,7 @@
 	function users_export() {
 		$.ajaf({
 			url: './export/csv',
-			type: 'POST',
+			method: 'POST',
 			data: $('#users_listform').serializeArray(),
 			beforeSend: main.loadmask,
 			error: main.ajax_error,
@@ -127,7 +127,7 @@
 
 		$.ajax({
 			url: './update',
-			type: 'POST',
+			method: 'POST',
 			data: $p.find('form').serialize(),
 			dataType: 'json',
 			beforeSend: main.form_ajax_start($p),
@@ -158,7 +158,7 @@
 
 		$.ajax({
 			url: './create',
-			type: 'POST',
+			method: 'POST',
 			data: $p.find('form').serialize(),
 			dataType: 'json',
 			beforeSend: main.form_ajax_start($p),
@@ -196,7 +196,7 @@
 
 		$.ajax({
 			url: './deletes',
-			type: 'POST',
+			method: 'POST',
 			data: {
 				_token_: main.token,
 				id: ids
@@ -230,7 +230,7 @@
 
 		$.ajax({
 			url: './deleteb',
-			type: 'POST',
+			method: 'POST',
 			data: $p.find('form').serialize(),
 			dataType: 'json',
 			beforeSend: main.form_ajax_start($p),
@@ -261,7 +261,7 @@
 
 		$.ajax({
 			url: './updates',
-			type: 'POST',
+			method: 'POST',
 			data: $p.find('form').serialize(),
 			dataType: 'json',
 			beforeSend: main.form_ajax_start($p),

@@ -6,7 +6,7 @@
 			var $jf = $('#job_form'), jid;
 			$.ajaf({
 				url: './start',
-				type: 'POST',
+				method: 'POST',
 				data: $jf.serializeArray(),
 				file: $jf.find('input[type="file"]'),
 				dataType: 'json',
@@ -32,7 +32,7 @@
 
 		$.ajax({
 			url: './abort',
-			type: 'POST',
+			method: 'POST',
 			data: {
 				_token_: main.token,
 				jid: jid
@@ -69,7 +69,7 @@
 		$.ajax({
 			url: './status',
 			data: param,
-			type: 'GET',
+			method: 'GET',
 			dataType: 'json',
 			success: function(data) {
 				var job = data.job, logs = data.logs || [];
@@ -126,7 +126,7 @@
 		$.ajax({
 			url: './logs',
 			data: param,
-			type: 'GET',
+			method: 'GET',
 			dataType: 'json',
 			beforeSend: function() { $a.hide(); $i.show(); },
 			success: function(logs) {
@@ -354,7 +354,7 @@
 
 		$.ajax({
 			url: './list',
-			type: 'GET',
+			method: 'GET',
 			dataType: 'json',
 			beforeSend: $jhs.loadmask.delegate($jhs),
 			success: function(data) {
