@@ -12,6 +12,7 @@ import (
 	"github.com/askasoft/pango-xdemo/app/handlers/demos"
 	"github.com/askasoft/pango-xdemo/app/handlers/files"
 	"github.com/askasoft/pango-xdemo/app/handlers/login"
+	"github.com/askasoft/pango-xdemo/app/handlers/super"
 	"github.com/askasoft/pango-xdemo/app/handlers/user"
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango-xdemo/web"
@@ -190,6 +191,7 @@ func configHandlers() {
 	addLoginHandlers(rg.Group("/login"))
 	addUserHandlers(rg.Group("/u"))
 	addAdminHandlers(rg.Group("/a"))
+	addSuperHandlers(rg.Group("/s"))
 }
 
 func addStaticHandlers(rg *xin.RouterGroup) {
@@ -343,4 +345,21 @@ func addAdminResetHandlers(rg *xin.RouterGroup) {
 	rg.GET("/status", admin.DatabaseResetJobCtrl.Status)
 	rg.POST("/start", admin.DatabaseResetJobCtrl.Start)
 	rg.POST("/abort", admin.DatabaseResetJobCtrl.Abort)
+}
+
+func addSuperHandlers(rg *xin.RouterGroup) {
+	rg.Use(tenant.CheckTenant)      // schema protect
+	rg.Use(app.XCA.Handler())       // cookie auth
+	rg.Use(tenant.IPProtect)        // IP protect
+	rg.Use(tenant.RoleSuperProtect) // role protect
+	rg.Use(app.XTP.Handler())       // token protect
+
+	// rg.GET("/", super.Index)
+
+	addSuperShellHandlers(rg.Group("/shell"))
+}
+
+func addSuperShellHandlers(rg *xin.RouterGroup) {
+	rg.GET("/", super.ShellIndex)
+	rg.POST("/exec", super.ShellExec)
 }

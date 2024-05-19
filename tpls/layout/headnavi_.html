@@ -14,9 +14,13 @@
 			</button>
 			<ul class="dropdown-menu dropdown-menu-end">
 				{{if .AuthUser.IsAdmin}}
-				<li><a class="dropdown-item" href="{{.Base}}/a/config/"><i class="{{T .Loc "icon.config"}}"></i><span>{{T .Loc "menu.config"}}</span></a></li>
+				<li><a class="dropdown-item" href="{{.Base}}/a/config/"><i class="{{T .Loc "icon.admin.config"}}"></i><span>{{T .Loc "menu.admin.config"}}</span></a></li>
 				<li><a class="dropdown-item" href="{{.Base}}/a/users/"><i class="{{T .Loc "icon.admin.users"}}"></i><span>{{T .Loc "menu.admin.users"}}</span></a></li>
 				<li><a class="dropdown-item" href="{{.Base}}/a/reset/"><i class="{{T .Loc "icon.admin.reset"}}"></i><span>{{T .Loc "menu.admin.reset"}}</span></a></li>
+				<li class="divider"></li>
+				{{end}}
+				{{if .AuthUser.IsSuper}}
+				<li><a class="dropdown-item" href="{{.Base}}/s/shell/"><i class="{{T .Loc "icon.super.shell"}}"></i><span>{{T .Loc "menu.super.shell"}}</span></a></li>
 				<li class="divider"></li>
 				{{end}}
 				<li><a class="dropdown-item" href="{{.Base}}/demos/pets/"><i class="{{T .Loc "icon.demos.pets"}}"></i><span>{{T .Loc "menu.demos.pets"}}</span></a></li>

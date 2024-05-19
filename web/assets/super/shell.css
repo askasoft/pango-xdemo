@@ -1,0 +1,10 @@
+#shell_result {
+	margin-top: 40px;
+	font-family: Consolas, Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace, serif;
+}
+#shell_result .ui-label {
+	font-weight: bold;
+}
+#shell_result .ui-value {
+	white-space: pre-wrap;
+}

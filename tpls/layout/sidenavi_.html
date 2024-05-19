@@ -7,9 +7,22 @@
 		</div>
 		<div class="card-body">
 			<ul class="nav flex-column">
-				<li class="nav-item"><a class="nav-link" href="{{.Base}}/a/config/"><i class="{{T .Loc "icon.config"}}"></i><span>{{T .Loc "menu.config"}}</span></a></li>
+				<li class="nav-item"><a class="nav-link" href="{{.Base}}/a/config/"><i class="{{T .Loc "icon.admin.config"}}"></i><span>{{T .Loc "menu.admin.config"}}</span></a></li>
 				<li class="nav-item"><a class="nav-link" href="{{.Base}}/a/users/"><i class="{{T .Loc "icon.admin.users"}}"></i><span>{{T .Loc "menu.admin.users"}}</span></a></li>
 				<li class="nav-item"><a class="nav-link" href="{{.Base}}/a/reset/"><i class="{{T .Loc "icon.admin.reset"}}"></i><span>{{T .Loc "menu.admin.reset"}}</span></a></li>
+			</ul>
+		</div>
+	</div>
+	{{end}}
+
+	{{if and .AuthUser .AuthUser.IsSuper}}
+	<div id="navi_super" class="card">
+		<div class="card-header">
+			<i class="{{T .Loc "icon.super"}}"></i><span>{{T .Loc "menu.super"}}</span>
+		</div>
+		<div class="card-body">
+			<ul class="nav flex-column">
+				<li class="nav-item"><a class="nav-link" href="{{.Base}}/s/shell/"><i class="{{T .Loc "icon.super.shell"}}"></i><span>{{T .Loc "menu.super.shell"}}</span></a></li>
 			</ul>
 		</div>
 	</div>
