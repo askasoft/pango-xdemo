@@ -25,13 +25,13 @@ func TagsIndex(c *xin.Context) {
 	_ = c.Bind(a)
 
 	checks := &cog.LinkedHashMap[string, string]{}
-	_ = checks.UnmarshalJSON(str.UnsafeBytes(tbs.GetText(c.Locale, "demo.tags.checks")))
+	_ = checks.UnmarshalJSON(str.UnsafeBytes(tbs.GetText(c.Locale, "demos.tags.checks")))
 
 	radios := &cog.LinkedHashMap[string, string]{}
-	_ = radios.UnmarshalJSON(str.UnsafeBytes(tbs.GetText(c.Locale, "demo.tags.radios")))
+	_ = radios.UnmarshalJSON(str.UnsafeBytes(tbs.GetText(c.Locale, "demos.tags.radios")))
 
 	selects := &cog.LinkedHashMap[string, string]{}
-	_ = selects.UnmarshalJSON(str.UnsafeBytes(tbs.GetText(c.Locale, "demo.tags.selects")))
+	_ = selects.UnmarshalJSON(str.UnsafeBytes(tbs.GetText(c.Locale, "demos.tags.selects")))
 
 	h["ChecksList"] = checks
 	h["RadiosList"] = radios

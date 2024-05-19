@@ -6,14 +6,14 @@
 <div class="s-section">
 	<div class="ui-headline">
 		<ol class="breadcrumb">
-			<li class="active"><i class="{{T .Loc "icon.uploads"}}"></i> {{T .Loc "menu.uploads"}}</li>
+			<li class="active"><i class="{{T .Loc "icon.demos.uploads"}}"></i> {{T .Loc "menu.demos.uploads"}}</li>
 		</ol>
 	</div>
 
-	<div class="well">{{T .Loc "demo.uploads.well"}}</div>
+	<div class="well">{{T .Loc "demos.uploads.well"}}</div>
 
 	<hr>
-	<h4>Single File upload</h4>
+	<h4>{{T .Loc "demos.uploads.label.single"}}</h4>
 	<div id="single"
 		data-upload-url="{{.Base}}/files/upload"
 		data-dnload-url="{{.Base}}/files$"
@@ -21,11 +21,11 @@
 		
 		<input type="hidden" name="demo" class="ui-uploader-data" value="single"/>
 		<input type="file" name="file" class="ui-uploader-file" accept="image/*" style="display:none"/>
-		<a class="btn btn-sm btn-primary ui-uploader-btn">Browse...</a>
+		<a class="btn btn-sm btn-primary ui-uploader-btn">{{T .Loc "button.browse"}}</a>
 	</div>
 
 	<hr>
-	<h4>Multiple Files upload</h4>
+	<h4>{{T .Loc "demos.uploads.label.multi"}}</h4>
 	<div id="multi"
 		data-upload-url="{{.Base}}/files/upload"
 		data-dnload-url="{{.Base}}/files$"
@@ -34,13 +34,13 @@
 		<input type="hidden" name="demo" class="ui-uploader-data" value="multi"/>
 		<input type="file" name="file" multiple class="ui-uploader-file" accept="image/*" style="display:none"/>
 		<div class="text-center">
-			<p>Drag and drop files to this area</p>
-			<a class="btn btn-sm btn-primary ui-uploader-btn">Browse...</a>
+			<p>{{T .Loc "demos.uploads.label.dragdrop"}}</p>
+			<a class="btn btn-sm btn-primary ui-uploader-btn">{{T .Loc "button.browse"}}</a>
 		</div>
 	</div>
 
 	<hr>
-	<h4>Multiple Files upload (image preview)</h4>
+	<h4>{{T .Loc "demos.uploads.label.multi_img"}}</h4>
 	<div id="multi2"
 		data-upload-url="{{.Base}}/files/upload"
 		data-dnload-url="{{.Base}}/files$"
@@ -51,13 +51,13 @@
 		<input type="hidden" name="demo" class="ui-uploader-data" value="multi"/>
 		<input type="file" name="file" multiple class="ui-uploader-file" accept="image/*" style="display:none"/>
 		<div class="text-center">
-			<p>Drag and drop files to this area</p>
-			<a class="btn btn-sm btn-primary ui-uploader-btn">Browse...</a>
+			<p>{{T .Loc "demos.uploads.label.dragdrop"}}</p>
+			<a class="btn btn-sm btn-primary ui-uploader-btn">{{T .Loc "button.browse"}}</a>
 		</div>
 	</div>
 
 	<hr>
-	<h4>Multiple Files upload (concurrent: 5)</h4>
+	<h4>{{TF .Loc "demos.uploads.label.multi_con" 5}}</h4>
 	<div id="multi2"
 		data-upload-url="{{.Base}}/files/upload"
 		data-dnload-url="{{.Base}}/files$"
@@ -67,8 +67,8 @@
 		<input type="hidden" name="demo" class="ui-uploader-data" value="multi"/>
 		<input type="file" name="file" multiple class="ui-uploader-file" accept="image/*" style="display:none"/>
 		<div class="text-center">
-			<p>Drag and drop files to this area</p>
-			<a class="btn btn-sm btn-primary ui-uploader-btn">Browse...</a>
+			<p>{{T .Loc "demos.uploads.label.dragdrop"}}</p>
+			<a class="btn btn-sm btn-primary ui-uploader-btn">{{T .Loc "button.browse"}}</a>
 		</div>
 	</div>
 
