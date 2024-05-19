@@ -1,19 +1,5 @@
 {{define "sidenavi"}}
-<div id="sidenavi"><div class="ui-sidenavi minimal">
-
-	<div id="navi_demmos" class="card">
-		<div class="card-header">
-			<i class="fas fa-earth-asia"></i><span>{{T .Loc "menu.demos"}}</span>
-		</div>
-		<div class="card-body">
-			<ul class="nav flex-column">
-				<li class="nav-item"><a class="nav-link" href="{{.Base}}/demos/pets/"><i class="{{T .Loc "icon.demos.pets"}}"></i><span>{{T .Loc "menu.demos.pets"}}</span></a></li>
-				<li class="nav-item"><a class="nav-link" href="{{.Base}}/demos/tags/"><i class="{{T .Loc "icon.demos.tags"}}"></i><span>{{T .Loc "menu.demos.tags"}}</span></a></li>
-				<li class="nav-item"><a class="nav-link" href="{{.Base}}/demos/uploads/"><i class="{{T .Loc "icon.demos.uploads"}}"></i><span>{{T .Loc "menu.demos.uploads"}}</span></a></li>
-			</ul>
-		</div>
-	</div>
-
+<div id="sidenavi"><div class="ui-sidenavi minimal hidable">
 	{{if and .AuthUser .AuthUser.IsAdmin}}
 	<div id="navi_admin" class="card">
 		<div class="card-header">
@@ -29,5 +15,17 @@
 	</div>
 	{{end}}
 
+	<div id="navi_demmos" class="card">
+		<div class="card-header">
+			<i class="fas fa-earth-asia"></i><span>{{T .Loc "menu.demos"}}</span>
+		</div>
+		<div class="card-body">
+			<ul class="nav flex-column">
+				<li class="nav-item"><a class="nav-link" href="{{.Base}}/demos/pets/"><i class="{{T .Loc "icon.demos.pets"}}"></i><span>{{T .Loc "menu.demos.pets"}}</span></a></li>
+				<li class="nav-item"><a class="nav-link" href="{{.Base}}/demos/tags/"><i class="{{T .Loc "icon.demos.tags"}}"></i><span>{{T .Loc "menu.demos.tags"}}</span></a></li>
+				<li class="nav-item"><a class="nav-link" href="{{.Base}}/demos/uploads/"><i class="{{T .Loc "icon.demos.uploads"}}"></i><span>{{T .Loc "menu.demos.uploads"}}</span></a></li>
+			</ul>
+		</div>
+	</div>
 </div></div>
 {{end}}
