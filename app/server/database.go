@@ -1,6 +1,9 @@
 package server
 
 import (
+	"errors"
+	"io"
+	"strings"
 	"time"
 
 	"github.com/askasoft/pango-xdemo/app"
@@ -9,6 +12,7 @@ import (
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/log/gormlog"
 	"github.com/askasoft/pango/mag"
+	"github.com/askasoft/pango/sqx"
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/str"
 	"gorm.io/driver/postgres"
@@ -131,23 +135,25 @@ func dbExecSQL(sqlfile string) error {
 
 		tsql := str.ReplaceAll(sql, "{{SCHEMA}}", tt.Schema())
 
-		tsqls := str.FieldsRune(tsql, ';')
+		sr := sqx.NewSqlReader(strings.NewReader(tsql))
 
 		err := app.GDB.Transaction(func(db *gorm.DB) error {
-			for i, s := range tsqls {
-				s := str.Strip(s)
-				if s == "" || str.StartsWith(s, "--") {
-					continue
+			for i := 1; ; i++ {
+				sql, err := sr.ReadSql()
+				if errors.Is(err, io.EOF) {
+					return nil
+				}
+				if err != nil {
+					return err
 				}
 
-				log.Infof("[%d] %s", i+1, s)
-				r := db.Exec(s)
+				log.Infof("[%d] %s", i, sql)
+				r := db.Exec(sql)
 				if r.Error != nil {
 					return r.Error
 				}
 				log.Infof("[%d] = %d", i+1, r.RowsAffected)
 			}
-			return nil
 		})
 
 		return err
