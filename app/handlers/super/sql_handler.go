@@ -1,10 +1,12 @@
 package super
 
 import (
+	"database/sql"
 	"errors"
 	"io"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/handlers"
@@ -29,11 +31,12 @@ type SqlArg struct {
 }
 
 type SqlResult struct {
-	Sql          string     `json:"sql,omitempty"`
-	Error        string     `json:"error,omitempty"`
-	RowsEffected int64      `json:"rows_effected,omitempty"`
-	Columns      []string   `json:"columns,omitempty"`
-	Datas        [][]string `json:"datas,omitempty"`
+	Sql      string     `json:"sql,omitempty"`
+	Error    string     `json:"error,omitempty"`
+	Elapsed  string     `json:"elapsed,omitempty"`
+	Effected int64      `json:"effected,omitempty"`
+	Columns  []string   `json:"columns,omitempty"`
+	Datas    [][]string `json:"datas,omitempty"`
 }
 
 func SqlExec(c *xin.Context) {
@@ -46,11 +49,11 @@ func SqlExec(c *xin.Context) {
 
 	srs := []*SqlResult{}
 
-	srd := sqx.NewSqlReader(strings.NewReader(arg.Sql))
+	sqr := sqx.NewSqlReader(strings.NewReader(arg.Sql))
 
 	err := app.SDB.Transaction(func(tx *sqlx.Tx) error {
 		for {
-			sql, err := srd.ReadSql()
+			sqs, err := sqr.ReadSql()
 			if errors.Is(err, io.EOF) {
 				return nil
 			}
@@ -58,11 +61,12 @@ func SqlExec(c *xin.Context) {
 				return err
 			}
 
-			sr := &SqlResult{Sql: sql}
+			sr := &SqlResult{Sql: sqs}
 			srs = append(srs, sr)
 
-			if str.StartsWithFold(sql, "select") {
-				rows, err := tx.Query(sql)
+			start := time.Now()
+			if str.StartsWithFold(sqs, "select") {
+				rows, err := tx.Query(sqs)
 				if err != nil {
 					sr.Error = err.Error()
 					return io.EOF
@@ -77,9 +81,10 @@ func SqlExec(c *xin.Context) {
 
 				for cnt := 0; rows.Next() && cnt < arg.Limit; cnt++ {
 					data := make([]string, len(sr.Columns))
+					strs := make([]sql.NullString, len(data))
 					ptrs := make([]any, len(data))
-					for i := range data {
-						ptrs[i] = &data[i]
+					for i := range strs {
+						ptrs[i] = &strs[i]
 					}
 
 					err = rows.Scan(ptrs...)
@@ -88,21 +93,26 @@ func SqlExec(c *xin.Context) {
 						return io.EOF
 					}
 
+					for i := range strs {
+						data[i] = strs[i].String
+					}
 					sr.Datas = append(sr.Datas, data)
 				}
 			} else {
-				r, err := tx.Exec(sql)
+				r, err := tx.Exec(sqs)
 				if err != nil {
 					sr.Error = err.Error()
 					return io.EOF
 				}
 
-				sr.RowsEffected, err = r.RowsAffected()
+				sr.Effected, err = r.RowsAffected()
 				if err != nil {
 					sr.Error = err.Error()
 					return io.EOF
 				}
 			}
+
+			sr.Elapsed = time.Since(start).String()
 		}
 	})
 	if err != nil && !errors.Is(err, io.EOF) {
