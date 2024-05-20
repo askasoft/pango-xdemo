@@ -358,6 +358,7 @@ func addSuperHandlers(rg *xin.RouterGroup) {
 
 	addSuperShellHandlers(rg.Group("/shell"))
 	addSuperSqlHandlers(rg.Group("/sql"))
+	addSuperJobHandlers(rg.Group("/job"))
 }
 
 func addSuperShellHandlers(rg *xin.RouterGroup) {
@@ -368,4 +369,8 @@ func addSuperShellHandlers(rg *xin.RouterGroup) {
 func addSuperSqlHandlers(rg *xin.RouterGroup) {
 	rg.GET("/", super.SqlIndex)
 	rg.POST("/exec", super.SqlExec)
+}
+
+func addSuperJobHandlers(rg *xin.RouterGroup) {
+	rg.GET("/", super.JobStats)
 }

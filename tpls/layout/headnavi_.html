@@ -20,6 +20,7 @@
 				<li class="divider"></li>
 				{{end}}
 				{{if .AuthUser.IsSuper}}
+				<li><a class="dropdown-item" href="{{.Base}}/s/job/"><i class="{{T .Loc "icon.super.job"}}"></i><span>{{T .Loc "menu.super.job"}}</span></a></li>
 				<li><a class="dropdown-item" href="{{.Base}}/s/shell/"><i class="{{T .Loc "icon.super.shell"}}"></i><span>{{T .Loc "menu.super.shell"}}</span></a></li>
 				<li><a class="dropdown-item" href="{{.Base}}/s/sql/"><i class="{{T .Loc "icon.super.sql"}}"></i><span>{{T .Loc "menu.super.sql"}}</span></a></li>
 				<li class="divider"></li>

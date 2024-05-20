@@ -284,6 +284,10 @@ func (tj *TenantJobs) Stats() string {
 	return sb.String()
 }
 
+func Stats() string {
+	return ttjobs.Stats()
+}
+
 // -----------------------------
 var mu sync.Mutex
 

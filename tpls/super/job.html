@@ -1,0 +1,13 @@
+{{template "main_header" .}}
+
+<div class="s-section">
+	<div class="ui-headline">
+		<ol class="breadcrumb">
+			<li class="active"><i class="{{T .Loc "icon.super.job"}}"></i> {{T .Loc "menu.super.job"}}</li>
+		</ol>
+	</div>
+
+	<pre>{{$.Stats}}</pre>
+</div>
+
+{{template "main_footer" .}}
