@@ -1,0 +1,83 @@
+{{MapSet .Ctx.Attrs "styles" (Array "super/tenants.css")}}
+{{MapSet .Ctx.Attrs "scripts" (Array "super/tenants.js")}}
+
+{{template "main_header" .}}
+
+<div class="s-section">
+	<div class="ui-headline">
+		<ol class="breadcrumb">
+			<li class="active"><i class="{{T .Loc "icon.super.tenants"}}"></i> {{T .Loc "menu.super.tenants"}}</li>
+		</ol>
+	</div>
+
+	<div class="row">
+		<div class="col-md-6 ui-toolbar">
+		</div>
+		<div class="col-md-6 ui-toolbar text-end">
+			<button class="btn btn-sm btn-outline-primary" popup-target="#tenants_create_popup">
+				<i class="{{T .Loc "icon.new"}}"></i> {{T .Loc "button.new"}}
+			</button>
+		</div>
+	</div>
+
+	<div id="tenants_alert">{{template "alerts" .}}</div>
+	
+	<fieldset id="tenants_listfset" class="ui-fieldset collapsed" data-spy="fieldset">
+		<legend>{{T .Loc "button.search"}}</legend>
+		<form id="tenants_listform"  class="form-horizontal grey" method="POST">
+			<input type="hidden" name="_token_" value="{{.Token}}"/>
+			<input type="hidden" name="p" value="{{.Q.Page}}"/>
+			<input type="hidden" name="l" value="{{.Q.Limit}}"/>
+			<input type="hidden" name="c" value="{{.Q.Col}}"/>
+			<input type="hidden" name="d" value="{{.Q.Dir}}"/>
+
+			<div class="row py-1">
+				<label class="col-md-2 col-form-label">{{T .Loc "tenant.name"}}</label>
+				<div class="col-md-10">
+					<input name="name" type="text" class="form-control" textclear value="{{.Q.Name}}"/>
+				</div>
+			</div>
+			<div class="row py-1">
+				<div class="offset-md-2 col-md-10">
+					<button type="submit" class="btn btn-primary"><i class="{{T .Loc "icon.search"}}"></i> {{T .Loc "button.search"}}</button>
+					<button type="reset" class="btn btn-secondary"><i class="{{T .Loc "icon.clear"}}"></i> {{T .Loc "button.clear"}}</button>
+				</div>
+			</div>
+		</form>
+	</fieldset>
+
+	<div id="tenants_list"></div>
+</div>
+
+
+<div id="tenants_create_popup" class="ui-popup s-popup-detail w800" data-spy="popup" tabindex="-1"
+	popup-closer="true" popup-position="center" popup-focus="#tenants_create_popup [name=name]">
+	<div class="ui-popup-header">
+		<h4><i class="{{T .Loc "icon.edit"}}"></i>
+			{{T .Loc "tenant.create.header"}}
+		</h4>
+	</div>
+	<form class="ui-popup-body form-horizontal grey lined">
+		<input type="hidden" name="_token_" value="{{.Token}}"/>
+		<div class="row py-3">
+			<label class="col-md-2 col-form-label">{{T .Loc "tenant.name"}}</label>
+			<div class="col-md-10">
+				<input name="name" type="text" class="form-control" maxlength="30" value="" textclear>
+				<div class="desc">{{T .Loc "tenant.desc.name"}}</div>
+			</div>
+		</div>
+		<div class="row py-3">
+			<label class="col-md-2 col-form-label">{{T .Loc "tenant.comment"}}</label>
+			<div class="col-md-10">
+				<textarea name="comment" class="form-control" maxlength="250" rows="2" textclear enterfire></textarea>
+			</div>
+		</div>
+		<button type="submit" class="hidden"></button>
+	</form>
+	<div class="ui-popup-footer">
+		<button type="submit" class="btn btn-primary"><i class="{{T .Loc "icon.save"}}"></i> {{T .Loc "button.create"}}</button>
+		<button type="button" class="btn btn-secondary" popup-dismiss="true"><i class="{{T .Loc "icon.close"}}"></i> {{T .Loc "button.close"}}</button>
+	</div>
+</div>
+
+{{template "main_footer" .}}

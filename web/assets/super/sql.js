@@ -24,7 +24,7 @@
 
 					$sr.find('.sql').text(d.sql);
 					$sr.find('.err').text(d.error)[d.error ? 'show' : 'hide']();
-					$sr.find('.info').text('Elapsed: ' + d.elapsed + (d.effected ? '\nEffected: ' + d.effected : ''));
+					$sr.find('.info').text((d.elapsed ? 'Elapsed: ' + d.elapsed : '') + (d.effected ? '\nEffected: ' + d.effected : ''));
 
 					if (d.columns) {
 						var $th = $sr.find('thead'), $tr = $('<tr>');

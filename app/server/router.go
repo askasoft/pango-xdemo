@@ -356,9 +356,20 @@ func addSuperHandlers(rg *xin.RouterGroup) {
 
 	// rg.GET("/", super.Index)
 
+	addSuperTenantHandlers(rg.Group("/tenants"))
+	addSuperJobHandlers(rg.Group("/job"))
 	addSuperShellHandlers(rg.Group("/shell"))
 	addSuperSqlHandlers(rg.Group("/sql"))
-	addSuperJobHandlers(rg.Group("/job"))
+}
+
+func addSuperTenantHandlers(rg *xin.RouterGroup) {
+	rg.GET("/", super.TenantIndex)
+	rg.POST("/list", super.TenantList)
+	rg.POST("/create", super.TenantCreate)
+}
+
+func addSuperJobHandlers(rg *xin.RouterGroup) {
+	rg.GET("/", super.JobStats)
 }
 
 func addSuperShellHandlers(rg *xin.RouterGroup) {
@@ -369,8 +380,4 @@ func addSuperShellHandlers(rg *xin.RouterGroup) {
 func addSuperSqlHandlers(rg *xin.RouterGroup) {
 	rg.GET("/", super.SqlIndex)
 	rg.POST("/exec", super.SqlExec)
-}
-
-func addSuperJobHandlers(rg *xin.RouterGroup) {
-	rg.GET("/", super.JobStats)
 }

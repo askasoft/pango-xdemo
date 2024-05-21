@@ -97,9 +97,15 @@ func Iterate(it func(tt Tenant) error) error {
 	return nil
 }
 
-func Create(name string) error {
+func Create(name string, comment ...string) error {
 	if err := app.GDB.Exec("CREATE SCHEMA " + name).Error; err != nil {
 		return err
+	}
+
+	if len(comment) > 0 && comment[0] != "" {
+		if err := app.GDB.Exec(fmt.Sprintf("COMMENT ON SCHEMA %s IS '%s'", name, sqx.EscapeString(comment[0]))).Error; err != nil {
+			log.Error(err)
+		}
 	}
 
 	tt := Tenant(name)

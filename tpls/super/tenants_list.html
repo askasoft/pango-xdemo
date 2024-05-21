@@ -1,0 +1,34 @@
+{{Pager .Q.Pager "Locale=" .Loc}}
+
+<form autocomplete="off" class="table-responsive">
+<table id="tenants_table" class="table table-striped ui-sortable s-table"
+	data-spy="sortable" data-sorted-col="{{.Q.Sorter.Col}}" data-sorted-dir="{{.Q.Sorter.Dir}}">
+	<thead>
+		<tr>
+			<th class="no">#</th>
+			<th class="name sortable" data-sort-col="name">{{T .Loc "tenant.name"}}</th>
+			<th class="domain">{{T .Loc "tenant.domain"}}</th>
+			<th class="comment sortable" data-sort-col="comment">{{T .Loc "tenant.comment"}}</th>
+		</tr>
+	</thead>
+	<tbody>
+		{{$n := .Q.Begin}}
+		{{range $i, $t := .Tenants}}
+		<tr id="tenant_{{$t.Name}}">
+			<td class="no">{{Add $n $i}}</td>
+			<td class="name">{{$t.Name}}</td>
+			<td class="domain"><a href="//{{$t.Name}}.{{$.Domain}}" target="_blank">{{$t.Name}}.{{$.Domain}}</a></td>
+			<td class="comment"><pre>{{$t.Comment}}</pre></td>
+		</tr>
+		{{end}}
+		<tr class="template hidden">
+			<td class="no"></td>
+			<td class="name"></td>
+			<td class="domain"><a href="#" target="_blank"></a></td>
+			<td class="comment"><pre></pre></td>
+		</tr>
+	</tbody>
+</table>
+</form>
+
+{{Pager .Q.Pager "Locale=" .Loc}}

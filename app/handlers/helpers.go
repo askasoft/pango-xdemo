@@ -48,6 +48,7 @@ func H(c *xin.Context) xin.H {
 		"Ctx":      c,
 		"Loc":      c.Locale,
 		"Token":    app.XTP.RefreshToken(c),
+		"Domain":   app.Domain,
 		"Tenant":   tt,
 		"AuthUser": au,
 	}

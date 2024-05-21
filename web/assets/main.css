@@ -252,7 +252,8 @@ form div.verr {
 
 .s-table th.check, .s-table td.check,
 .s-table th.error, .s-table td.error,
-.s-table th.id, .s-table td.id {
+.s-table th.id, .s-table td.id,
+.s-table th.no, .s-table td.no {
 	width: 1%;
 	white-space: nowrap;
 }
