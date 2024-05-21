@@ -12,31 +12,31 @@ import (
 )
 
 func TenantCreate(c *xin.Context) {
-	t := &TenantInfo{}
-	if err := c.Bind(t); err != nil {
+	ti := &TenantInfo{}
+	if err := c.Bind(ti); err != nil {
 		vadutil.AddBindErrors(c, err, "tenant.")
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}
 
-	if ok, err := tenant.ExistsTenant(t.Name); err != nil {
+	if ok, err := tenant.ExistsTenant(ti.Name); err != nil {
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return
 	} else if ok {
-		c.AddError(fmt.Errorf(tbs.GetText(c.Locale, "tenant.error.duplicate"), t.Name))
+		c.AddError(fmt.Errorf(tbs.GetText(c.Locale, "tenant.error.duplicate"), ti.Name))
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}
 
-	if err := tenant.Create(t.Name, t.Comment); err != nil {
+	if err := tenant.Create(ti.Name, ti.Comment); err != nil {
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return
 	}
 
 	c.JSON(http.StatusOK, xin.H{
-		"tenant":  t,
+		"tenant":  ti,
 		"success": tbs.GetText(c.Locale, "success.created"),
 	})
 }
@@ -47,79 +47,93 @@ type TenantEdit struct {
 }
 
 func TenantUpdate(c *xin.Context) {
-	t := &TenantEdit{}
-	if err := c.Bind(t); err != nil {
+	te := &TenantEdit{}
+	if err := c.Bind(te); err != nil {
 		vadutil.AddBindErrors(c, err, "tenant.")
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}
 
-	if ok, err := tenant.ExistsTenant(t.Oname); err != nil {
-		c.AddError(err)
-		c.JSON(http.StatusInternalServerError, handlers.E(c))
-		return
-	} else if !ok {
-		c.AddError(fmt.Errorf(tbs.GetText(c.Locale, "tenant.error.notexists"), t.Oname))
+	tt := tenant.FromCtx(c)
+	if te.Oname != te.Name && te.Oname == tt.String() {
+		c.AddError(fmt.Errorf(tbs.GetText(c.Locale, "tenant.error.unrename"), te.Oname))
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}
 
-	if t.Oname != t.Name {
-		if ok, err := tenant.ExistsTenant(t.Name); err != nil {
+	if ok, err := tenant.ExistsTenant(te.Oname); err != nil {
+		c.AddError(err)
+		c.JSON(http.StatusInternalServerError, handlers.E(c))
+		return
+	} else if !ok {
+		c.AddError(fmt.Errorf(tbs.GetText(c.Locale, "tenant.error.notexists"), te.Oname))
+		c.JSON(http.StatusBadRequest, handlers.E(c))
+		return
+	}
+
+	if te.Oname != te.Name {
+		if ok, err := tenant.ExistsTenant(te.Name); err != nil {
 			c.AddError(err)
 			c.JSON(http.StatusInternalServerError, handlers.E(c))
 			return
 		} else if ok {
-			c.AddError(fmt.Errorf(tbs.GetText(c.Locale, "tenant.error.duplicate"), t.Name))
+			c.AddError(fmt.Errorf(tbs.GetText(c.Locale, "tenant.error.duplicate"), te.Name))
 			c.JSON(http.StatusBadRequest, handlers.E(c))
 			return
 		}
 
-		if err := tenant.Rename(t.Oname, t.Name); err != nil {
+		if err := tenant.Rename(te.Oname, te.Name); err != nil {
 			c.AddError(err)
 			c.JSON(http.StatusInternalServerError, handlers.E(c))
 			return
 		}
 	}
 
-	if err := tenant.Update(t.Name, t.Comment); err != nil {
+	if err := tenant.Update(te.Name, te.Comment); err != nil {
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return
 	}
 
 	c.JSON(http.StatusOK, xin.H{
-		"tenant":  t,
+		"tenant":  te,
 		"success": tbs.GetText(c.Locale, "success.updated"),
 	})
 }
 
 func TenantDelete(c *xin.Context) {
-	t := &TenantInfo{}
-	if err := c.Bind(t); err != nil {
+	ti := &TenantInfo{}
+	if err := c.Bind(ti); err != nil {
 		vadutil.AddBindErrors(c, err, "tenant.")
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}
 
-	if ok, err := tenant.ExistsTenant(t.Name); err != nil {
-		c.AddError(err)
-		c.JSON(http.StatusInternalServerError, handlers.E(c))
-		return
-	} else if !ok {
-		c.AddError(fmt.Errorf(tbs.GetText(c.Locale, "tenant.error.notexists"), t.Name))
+	tt := tenant.FromCtx(c)
+	if ti.Name == tt.String() {
+		c.AddError(fmt.Errorf(tbs.GetText(c.Locale, "tenant.error.unrename"), ti.Name))
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}
 
-	if err := tenant.Delete(t.Name); err != nil {
+	if ok, err := tenant.ExistsTenant(ti.Name); err != nil {
+		c.AddError(err)
+		c.JSON(http.StatusInternalServerError, handlers.E(c))
+		return
+	} else if !ok {
+		c.AddError(fmt.Errorf(tbs.GetText(c.Locale, "tenant.error.notexists"), ti.Name))
+		c.JSON(http.StatusBadRequest, handlers.E(c))
+		return
+	}
+
+	if err := tenant.Delete(ti.Name); err != nil {
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return
 	}
 
 	c.JSON(http.StatusOK, xin.H{
-		"tenant":  t,
+		"tenant":  ti,
 		"success": tbs.GetText(c.Locale, "success.deleted"),
 	})
 }

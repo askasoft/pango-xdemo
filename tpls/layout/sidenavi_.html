@@ -1,5 +1,5 @@
 {{define "sidenavi"}}
-<div id="sidenavi"><div class="ui-sidenavi minimal hidable">
+<div id="sidenavi"><div class="ui-sidenavi minimal">
 	{{if and .AuthUser .AuthUser.IsAdmin}}
 	<div id="navi_admin" class="card">
 		<div class="card-header">
@@ -33,7 +33,7 @@
 	</div>
 	{{end}}
 
-	<div id="navi_demmos" class="card">
+	<div id="navi_demos" class="card">
 		<div class="card-header">
 			<i class="fas fa-earth-asia"></i><span>{{T .Loc "menu.demos"}}</span>
 		</div>
