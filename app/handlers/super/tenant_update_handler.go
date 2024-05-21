@@ -93,3 +93,33 @@ func TenantUpdate(c *xin.Context) {
 		"success": tbs.GetText(c.Locale, "success.updated"),
 	})
 }
+
+func TenantDelete(c *xin.Context) {
+	t := &TenantInfo{}
+	if err := c.Bind(t); err != nil {
+		vadutil.AddBindErrors(c, err, "tenant.")
+		c.JSON(http.StatusBadRequest, handlers.E(c))
+		return
+	}
+
+	if ok, err := tenant.ExistsTenant(t.Name); err != nil {
+		c.AddError(err)
+		c.JSON(http.StatusInternalServerError, handlers.E(c))
+		return
+	} else if !ok {
+		c.AddError(fmt.Errorf(tbs.GetText(c.Locale, "tenant.error.notexists"), t.Name))
+		c.JSON(http.StatusBadRequest, handlers.E(c))
+		return
+	}
+
+	if err := tenant.Delete(t.Name); err != nil {
+		c.AddError(err)
+		c.JSON(http.StatusInternalServerError, handlers.E(c))
+		return
+	}
+
+	c.JSON(http.StatusOK, xin.H{
+		"tenant":  t,
+		"success": tbs.GetText(c.Locale, "success.deleted"),
+	})
+}

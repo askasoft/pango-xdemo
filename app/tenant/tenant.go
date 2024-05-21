@@ -138,6 +138,10 @@ func Rename(old string, new string) error {
 	return app.GDB.Exec(fmt.Sprintf("ALTER SCHEMA %s RENAME TO %s", old, new)).Error
 }
 
+func Delete(name string) error {
+	return app.GDB.Exec(fmt.Sprintf("DROP SCHEMA %s CASCADE", name)).Error
+}
+
 func FromCtx(c *xin.Context) (tt Tenant) {
 	if IsMultiTenant() {
 		host := c.Request.Host

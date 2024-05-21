@@ -117,6 +117,46 @@
 
 
 	//----------------------------------------------------
+	// delete
+	//
+	function tenant_delete_confirm() {
+		var $tr = $(this).closest('tr'), name = $tr.find('.name').text();
+		var $p = $('#tenants_delete_popup');
+		$p.find('[name=name]').val(name);
+		$p.find('.msg > b').text(name);
+		$p.popup('show');
+		return false;
+	}
+
+	function tenant_delete() {
+		var $p = $('#tenants_delete_popup').popup('update', { keyboard: false });
+
+		$.ajax({
+			url: './delete',
+			method: 'POST',
+			data: $p.find('form').serialize(),
+			dataType: 'json',
+			beforeSend: main.form_ajax_start($p),
+			success: function(data) {
+				$p.popup('hide');
+
+				$.toast({
+					icon: 'success',
+					text: data.success
+				});
+
+				tenants_search();
+			},
+			error: main.form_ajax_error($p),
+			complete: function() {
+				$p.unloadmask().popup('update', { keyboard: true });
+			}
+		});
+		return false;
+	}
+
+
+	//----------------------------------------------------
 	// init
 	//
 	function tenants_init() {
@@ -134,7 +174,9 @@
 			.on('submit', tenants_search)
 			.submit();
 
-		$('#tenants_list').on('click', 'button.edit', tenant_edit);
+		$('#tenants_list')
+			.on('click', 'button.edit', tenant_edit)
+			.on('click', 'button.delete', tenant_delete_confirm);
 
 		$('#tenants_create_popup')
 			.find('form').submit(tenant_create).end()
@@ -143,6 +185,10 @@
 		$('#tenants_update_popup')
 			.find('form').submit(tenant_update).end()
 			.find('.ui-popup-footer button[type=submit]').click(tenant_update);
+	
+		$('#tenants_delete_popup')
+			.find('form').submit(tenant_delete).end()
+			.find('.ui-popup-footer button[type=submit]').click(tenant_delete);
 	}
 
 	$(window).on('load', tenants_init);
