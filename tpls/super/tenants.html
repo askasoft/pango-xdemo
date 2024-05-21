@@ -80,4 +80,34 @@
 	</div>
 </div>
 
+<div id="tenants_update_popup" class="ui-popup s-popup-detail w800" data-spy="popup" tabindex="-1"
+	popup-closer="true" popup-position="center" popup-focus="#tenants_update_popup [name=comment]">
+	<div class="ui-popup-header">
+		<h4><i class="{{T .Loc "icon.edit"}}"></i>
+			{{T .Loc "tenant.update.header"}}
+		</h4>
+	</div>
+	<form class="ui-popup-body form-horizontal grey lined">
+		<input type="hidden" name="_token_" value="{{.Token}}"/>
+		<input type="hidden" name="oname" value=""/>
+		<div class="row py-3">
+			<label class="col-md-2 col-form-label">{{T .Loc "tenant.name"}}</label>
+			<div class="col-md-10">
+				<input name="name" type="text" class="form-control" textclear>
+			</div>
+		</div>
+		<div class="row py-3">
+			<label class="col-md-2 col-form-label">{{T .Loc "tenant.comment"}}</label>
+			<div class="col-md-10">
+				<textarea name="comment" class="form-control" maxlength="250" rows="2" textclear enterfire></textarea>
+			</div>
+		</div>
+		<button type="submit" class="hidden"></button>
+	</form>
+	<div class="ui-popup-footer">
+		<button type="submit" class="btn btn-primary"><i class="{{T .Loc "icon.save"}}"></i> {{T .Loc "button.save"}}</button>
+		<button type="button" class="btn btn-secondary" popup-dismiss="true"><i class="{{T .Loc "icon.close"}}"></i> {{T .Loc "button.close"}}</button>
+	</div>
+</div>
+
 {{template "main_footer" .}}

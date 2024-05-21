@@ -366,6 +366,7 @@ func addSuperTenantHandlers(rg *xin.RouterGroup) {
 	rg.GET("/", super.TenantIndex)
 	rg.POST("/list", super.TenantList)
 	rg.POST("/create", super.TenantCreate)
+	rg.POST("/update", super.TenantUpdate)
 }
 
 func addSuperJobHandlers(rg *xin.RouterGroup) {

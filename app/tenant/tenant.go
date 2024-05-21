@@ -97,13 +97,13 @@ func Iterate(it func(tt Tenant) error) error {
 	return nil
 }
 
-func Create(name string, comment ...string) error {
+func Create(name string, comment string) error {
 	if err := app.GDB.Exec("CREATE SCHEMA " + name).Error; err != nil {
 		return err
 	}
 
-	if len(comment) > 0 && comment[0] != "" {
-		if err := app.GDB.Exec(fmt.Sprintf("COMMENT ON SCHEMA %s IS '%s'", name, sqx.EscapeString(comment[0]))).Error; err != nil {
+	if comment != "" {
+		if err := app.GDB.Exec(fmt.Sprintf("COMMENT ON SCHEMA %s IS '%s'", name, sqx.EscapeString(comment))).Error; err != nil {
 			log.Error(err)
 		}
 	}
@@ -128,6 +128,14 @@ func Create(name string, comment ...string) error {
 	}
 
 	return nil
+}
+
+func Update(name string, comment string) error {
+	return app.GDB.Exec(fmt.Sprintf("COMMENT ON SCHEMA %s IS '%s'", name, sqx.EscapeString(comment))).Error
+}
+
+func Rename(old string, new string) error {
+	return app.GDB.Exec(fmt.Sprintf("ALTER SCHEMA %s RENAME TO %s", old, new)).Error
 }
 
 func FromCtx(c *xin.Context) (tt Tenant) {

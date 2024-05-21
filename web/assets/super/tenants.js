@@ -31,6 +31,14 @@
 	}
 
 
+	function tenant_set_tr_values($tr, tenant) {
+		main.set_table_tr_values($tr, tenant);
+		$tr.attr({ 'class': '', 'id': 'tenant_' + tenant.name});
+		$tr.find('td.check').append($('<input type="checkbox"/>').val(tenant.name));
+		$tr.find('td.domain > a').attr('href', '//' + tenant.name + '.' + main.domain).text(tenant.name + '.' + main.domain);
+		main.blink($tr);
+	}
+
 	//----------------------------------------------------
 	// create
 	//
@@ -54,13 +62,50 @@
 				var tenant = data.tenant;
 				var $tb = $('#tenants_table > tbody'), $tr = $tb.children('tr.template').clone();
 
-				$tr.attr({ 'class': '', 'id': 'tenant_' + tenant.name});
-				$tr.find('td.check').append($('<input type="checkbox"/>').val(tenant.name));
 				$tb.prepend($tr);
 
-				main.set_table_tr_values($tr, tenant);
-				$tr.find('td.domain > a').attr('href', '//' + tenant.name + '.' + main.domain).text(tenant.name + '.' + main.domain);
-				main.blink($tr);
+				tenant_set_tr_values($tr, tenant);
+			},
+			error: main.form_ajax_error($p),
+			complete: function() {
+				$p.unloadmask().popup('update', { keyboard: true });
+			}
+		});
+		return false;
+	}
+
+
+	//----------------------------------------------------
+	// update
+	//
+	function tenant_edit() {
+		var $tr = $(this).closest('tr'), $p = $('#tenants_update_popup');
+		$p.find('[name=oname], [name=name]').val($tr.find('.name').text());
+		$p.find('[name=comment]').val($tr.find('.comment > pre').text());
+		$p.popup('show');
+		return false;
+	}
+
+	function tenant_update() {
+		var $p = $('#tenants_update_popup').popup('update', { keyboard: false });
+
+		$.ajax({
+			url: './update',
+			method: 'POST',
+			data: $p.find('form').serialize(),
+			dataType: 'json',
+			beforeSend: main.form_ajax_start($p),
+			success: function(data) {
+				$p.popup('hide');
+
+				$.toast({
+					icon: 'success',
+					text: data.success
+				});
+
+				var tenant = data.tenant, $tr = $('#tenant_' + tenant.oname);
+
+				tenant_set_tr_values($tr, tenant);
 			},
 			error: main.form_ajax_error($p),
 			complete: function() {
@@ -89,10 +134,15 @@
 			.on('submit', tenants_search)
 			.submit();
 
+		$('#tenants_list').on('click', 'button.edit', tenant_edit);
+
 		$('#tenants_create_popup')
 			.find('form').submit(tenant_create).end()
 			.find('.ui-popup-footer button[type=submit]').click(tenant_create);
 	
+		$('#tenants_update_popup')
+			.find('form').submit(tenant_update).end()
+			.find('.ui-popup-footer button[type=submit]').click(tenant_update);
 	}
 
 	$(window).on('load', tenants_init);
