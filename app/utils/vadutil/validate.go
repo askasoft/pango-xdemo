@@ -46,8 +46,9 @@ func ErrInvalidID(c *xin.Context) error {
 //  3. error.param.{tag}
 //  4. error.param.invalid
 func AddBindErrors(c *xin.Context, err error, ns string) {
-	if fbes, ok := err.(binding.FieldBindErrors); ok { //nolint: errorlint
-		for _, fbe := range fbes {
+	var fbes *binding.FieldBindErrors
+	if ok := errors.As(err, &fbes); ok {
+		for _, fbe := range *fbes {
 			fk := str.SnakeCase(fbe.Field)
 			fn := tbs.GetText(c.Locale, ns+fk, fk)
 			fm := tbs.GetText(c.Locale, ns+"error."+fk)
@@ -56,8 +57,12 @@ func AddBindErrors(c *xin.Context, err error, ns string) {
 			}
 			c.AddError(&ParamError{Param: fk, Message: fm})
 		}
-	} else if ves, ok := err.(vad.ValidationErrors); ok { //nolint: errorlint
-		for _, fe := range ves {
+		return
+	}
+
+	var ves *vad.ValidationErrors
+	if ok := errors.As(err, &ves); ok {
+		for _, fe := range *ves {
 			fk := str.SnakeCase(fe.Field())
 			fn := ""
 			fm := tbs.GetText(c.Locale, ns+"error."+fk+"."+fe.Tag())
@@ -92,9 +97,10 @@ func AddBindErrors(c *xin.Context, err error, ns string) {
 
 			c.AddError(&ParamError{Param: fk, Message: em})
 		}
-	} else {
-		c.AddError(err)
+		return
 	}
+
+	c.AddError(err)
 }
 
 func ValidateCIDRs(cidr string) bool {
