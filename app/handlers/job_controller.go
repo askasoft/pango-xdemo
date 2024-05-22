@@ -210,10 +210,28 @@ func (jc *JobController) Abort(c *xin.Context) {
 
 	tjm := tt.JM()
 
-	reason := tbs.GetText(c.Locale, "job.userabort", "User canceled.")
+	reason := tbs.GetText(c.Locale, "job.abort.userabort", "User canceled.")
 
 	err := tjm.AbortJob(jid, reason)
-	if err != nil && !errors.Is(err, xjm.ErrJobMissing) {
+	if err != nil {
+		if errors.Is(err, xjm.ErrJobMissing) {
+			job, err := tjm.GetJob(jid)
+			if err != nil {
+				c.Logger.Errorf("Failed to get job #%d: %v", jid, err)
+				c.AddError(err)
+				c.JSON(http.StatusInternalServerError, E(c))
+				return
+			}
+			if job.Status == xjm.JobStatusAborted {
+				c.JSON(http.StatusOK, xin.H{"warning": tbs.GetText(c.Locale, "job.aborted")})
+				return
+			}
+			if job.Status == xjm.JobStatusCompleted {
+				c.JSON(http.StatusOK, xin.H{"warning": tbs.GetText(c.Locale, "job.abort.completed")})
+				return
+			}
+		}
+
 		c.Logger.Errorf("Failed to abort job #%d: %v", jid, err)
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, E(c))
@@ -222,5 +240,5 @@ func (jc *JobController) Abort(c *xin.Context) {
 
 	_ = tjm.AddJobLog(jid, time.Now(), xjm.JobLogLevelWarn, reason)
 
-	c.JSON(http.StatusOK, xin.H{"success": tbs.GetText(c.Locale, "job.aborted")})
+	c.JSON(http.StatusOK, xin.H{"warning": tbs.GetText(c.Locale, "job.aborted")})
 }

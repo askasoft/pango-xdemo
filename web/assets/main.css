@@ -348,7 +348,7 @@ form div.verr {
 
 .s-popup-error .ui-popup-body {
 	color: #a94442;
-	max-width: 500px;
+	max-width: 600px;
 	white-space: pre-wrap;
 	word-break: break-all;
 }

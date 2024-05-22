@@ -141,10 +141,18 @@ var main = {
 		});
 	},
 	ajax_success: function(data) {
-		$.toast({
-			icon: 'success',
-			text: data.success
-		});
+		if (data.success) {
+			$.toast({
+				icon: 'success',
+				text: data.success
+			});
+		}
+		if (data.warning) {
+			$.toast({
+				icon: 'warning',
+				text: data.warning
+			});
+		}
 	},
 
 	// list

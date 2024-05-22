@@ -199,7 +199,9 @@ func (jr *JobRunner) Done(err error) {
 
 	if err == nil || errors.Is(err, xjm.ErrJobComplete) {
 		if err := jr.Complete(); err != nil {
-			jr.Log.Error(err)
+			if !errors.Is(err, xjm.ErrJobMissing) {
+				jr.Log.Error(err)
+			}
 			if err := jr.Abort(err.Error()); err != nil {
 				jr.Log.Error(err)
 			}
