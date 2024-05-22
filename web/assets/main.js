@@ -247,6 +247,12 @@ var main = {
 			($c.length ? $c : $td).text(v);
 		}
 	},
+	blink_start: function($e) {
+		$e.addClass('ui-blink-1s');
+	},
+	blink_stop: function($e) {
+		$e.removeClass('ui-blink-1s');
+	},
 	blink: function($e) {
 		$e.addClass('ui-blink-1s2');
 		setTimeout(function() { $e.removeClass('ui-blink-1s2'); }, 2000);

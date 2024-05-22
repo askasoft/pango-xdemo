@@ -283,7 +283,7 @@ form div.verr {
 .s-table td.error * {
 	color: #a94442;
 }
-.s-table tr.ui-blink-1s2 td {
+.s-table tr.ui-blink-1s td, .s-table tr.ui-blink-1s2 td {
 	background-color: transparent;
 }
 
