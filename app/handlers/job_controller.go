@@ -4,6 +4,7 @@ import (
 	"errors"
 	"mime/multipart"
 	"net/http"
+	"time"
 
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/jobs"
@@ -208,13 +209,18 @@ func (jc *JobController) Abort(c *xin.Context) {
 	tt := tenant.FromCtx(c)
 
 	tjm := tt.JM()
-	err := tjm.AbortJob(jid, "User aborted")
+
+	reason := tbs.GetText(c.Locale, "job.userabort", "User canceled.")
+
+	err := tjm.AbortJob(jid, reason)
 	if err != nil && !errors.Is(err, xjm.ErrJobMissing) {
 		c.Logger.Errorf("Failed to abort job #%d: %v", jid, err)
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, E(c))
 		return
 	}
+
+	_ = tjm.AddJobLog(jid, time.Now(), xjm.JobLogLevelWarn, reason)
 
 	c.JSON(http.StatusOK, xin.H{"success": tbs.GetText(c.Locale, "job.aborted")})
 }

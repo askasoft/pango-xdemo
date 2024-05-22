@@ -131,6 +131,29 @@ func (si *FailedItem) String() string {
 	return fmt.Sprintf("#%d %s - %s", si.ID, si.Title, si.Error)
 }
 
+type ClientError struct {
+	Err error
+}
+
+var ErrClient = &ClientError{}
+
+func NewClientError(err error) error {
+	return &ClientError{Err: err}
+}
+
+func (ce *ClientError) Is(err error) (ok bool) {
+	_, ok = err.(*ClientError)
+	return
+}
+
+func (ce *ClientError) Error() string {
+	return ce.Err.Error()
+}
+
+func (ce *ClientError) Unwrap() error {
+	return ce.Err
+}
+
 type JobRunner struct {
 	*xjm.JobRunner
 
@@ -174,31 +197,42 @@ func (jr *JobRunner) Running(state any) error {
 func (jr *JobRunner) Done(err error) {
 	defer jr.Log.Close()
 
-	if err != nil && !errors.Is(err, xjm.ErrJobAborted) && !errors.Is(err, xjm.ErrJobCompleted) && !errors.Is(err, xjm.ErrJobMissing) {
+	if err == nil || errors.Is(err, xjm.ErrJobComplete) {
+		if err := jr.Complete(); err != nil {
+			jr.Log.Error(err)
+			if err := jr.Abort(err.Error()); err != nil {
+				jr.Log.Error(err)
+			}
+			return
+		}
+		jr.Log.Info("DONE.")
+		return
+	}
+
+	if errors.Is(err, xjm.ErrJobMissing) {
+		jr.Log.Error(err)
+		return
+	}
+
+	if errors.Is(err, xjm.ErrJobAborted) {
+		jr.Log.Warn("ABORTED.")
+		return
+	}
+
+	if errors.Is(err, ErrClient) {
 		jr.Log.Warn(err)
-		err = jr.Abort(err.Error())
-		if err != nil {
+		if err := jr.Abort(err.Error()); err != nil {
 			jr.Log.Error(err)
 		}
 		jr.Log.Warn("ABORTED.")
 		return
 	}
 
-	job, err := jr.GetJob()
-	if err != nil {
-		jr.Log.Error(err)
-		return
-	}
-
-	if job.IsAborted() {
-		jr.Log.Warn("ABORTED.")
-		return
-	}
-
-	if err := jr.Complete(); err != nil {
+	jr.Log.Error(err)
+	if err := jr.Abort(err.Error()); err != nil {
 		jr.Log.Error(err)
 	}
-	jr.Log.Info("DONE.")
+	jr.Log.Warn("ABORTED.")
 }
 
 //------------------------------------
