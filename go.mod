@@ -3,8 +3,8 @@ module github.com/askasoft/pango-xdemo
 go 1.21
 
 require (
-	github.com/askasoft/pango v1.0.15
-	github.com/askasoft/pango-assets v1.0.9
+	github.com/askasoft/pango v1.0.17
+	github.com/askasoft/pango-assets v1.0.11
 	github.com/google/uuid v1.6.0
 	github.com/jackc/pgerrcode v0.0.0-20240316143900-6e2875d9b438
 	github.com/jackc/pgx/v5 v5.5.5

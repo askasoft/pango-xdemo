@@ -103,6 +103,8 @@ xdemo.exe install
 
 
 ## apache proxy setting
+
+### Virtual Host
 ```xml
 <VirtualHost *:80 *:443>
 	ServerName xdemo.local
@@ -128,6 +130,28 @@ xdemo.exe install
 	ProxyPass         /         http://localhost:6060/ nocanon retry=0
 	ProxyPassReverse  /         http://localhost:6060/ nocanon
 </VirtualHost>
+```
+
+### Directory
+```ini
+[server]
+prefix = /xdemo
+```
+
+```xml
+	Alias /xdemo /app/xdemo/web
+	<Directory /app/xdemo/web>
+		AllowOverride All
+		Options FollowSymLinks Indexes
+		Require all granted
+	</Directory>
+
+	ProxyTimeout      300
+	ProxyRequests     Off
+	ProxyPreserveHost On
+
+	ProxyPass         /xdemo   http://localhost:6060/xdemo  nocanon retry=0
+	ProxyPassReverse  /xdemo   http://localhost:6060/xdemo  nocanon
 ```
 
 
