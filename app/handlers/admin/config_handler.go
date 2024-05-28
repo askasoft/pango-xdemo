@@ -30,7 +30,7 @@ func ConfigIndex(c *xin.Context) {
 	au := tenant.AuthUser(c)
 
 	tx := app.GDB.Table(tt.TableConfigs()).Order(clause.OrderByColumn{Column: clause.Column{Name: "order"}})
-	if !au.IsSuper() {
+	if !au.IsDevel() {
 		tx = tx.Where("hidden = ?", false)
 	}
 
@@ -124,6 +124,9 @@ func ConfigSave(c *xin.Context) {
 		}
 
 		tx := db.Table(tt.TableConfigs()).Where("name = ?", cfg.Name)
+		if !au.IsDevel() {
+			tx = tx.Where("hidden = ?", false)
+		}
 		if !au.IsSuper() {
 			tx = tx.Where("readonly = ?", false)
 		}

@@ -118,6 +118,10 @@ func RoleSuperProtect(c *xin.Context) {
 	RoleProtect(c, models.RoleSuper)
 }
 
+func RoleDevelProtect(c *xin.Context) {
+	RoleProtect(c, models.RoleSuper)
+}
+
 func RoleAdminProtect(c *xin.Context) {
 	RoleProtect(c, models.RoleAdmin)
 }

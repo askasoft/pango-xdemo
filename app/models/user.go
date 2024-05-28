@@ -12,6 +12,7 @@ const (
 	UserStartID = int64(101)
 
 	RoleSuper   = "$"
+	RoleDevel   = "@"
 	RoleAdmin   = "A"
 	RoleEditor  = "E"
 	RoleViewer  = "V"
@@ -49,27 +50,31 @@ func (u *User) CIDRs() (cidrs []*net.IPNet) {
 }
 
 func (u *User) HasRole(role string) bool {
-	return str.Compare(u.Role, role) <= 0
+	return u.Role != "" && u.Role <= role
 }
 
 func (u *User) IsSuper() bool {
-	return u.Role == RoleSuper
+	return u.HasRole(RoleSuper)
+}
+
+func (u *User) IsDevel() bool {
+	return u.HasRole(RoleDevel)
 }
 
 func (u *User) IsAdmin() bool {
-	return str.Compare(u.Role, RoleAdmin) <= 0
+	return u.HasRole(RoleAdmin)
 }
 
 func (u *User) IsEditor() bool {
-	return str.Compare(u.Role, RoleEditor) <= 0
+	return u.HasRole(RoleEditor)
 }
 
 func (u *User) IsViewer() bool {
-	return str.Compare(u.Role, RoleViewer) <= 0
+	return u.HasRole(RoleViewer)
 }
 
 func (u *User) IsApiOnly() bool {
-	return str.Compare(u.Role, RoleApiOnly) <= 0
+	return u.HasRole(RoleApiOnly)
 }
 
 func (u *User) SetPassword(password string) {
