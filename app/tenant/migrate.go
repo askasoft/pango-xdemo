@@ -6,7 +6,7 @@ import (
 
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/models"
-	"github.com/askasoft/pango-xdemo/app/utils"
+	"github.com/askasoft/pango-xdemo/app/utils/cptutil"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/log/gormlog"
 	"github.com/askasoft/pango/xfs"
@@ -90,7 +90,7 @@ func (tt Tenant) MigrateSuper() error {
 		user.ID = suc.GetInt64("id", 1)
 		user.Email = superEmail
 		user.Name = suc.GetString("name", "SUPER") + "@" + tt.String()
-		user.Password = utils.Encrypt(superEmail, suc.GetString("password", "changeme"))
+		user.Password = cptutil.Encrypt(superEmail, suc.GetString("password", "changeme"))
 		user.Role = models.RoleSuper
 		user.Status = models.UserActive
 		user.CIDR = "0.0.0.0/0\n::/0"

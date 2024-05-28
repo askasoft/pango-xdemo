@@ -1,4 +1,4 @@
-package utils
+package cptutil
 
 import (
 	"crypto/sha256"

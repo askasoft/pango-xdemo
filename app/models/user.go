@@ -4,7 +4,7 @@ import (
 	"net"
 	"time"
 
-	"github.com/askasoft/pango-xdemo/app/utils"
+	"github.com/askasoft/pango-xdemo/app/utils/cptutil"
 	"github.com/askasoft/pango/str"
 )
 
@@ -73,7 +73,7 @@ func (u *User) IsApiOnly() bool {
 }
 
 func (u *User) SetPassword(password string) {
-	u.Password = utils.Encrypt(u.Email, password)
+	u.Password = cptutil.Encrypt(u.Email, password)
 }
 
 //-------------------------------------
@@ -84,5 +84,5 @@ func (u *User) GetUsername() string {
 }
 
 func (u *User) GetPassword() string {
-	return utils.Decrypt(u.Email, u.Password)
+	return cptutil.Decrypt(u.Email, u.Password)
 }

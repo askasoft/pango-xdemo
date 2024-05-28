@@ -18,6 +18,14 @@ const (
 	PrefixPetFile = "p"
 )
 
+func toString(o any) string {
+	bs, err := json.MarshalIndent(o, "", "  ")
+	if err != nil {
+		return err.Error()
+	}
+	return string(bs)
+}
+
 func FormatDate(t time.Time) string {
 	return t.Local().Format(DateFormat)
 }
@@ -36,12 +44,4 @@ func MakeFileID(prefix, name string) string {
 
 	fid += name
 	return fid
-}
-
-func toString(o any) string {
-	bs, err := json.MarshalIndent(o, "", "  ")
-	if err != nil {
-		return err.Error()
-	}
-	return string(bs)
 }

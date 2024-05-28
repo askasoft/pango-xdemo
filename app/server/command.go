@@ -11,7 +11,7 @@ import (
 
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/tasks"
-	"github.com/askasoft/pango-xdemo/app/utils"
+	"github.com/askasoft/pango-xdemo/app/utils/cptutil"
 	"github.com/askasoft/pango-xdemo/tpls"
 	"github.com/askasoft/pango-xdemo/txts"
 	"github.com/askasoft/pango-xdemo/web"
@@ -110,11 +110,11 @@ func (s *service) Exec(cmd string) {
 		app.Exit(0)
 	case "encrypt":
 		k, v := cryptFlags()
-		fmt.Println(utils.Encrypt(k, v))
+		fmt.Println(cptutil.Encrypt(k, v))
 		app.Exit(0)
 	case "decrypt":
 		k, v := cryptFlags()
-		fmt.Println(utils.Decrypt(k, v))
+		fmt.Println(cptutil.Decrypt(k, v))
 		app.Exit(0)
 	case "assets":
 		exportAssets(flag.Arg(1))
