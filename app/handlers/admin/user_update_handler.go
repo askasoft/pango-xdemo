@@ -79,7 +79,8 @@ func userValidateCIDR(c *xin.Context, cidr string) {
 
 func userValidateRole(c *xin.Context, role string) {
 	if role != "" {
-		urm := tenant.GetUserRoleMap(c)
+		au := tenant.AuthUser(c)
+		urm := tbsutil.GetUserRoleMap(c.Locale, au.Role)
 		if !urm.Contain(role) {
 			c.AddError(vadutil.ErrInvalidField(c, "user.", "role"))
 		}

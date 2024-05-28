@@ -23,7 +23,18 @@ import (
 	"gorm.io/gorm"
 )
 
-type UserCsvImportArg ArgLocale
+type UserCsvImportArg struct {
+	ArgLocale
+
+	Role string `json:"role,omitempty"`
+}
+
+func NewUserCsvImportArg(locale, role string) *UserCsvImportArg {
+	uci := &UserCsvImportArg{}
+	uci.Locale = locale
+	uci.Role = role
+	return uci
+}
 
 type UserCsvImportJob struct {
 	*JobRunner
@@ -71,7 +82,7 @@ func (uci *UserCsvImportJob) Run() {
 		return
 	}
 
-	uci.roleMap = tbsutil.GetUserRoleMap(uci.arg.Locale)
+	uci.roleMap = tbsutil.GetUserRoleMap(uci.arg.Locale, uci.arg.Role)
 	uci.statusMap = tbsutil.GetUserStatusMap(uci.arg.Locale)
 	uci.roleRevMap = tbsutil.GetUserRoleReverseMap()
 	uci.statusRevMap = tbsutil.GetUserStatusReverseMap()

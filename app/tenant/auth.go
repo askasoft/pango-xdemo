@@ -6,8 +6,6 @@ import (
 
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/models"
-	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
-	"github.com/askasoft/pango/cog"
 	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pango/xmw"
 	"gorm.io/gorm"
@@ -97,15 +95,4 @@ func CheckClientAndFindUser(c *xin.Context, username string) (xmw.AuthUser, erro
 		return nil, nil
 	}
 	return FindUser(c, username)
-}
-
-func GetUserRoleMap(c *xin.Context) *cog.LinkedHashMap[string, string] {
-	au := AuthUser(c)
-	urm := tbsutil.GetUserRoleMap(c.Locale)
-	for it := urm.Iterator(); it.Next(); {
-		if it.Key() < au.Role {
-			it.Remove()
-		}
-	}
-	return urm
 }

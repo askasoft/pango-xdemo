@@ -44,8 +44,14 @@ func GetUserStatusReverseMap() map[string]string {
 	return GetAllReverseMap("user.map.status")
 }
 
-func GetUserRoleMap(locale string) *cog.LinkedHashMap[string, string] {
-	return GetLinkedHashMap(locale, "user.map.role")
+func GetUserRoleMap(locale string, role string) *cog.LinkedHashMap[string, string] {
+	urm := GetLinkedHashMap(locale, "user.map.role")
+	for it := urm.Iterator(); it.Next(); {
+		if it.Key() < role {
+			it.Remove()
+		}
+	}
+	return urm
 }
 
 func GetUserRoleReverseMap() map[string]string {

@@ -50,7 +50,8 @@ func (ucijc *UserCsvImportJobController) Start(c *xin.Context) {
 		return
 	}
 
-	ucia := &jobs.UserCsvImportArg{Locale: c.Locale}
+	au := tenant.AuthUser(c)
+	ucia := jobs.NewUserCsvImportArg(c.Locale, au.Role)
 	ucijc.SetParam(ucia)
 	ucijc.JobController.Start(c)
 }
@@ -78,7 +79,7 @@ func UserCsvImportSample(c *xin.Context) {
 	}
 
 	sm := tbsutil.GetUserStatusMap(c.Locale)
-	rm := tbsutil.GetUserRoleMap(c.Locale)
+	rm := tbsutil.GetUserRoleMap(c.Locale, models.RoleAdmin)
 
 	domain := c.Request.Host
 	data := [][]string{

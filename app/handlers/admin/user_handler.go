@@ -113,8 +113,9 @@ func userListArgs(c *xin.Context) (uq *UserQuery, err error) {
 }
 
 func userAddMaps(c *xin.Context, h xin.H) {
+	au := tenant.AuthUser(c)
 	h["UserStatusMap"] = tbsutil.GetUserStatusMap(c.Locale)
-	h["UserRoleMap"] = tenant.GetUserRoleMap(c)
+	h["UserRoleMap"] = tbsutil.GetUserRoleMap(c.Locale, au.Role)
 }
 
 func UserIndex(c *xin.Context) {

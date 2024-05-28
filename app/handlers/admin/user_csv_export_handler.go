@@ -6,6 +6,7 @@ import (
 
 	"github.com/askasoft/pango-xdemo/app/handlers"
 	"github.com/askasoft/pango-xdemo/app/models"
+	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
 	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
 	"github.com/askasoft/pango/iox"
@@ -56,8 +57,9 @@ func UserCsvExport(c *xin.Context) {
 		return
 	}
 
+	au := tenant.AuthUser(c)
 	sm := tbsutil.GetUserStatusMap(c.Locale)
-	rm := tbsutil.GetUserRoleMap(c.Locale)
+	rm := tbsutil.GetUserRoleMap(c.Locale, au.Role)
 	for rows.Next() {
 		var user models.User
 		err = tx.ScanRows(rows, &user)
@@ -71,7 +73,7 @@ func UserCsvExport(c *xin.Context) {
 			num.Ltoa(user.ID),
 			user.Name,
 			user.Email,
-			rm.MustGet(user.Role, user.Role),
+			rm.MustGet(user.Role),
 			sm.MustGet(user.Status, user.Status),
 			"",
 			user.CIDR,
