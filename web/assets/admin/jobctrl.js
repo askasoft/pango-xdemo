@@ -238,7 +238,7 @@
 			$jobs.prepend($job);
 		}
 
-		$jhs.find(jid ? '#job_head_' + jid + ' > a' : 'a:first').trigger('click');
+		$jhs.find(jid ? '#job_head_' + jid + ' > a' : 'li:first-child > a').trigger('click');
 	}
 
 	function build_job_head(job) {

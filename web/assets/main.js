@@ -171,13 +171,16 @@ var main = {
 			$f.submit();
 		});
 	},
+	list_build: function($l, data) {
+		$l.html(data);
+
+		$l.find('[checkall]').checkall();
+		$l.find('[data-spy="pager"]').pager();
+		$l.find('[data-spy="sortable"]').sortable();
+	},
 	list_builder: function($l) {
 		return function(data) {
-			$l.html(data);
-
-			$l.find('[checkall]').checkall();
-			$l.find('[data-spy="pager"]').pager();
-			$l.find('[data-spy="sortable"]').sortable();
+			main.list_build($l, data);
 		};
 	},
 
