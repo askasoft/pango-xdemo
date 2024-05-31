@@ -178,9 +178,9 @@
 				});
 
 				var pet = data.pet;
-				var $tb = $('#pets_table > tbody'), $tr = $tb.children('tr.template').clone();
+				var $tb = $('#pets_table > tbody'), $tr = $('#pets_template tr').clone();
 
-				$tr.attr({ 'class': '', 'id': 'pet_' + pet.id});
+				$tr.attr({'id': 'pet_' + pet.id});
 				$tr.find('td.check').append($('<input type="checkbox"/>').val(pet.id));
 				$tb.prepend($tr);
 

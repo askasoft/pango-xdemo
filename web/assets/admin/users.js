@@ -171,9 +171,9 @@
 				});
 
 				var user = data.user;
-				var $tb = $('#users_table > tbody'), $tr = $tb.children('tr.template').clone();
+				var $tb = $('#users_table > tbody'), $tr = $('#users_template tr').clone();
 
-				$tr.attr({ 'class': '', 'id': 'user_' + user.id});
+				$tr.attr({'id': 'user_' + user.id});
 				$tr.find('td.check').append($('<input type="checkbox"/>').val(user.id));
 				$tb.prepend($tr);
 

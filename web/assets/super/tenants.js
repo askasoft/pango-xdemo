@@ -33,8 +33,6 @@
 
 	function tenant_set_tr_values($tr, tenant) {
 		main.set_table_tr_values($tr, tenant);
-		$tr.attr({ 'class': '', 'id': 'tenant_' + tenant.name});
-		$tr.find('td.check').append($('<input type="checkbox"/>').val(tenant.name));
 		$tr.find('td.domain > a').attr('href', '//' + tenant.name + '.' + main.domain).text(tenant.name + '.' + main.domain);
 		main.blink($tr);
 	}
@@ -60,8 +58,10 @@
 				});
 
 				var tenant = data.tenant;
-				var $tb = $('#tenants_table > tbody'), $tr = $tb.children('tr.template').clone();
+				var $tb = $('#tenants_table > tbody'), $tr = $('#tenants_template tr').clone();
 
+				$tr.attr({'id': 'tenant_' + tenant.name});
+				$tr.find('td.check').append($('<input type="checkbox"/>').val(tenant.name));
 				$tb.prepend($tr);
 
 				tenant_set_tr_values($tr, tenant);

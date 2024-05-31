@@ -43,27 +43,30 @@
 			</td>
 		</tr>
 		{{end}}
-		<tr class="hidden template">
-			<td class="check"></td>
-			<td class="id"></td>
-			<td class="name"></td>
-			<td class="gender"></td>
-			<td class="born_at date"></td>
-			<td class="origin"></td>
-			<td class="temper"></td>
-			<td class="habits"></td>
-			<td class="amount"></td>
-			<td class="price"></td>
-			<td class="shop_name"></td>
-			<td class="created_at"></td>
-			<td class="updated_at"></td>
-			<td class="actions">
-				<button class="btn btn-outline-secondary view" title="{{T .Loc "button.view"}}"><i class="{{T .Loc "icon.view"}}"></i></button>
-				<button class="btn btn-secondary edit" title="{{T .Loc "button.edit"}}"><i class="{{T .Loc "icon.edit"}}"></i></button>
-			</td>
-		</tr>
 	</tbody>
 </table>
 </form>
+
+<table id="pets_template" class="hidden">
+	<tr class="hidden template">
+		<td class="check"></td>
+		<td class="id"></td>
+		<td class="name"></td>
+		<td class="gender"></td>
+		<td class="born_at date"></td>
+		<td class="origin"></td>
+		<td class="temper"></td>
+		<td class="habits"></td>
+		<td class="amount"></td>
+		<td class="price"></td>
+		<td class="shop_name"></td>
+		<td class="created_at"></td>
+		<td class="updated_at"></td>
+		<td class="actions">
+			<button class="btn btn-outline-secondary view" title="{{T .Loc "button.view"}}"><i class="{{T .Loc "icon.view"}}"></i></button>
+			<button class="btn btn-secondary edit" title="{{T .Loc "button.edit"}}"><i class="{{T .Loc "icon.edit"}}"></i></button>
+		</td>
+	</tr>
+</table>
 
 {{Pager .Q.Pager "Locale=" .Loc}}

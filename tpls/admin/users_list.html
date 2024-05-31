@@ -34,22 +34,25 @@
 			</td>
 		</tr>
 		{{end}}
-		<tr class="hidden template">
-			<td class="check"></td>
-			<td class="id"></td>
-			<td class="name"></td>
-			<td class="email"></td>
-			<td class="role"></td>
-			<td class="status"></td>
-			<td class="cidr"><pre></pre></td>
-			<td class="created_at"></td>
-			<td class="updated_at"></td>
-			<td class="actions">
-				<button class="btn btn-outline-secondary edit" title="{{T .Loc "button.edit"}}"><i class="{{T .Loc "icon.edit"}}"></i></button>
-			</td>
-		</tr>
 	</tbody>
 </table>
 </form>
+
+<table id="users_template" class="hidden">
+	<tr>
+		<td class="check"></td>
+		<td class="id"></td>
+		<td class="name"></td>
+		<td class="email"></td>
+		<td class="role"></td>
+		<td class="status"></td>
+		<td class="cidr"><pre></pre></td>
+		<td class="created_at"></td>
+		<td class="updated_at"></td>
+		<td class="actions">
+			<button class="btn btn-outline-secondary edit" title="{{T .Loc "button.edit"}}"><i class="{{T .Loc "icon.edit"}}"></i></button>
+		</td>
+	</tr>
+</table>
 
 {{Pager .Q.Pager "Locale=" .Loc}}
