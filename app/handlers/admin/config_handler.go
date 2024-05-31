@@ -29,10 +29,9 @@ func ConfigIndex(c *xin.Context) {
 	tt := tenant.FromCtx(c)
 	au := tenant.AuthUser(c)
 
-	tx := app.GDB.Table(tt.TableConfigs()).Order(clause.OrderByColumn{Column: clause.Column{Name: "order"}})
-	if !au.IsDevel() {
-		tx = tx.Where("hidden = ?", false)
-	}
+	tx := app.GDB.Table(tt.TableConfigs())
+	tx = tx.Where("role >= ?", au.Role)
+	tx = tx.Order(clause.OrderByColumn{Column: clause.Column{Name: "order"}})
 
 	configs := []*models.Config{}
 	if err := tx.Find(&configs).Error; err != nil {
@@ -41,7 +40,6 @@ func ConfigIndex(c *xin.Context) {
 
 	if au.IsSuper() {
 		for _, cfg := range configs {
-			cfg.Readonly = false
 			cfg.Secret = false
 		}
 	}
@@ -137,14 +135,8 @@ func ConfigSave(c *xin.Context) {
 			}
 		}
 
-		tx := db.Table(tt.TableConfigs()).Where("name = ?", cfg.Name)
-		if !au.IsDevel() {
-			tx = tx.Where("hidden = ?", false)
-		}
-		if !au.IsSuper() {
-			tx = tx.Where("readonly = ?", false)
-		}
-
+		tx := db.Table(tt.TableConfigs())
+		tx = tx.Where("name = ? AND role >= ?", cfg.Name, au.Role)
 		r := tx.Update("value", v)
 		if r.Error != nil {
 			c.Logger.Warn(r.Error)

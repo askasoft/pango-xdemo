@@ -1,2 +1,2 @@
-﻿Name,Value,Style,Order,Required,Secret,Readonly,Hidden,Validation
-secure_cidr,,T,1001,FALSE,FALSE,FALSE,FALSE,cidrs
+﻿Name,Value,Style,Order,Required,Secret,Role,Validation
+secure_cidr,,T,1001,FALSE,FALSE,A,cidrs

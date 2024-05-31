@@ -36,25 +36,25 @@
 
 						{{range $c := $cg.Items}}
 						<div class="row py-3">
-							<label class="col-md-3 col-form-label{{if $c.Required}} required{{end}}{{if $c.Hidden}} cihide{{end}}">{{T $.Loc (print "config." $c.Name)}}</label>
+							<label class="col-md-3 col-form-label{{if $c.Required}} required{{end}} role-{{$c.DisplayRole}}">{{T $.Loc (print "config." $c.Name)}}</label>
 							<div class="col-md-9">
 							{{if eq $c.Style "C"}}
-								{{Checks "Name=" $c.Name "List=" (MapGet $.Lists $c.Name) "Values=" $c.Values "Disabled=" $c.Readonly}}
+								{{Checks "Name=" $c.Name "List=" (MapGet $.Lists $c.Name) "Values=" $c.Values}}
 							{{else if eq $c.Style "O"}}
-								{{Checks "Name=" $c.Name "List=" (MapGet $.Lists $c.Name) "Values=" $c.Values "Ordered=" true "Disabled=" $c.Readonly "class=" "vertical"}}
+								{{Checks "Name=" $c.Name "List=" (MapGet $.Lists $c.Name) "Values=" $c.Values "Ordered=" true "class=" "vertical"}}
 							{{else if eq $c.Style "R"}}
-								{{Radios "Name=" $c.Name "List=" (MapGet $.Lists $c.Name) "Value=" $c.Value "Disabled=" $c.Readonly}}
+								{{Radios "Name=" $c.Name "List=" (MapGet $.Lists $c.Name) "Value=" $c.Value}}
 							{{else if eq $c.Style "S"}}
-								{{Select "Name=" $c.Name "List=" (MapGet $.Lists $c.Name) "Value=" $c.Value "Disabled=" $c.Readonly}}
+								{{Select "Name=" $c.Name "List=" (MapGet $.Lists $c.Name) "Value=" $c.Value}}
 							{{else if eq $c.Style "M"}}
-								{{Select "Name=" $c.Name "List=" (MapGet $.Lists $c.Name) "Values=" $c.Values "Multiple=" true "Disabled=" $c.Readonly}}
+								{{Select "Name=" $c.Name "List=" (MapGet $.Lists $c.Name) "Values=" $c.Values "Multiple=" true}}
 							{{else if eq $c.Style "T"}}
-								<textarea name="{{$c.Name}}" class="form-control" rows="2" textclear enterfire{{if $c.Readonly}} disabled{{end}}>
+								<textarea name="{{$c.Name}}" class="form-control" rows="2" textclear enterfire>
 {{$c.DisplayValue}}</textarea>
 							{{else if eq $c.Style "N"}}
-								<input name="{{$c.Name}}" type="number" size="20" class="form-control" textclear value="{{$c.DisplayValue}}"{{if $c.Readonly}} disabled{{end}}/>
+								<input name="{{$c.Name}}" type="number" size="20" class="form-control" textclear value="{{$c.DisplayValue}}"/>
 							{{else}}
-								<input name="{{$c.Name}}" type="text" class="form-control" textclear value="{{$c.DisplayValue}}"{{if $c.Readonly}} disabled{{end}}/>
+								<input name="{{$c.Name}}" type="text" class="form-control" textclear value="{{$c.DisplayValue}}"/>
 							{{end}}
 							{{$desc := (T $.Loc (print "config.desc." $c.Name))}}
 							{{if $desc}}

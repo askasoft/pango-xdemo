@@ -21,6 +21,10 @@
 	width: 100%;
 }
 
-label.cihide {
+label.role-super {
+	font-style: italic;
+	text-decoration: underline;
+}
+label.role-devel {
 	font-style: italic;
 }
