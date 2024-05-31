@@ -109,15 +109,15 @@ func AddBindErrors(c *xin.Context, err error, ns string, fks ...string) {
 	c.AddError(err)
 }
 
-func ValidateCIDRs(cidr string) bool {
-	ss := str.Fields(cidr)
-	for _, s := range ss {
-		_, _, err := net.ParseCIDR(s)
-		if err != nil {
+func ValidateCIDRs(fl vad.FieldLevel) bool {
+	v := false
+	for _, s := range str.Fields(fl.Field().String()) {
+		if !vad.IsCIDR(s) {
 			return false
 		}
+		v = true
 	}
-	return true
+	return v
 }
 
 func ParseCIDRs(cidr string) (cidrs []*net.IPNet) {

@@ -71,12 +71,6 @@ func UserEdit(c *xin.Context) {
 	userDetail(c, true)
 }
 
-func userValidateCIDR(c *xin.Context, cidr string) {
-	if !vadutil.ValidateCIDRs(cidr) {
-		c.AddError(vadutil.ErrInvalidField(c, "user.", "cidr"))
-	}
-}
-
 func userValidateRole(c *xin.Context, role string) {
 	if role != "" {
 		au := tenant.AuthUser(c)
@@ -102,7 +96,6 @@ func userBind(c *xin.Context) *models.User {
 		vadutil.AddBindErrors(c, err, "user.")
 	}
 
-	userValidateCIDR(c, user.CIDR)
 	userValidateRole(c, user.Role)
 	userValidateStatus(c, user.Status)
 
@@ -220,7 +213,6 @@ func UserUpdates(c *xin.Context) {
 	if err := c.Bind(uua); err != nil {
 		vadutil.AddBindErrors(c, err, "user.")
 	}
-	userValidateCIDR(c, uua.CIDR)
 	userValidateRole(c, uua.Role)
 	userValidateStatus(c, uua.Status)
 

@@ -11,7 +11,6 @@ import (
 	"github.com/askasoft/pango/cog"
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/tbs"
-	"github.com/askasoft/pango/vad"
 	"github.com/askasoft/pango/xin"
 	"gorm.io/gorm/clause"
 )
@@ -99,8 +98,6 @@ func ConfigSave(c *xin.Context) {
 		panic(err)
 	}
 
-	ve := app.XIN.Validator.Engine().(*vad.Validate)
-
 	var vs []string
 	var v string
 	var ok bool
@@ -134,7 +131,7 @@ func ConfigSave(c *xin.Context) {
 			validation += str.If(validation == "", "", ",") + "omitempty," + cfg.Validation
 		}
 		if validation != "" {
-			if err := ve.Var(v, validation); err != nil {
+			if err := app.VAD.Var(v, validation); err != nil {
 				vadutil.AddBindErrors(c, err, "config.", cfg.Name)
 				continue
 			}

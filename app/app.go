@@ -10,6 +10,7 @@ import (
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/net/netutil"
 	"github.com/askasoft/pango/sqx/sqlx"
+	"github.com/askasoft/pango/vad"
 	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pango/xin/render"
 	"github.com/askasoft/pango/xmw"
@@ -75,6 +76,9 @@ var (
 
 	// WAS web assets filesystem
 	WAS http.FileSystem
+
+	// VAD global validate
+	VAD *vad.Validate
 
 	// XIN global xin engine
 	XIN *xin.Engine
