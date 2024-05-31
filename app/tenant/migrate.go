@@ -52,7 +52,9 @@ func (tt Tenant) MigrateConfig(configs []*models.Config) error {
 	tn := tt.TableConfigs()
 
 	for _, cfg := range configs {
-		r := app.GDB.Table(tn).Where("name = ?", cfg.Name).Select("style", "order", "required", "secret", "readonly", "hidden").Updates(cfg)
+		tx := app.GDB.Table(tn).Where("name = ?", cfg.Name)
+		tx = tx.Select("style", "order", "required", "secret", "readonly", "hidden", "validation")
+		r := tx.Updates(cfg)
 		if r.Error != nil {
 			return r.Error
 		}

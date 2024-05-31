@@ -9,7 +9,7 @@
 			dataType: 'json',
 			beforeSend: main.form_ajax_start($f),
 			success: main.ajax_success,
-			error: main.ajax_error,
+			error: main.form_ajax_error($f),
 			complete: main.form_ajax_end($f)
 		});
 

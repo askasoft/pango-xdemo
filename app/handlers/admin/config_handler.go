@@ -1,16 +1,17 @@
 package admin
 
 import (
-	"errors"
 	"net/http"
 
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/handlers"
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/tenant"
+	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
 	"github.com/askasoft/pango/cog"
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/tbs"
+	"github.com/askasoft/pango/vad"
 	"github.com/askasoft/pango/xin"
 	"gorm.io/gorm/clause"
 )
@@ -98,6 +99,8 @@ func ConfigSave(c *xin.Context) {
 		panic(err)
 	}
 
+	ve := app.XIN.Validator.Engine().(*vad.Validate)
+
 	var vs []string
 	var v string
 	var ok bool
@@ -123,6 +126,20 @@ func ConfigSave(c *xin.Context) {
 			continue
 		}
 
+		validation := ""
+		if cfg.Required {
+			validation = "required"
+		}
+		if cfg.Validation != "" {
+			validation += str.If(validation == "", "", ",") + "omitempty," + cfg.Validation
+		}
+		if validation != "" {
+			if err := ve.Var(v, validation); err != nil {
+				vadutil.AddBindErrors(c, err, "config.", cfg.Name)
+				continue
+			}
+		}
+
 		tx := db.Table(tt.TableConfigs()).Where("name = ?", cfg.Name)
 		if !au.IsDevel() {
 			tx = tx.Where("hidden = ?", false)
@@ -134,11 +151,11 @@ func ConfigSave(c *xin.Context) {
 		r := tx.Update("value", v)
 		if r.Error != nil {
 			c.Logger.Warn(r.Error)
-			c.AddError(r.Error)
+			c.AddError(&vadutil.ParamError{Param: cfg.Name, Message: r.Error.Error()})
 		} else if r.RowsAffected != 1 {
 			msg := tbs.Format(c.Locale, "error.param.invalid", cfg.Name)
 			c.Logger.Warn(msg)
-			c.AddError(errors.New(msg))
+			c.AddError(&vadutil.ParamError{Param: cfg.Name, Message: msg})
 		}
 	}
 

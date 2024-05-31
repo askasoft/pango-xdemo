@@ -45,11 +45,14 @@ func ErrInvalidID(c *xin.Context) error {
 //  2. {xxx}.error.param.{tag}
 //  3. error.param.{tag}
 //  4. error.param.invalid
-func AddBindErrors(c *xin.Context, err error, ns string) {
+func AddBindErrors(c *xin.Context, err error, ns string, fks ...string) {
 	var fbes *binding.FieldBindErrors
 	if ok := errors.As(err, &fbes); ok {
 		for _, fbe := range *fbes {
 			fk := str.SnakeCase(fbe.Field)
+			if fk == "" && len(fks) > 0 {
+				fk = fks[0]
+			}
 			fn := tbs.GetText(c.Locale, ns+fk, fk)
 			fm := tbs.GetText(c.Locale, ns+"error."+fk)
 			if fm == "" {
@@ -64,6 +67,9 @@ func AddBindErrors(c *xin.Context, err error, ns string) {
 	if ok := errors.As(err, &ves); ok {
 		for _, fe := range *ves {
 			fk := str.SnakeCase(fe.Field())
+			if fk == "" && len(fks) > 0 {
+				fk = fks[0]
+			}
 			fn := ""
 			fm := tbs.GetText(c.Locale, ns+"error."+fk+"."+fe.Tag())
 			if fm == "" {

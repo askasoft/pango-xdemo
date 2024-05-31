@@ -125,7 +125,7 @@ var main = {
 					main.form_add_invalid($f, e);
 					es.push(e.message);
 				} else {
-					es.push(e + "");
+					es.push(e.message || e + "");
 				}
 			});
 			err = es;

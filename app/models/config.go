@@ -15,16 +15,17 @@ const (
 )
 
 type Config struct {
-	Name      string    `gorm:"size:64;not null;primaryKey"`
-	Value     string    `gorm:"not null"`
-	Style     string    `gorm:"size:1;not null"`
-	Order     int       `gorm:"not null"`
-	Required  bool      `gorm:"not null"`
-	Secret    bool      `gorm:"not null"`
-	Readonly  bool      `gorm:"not null"`
-	Hidden    bool      `gorm:"not null"`
-	CreatedAt time.Time `gorm:"not null;<-:create" json:"created_at"`
-	UpdatedAt time.Time `gorm:"not null" json:"updated_at"`
+	Name       string    `gorm:"size:64;not null;primaryKey"`
+	Value      string    `gorm:"not null"`
+	Style      string    `gorm:"size:1;not null"`
+	Order      int       `gorm:"not null"`
+	Required   bool      `gorm:"not null"`
+	Secret     bool      `gorm:"not null"`
+	Readonly   bool      `gorm:"not null"`
+	Hidden     bool      `gorm:"not null"`
+	Validation string    `gorm:"not null"`
+	CreatedAt  time.Time `gorm:"not null;<-:create" json:"created_at"`
+	UpdatedAt  time.Time `gorm:"not null" json:"updated_at"`
 }
 
 func (c *Config) String() string {
