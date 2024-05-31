@@ -16,7 +16,7 @@ import (
 )
 
 type TenantInfo struct {
-	Name    string `json:"name" form:"name,strip,lower" validate:"required,regexp=^[a-z][a-z0-9]{00x2C29}$"`
+	Name    string `json:"name" form:"name,strip,lower" validate:"required,maxlen=30,regexp=^[a-z][a-z0-9]{00x2C29}$"`
 	Comment string `json:"comment" form:"comment" validate:"omitempty,maxlen=250"`
 }
 
