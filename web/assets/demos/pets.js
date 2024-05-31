@@ -10,7 +10,7 @@
 		return false;
 	}
 
-	function pets_search() {
+	function pets_search(evt, callback) {
 		var $f = $('#pets_listform');
 
 		main.sssave(sskey, main.form_input_values($f));
@@ -23,13 +23,29 @@
 				main.form_clear_invalid($f);
 				main.loadmask();
 			},
-			success: main.list_builder($('#pets_list')),
+			success: function(data) {
+				main.list_build($('#pets_list'), data);
+				if (callback) {
+					setTimeout(callback, 100);
+				}
+			},
 			error: main.form_ajax_error($f),
 			complete: main.unloadmask
 		});
 		return false;
 	}
 
+	function pets_prev_page(callback) {
+		var pno = $('#pets_list > .ui-pager > .pagination > .page-item.prev > a').attr('pageno');
+		$('#pets_listform input[name="p"]').val(pno);
+		pets_search(null, callback);
+	}
+
+	function pets_next_page(callback) {
+		var pno = $('#pets_list > .ui-pager > .pagination > .page-item.next > a').attr('pageno');
+		$('#pets_listform input[name="p"]').val(pno);
+		pets_search(null, callback);
+	}
 
 	//----------------------------------------------------
 	// export
@@ -68,10 +84,11 @@
 	// detail
 	//
 	function pet_detail(self, edit) {
-		var $tr = $(self).closest('tr');
-		var params = {
-			id: $tr.attr('id').replace('pet_', '')
-		};
+		return pet_detail_show($(self).closest('tr'), edit);
+	}
+
+	function pet_detail_show($tr, edit) {
+		var params = { id: $tr.attr('id').replace('pet_', '') };
 
 		$('#pets_detail_popup').popup({
 			loaded: false,
@@ -81,9 +98,39 @@
 				method: 'GET',
 				data: params
 			}
-		}).popup('show', this);
+		}).popup('show');
 
 		return false;
+	}
+
+	function pet_detail_prev() {
+		var id = $('#pet_detail_id').val(), $tr = $('#pet_' + id);
+
+		$('#pets_detail_popup').popup('hide', $tr);
+
+		var $pv = $tr.prev('tr');
+		if ($pv.length) {
+			pet_detail_show($pv, $(this).attr('action') == 'edit');
+		} else {
+			pets_prev_page(function() {
+				$('#pets_table > tbody > tr:last-child').find('button.edit').trigger('click');
+			});
+		}
+	}
+
+	function pet_detail_next() {
+		var id = $('#pet_detail_id').val(), $tr = $('#pet_' + id);
+
+		$('#pets_detail_popup').popup('hide', $tr);
+
+		var $nx = $tr.next('tr');
+		if ($nx.length) {
+			pet_detail_show($nx, $(this).attr('action') == 'edit');
+		} else {
+			pets_next_page(function() {
+				$('#pets_table > tbody > tr:first-child').find('button.edit').trigger('click');
+			});
+		}
 	}
 
 	function pet_detail_submit() {
@@ -95,6 +142,16 @@
 		$('#pets_detail_popup')
 			.find('form').on('submit', pet_detail_submit).end()
 			.find('.ui-popup-footer button[type=submit]').on('click', pet_detail_submit);
+
+		var $p = $('#pets_detail_popup > .prev').on('click', pet_detail_prev);
+		var $n = $('#pets_detail_popup > .next').on('click', pet_detail_next);
+		
+		var id = $('#pet_detail_id').val(), $tr = $('#pet_' + id);
+		var prev = $tr.prev('tr').length || $('#pets_list > .ui-pager > .pagination > .page-item.prev.disabled').length == 0;
+		var next = $tr.next('tr').length || $('#pets_list > .ui-pager > .pagination > .page-item.next.disabled').length == 0;
+
+		$p[(id != '0' && prev) ? 'show' : 'hide']();
+		$n[(id != '0' && next) ? 'show' : 'hide']();
 	}
 
 	function pets_detail_popup_shown() {

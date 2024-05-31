@@ -10,7 +10,7 @@
 		return false;
 	}
 
-	function users_search() {
+	function users_search(evt, callback) {
 		var $f = $('#users_listform');
 
 		main.sssave(sskey, main.form_input_values($f));
@@ -23,13 +23,29 @@
 				main.form_clear_invalid($f);
 				main.loadmask();
 			},
-			success: main.list_builder($('#users_list')),
+			success: function(data) {
+				main.list_build($('#users_list'), data);
+				if (callback) {
+					setTimeout(callback, 100);
+				}
+			},
 			error: main.form_ajax_error($f),
 			complete: main.unloadmask
 		});
 		return false;
 	}
 
+	function users_prev_page(callback) {
+		var pno = $('#users_list > .ui-pager > .pagination > .page-item.prev > a').attr('pageno');
+		$('#users_listform input[name="p"]').val(pno);
+		users_search(null, callback);
+	}
+
+	function users_next_page(callback) {
+		var pno = $('#users_list > .ui-pager > .pagination > .page-item.next > a').attr('pageno');
+		$('#users_listform input[name="p"]').val(pno);
+		users_search(null, callback);
+	}
 
 	//----------------------------------------------------
 	// export
@@ -68,10 +84,11 @@
 	// detail
 	//
 	function user_detail(self, edit) {
-		var $tr = $(self).closest('tr');
-		var params = {
-			id: $tr.attr('id').replace('user_', '')
-		};
+		return user_detail_show($(self).closest('tr'), edit);
+	}
+
+	function user_detail_show($tr, edit) {
+		var params = { id: $tr.attr('id').replace('user_', '') };
 
 		$('#users_detail_popup').popup({
 			loaded: false,
@@ -81,9 +98,39 @@
 				method: 'GET',
 				data: params
 			}
-		}).popup('show', this);
+		}).popup('show');
 
 		return false;
+	}
+
+	function user_detail_prev() {
+		var id = $('#user_detail_id').val(), $tr = $('#user_' + id);
+
+		$('#users_detail_popup').popup('hide', $tr);
+
+		var $pv = $tr.prev('tr');
+		if ($pv.length) {
+			user_detail_show($pv, $(this).attr('action') == 'edit');
+		} else {
+			users_prev_page(function() {
+				$('#users_table > tbody > tr:last-child').find('button.edit').trigger('click');
+			});
+		}
+	}
+
+	function user_detail_next() {
+		var id = $('#user_detail_id').val(), $tr = $('#user_' + id);
+
+		$('#users_detail_popup').popup('hide', $tr);
+
+		var $nx = $tr.next('tr');
+		if ($nx.length) {
+			user_detail_show($nx, $(this).attr('action') == 'edit');
+		} else {
+			users_next_page(function() {
+				$('#users_table > tbody > tr:first-child').find('button.edit').trigger('click');
+			});
+		}
 	}
 
 	function user_detail_submit() {
@@ -95,6 +142,16 @@
 		$('#users_detail_popup')
 			.find('form').on('submit', user_detail_submit).end()
 			.find('.ui-popup-footer button[type=submit]').on('click', user_detail_submit);
+
+		var $p = $('#users_detail_popup > .prev').on('click', user_detail_prev);
+		var $n = $('#users_detail_popup > .next').on('click', user_detail_next);
+		
+		var id = $('#user_detail_id').val(), $tr = $('#user_' + id);
+		var prev = $tr.prev('tr').length || $('#users_list > .ui-pager > .pagination > .page-item.prev.disabled').length == 0;
+		var next = $tr.next('tr').length || $('#users_list > .ui-pager > .pagination > .page-item.next.disabled').length == 0;
+
+		$p[(id != '0' && prev) ? 'show' : 'hide']();
+		$n[(id != '0' && next) ? 'show' : 'hide']();
 	}
 
 	function user_detail_popup_shown() {

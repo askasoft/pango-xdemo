@@ -341,9 +341,52 @@ form div.verr {
 .s-popup-detail.wide .ui-popup-body {
 	max-height: 80vh;
 }
-
 .s-popup-detail .ui-popup-body pre {
 	white-space: pre-wrap;
+}
+.s-popup-detail > .prev, .s-popup-detail > .next {
+	background-color: var(--bs-body-bg);
+	border: solid 1px var(--bs-border-color);
+	border-radius: 24px;
+	cursor: pointer;
+	display: none;
+	width: 48px;
+	height: 48px;
+	position: absolute;
+	top: 50%;
+}
+.s-popup-detail > .prev:hover, .s-popup-detail > .next:hover {
+	background-color: var(--bs-border-color);
+}
+.s-popup-detail > .prev {
+	left: -24px;
+}
+.s-popup-detail > .next {
+	right: -24px;
+}
+.s-popup-detail > .prev:before, .s-popup-detail > .next:after {
+	border-style: solid;
+	border-width: 6px 0 0 0;
+	border-color: var(--bs-secondary);
+	content: '';
+	display: block;
+	width: 16px;
+	height: 16px;
+	position: absolute;
+	top: 16px;
+}
+.s-popup-detail > .prev:hover:before, .s-popup-detail > .next:hover:after {
+	border-color: var(--bs-link-color);
+}
+.s-popup-detail > .prev:before {
+	border-left-width: 6px;
+	left: 16px;
+	transform: rotate(-45deg);
+}
+.s-popup-detail > .next:after {
+	border-right-width: 6px;
+	right: 16px;
+	transform: rotate(45deg);
 }
 
 .s-popup-error .ui-popup-body {
