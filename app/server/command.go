@@ -110,11 +110,20 @@ func (s *service) Exec(cmd string) {
 		app.Exit(0)
 	case "encrypt":
 		k, v := cryptFlags()
-		fmt.Println(cptutil.Encrypt(k, v))
+		if es, err := cptutil.Encrypt(k, v); err != nil {
+			fmt.Println(err)
+		} else {
+			fmt.Println(es)
+		}
+		fmt.Println()
 		app.Exit(0)
 	case "decrypt":
 		k, v := cryptFlags()
-		fmt.Println(cptutil.Decrypt(k, v))
+		if ds, err := cptutil.Decrypt(k, v); err != nil {
+			fmt.Println(err)
+		} else {
+			fmt.Println(ds)
+		}
 		app.Exit(0)
 	case "assets":
 		exportAssets(flag.Arg(1))

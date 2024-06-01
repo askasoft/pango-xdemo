@@ -78,7 +78,7 @@ func (u *User) IsApiOnly() bool {
 }
 
 func (u *User) SetPassword(password string) {
-	u.Password = cptutil.Encrypt(u.Email, password)
+	u.Password = cptutil.MustEncrypt(u.Email, password)
 }
 
 //-------------------------------------
@@ -89,5 +89,5 @@ func (u *User) GetUsername() string {
 }
 
 func (u *User) GetPassword() string {
-	return cptutil.Decrypt(u.Email, u.Password)
+	return cptutil.MustDecrypt(u.Email, u.Password)
 }

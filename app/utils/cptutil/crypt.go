@@ -8,28 +8,34 @@ import (
 	"github.com/askasoft/pango/str"
 )
 
-func Encrypt(secret, s string) string {
-	cryptor := cpt.NewAesCBC(secret)
+func Hash(s string) string {
+	h := sha256.New()
+	h.Write(str.UnsafeBytes(s))
+	return fmt.Sprintf("%x", h.Sum(nil))
+}
 
-	es, err := cryptor.EncryptString(s)
+func Encrypt(secret, s string) (string, error) {
+	cryptor := cpt.NewAesCBC(secret)
+	return cryptor.EncryptString(s)
+}
+
+func MustEncrypt(secret, s string) string {
+	es, err := Encrypt(secret, s)
 	if err != nil {
 		panic(err)
 	}
 	return es
 }
 
-func Decrypt(secret, s string) string {
+func Decrypt(secret, s string) (string, error) {
 	cryptor := cpt.NewAesCBC(secret)
+	return cryptor.DecryptString(s)
+}
 
-	ds, err := cryptor.DecryptString(s)
+func MustDecrypt(secret, s string) string {
+	ds, err := Decrypt(secret, s)
 	if err != nil {
 		panic(err)
 	}
 	return ds
-}
-
-func Hash(s string) string {
-	h := sha256.New()
-	h.Write(str.UnsafeBytes(s))
-	return fmt.Sprintf("%x", h.Sum(nil))
 }
