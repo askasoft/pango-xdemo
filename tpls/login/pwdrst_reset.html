@@ -1,0 +1,22 @@
+{{MapSet .Ctx.Attrs "styles" (Array "login/login.css")}}
+{{MapSet .Ctx.Attrs "sidenavi" false}}
+
+{{template "main_header" .}}
+
+<div class="s-section">
+	<div class="ui-headline">
+		<ol class="breadcrumb">
+			<li class="active"><i class="{{T .Loc "icon.login.pwdrst"}}"></i> {{T .Loc "menu.login.pwdrst"}}</li>
+		</ol>
+	</div>
+
+	<div id="pwdrst_alert">
+		{{template "alerts" .}}
+	</div>
+
+	<div>
+		<a href="/">{{T .Loc "button.home"}} <i class="fas fa-circle-arrow-right"></i></a>
+	</div>
+</div>
+
+{{template "main_footer" .}}

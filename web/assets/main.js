@@ -121,7 +121,7 @@ var main = {
 		if ($.isArray(err)) {
 			var es = [];
 			$.each(err, function(i, e) {
-				if (e.param && e.message) {
+				if (e.param) {
 					main.form_add_invalid($f, e);
 					es.push(e.message);
 				} else {

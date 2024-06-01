@@ -164,6 +164,13 @@ func (tt Tenant) String() string {
 	return string(tt)
 }
 
+func (tt Tenant) FQDN() string {
+	if tt == "" {
+		return app.Domain
+	}
+	return string(tt) + "." + app.Domain
+}
+
 func (tt Tenant) Schema() string {
 	if len(tt) == 0 {
 		return app.INI.GetString("database", "schema", "public")

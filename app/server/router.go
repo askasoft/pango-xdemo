@@ -249,6 +249,14 @@ func addLoginHandlers(rg *xin.RouterGroup) {
 	rg.GET("/", login.Index)
 	rg.POST("/login", login.Login)
 	rg.GET("/logout", login.Logout)
+
+	addLoginPasswordResetHandlers(rg.Group("/pwdrst"))
+}
+
+func addLoginPasswordResetHandlers(rg *xin.RouterGroup) {
+	rg.GET("/", login.PasswordResetIndex)
+	rg.POST("/send", login.PasswordResetSend)
+	rg.GET("/reset/:token", login.PasswordResetReset)
 }
 
 func addDemosHandlers(rg *xin.RouterGroup) {
