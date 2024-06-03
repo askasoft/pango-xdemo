@@ -240,5 +240,12 @@ func (jc *JobController) Abort(c *xin.Context) {
 
 	_ = tjm.AddJobLog(jid, time.Now(), xjm.JobLogLevelWarn, reason)
 
+	if err := jobs.JobChainFindAndAbort(tt, jid, reason); err != nil {
+		c.Logger.Errorf("Failed to abort job chain for job #%d: %v", jid, err)
+		c.AddError(err)
+		c.JSON(http.StatusInternalServerError, E(c))
+		return
+	}
+
 	c.JSON(http.StatusOK, xin.H{"warning": tbs.GetText(c.Locale, "job.aborted")})
 }

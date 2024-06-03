@@ -35,6 +35,7 @@ func (tt Tenant) MigrateSchema() error {
 		&xfs.File{},
 		&xjm.Job{},
 		&xjm.JobLog{},
+		&xjm.JobChain{},
 		&models.Config{},
 		&models.User{},
 		&models.Pet{},

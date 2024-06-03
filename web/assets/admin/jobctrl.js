@@ -1,34 +1,35 @@
 (function($) {
 	function job_start() {
-		if (!$('#job_start').prop('disabled')) {
-			$('#job_start').prop('disabled', true);
+		$('#job_start').prop('disabled', true);
 
-			var $jf = $('#job_form'), jid;
-			$.ajaf({
-				url: './start',
-				method: 'POST',
-				data: $jf.serializeArray(),
-				file: $jf.find('input[type="file"]'),
-				dataType: 'json',
-				beforeSend: main.form_ajax_start($jf),
-				success: function(data) {
-					jid = data.jid;
-					main.ajax_success(data);
-				},
-				error: main.form_ajax_error($jf),
-				complete: function() {
-					main.form_ajax_end($jf)();
-					job_list(jid);
-				}
-			});
-		}
+		var $jf = $('#job_form'), jid;
+		$.ajaf({
+			url: './start',
+			method: 'POST',
+			data: $jf.serializeArray(),
+			file: $jf.find('input[type="file"]'),
+			dataType: 'json',
+			beforeSend: main.form_ajax_start($jf),
+			success: function(data) {
+				jid = data.jid;
+				main.ajax_success(data);
+			},
+			error: main.form_ajax_error($jf),
+			complete: function() {
+				main.form_ajax_end($jf)();
+				job_list(jid);
+			}
+		});
 		return false;
 	}
 
 	function job_abort() {
-		$(this).prop('disabled', true).find('i').addClass('fa-spinner fa-spin');
+		var $i = $(this).prop('disabled', true).find('i').addClass('fa-spinner fa-spin');
 
 		var jid = $(this).closest('.job').data('jid');
+		if (!jid) {
+			jid = $('#job_list > ul').children('li[status=P], li[status=R]').data('jid');
+		}
 
 		$.ajax({
 			url: './abort',
@@ -41,6 +42,7 @@
 			success: main.ajax_success,
 			error: main.ajax_error,
 			complete: function() {
+				$i.removeClass('fa-spinner fa-spin');
 				job_list(jid);
 			}
 		});
@@ -171,7 +173,21 @@
 		}
 
 		var jpr = $('#job_list > ul').children('li[status=P], li[status=R]').length > 0;
-		$('#job_start').prop('disabled', jpr).find('i')[jpr ? 'addClass' : 'removeClass']('fa-spinner fa-spin');
+		var $b = $('#job_start').prop('disabled', jpr), lbl = $b.data('processing');
+		if (lbl) {
+			var $s = $b.find('span');
+			if (jpr) {
+				if (!$b.data('original')) {
+					$b.data('original', $s.text());
+				}
+				$s.text(lbl);
+			} else {
+				$s.text($b.data('original'));
+			}
+		}
+		$b.find('i')[jpr ? 'addClass' : 'removeClass']('fa-spinner fa-spin');
+
+		$('#job_abort').prop('disabled', !jpr);
 	}
 
 	function job_status_icon(s) {
@@ -318,22 +334,20 @@
 
 	function build_job_tools(jst) {
 		var $jt = $('<div>', { 'class': 'jobtools' });
-
-		if (jst == 'P' || jst == 'R') {
-			$jt.append(build_job_abort());
-		}
+		append_job_abort($jt, jst);
 		return $jt;
 	}
 
-	function build_job_abort() {
-		var $jf = $('#job_form');
-
-		var $btn = $('<button>', { 'class': 'abort btn btn-danger' });
-		var $i = $('<i>', { 'class': 'fas fa-stop' });
-		var $t = $('<span>').text($jf.data('abort'));
-
-		$btn.append($i, $t);
-		return $btn;
+	function append_job_abort($jt, jst) {
+		if (jst == 'P' || jst == 'R') {
+			var label = $('#job_form').data('abort');
+			if (label) {
+				var $btn = $('<button>', { 'class': 'abort btn btn-danger' }),
+					$i = $('<i>', { 'class': 'fas fa-stop' }),
+					$t = $('<span>').text(label);
+				$jt.append($btn.append($i, $t));
+			}
+		}
 	}
 
 	function refresh_job_info(job) {
@@ -343,9 +357,7 @@
 			$jh.find('i').attr('class', job_status_icon(job.status));
 
 			var $jt = $('#job_' + job.id).find('.jobtools').empty();
-			if (job.status == 'P' || job.status == 'R') {
-				$jt.append(build_job_abort());
-			}
+			append_job_abort($jt, job.status);
 		}
 	}
 
@@ -373,6 +385,7 @@
 	function job_init() {
 		$('#job_form').on('submit', job_start);
 		$('#job_start').on('click', job_start);
+		$('#job_abort').on('click', job_abort);
 		$('#job_list').on('click', 'button.abort', job_abort);
 
 		job_list();

@@ -1,0 +1,232 @@
+:root, [data-bs-theme=light] {
+	--js-pending-bg: #dfe8ed;
+	--js-pending-fg: #999;
+}
+[data-bs-theme=dark] {
+	--js-pending-bg: #ccc;
+}
+
+#jobchain_form {
+	margin-bottom: 20px;
+}
+fieldset > form, fieldset > form#jobchain_form {
+	margin-bottom: 0;
+}
+
+#jobchain_list {
+	margin-top: 40px;
+}
+#jobchain_list > ul.nav-pills {
+	padding-right: 20px;
+	overflow-x: hidden;
+	overflow-y: auto;
+	max-height: 92px;
+	scrollbar-width: thin;
+}
+#jobchain_list > ul.nav-pills > li {
+	border: solid 1px transparent;
+	margin-left: 2px;
+}
+#jobchain_list > ul.nav-pills .nav-link {
+	border: solid 1px transparent;
+}
+#jobchain_list > ul.nav-pills .nav-link.active, #jobchain_list > ul.nav-pills .show > .nav-link {
+	background-color: transparent;
+	border-color: var(--bs-nav-pills-link-active-bg);
+	color: var(--bs-nav-link-color);
+}
+#jobchain_list > ul > li i {
+	font-size: 150%;
+	margin-right: 5px;
+	vertical-align: middle;
+}
+#jobchain_list > ul > li[status=A] i {
+	color: var(--bs-danger);
+}
+#jobchain_list > ul > li[status=C] i {
+	color: var(--bs-success);
+}
+#jobchain_list > ul > li[status=P] i {
+	color: var(--js-pending-bg);
+}
+#jobchain_list > ul > li[status=R] i {
+	color: var(--bs-primary);
+}
+
+#jobchain_list .tab-content {
+	padding-top: 20px;
+	width: 100%;
+}
+
+.jobchain {
+	border: solid 1px #fff;
+	margin-bottom: 20px;
+	padding: 15px 15px 0 15px;
+}
+.jobchain[status=A] {
+	border-color: var(--bs-danger);
+}
+.jobchain[status=C] {
+	border-color: var(--bs-success);
+}
+.jobchain[status=P] {
+	border-color: var(--js-pending-bg);
+}
+.jobchain[status=R] {
+	border-color: var(--bs-primary);
+}
+
+.jobtools {
+	text-align: left;
+}
+.jobtools > * {
+	margin-bottom: 15px;
+}
+.jobtools > button {
+	float: right;
+}
+.jobtools > .jobcaption > i, .jobtools > button > i {
+	margin-right: 8px;
+}
+.jobchain[status=A] .jobcaption {
+	color: var(--bs-danger);
+}
+.jobchain[status=C] .jobcaption {
+	color: var(--bs-success);
+}
+.jobchain[status=P] .jobcaption {
+	color: var(--js-pending-fg);
+}
+.jobchain[status=R] .jobcaption {
+	color: var(--bs-primary);
+}
+
+.jobstates {
+	display: flex;
+	flex-wrap: wrap;
+}
+
+.jrs {
+	margin: 0 60px 15px 0;
+	min-width: 250px;
+	position: relative;
+}
+.jrs:after {
+	content: '';
+	position: absolute;
+	top: 5px;
+	right: -62px;
+	border: 16px solid transparent;
+	border-left: 28px solid var(--js-pending-bg);
+	box-sizing: border-box;
+}
+.jrs:last-child:before, .jrs:last-child:after {
+	display: none;
+}
+.jnm {
+	color: #eee;
+	margin: 0 0 5px 0;
+	padding: 10px 15px;
+	text-align: center;
+}
+.jrs[status=A] .jnm {
+	background-color: var(--bs-danger);
+}
+.jrs[status=C] .jnm {
+	background-color: var(--bs-success);
+}
+.jrs[status=P] .jnm {
+	background-color: var(--js-pending-bg);
+	color: #333;
+}
+.jrs[status=R] .jnm {
+	background-color: var(--bs-primary);
+}
+.jif {
+	display: flex;
+}
+.jpg {
+	margin: 10px 20px 10px 0;
+	position: relative;
+}
+.jpg .txt {
+	position: absolute;
+	z-index: 1;
+	left: 0;
+	top: 0;
+	width: 80px;
+	height: 80px;
+	line-height: 80px;
+	font-size: 20px;
+	display: block;
+	text-align: center;
+	white-space: nowrap;
+}
+.jss {
+	display: flex;
+	flex-flow: column;
+	justify-content: center;
+}
+.jss > div {
+	padding: 2px 0;
+}
+.jss label {
+	width: 80px;
+	margin-right: 5px;
+}
+.jss .error, .jss .failure {
+	color: var(--bs-danger);
+}
+.jss .error > * {
+	cursor: pointer;
+}
+
+@keyframes pgrotate {
+	100% {
+		transform: rotate(360deg);
+	}
+}
+.pgcircle {
+	--progress: 10;
+	--size: 80px;
+	--half-size: calc(var(--size) / 2);
+	--stroke-width: 8px;
+	--radius: calc((var(--size) - var(--stroke-width)) / 2);
+	--circumference: calc(var(--radius) * pi * 2);
+	--dash: calc((var(--progress) * var(--circumference)) / 100);
+}
+.pgcircle circle {
+	cx: var(--half-size);
+	cy: var(--half-size);
+	r: var(--radius);
+	stroke-width: var(--stroke-width);
+	fill: none;
+}
+.pgcircle circle.bg {
+	stroke: var(--js-pending-bg);
+}
+.pgcircle circle.fg {
+	transform: rotate(-90deg);
+	transform-origin: var(--half-size) var(--half-size);
+	transition: stroke-dasharray 0.3s linear 0s;
+}
+
+.jrs[status=A] .pgcircle circle.fg {
+	stroke: var(--bs-danger);
+}
+.jrs[status=C] .pgcircle circle.fg {
+	stroke: var(--bs-success);
+}
+.jrs[status=P] .pgcircle circle.bg {
+	stroke-dasharray: 15 11;
+}
+.jrs[status=P] .pgcircle circle.fg {
+	display: none;
+}
+.jrs[status=R] .pgcircle circle.fg {
+	stroke: var(--bs-primary);
+	stroke-linecap: round;
+	stroke-dasharray: var(--dash) calc(var(--circumference) - var(--dash));
+	transform: rotate(0deg);
+	animation: pgrotate 2s linear infinite;
+}

@@ -1,3 +1,11 @@
+:root, [data-bs-theme=light] {
+	--js-pending-bg: #dfe8ed;
+	--js-pending-fg: #999;
+}
+[data-bs-theme=dark] {
+	--js-pending-bg: #ccc;
+}
+
 #job_form {
 	margin-bottom: 20px;
 }
@@ -8,33 +16,24 @@ fieldset > form, fieldset > form#job_form {
 #job_list {
 	margin-top: 40px;
 }
-#job_list.stacked {
-	display: flex;
-}
 #job_list > ul.nav-pills {
 	padding-right: 20px;
 	overflow-x: hidden;
 	overflow-y: auto;
-	max-height: 84px;
+	max-height: 92px;
 	scrollbar-width: thin;
-}
-#job_list > ul.nav-tabs {
-	padding: 2px 10px 0px 10px;
-	overflow-x: auto;
-	overflow-y: hidden;
-	scrollbar-width: thin;
-	white-space: nowrap;
-}
-#job_list > ul.nav-stacked {
-	margin-right: 10px;
-	white-space: nowrap;
-}
-#job_list > ul.nav-tabs > li, #job_list > ul.nav-pills > li {
-	float: none;
-	display: inline-block;
 }
 #job_list > ul.nav-pills > li {
+	border: solid 1px transparent;
 	margin-left: 2px;
+}
+#job_list > ul.nav-pills .nav-link {
+	border: solid 1px transparent;
+}
+#job_list > ul.nav-pills .nav-link.active, #job_list > ul.nav-pills .show > .nav-link {
+	background-color: transparent;
+	border-color: var(--bs-nav-pills-link-active-bg);
+	color: var(--bs-nav-link-color);
 }
 #job_list > ul > li i {
 	font-size: 150%;
@@ -42,22 +41,16 @@ fieldset > form, fieldset > form#job_form {
 	vertical-align: middle;
 }
 #job_list > ul > li[status=A] i {
-	color: #a94442;
+	color: var(--bs-danger);
 }
 #job_list > ul > li[status=C] i {
-	color: #3c763d;
+	color: var(--bs-success);
 }
 #job_list > ul > li[status=P] i {
-	color: #aaa;
+	color: var(--js-pending-bg);
 }
 #job_list > ul > li[status=R] i {
-	color: #00f;
-}
-#job_list > ul.nav-pills > li[status=A] > a.active > i {
-	color: #f00;
-}
-#job_list > ul.nav-pills > li[status=C] > a.active > i {
-	color: #15c7a8;
+	color: var(--bs-primary);
 }
 
 #job_list .tab-content {
@@ -80,10 +73,15 @@ fieldset > form, fieldset > form#job_form {
 }
 
 .jobtools {
-	text-align: right;
+	text-align: left;
+}
+.jobtools > * {
 	margin-bottom: 15px;
 }
-.jobtools button > i {
+.jobtools > button {
+	float: right;
+}
+.jobtools > button > i {
 	margin-right: 8px;
 }
 

@@ -202,6 +202,10 @@ func (tt Tenant) TableJobLogs() string {
 	return tt.Table("job_logs")
 }
 
+func (tt Tenant) TableJobChains() string {
+	return tt.Table("job_chains")
+}
+
 func (tt Tenant) TableConfigs() string {
 	return tt.Table("configs")
 }
@@ -220,6 +224,10 @@ func (tt Tenant) ResetSequence(table string, starts ...int64) string {
 	return fmt.Sprintf("SELECT SETVAL('%s_id_seq', GREATEST((SELECT MAX(id)+1 FROM %s), %d), false)", stn, stn, start)
 }
 
+func (tt Tenant) GJC(db *gorm.DB) xjm.JobChainer {
+	return gormjm.JC(db, tt.TableJobChains())
+}
+
 func (tt Tenant) GJM(db *gorm.DB) xjm.JobManager {
 	return gormjm.JM(db, tt.TableJobs(), tt.TableJobLogs())
 }
@@ -228,12 +236,23 @@ func (tt Tenant) GFS(db *gorm.DB) xfs.XFS {
 	return gormfs.FS(db, tt.TableFiles())
 }
 
+func (tt Tenant) SJC(db sqlx.Sqlx) xjm.JobChainer {
+	return sqlxjm.JC(db, tt.TableJobChains())
+}
+
 func (tt Tenant) SJM(db sqlx.Sqlx) xjm.JobManager {
 	return sqlxjm.JM(db, tt.TableJobs(), tt.TableJobLogs())
 }
 
 func (tt Tenant) SFS(db sqlx.Sqlx) xfs.XFS {
 	return sqlxfs.FS(db, tt.TableFiles())
+}
+
+func (tt Tenant) JC() xjm.JobChainer {
+	if app.INI.GetString("internal", "xjc") == "sqlxjc" {
+		return tt.SJC(app.SDB)
+	}
+	return tt.GJC(app.GDB)
 }
 
 func (tt Tenant) JM() xjm.JobManager {
