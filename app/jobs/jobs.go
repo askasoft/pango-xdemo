@@ -80,6 +80,10 @@ func (af *ArgStartEnd) Bind(c *xin.Context, a any) error {
 	return err
 }
 
+type iState interface {
+	State() JobState
+}
+
 type JobState struct {
 	Step    int `json:"step,omitempty"`
 	Total   int `json:"total,omitempty"`

@@ -148,8 +148,6 @@ func (jcc *JobChainController) Start(c *xin.Context) {
 		return
 	}
 
-	go jobs.StartJobs(tt) //nolint: errcheck
-
 	c.JSON(http.StatusOK, xin.H{"cid": cid, "success": tbs.GetText(c.Locale, "job.started")})
 }
 

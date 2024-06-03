@@ -16,10 +16,6 @@ const (
 	JobChainPetReset = "PetReset"
 )
 
-type iState interface {
-	State() JobState
-}
-
 type JobRunState struct {
 	JID    int64    `json:"jid"`
 	Name   string   `json:"name"`
@@ -55,6 +51,10 @@ func JobChainStart(tt tenant.Tenant, chainName string, states []*JobRunState, jo
 
 		return err
 	})
+	if err != nil {
+		go StartJobs(tt) //nolint: errcheck
+	}
+
 	return
 }
 
