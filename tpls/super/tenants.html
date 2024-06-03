@@ -6,7 +6,7 @@
 <div class="s-section">
 	<div class="ui-headline">
 		<ol class="breadcrumb">
-			<li class="active"><i class="{{T .Loc "icon.super.tenants"}}"></i> {{T .Loc "menu.super.tenants"}}</li>
+			<li class="active"><i class="{{T .Loc "icon.super.tenants"}}"></i>{{T .Loc "menu.super.tenants"}}</li>
 		</ol>
 	</div>
 
@@ -23,7 +23,7 @@
 	<div id="tenants_alert">{{template "alerts" .}}</div>
 	
 	<fieldset id="tenants_listfset" class="ui-fieldset collapsed" data-spy="fieldset">
-		<legend>{{T .Loc "button.search"}}</legend>
+		<legend class="circle"><i class="{{T .Loc "icon.search"}}"></i>{{T .Loc "button.search"}}</legend>
 		<form id="tenants_listform"  class="form-horizontal grey" method="POST">
 			<input type="hidden" name="_token_" value="{{.Token}}"/>
 			<input type="hidden" name="p" value="{{.Q.Page}}"/>

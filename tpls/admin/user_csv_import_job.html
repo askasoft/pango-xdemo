@@ -6,7 +6,7 @@
 <div class="s-section">
 	<div class="ui-headline">
 		<ol class="breadcrumb">
-			<li class="active"><i class="{{T .Loc "icon.admin.users.import"}}"></i> {{T .Loc "menu.admin.users.import"}}</li>
+			<li class="active"><i class="{{T .Loc "icon.admin.users.import"}}"></i>{{T .Loc "menu.admin.users.import"}}</li>
 		</ol>
 	</div>
 
@@ -18,7 +18,7 @@
 
 	<fieldset data-spy="fieldset">
 		<legend>{{T .Loc "user.import.csv.legend"}}</legend>
-		<form id="job_form" class="form-horizontal grey" enctype="multipart/form-data" autocomplete="off" data-abort="{{T .Loc "button.stop"}}">
+		<form id="job_form" class="form-horizontal grey" enctype="multipart/form-data" autocomplete="off">
 			<input type="hidden" name="_token_" value="{{.Token}}"/>
 			<div class="row py-2">
 				<label class="col-md-3 col-form-label">{{T .Loc "user.import.csv.file"}}</label>
@@ -30,7 +30,8 @@
 	</fieldset>
 
 	<div class="text-center">
-		<button id="job_start" class="btn btn-primary" disabled><i class="{{T .Loc "icon.start"}}"></i> {{T .Loc "button.start"}}</button>
+		<button id="job_start" class="btn btn-success" disabled data-processing="{{T .Loc "button.processing"}}"><i class="{{T .Loc "icon.start"}}"></i> <span>{{T .Loc "button.start"}}</span></button>
+		<button id="job_abort" class="btn btn-danger" disabled><i class="{{T .Loc "icon.stop"}}"></i> {{T .Loc "button.stop"}}</button>
 	</div>
 
 	<div id="job_list"></div>

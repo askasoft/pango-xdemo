@@ -7,7 +7,6 @@
 	{{if and .AuthUser .AuthUser.IsAdmin}}
 		<a class="ui-menu-item" href="{{.Base}}/a/config/"><i class="fa-4x {{T .Loc "icon.admin.config"}}"></i><div>{{T .Loc "menu.admin.config"}}</div></a>
 		<a class="ui-menu-item" href="{{.Base}}/a/users/"><i class="fa-4x {{T .Loc "icon.admin.users"}}"></i><div>{{T .Loc "menu.admin.users"}}</div></a>
-		<a class="ui-menu-item" href="{{.Base}}/a/reset/"><i class="fa-4x {{T .Loc "icon.admin.reset"}}"></i><div>{{T .Loc "menu.admin.reset"}}</div></a>
 	{{end}}
 
 	{{if and .AuthUser .AuthUser.IsSuper}}
