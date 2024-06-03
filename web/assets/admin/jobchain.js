@@ -294,7 +294,7 @@
 		}
 		$jrs.find('.txt').text(t);
 
-		var size = 100, stroke_width = 8;
+		var size = 80, stroke_width = 8;
 		var radius = (size - stroke_width) / 2;
 		var circumference = radius * 3.14 * 2;
 		var dash = p * circumference / 100;
