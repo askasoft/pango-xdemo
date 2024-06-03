@@ -22,9 +22,8 @@
 }
 
 label.role-super {
-	font-style: italic;
-	text-decoration: underline;
+	color: #A02B93;
 }
 label.role-devel {
-	font-style: italic;
+	color: #045C92;
 }

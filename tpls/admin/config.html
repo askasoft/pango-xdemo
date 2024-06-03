@@ -6,19 +6,21 @@
 <div class="s-section">
 	<div class="ui-headline">
 		<ol class="breadcrumb">
-			<li class="active"><i class="{{T .Loc "icon.admin.config"}}"></i> {{T .Loc "menu.admin.config"}}</li>
+			<li class="active"><i class="{{T .Loc "icon.admin.config"}}"></i>{{T .Loc "menu.admin.config"}}</li>
 		</ol>
 	</div>
 
+	{{if gt (len .Configs) 1}}
 	<ul class="nav nav-tabs">
 		{{range $i, $cc := .Configs}}
 		<li class="nav-item"><a class="nav-link{{if eq $i 0}} active{{end}}" href="#cc_{{$cc.Name}}" data-bs-toggle="tab">{{T $.Loc (print "config.category.label." $cc.Name)}}</a></li>
 		{{end}}
 	</ul>
+	{{end}}
 
 	<div class="tab-content">
 		{{range $i, $cc := .Configs}}
-		<div class="tab-pane{{if eq $i 0}} active{{end}}" id="cc_{{$cc.Name}}"><div class="ccc">
+		<div id="cc_{{$cc.Name}}" class="tab-pane{{if eq $i 0}} active{{end}}"><div class="ccc">
 			<ul class="nav nav-pills">
 				{{range $j, $cg := $cc.Groups}}
 				<li class="nav-item"><a class="nav-link{{if eq $j 0}} active{{end}}" href="#cg_{{$cg.Name}}" data-bs-toggle="tab">{{T $.Loc (print "config.group.label." $cg.Name)}}</a></li>
