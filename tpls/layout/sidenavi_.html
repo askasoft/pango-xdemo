@@ -1,49 +1,66 @@
 {{define "sidenavi"}}
-<div id="sidenavi"><div class="ui-sidenavi minimal">
+<div id="sidenavi">
+	<div class="mainnavi ui-sidenavi minimal">
+		<div id="navi_demos" class="card">
+			<div class="card-header">
+				<i class="{{T .Loc "icon.demos"}}"></i><span>{{T .Loc "menu.demos"}}</span>
+			</div>
+			<div class="card-body">
+				<ul class="nav flex-column">
+					<li class="nav-item"><a class="nav-link" href="{{.Base}}/demos/tags/"><i class="{{T .Loc "icon.demos.tags"}}"></i><span>{{T .Loc "menu.demos.tags"}}</span></a></li>
+					<li class="nav-item"><a class="nav-link" href="{{.Base}}/demos/uploads/"><i class="{{T .Loc "icon.demos.uploads"}}"></i><span>{{T .Loc "menu.demos.uploads"}}</span></a></li>
+				</ul>
+			</div>
+		</div>
+
+		<div id="navi_demos_pets" class="card">
+			<div class="card-header">
+				<i class="{{T .Loc "icon.demos.pets"}}"></i><span>{{T .Loc "menu.demos.pets"}}</span>
+			</div>
+			<div class="card-body">
+				<ul class="nav flex-column">
+					<li class="nav-item"><a class="nav-link" href="{{.Base}}/demos/pets/"><i class="{{T .Loc "icon.demos.pets.list"}}"></i><span>{{T .Loc "menu.demos.pets.list"}}</span></a></li>
+					<li class="nav-item"><a class="nav-link" href="{{.Base}}/demos/pets/jobs/clear/"><i class="{{T .Loc "icon.demos.pets.clear"}}"></i><span>{{T .Loc "menu.demos.pets.clear"}}</span></a></li>
+					<li class="nav-item"><a class="nav-link" href="{{.Base}}/demos/pets/jobs/catcreate/"><i class="{{T .Loc "icon.demos.pets.catcreate"}}"></i><span>{{T .Loc "menu.demos.pets.catcreate"}}</span></a></li>
+					<li class="nav-item"><a class="nav-link" href="{{.Base}}/demos/pets/jobs/dogcreate/"><i class="{{T .Loc "icon.demos.pets.dogcreate"}}"></i><span>{{T .Loc "menu.demos.pets.dogcreate"}}</span></a></li>
+					<li class="nav-item"><a class="nav-link" href="{{.Base}}/demos/pets/jobs/reset/"><i class="{{T .Loc "icon.demos.pets.reset"}}"></i><span>{{T .Loc "menu.demos.pets.reset"}}</span></a></li>
+				</ul>
+			</div>
+		</div>
+
+		{{if and .AuthUser .AuthUser.IsSuper}}
+		<div id="navi_super" class="card">
+			<div class="card-header">
+				<i class="{{T .Loc "icon.super"}}"></i><span>{{T .Loc "menu.super"}}</span>
+			</div>
+			<div class="card-body">
+				<ul class="nav flex-column">
+					{{if eq .CFG.app.tenants "true"}}
+					<li class="nav-item"><a class="nav-link" href="{{.Base}}/s/tenants/"><i class="{{T .Loc "icon.super.tenants"}}"></i><span>{{T .Loc "menu.super.tenants"}}</span></a></li>
+					{{end}}
+					<li class="nav-item"><a class="nav-link" href="{{.Base}}/s/job/"><i class="{{T .Loc "icon.super.job"}}"></i><span>{{T .Loc "menu.super.job"}}</span></a></li>
+					<li class="nav-item"><a class="nav-link" href="{{.Base}}/s/shell/"><i class="{{T .Loc "icon.super.shell"}}"></i><span>{{T .Loc "menu.super.shell"}}</span></a></li>
+					<li class="nav-item"><a class="nav-link" href="{{.Base}}/s/sql/"><i class="{{T .Loc "icon.super.sql"}}"></i><span>{{T .Loc "menu.super.sql"}}</span></a></li>
+				</ul>
+			</div>
+		</div>
+		{{end}}
+	</div>
+
 	{{if and .AuthUser .AuthUser.IsAdmin}}
-	<div id="navi_admin" class="card">
-		<div class="card-header">
-			<i class="{{T .Loc "icon.admin"}}"></i><span>{{T .Loc "menu.admin"}}</span>
-		</div>
-		<div class="card-body">
-			<ul class="nav flex-column">
-				<li class="nav-item"><a class="nav-link" href="{{.Base}}/a/config/"><i class="{{T .Loc "icon.admin.config"}}"></i><span>{{T .Loc "menu.admin.config"}}</span></a></li>
-				<li class="nav-item"><a class="nav-link" href="{{.Base}}/a/users/"><i class="{{T .Loc "icon.admin.users"}}"></i><span>{{T .Loc "menu.admin.users"}}</span></a></li>
-				<li class="nav-item"><a class="nav-link" href="{{.Base}}/a/reset/"><i class="{{T .Loc "icon.admin.reset"}}"></i><span>{{T .Loc "menu.admin.reset"}}</span></a></li>
-			</ul>
-		</div>
-	</div>
-	{{end}}
-
-	{{if and .AuthUser .AuthUser.IsSuper}}
-	<div id="navi_super" class="card">
-		<div class="card-header">
-			<i class="{{T .Loc "icon.super"}}"></i><span>{{T .Loc "menu.super"}}</span>
-		</div>
-		<div class="card-body">
-			<ul class="nav flex-column">
-				{{if eq .CFG.app.tenants "true"}}
-				<li class="nav-item"><a class="nav-link" href="{{.Base}}/s/tenants/"><i class="{{T .Loc "icon.super.tenants"}}"></i><span>{{T .Loc "menu.super.tenants"}}</span></a></li>
-				{{end}}
-				<li class="nav-item"><a class="nav-link" href="{{.Base}}/s/job/"><i class="{{T .Loc "icon.super.job"}}"></i><span>{{T .Loc "menu.super.job"}}</span></a></li>
-				<li class="nav-item"><a class="nav-link" href="{{.Base}}/s/shell/"><i class="{{T .Loc "icon.super.shell"}}"></i><span>{{T .Loc "menu.super.shell"}}</span></a></li>
-				<li class="nav-item"><a class="nav-link" href="{{.Base}}/s/sql/"><i class="{{T .Loc "icon.super.sql"}}"></i><span>{{T .Loc "menu.super.sql"}}</span></a></li>
-			</ul>
+	<div class="footnavi ui-sidenavi minimal">
+		<div id="navi_admin" class="card">
+			<div class="card-header">
+				<i class="{{T .Loc "icon.admin"}}"></i><span>{{T .Loc "menu.admin"}}</span>
+			</div>
+			<div class="card-body">
+				<ul class="nav flex-column">
+					<li class="nav-item"><a class="nav-link" href="{{.Base}}/a/users/"><i class="{{T .Loc "icon.admin.users"}}"></i><span>{{T .Loc "menu.admin.users"}}</span></a></li>
+					<li class="nav-item"><a class="nav-link" href="{{.Base}}/a/config/"><i class="{{T .Loc "icon.admin.config"}}"></i><span>{{T .Loc "menu.admin.config"}}</span></a></li>
+				</ul>
+			</div>
 		</div>
 	</div>
 	{{end}}
-
-	<div id="navi_demos" class="card">
-		<div class="card-header">
-			<i class="fas fa-earth-asia"></i><span>{{T .Loc "menu.demos"}}</span>
-		</div>
-		<div class="card-body">
-			<ul class="nav flex-column">
-				<li class="nav-item"><a class="nav-link" href="{{.Base}}/demos/pets/"><i class="{{T .Loc "icon.demos.pets"}}"></i><span>{{T .Loc "menu.demos.pets"}}</span></a></li>
-				<li class="nav-item"><a class="nav-link" href="{{.Base}}/demos/tags/"><i class="{{T .Loc "icon.demos.tags"}}"></i><span>{{T .Loc "menu.demos.tags"}}</span></a></li>
-				<li class="nav-item"><a class="nav-link" href="{{.Base}}/demos/uploads/"><i class="{{T .Loc "icon.demos.uploads"}}"></i><span>{{T .Loc "menu.demos.uploads"}}</span></a></li>
-			</ul>
-		</div>
-	</div>
-</div></div>
+</div>
 {{end}}

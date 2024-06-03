@@ -283,6 +283,50 @@ func addDemosPetsHandlers(rg *xin.RouterGroup) {
 	rg.POST("/deletes", demos.PetDeletes)
 	rg.POST("/deleteb", demos.PetDeleteBatch)
 	rg.POST("/export/csv", demos.PetCsvExport)
+
+	addDemosPetJobsHandlers(rg.Group("/jobs"))
+}
+
+func addDemosPetJobsHandlers(rg *xin.RouterGroup) {
+	addDemosPetClearHandlers(rg.Group("/clear"))
+	addDemosPetCatCreateHandlers(rg.Group("/catcreate"))
+	addDemosPetDogCreateHandlers(rg.Group("/dogcreate"))
+	addDemosPetResetHandlers(rg.Group("/reset"))
+}
+
+func addDemosPetClearHandlers(rg *xin.RouterGroup) {
+	rg.GET("/", demos.PetClearJobCtrl.Index)
+	rg.GET("/list", demos.PetClearJobCtrl.List)
+	rg.GET("/logs", demos.PetClearJobCtrl.Logs)
+	rg.GET("/status", demos.PetClearJobCtrl.Status)
+	rg.POST("/start", demos.PetClearJobCtrl.Start)
+	rg.POST("/abort", demos.PetClearJobCtrl.Abort)
+}
+
+func addDemosPetCatCreateHandlers(rg *xin.RouterGroup) {
+	rg.GET("/", demos.PetCatCreateJobCtrl.Index)
+	rg.GET("/list", demos.PetCatCreateJobCtrl.List)
+	rg.GET("/logs", demos.PetCatCreateJobCtrl.Logs)
+	rg.GET("/status", demos.PetCatCreateJobCtrl.Status)
+	rg.POST("/start", demos.PetCatCreateJobCtrl.Start)
+	rg.POST("/abort", demos.PetCatCreateJobCtrl.Abort)
+}
+
+func addDemosPetDogCreateHandlers(rg *xin.RouterGroup) {
+	rg.GET("/", demos.PetDogCreateJobCtrl.Index)
+	rg.GET("/list", demos.PetDogCreateJobCtrl.List)
+	rg.GET("/logs", demos.PetDogCreateJobCtrl.Logs)
+	rg.GET("/status", demos.PetDogCreateJobCtrl.Status)
+	rg.POST("/start", demos.PetDogCreateJobCtrl.Start)
+	rg.POST("/abort", demos.PetDogCreateJobCtrl.Abort)
+}
+
+func addDemosPetResetHandlers(rg *xin.RouterGroup) {
+	rg.GET("/", demos.PetResetJobChainCtrl.Index)
+	rg.GET("/list", demos.PetResetJobChainCtrl.List)
+	rg.GET("/status", demos.PetResetJobChainCtrl.Status)
+	rg.POST("/start", demos.PetResetJobChainCtrl.Start)
+	rg.POST("/abort", demos.PetResetJobChainCtrl.Abort)
 }
 
 func addUserHandlers(rg *xin.RouterGroup) {
@@ -310,7 +354,6 @@ func addAdminHandlers(rg *xin.RouterGroup) {
 
 	addAdminConfigHandlers(rg.Group("/config"))
 	addAdminUserHandlers(rg.Group("/users"))
-	addAdminResetHandlers(rg.Group("/reset"))
 }
 
 func addAdminConfigHandlers(rg *xin.RouterGroup) {
@@ -348,15 +391,6 @@ func addAdminUserCsvImportHandlers(rg *xin.RouterGroup) {
 	rg.POST("/start", admin.UserCsvImportJobCtrl.Start)
 	rg.POST("/abort", admin.UserCsvImportJobCtrl.Abort)
 	rg.GET("/sample", admin.UserCsvImportSample)
-}
-
-func addAdminResetHandlers(rg *xin.RouterGroup) {
-	rg.GET("/", admin.DatabaseResetJobCtrl.Index)
-	rg.GET("/list", admin.DatabaseResetJobCtrl.List)
-	rg.GET("/logs", admin.DatabaseResetJobCtrl.Logs)
-	rg.GET("/status", admin.DatabaseResetJobCtrl.Status)
-	rg.POST("/start", admin.DatabaseResetJobCtrl.Start)
-	rg.POST("/abort", admin.DatabaseResetJobCtrl.Abort)
 }
 
 func addSuperHandlers(rg *xin.RouterGroup) {

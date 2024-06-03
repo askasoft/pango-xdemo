@@ -27,7 +27,9 @@ var (
 
 const (
 	JobNameUserCsvImport = "UserCsvImport"
-	JobNameDatabaseReset = "DatabaseReset"
+	JobNamePetClear      = "PetClear"
+	JobNamePetCatCreate  = "PetCatCreate"
+	JobNamePetDogCreate  = "PetDogCreate"
 )
 
 var hasFileJobs = []string{
@@ -42,20 +44,33 @@ type JobRunnerCreator func(tenant.Tenant, *xjm.Job) iRunner
 
 var creators = map[string]JobRunnerCreator{
 	JobNameUserCsvImport: NewUserCsvImportJob,
-	JobNameDatabaseReset: NewDatabaseResetJob,
+	JobNamePetClear:      NewPetClearJob,
+	JobNamePetCatCreate:  NewPetCatCreateJob,
+	JobNamePetDogCreate:  NewPetDogCreateJob,
+}
+
+type ISetChainID interface {
+	SetChainID(int64)
+}
+
+type ArgChain struct {
+	ChainID int64 `json:"chain_id,omitempty"`
+}
+
+func (ac *ArgChain) SetChainID(cid int64) {
+	ac.ChainID = cid
 }
 
 type ArgLocale struct {
 	Locale string `json:"locale,omitempty"`
 }
 
-type ArgFilter struct {
-	Start time.Time `form:"start" json:"start,omitempty"`
-	End   time.Time `form:"end" json:"end,omitempty"`
-	Items int       `form:"items" json:"items,omitempty"`
+type ArgStartEnd struct {
+	Start time.Time `json:"start,omitempty" form:"start"`
+	End   time.Time `json:"end,omitempty" form:"end"`
 }
 
-func (af *ArgFilter) Bind(c *xin.Context, a any) error {
+func (af *ArgStartEnd) Bind(c *xin.Context, a any) error {
 	err := c.Bind(a)
 
 	if !af.End.IsZero() {
@@ -157,7 +172,9 @@ func (ce *ClientError) Unwrap() error {
 type JobRunner struct {
 	*xjm.JobRunner
 
-	Tenant tenant.Tenant
+	Tenant  tenant.Tenant
+	Locale  string
+	ChainID int64
 }
 
 func newJobRunner(tt tenant.Tenant, jnm string, jid int64) *JobRunner {
@@ -190,12 +207,64 @@ func (jr *JobRunner) AddFailedItem(id int64, title, reason string) {
 	_ = jr.AddResult(si.Quoted())
 }
 
-func (jr *JobRunner) Running(state any) error {
-	return jr.JobRunner.Running(xjm.MustEncode(state))
+func (jr *JobRunner) Checkout() error {
+	if err := jr.JobRunner.Checkout(); err != nil {
+		return err
+	}
+
+	return jr.jobChainCheckout()
+}
+
+func (jr *JobRunner) jobChainCheckout() error {
+	if jr.ChainID != 0 {
+		if err := JobChainCheckout(jr); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (jr *JobRunner) Running(state iState) error {
+	if err := jr.JobRunner.Running(xjm.MustEncode(state)); err != nil {
+		return err
+	}
+
+	return jr.jobChainRunning(state)
+}
+
+func (jr *JobRunner) jobChainRunning(state iState) error {
+	if jr.ChainID != 0 {
+		if err := JobChainRunning(jr, state); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (jr *JobRunner) Abort(reason string) error {
+	if err := jr.JobRunner.Abort(reason); err != nil {
+		return err
+	}
+	return jr.jobChainAbort(reason)
+}
+
+func (jr *JobRunner) jobChainAbort(reason string) error {
+	if jr.ChainID != 0 {
+		if err := JobChainAbort(jr, reason); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (jr *JobRunner) Done(err error) {
 	defer jr.Log.Close()
+
+	if errors.Is(err, xjm.ErrJobCheckout) {
+		// do nothing, just log it
+		jr.Tenant.Logger("JOB").Warn(err)
+		return
+	}
 
 	if err == nil || errors.Is(err, xjm.ErrJobComplete) {
 		if err := jr.Complete(); err != nil {
@@ -208,6 +277,11 @@ func (jr *JobRunner) Done(err error) {
 			return
 		}
 		jr.Log.Info("DONE.")
+
+		// Continue job chain
+		if err := jr.jobChainContinue(); err != nil {
+			jr.Log.Error(err)
+		}
 		return
 	}
 
@@ -217,6 +291,19 @@ func (jr *JobRunner) Done(err error) {
 	}
 
 	if errors.Is(err, xjm.ErrJobAborted) {
+		reason := ""
+		if job, err := jr.GetJob(); err != nil {
+			jr.Log.Error(err.Error())
+		} else {
+			reason = job.Error
+		}
+
+		// NOTE:
+		// It's necessary to call jobChainAbort() again.
+		// The jobChainContinue() method may update job chain status to 'R' to a aborted job chain.
+		if err := jr.jobChainAbort(reason); err != nil {
+			jr.Log.Error(err.Error())
+		}
 		jr.Log.Warn("ABORTED.")
 		return
 	}
@@ -235,6 +322,15 @@ func (jr *JobRunner) Done(err error) {
 		jr.Log.Error(err)
 	}
 	jr.Log.Warn("ABORTED.")
+}
+
+func (jr *JobRunner) jobChainContinue() error {
+	if jr.ChainID != 0 {
+		if err := JobChainContinue(jr); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 //------------------------------------

@@ -1,0 +1,71 @@
+{{MapSet .Ctx.Attrs "styles" (Array "admin/jobchain.css")}}
+{{MapSet .Ctx.Attrs "scripts" (Array "admin/jobchain.js")}}
+
+{{template "main_header" .}}
+
+<div class="s-section">
+	<div class="ui-headline">
+		<ol class="breadcrumb">
+			<li class="active"><i class="{{T .Loc "icon.demos.pets.reset"}}"></i>{{T .Loc "menu.demos.pets.reset"}}</li>
+		</ol>
+	</div>
+
+	<div class="well">{{T .Loc "pet.reset.well"}}</div>
+
+	<fieldset data-spy="fieldset">
+		<legend>{{T .Loc "label.parameter"}}</legend>
+		<form id="jobchain_form" class="form-horizontal grey">
+			<input type="hidden" name="_token_" value="{{.Token}}"/>
+			<div class="row py-2">
+				<label class="col-md-3 col-form-label">{{T .Loc "pet.clear.reset_sequence"}}</label>
+				<div class="col-md-9">
+					{{Radios "Name=" "reset_sequence" "List=" .PetResetSequenceMap "Value=" .Arg.ResetSequence}}
+				</div>
+			</div>
+		</form>
+	</fieldset>
+
+	<div class="text-center">
+		<button id="jobchain_start" class="btn btn-primary" disabled data-processing="{{T .Loc "button.processing"}}"><i class="{{T .Loc "icon.start"}}"></i> <span>{{T .Loc "button.start"}}</span></button>
+		<button id="jobchain_abort" class="btn btn-danger" disabled><i class="{{T .Loc "icon.stop"}}"></i> {{T .Loc "button.stop"}}</button>
+	</div>
+
+	<div id="jobchain_list"></div>
+
+	<div id="jobchain_template" class="hidden">
+		<div class="jrs">
+			<div class="jnm"></div>
+			<div class="jif">
+				<div class="jpg">
+					<svg width="80" height="80" viewBox="0 0 80 80" class="pgcircle">
+						<circle class="bg"></circle>
+						<circle class="fg"></circle>
+					</svg>
+					<span class="txt">0%</span>
+				</div>
+				<div class="jss">
+					<div class="total"><label>Total</label><span></span></div>
+					<div class="skipped"><label>Skipped</label><span></span></div>
+					<div class="success"><label>Success</label><span></span></div>
+					<div class="failure"><label>Failure</label><span></span></div>
+					<div class="error"><label>Error</label><i class="fas fa-circle-exclamation"></i></div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div id="jobchain_maps"
+		data-jobnames="{{JSON .PetResetJobnamesMap}}"
+		data-jslabels="{{JSON .PetResetJslabelsMap}}"
+	></div>
+</div>
+
+<div id="jobchain_error_popup" class="ui-popup s-popup-error" data-spy="popup" tabindex="-1">
+	<h4 class="ui-popup-header">{{T .Loc "label.error"}}</h4>
+	<div class="ui-popup-body"></div>
+	<div class="ui-popup-footer">
+		<button type="button" class="btn btn-secondary" popup-dismiss="true"><i class="{{T .Loc "icon.close"}}"></i> {{T .Loc "button.close"}}</button>
+	</div>
+</div>
+
+{{template "main_footer" .}}

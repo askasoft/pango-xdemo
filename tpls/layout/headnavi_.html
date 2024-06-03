@@ -7,35 +7,49 @@
 				<a class="btn btn-primary active" href="#dark" title="{{T .Loc "theme.dark"}}"><i class="fa-fw fas fa-moon"></i></a>
 			</div>
 		</li>
+		<li class="maindrop">
+			<div class="dropdown">
+				<button class="btn btn-primary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+					<i class="fas fa-bars"></i><span class="caret"></span>
+				</button>
+				<ul class="dropdown-menu dropdown-menu-end">
+					<li><a class="dropdown-item" href="{{.Base}}/demos/tags/"><i class="{{T .Loc "icon.demos.tags"}}"></i><span>{{T .Loc "menu.demos.tags"}}</span></a></li>
+					<li><a class="dropdown-item" href="{{.Base}}/demos/uploads/"><i class="{{T .Loc "icon.demos.uploads"}}"></i><span>{{T .Loc "menu.demos.uploads"}}</span></a></li>
+					<li class="divider"></li>
+					<li><a class="dropdown-item" href="{{.Base}}/demos/pets/"><i class="{{T .Loc "icon.demos.pets.list"}}"></i><span>{{T .Loc "menu.demos.pets.list"}}</span></a></li>
+					<li><a class="dropdown-item" href="{{.Base}}/demos/pets/jobs/clear/"><i class="{{T .Loc "icon.demos.pets.clear"}}"></i><span>{{T .Loc "menu.demos.pets.clear"}}</span></a></li>
+					<li><a class="dropdown-item" href="{{.Base}}/demos/pets/jobs/catcreate/"><i class="{{T .Loc "icon.demos.pets.catcreate"}}"></i><span>{{T .Loc "menu.demos.pets.catcreate"}}</span></a></li>
+					<li><a class="dropdown-item" href="{{.Base}}/demos/pets/jobs/dogcreate/"><i class="{{T .Loc "icon.demos.pets.dogcreate"}}"></i><span>{{T .Loc "menu.demos.pets.dogcreate"}}</span></a></li>
+					<li><a class="dropdown-item" href="{{.Base}}/demos/pets/jobs/reset/"><i class="{{T .Loc "icon.demos.pets.reset"}}"></i><span>{{T .Loc "menu.demos.pets.reset"}}</span></a></li>
+				</ul>
+			</div>
+		</li>
 		{{if .AuthUser}}
-		<li><div class="dropdown">
-			<button class="btn btn-primary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
-				<i class="fas fa-user-circle"></i> {{.AuthUser.Name}} <span class="caret"></span>
-			</button>
-			<ul class="dropdown-menu dropdown-menu-end">
-				{{if .AuthUser.IsAdmin}}
-				<li><a class="dropdown-item" href="{{.Base}}/a/config/"><i class="{{T .Loc "icon.admin.config"}}"></i><span>{{T .Loc "menu.admin.config"}}</span></a></li>
-				<li><a class="dropdown-item" href="{{.Base}}/a/users/"><i class="{{T .Loc "icon.admin.users"}}"></i><span>{{T .Loc "menu.admin.users"}}</span></a></li>
-				<li><a class="dropdown-item" href="{{.Base}}/a/reset/"><i class="{{T .Loc "icon.admin.reset"}}"></i><span>{{T .Loc "menu.admin.reset"}}</span></a></li>
-				<li class="divider"></li>
-				{{end}}
-				{{if .AuthUser.IsSuper}}
-				{{if eq .CFG.app.tenants "true"}}
-				<li><a class="dropdown-item" href="{{.Base}}/s/tenants/"><i class="{{T .Loc "icon.super.tenants"}}"></i><span>{{T .Loc "menu.super.tenants"}}</span></a></li>
-				{{end}}
-				<li><a class="dropdown-item" href="{{.Base}}/s/job/"><i class="{{T .Loc "icon.super.job"}}"></i><span>{{T .Loc "menu.super.job"}}</span></a></li>
-				<li><a class="dropdown-item" href="{{.Base}}/s/shell/"><i class="{{T .Loc "icon.super.shell"}}"></i><span>{{T .Loc "menu.super.shell"}}</span></a></li>
-				<li><a class="dropdown-item" href="{{.Base}}/s/sql/"><i class="{{T .Loc "icon.super.sql"}}"></i><span>{{T .Loc "menu.super.sql"}}</span></a></li>
-				<li class="divider"></li>
-				{{end}}
-				<li><a class="dropdown-item" href="{{.Base}}/demos/pets/"><i class="{{T .Loc "icon.demos.pets"}}"></i><span>{{T .Loc "menu.demos.pets"}}</span></a></li>
-				<li><a class="dropdown-item" href="{{.Base}}/demos/tags/"><i class="{{T .Loc "icon.demos.tags"}}"></i><span>{{T .Loc "menu.demos.tags"}}</span></a></li>
-				<li><a class="dropdown-item" href="{{.Base}}/demos/uploads/"><i class="{{T .Loc "icon.demos.uploads"}}"></i><span>{{T .Loc "menu.demos.uploads"}}</span></a></li>
-				<li class="divider"></li>
-				<li><a class="dropdown-item" href="{{.Base}}/u/pwdchg/"><i class="{{T .Loc "icon.user.pwdchg"}}"></i><span>{{T .Loc "menu.user.pwdchg"}}</span></a></li>
-				<li><a class="dropdown-item" href="{{.Base}}/login/logout"><i class="{{T .Loc "icon.logout"}}"></i><span>{{T .Loc "menu.logout"}}</span></a></li>
-			</ul>
-		</div></li>
+		<li class="userdrop">
+			<div class="dropdown">
+				<button class="btn btn-primary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+					<i class="fas fa-user-circle"></i> {{.AuthUser.Name}} <span class="caret"></span>
+				</button>
+				<ul class="dropdown-menu dropdown-menu-end">
+					{{if .AuthUser.IsSuper}}
+					{{if eq .CFG.app.tenants "true"}}
+					<li><a class="dropdown-item" href="{{.Base}}/s/tenants/"><i class="{{T .Loc "icon.super.tenants"}}"></i><span>{{T .Loc "menu.super.tenants"}}</span></a></li>
+					{{end}}
+					<li><a class="dropdown-item" href="{{.Base}}/s/job/"><i class="{{T .Loc "icon.super.job"}}"></i><span>{{T .Loc "menu.super.job"}}</span></a></li>
+					<li><a class="dropdown-item" href="{{.Base}}/s/shell/"><i class="{{T .Loc "icon.super.shell"}}"></i><span>{{T .Loc "menu.super.shell"}}</span></a></li>
+					<li><a class="dropdown-item" href="{{.Base}}/s/sql/"><i class="{{T .Loc "icon.super.sql"}}"></i><span>{{T .Loc "menu.super.sql"}}</span></a></li>
+					<li class="divider"></li>
+					{{end}}
+					{{if .AuthUser.IsAdmin}}
+					<li><a class="dropdown-item" href="{{.Base}}/a/users/"><i class="{{T .Loc "icon.admin.users"}}"></i><span>{{T .Loc "menu.admin.users"}}</span></a></li>
+					<li><a class="dropdown-item" href="{{.Base}}/a/config/"><i class="{{T .Loc "icon.admin.config"}}"></i><span>{{T .Loc "menu.admin.config"}}</span></a></li>
+					<li class="divider"></li>
+					{{end}}
+					<li><a class="dropdown-item" href="{{.Base}}/u/pwdchg/"><i class="{{T .Loc "icon.user.pwdchg"}}"></i><span>{{T .Loc "menu.user.pwdchg"}}</span></a></li>
+					<li><a class="dropdown-item" href="{{.Base}}/login/logout"><i class="{{T .Loc "icon.logout"}}"></i><span>{{T .Loc "menu.logout"}}</span></a></li>
+				</ul>
+			</div>
+		</li>
 		{{else}}
 		<li><a href="{{.Base}}/login/"><i class="{{T .Loc "icon.login"}}"></i><span>{{T .Loc "menu.login"}}</span></a></li>
 		{{end}}

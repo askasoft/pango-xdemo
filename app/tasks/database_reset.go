@@ -1,8 +1,8 @@
 package tasks
 
 import (
+	"github.com/askasoft/pango-xdemo/app/jobs"
 	"github.com/askasoft/pango-xdemo/app/tenant"
-	"github.com/askasoft/pango/log"
 )
 
 func ResetDatabase() {
@@ -11,6 +11,6 @@ func ResetDatabase() {
 
 func ResetShcemasData() error {
 	return tenant.Iterate(func(tt tenant.Tenant) error {
-		return tt.ResetPets(log.GetLogger("RST"))
+		return jobs.PetResetJobChainStart(tt)
 	})
 }

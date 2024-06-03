@@ -20,6 +20,10 @@ func GetPagerLimits(locale string) []int {
 	return ps
 }
 
+func GetBoolMap(locale string) *cog.LinkedHashMap[string, string] {
+	return GetLinkedHashMap(locale, "maps.bool")
+}
+
 func GetPetGenderMap(locale string) *cog.LinkedHashMap[string, string] {
 	return GetLinkedHashMap(locale, "pet.map.gender")
 }
@@ -56,6 +60,14 @@ func GetUserRoleMap(locale string, role string) *cog.LinkedHashMap[string, strin
 
 func GetUserRoleReverseMap() map[string]string {
 	return GetAllReverseMap("user.map.role")
+}
+
+func GetPetResetJobnamesMap(locale string) *cog.LinkedHashMap[string, string] {
+	return GetLinkedHashMap(locale, "pet.reset.jobnames")
+}
+
+func GetPetResetJslabelsMap(locale string) *cog.LinkedHashMap[string, string] {
+	return GetLinkedHashMap(locale, "pet.reset.jslabels")
 }
 
 func GetLinkedHashMap(locale, name string) *cog.LinkedHashMap[string, string] {

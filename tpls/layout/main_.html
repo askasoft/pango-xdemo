@@ -2,15 +2,14 @@
 <!DOCTYPE html>
 <html lang="{{.Loc}}">
 {{template "head" .}}
-<body data-bs-theme="dark">
+<body data-bs-theme="dark"{{if eq .Ctx.Attrs.sidenavi false}} class="nosidenavi"{{end}}>
 {{template "header" .}}
 
 {{if ne .Ctx.Attrs.sidenavi false}}
 {{template "sidenavi" .}}
-<div id="content" class="container-fluid">
-{{else}}
-<div id="content" class="container-fluid nosidenavi">
 {{end}}
+
+<div id="content" class="container-fluid">
 {{end}}
 
 {{define "main_footer"}}
