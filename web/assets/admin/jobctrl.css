@@ -1,9 +1,13 @@
 :root, [data-bs-theme=light] {
+	--js-aborted: var(--bs-danger);
+	--js-completed: var(--bs-success);
 	--js-pending-bg: #dfe8ed;
-	--js-pending-fg: #999;
+	--js-pending-fg: #333;
+	--js-running: var(--bs-primary);
 }
 [data-bs-theme=dark] {
-	--js-pending-bg: #ccc;
+	--js-pending-bg: #666;
+	--js-pending-fg: #ccc;
 }
 
 #job_form {
@@ -41,16 +45,16 @@ fieldset > form, fieldset > form#job_form {
 	vertical-align: middle;
 }
 #job_list > ul > li[status=A] i {
-	color: var(--bs-danger);
+	color: var(--js-aborted);
 }
 #job_list > ul > li[status=C] i {
-	color: var(--bs-success);
+	color: var(--js-completed);
 }
 #job_list > ul > li[status=P] i {
 	color: var(--js-pending-bg);
 }
 #job_list > ul > li[status=R] i {
-	color: var(--bs-primary);
+	color: var(--js-running);
 }
 
 #job_list .tab-content {

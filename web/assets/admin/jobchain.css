@@ -1,9 +1,13 @@
 :root, [data-bs-theme=light] {
+	--js-aborted: var(--bs-danger);
+	--js-completed: var(--bs-success);
 	--js-pending-bg: #dfe8ed;
-	--js-pending-fg: #999;
+	--js-pending-fg: #333;
+	--js-running: var(--bs-primary);
 }
 [data-bs-theme=dark] {
-	--js-pending-bg: #ccc;
+	--js-pending-bg: #666;
+	--js-pending-fg: #ccc;
 }
 
 #jobchain_form {
@@ -41,16 +45,16 @@ fieldset > form, fieldset > form#jobchain_form {
 	vertical-align: middle;
 }
 #jobchain_list > ul > li[status=A] i {
-	color: var(--bs-danger);
+	color: var(--js-aborted);
 }
 #jobchain_list > ul > li[status=C] i {
-	color: var(--bs-success);
+	color: var(--js-completed);
 }
 #jobchain_list > ul > li[status=P] i {
 	color: var(--js-pending-bg);
 }
 #jobchain_list > ul > li[status=R] i {
-	color: var(--bs-primary);
+	color: var(--js-running);
 }
 
 #jobchain_list .tab-content {
@@ -59,21 +63,21 @@ fieldset > form, fieldset > form#jobchain_form {
 }
 
 .jobchain {
-	border: solid 1px #fff;
+	border: solid 1px transparent;
 	margin-bottom: 20px;
 	padding: 15px 15px 0 15px;
 }
 .jobchain[status=A] {
-	border-color: var(--bs-danger);
+	border-color: var(--js-aborted);
 }
 .jobchain[status=C] {
-	border-color: var(--bs-success);
+	border-color: var(--js-completed);
 }
 .jobchain[status=P] {
 	border-color: var(--js-pending-bg);
 }
 .jobchain[status=R] {
-	border-color: var(--bs-primary);
+	border-color: var(--js-running);
 }
 
 .jobtools {
@@ -85,20 +89,26 @@ fieldset > form, fieldset > form#jobchain_form {
 .jobtools > button {
 	float: right;
 }
+.jobtools > .jobcaption > i {
+	font-size: 125%;
+}
+.jobtools > .jobcaption > * {
+	vertical-align: middle;
+}
 .jobtools > .jobcaption > i, .jobtools > button > i {
 	margin-right: 8px;
 }
 .jobchain[status=A] .jobcaption {
-	color: var(--bs-danger);
+	color: var(--js-aborted);
 }
 .jobchain[status=C] .jobcaption {
-	color: var(--bs-success);
+	color: var(--js-completed);
 }
 .jobchain[status=P] .jobcaption {
 	color: var(--js-pending-fg);
 }
 .jobchain[status=R] .jobcaption {
-	color: var(--bs-primary);
+	color: var(--js-running);
 }
 
 .jobstates {
@@ -124,23 +134,27 @@ fieldset > form, fieldset > form#jobchain_form {
 	display: none;
 }
 .jnm {
-	color: #eee;
+	border: solid 1px transparent;
+	color: #fff;
 	margin: 0 0 5px 0;
 	padding: 10px 15px;
 	text-align: center;
 }
 .jrs[status=A] .jnm {
-	background-color: var(--bs-danger);
+	background-color: var(--js-aborted);
+	border-color: var(--js-aborted);
 }
 .jrs[status=C] .jnm {
-	background-color: var(--bs-success);
+	background-color: var(--js-completed);
+	border-color: var(--js-completed);
 }
 .jrs[status=P] .jnm {
-	background-color: var(--js-pending-bg);
-	color: #333;
+	border: solid 1px var(--js-running);
+	color: var(--js-pending-fg);
 }
 .jrs[status=R] .jnm {
-	background-color: var(--bs-primary);
+	background-color: var(--js-running);
+	border-color: var(--js-running);
 }
 .jif {
 	display: flex;
@@ -175,7 +189,7 @@ fieldset > form, fieldset > form#jobchain_form {
 	margin-right: 5px;
 }
 .jss .error, .jss .failure {
-	color: var(--bs-danger);
+	color: var(--js-aborted);
 }
 .jss .error > * {
 	cursor: pointer;
@@ -212,10 +226,10 @@ fieldset > form, fieldset > form#jobchain_form {
 }
 
 .jrs[status=A] .pgcircle circle.fg {
-	stroke: var(--bs-danger);
+	stroke: var(--js-aborted);
 }
 .jrs[status=C] .pgcircle circle.fg {
-	stroke: var(--bs-success);
+	stroke: var(--js-completed);
 }
 .jrs[status=P] .pgcircle circle.bg {
 	stroke-dasharray: 15 11;
@@ -224,7 +238,7 @@ fieldset > form, fieldset > form#jobchain_form {
 	display: none;
 }
 .jrs[status=R] .pgcircle circle.fg {
-	stroke: var(--bs-primary);
+	stroke: var(--js-running);
 	stroke-linecap: round;
 	stroke-dasharray: var(--dash) calc(var(--circumference) - var(--dash));
 	transform: rotate(0deg);
