@@ -170,14 +170,16 @@ blockquote {
 }
 #footsite {
 	font-size: 80%;
-	padding: 15px;
+	padding: 15px 100px;
 	text-align: center;
-	width: 100%;
 }
-#footer .ver {
+#footsite .ver {
 	color: #999;
 	position: absolute;
 	right: 15px;
+}
+#footsite .cpr, #footsite .pwr, #footsite .ver {
+	white-space: nowrap;
 }
 
 @media (max-width: 991px) {
@@ -233,6 +235,19 @@ blockquote {
 
 [data-bs-theme=dark] .well {
 	background-color: #333;
+}
+
+/*--------------------------------------------------
+ * nav-popup
+ */
+.nav.nav-popup {
+	margin: 5px;
+}
+.nav.nav-popup > li > a {
+	padding: 3px 5px;
+}
+.nav.nav-popup > li > hr {
+	margin: 5px 0;
 }
 
 /*--------------------------------------------------
