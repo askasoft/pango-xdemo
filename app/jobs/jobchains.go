@@ -51,7 +51,7 @@ func JobChainStart(tt tenant.Tenant, chainName string, states []*JobRunState, jo
 
 		return err
 	})
-	if err != nil {
+	if err == nil {
 		go StartJobs(tt) //nolint: errcheck
 	}
 
@@ -66,8 +66,11 @@ func JobChainCheckout(jr *JobRunner) error {
 		return err
 	}
 
-	if jc.Status == xjm.JobChainAborted || jc.Status == xjm.JobChainCompleted {
-		return nil
+	if jc.Status == xjm.JobChainAborted {
+		return xjm.ErrJobAborted
+	}
+	if jc.Status == xjm.JobChainCompleted {
+		return xjm.ErrJobComplete
 	}
 
 	states := JobChainDecodeStates(jc.States)
@@ -204,12 +207,12 @@ func JobChainContinue(jr *JobRunner) error {
 		return err
 	}
 	if next != nil && status == xjm.JobChainRunning {
-		return JobChainAppendJob(jr.ChainID, next.Name, jr.Tenant, jr.Locale)
+		return JobChainAppendJob(jr.Tenant, jr.ChainID, next.Name, jr.Locale)
 	}
 	return nil
 }
 
-func JobChainAppendJob(cid int64, name string, tt tenant.Tenant, locale string) error {
+func JobChainAppendJob(tt tenant.Tenant, cid int64, name string, locale string) error {
 	tjm := tt.JM()
 
 	var arg any
