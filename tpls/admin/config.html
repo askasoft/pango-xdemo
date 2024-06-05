@@ -13,7 +13,9 @@
 	{{if gt (len .Configs) 1}}
 	<ul class="nav nav-tabs">
 		{{range $i, $cc := .Configs}}
-		<li class="nav-item"><a class="nav-link{{if eq $i 0}} active{{end}}" href="#cc_{{$cc.Name}}" data-bs-toggle="tab">{{T $.Loc (print "config.category.label." $cc.Name)}}</a></li>
+		<li id="cch_{{$cc.Name}}" class="nav-item">
+			<a class="nav-link{{if eq $i 0}} active{{end}}" href="#cc_{{$cc.Name}}" data-bs-toggle="tab">{{T $.Loc (print "config.category.label." $cc.Name)}}</a>
+		</li>
 		{{end}}
 	</ul>
 	{{end}}
@@ -23,7 +25,9 @@
 		<div id="cc_{{$cc.Name}}" class="tab-pane{{if eq $i 0}} active{{end}}"><div class="ccc">
 			<ul class="nav nav-pills">
 				{{range $j, $cg := $cc.Groups}}
-				<li class="nav-item"><a class="nav-link{{if eq $j 0}} active{{end}}" href="#cg_{{$cg.Name}}" data-bs-toggle="tab">{{T $.Loc (print "config.group.label." $cg.Name)}}</a></li>
+				<li id="cgh_{{$cg.Name}}" class="nav-item">
+					<a class="nav-link{{if eq $j 0}} active{{end}}" href="#cg_{{$cg.Name}}" data-bs-toggle="tab">{{T $.Loc (print "config.group.label." $cg.Name)}}</a>
+				</li>
 				{{end}}
 			</ul>
 
@@ -38,25 +42,26 @@
 
 						{{range $c := $cg.Items}}
 						<div class="row py-3">
-							<label class="col-md-3 col-form-label{{if $c.Required}} required{{end}} role-{{$c.DisplayRole}}">{{T $.Loc (print "config." $c.Name)}}</label>
+							<label class="col-md-3 col-form-label{{if $c.Required}} required{{end}}"
+								viewer="{{$c.Viewer}}" editor="{{$c.Editor}}">{{T $.Loc (print "config." $c.Name)}}</label>
 							<div class="col-md-9">
 							{{if eq $c.Style "C"}}
-								{{Checks "Name=" $c.Name "List=" (MapGet $.Lists $c.Name) "Values=" $c.Values}}
+								{{Checks "Name=" $c.Name "List=" (MapGet $.Lists $c.Name) "Values=" $c.Values "Disabled=" ($c.Readonly $.AuthUser.Role)}}
 							{{else if eq $c.Style "O"}}
-								{{Checks "Name=" $c.Name "List=" (MapGet $.Lists $c.Name) "Values=" $c.Values "Ordered=" true "class=" "vertical"}}
+								{{Checks "Name=" $c.Name "List=" (MapGet $.Lists $c.Name) "Values=" $c.Values "Disabled=" ($c.Readonly $.AuthUser.Role) "Ordered=" true "class=" "vertical"}}
 							{{else if eq $c.Style "R"}}
-								{{Radios "Name=" $c.Name "List=" (MapGet $.Lists $c.Name) "Value=" $c.Value}}
+								{{Radios "Name=" $c.Name "List=" (MapGet $.Lists $c.Name) "Value=" $c.Value "Disabled=" ($c.Readonly $.AuthUser.Role)}}
 							{{else if eq $c.Style "S"}}
-								{{Select "Name=" $c.Name "List=" (MapGet $.Lists $c.Name) "Value=" $c.Value}}
+								{{Select "Name=" $c.Name "List=" (MapGet $.Lists $c.Name) "Value=" $c.Value "Disabled=" ($c.Readonly $.AuthUser.Role)}}
 							{{else if eq $c.Style "M"}}
-								{{Select "Name=" $c.Name "List=" (MapGet $.Lists $c.Name) "Values=" $c.Values "Multiple=" true}}
+								{{Select "Name=" $c.Name "List=" (MapGet $.Lists $c.Name) "Values=" $c.Values "Disabled=" ($c.Readonly $.AuthUser.Role) "Multiple=" true}}
 							{{else if eq $c.Style "T"}}
-								<textarea name="{{$c.Name}}" class="form-control" rows="2" textclear enterfire>
+								<textarea name="{{$c.Name}}" class="form-control" rows="2" textclear enterfire{{if $c.Readonly $.AuthUser.Role}} disabled{{end}}>
 {{$c.DisplayValue}}</textarea>
 							{{else if eq $c.Style "N"}}
-								<input name="{{$c.Name}}" type="number" size="20" class="form-control" textclear value="{{$c.DisplayValue}}"/>
+								<input name="{{$c.Name}}" type="number" size="20" class="form-control" textclear value="{{$c.DisplayValue}}"{{if $c.Readonly $.AuthUser.Role}} disabled{{end}}/>
 							{{else}}
-								<input name="{{$c.Name}}" type="text" class="form-control" textclear value="{{$c.DisplayValue}}"/>
+								<input name="{{$c.Name}}" type="text" class="form-control" textclear value="{{$c.DisplayValue}}"{{if $c.Readonly $.AuthUser.Role}} disabled{{end}}/>
 							{{end}}
 							{{$desc := (T $.Loc (print "config.desc." $c.Name))}}
 							{{if $desc}}

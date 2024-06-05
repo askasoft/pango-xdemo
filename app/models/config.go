@@ -21,33 +21,19 @@ type Config struct {
 	Order      int       `gorm:"not null"`
 	Required   bool      `gorm:"not null"`
 	Secret     bool      `gorm:"not null"`
-	Role       string    `gorm:"size:1;not null"`
+	Viewer     string    `gorm:"size:1;not null"`
+	Editor     string    `gorm:"size:1;not null"`
 	Validation string    `gorm:"not null"`
 	CreatedAt  time.Time `gorm:"not null;<-:create" json:"created_at"`
-	UpdatedAt  time.Time `gorm:"not null" json:"updated_at"`
+	UpdatedAt  time.Time `gorm:"not null;autoUpdateTime:false" json:"updated_at"`
 }
 
 func (c *Config) String() string {
 	return toString(c)
 }
 
-func (c *Config) DisplayRole() string {
-	switch c.Role {
-	case RoleSuper:
-		return "super"
-	case RoleDevel:
-		return "devel"
-	case RoleAdmin:
-		return "admin"
-	case RoleEditor:
-		return "editor"
-	case RoleViewer:
-		return "viewer"
-	case RoleApiOnly:
-		return "api"
-	default:
-		return ""
-	}
+func (c *Config) Readonly(role string) bool {
+	return c.Editor < role
 }
 
 func (c *Config) DisplayValue() string {

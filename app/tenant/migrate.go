@@ -53,14 +53,17 @@ func (tt Tenant) MigrateConfig(configs []*models.Config) error {
 	tn := tt.TableConfigs()
 
 	for _, cfg := range configs {
-		tx := app.GDB.Table(tn).Where("name = ?", cfg.Name)
-		tx = tx.Select("style", "order", "required", "secret", "role", "validation")
+		tx := app.GDB.Table(tn)
+		tx = tx.Select("style", "order", "required", "secret", "viewer", "editor", "validation")
 		r := tx.Updates(cfg)
 		if r.Error != nil {
 			return r.Error
 		}
 
 		if r.RowsAffected == 0 {
+			cfg.CreatedAt = time.Now()
+			cfg.UpdatedAt = cfg.CreatedAt
+
 			log.Infof("INSERT INTO %s: %v", tn, cfg)
 			r = app.GDB.Table(tn).Create(cfg)
 			if r.Error != nil {

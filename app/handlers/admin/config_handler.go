@@ -2,6 +2,7 @@ package admin
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/handlers"
@@ -30,7 +31,7 @@ func ConfigIndex(c *xin.Context) {
 	au := tenant.AuthUser(c)
 
 	tx := app.GDB.Table(tt.TableConfigs())
-	tx = tx.Where("role >= ?", au.Role)
+	tx = tx.Where("viewer >= ?", au.Role)
 	tx = tx.Order(clause.OrderByColumn{Column: clause.Column{Name: "order"}})
 
 	configs := []*models.Config{}
@@ -135,9 +136,12 @@ func ConfigSave(c *xin.Context) {
 			}
 		}
 
+		cfg.Value = v
+		cfg.UpdatedAt = time.Now()
+
 		tx := db.Table(tt.TableConfigs())
-		tx = tx.Where("name = ? AND role >= ?", cfg.Name, au.Role)
-		r := tx.Update("value", v)
+		tx = tx.Where("editor >= ?", au.Role)
+		r := tx.Select("value", "updated_at").Updates(cfg)
 		if r.Error != nil {
 			c.Logger.Warn(r.Error)
 			c.AddError(&vadutil.ParamError{Param: cfg.Name, Message: r.Error.Error()})

@@ -21,9 +21,9 @@
 	width: 100%;
 }
 
-label.role-super {
+label[editor="$"] {
 	color: #A02B93;
 }
-label.role-devel {
+label[editor="@"] {
 	color: #045C92;
 }
