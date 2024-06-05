@@ -1,6 +1,4 @@
-/* ----------------------------------------------------
- * bootstrap5 (default)
-*/
+/** bootstrap5 (default) **/
 :root, [data-bs-theme=light] {
 	--blue: #1d6091;
 	--bs-primary: #1d6091;
@@ -30,8 +28,7 @@
 	--bs-pagination-active-border-color: #337ab7;
 }
 
-/* ----------------------------------------------------
- * bootswatch5 (cosmo)
+/** bootswatch5 (cosmo)
 [data-bs-theme=dark] .btn-outline-secondary {
 	--bs-btn-color: #aaa;
 	--bs-btn-border-color: #aaa;
@@ -42,10 +39,9 @@
 	--bs-btn-disabled-color: #aaa;
 	--bs-btn-disabled-border-color: #aaa;
 }
- */
+*/
 
-/* ----------------------------------------------------
- * bootswatch5 (pulse)
+/** bootswatch5 (pulse)
 [data-bs-theme=dark] .dropdown-menu {
 	--bs-dropdown-link-color: #ccc;
 }
@@ -55,7 +51,7 @@
 	--bs-btn-disabled-color: #ac8edb;
 	--bs-btn-disabled-border-color:#ac8edb;
 }
- */
+*/
 
 
 /* copy from bootstrap3 */
@@ -66,9 +62,7 @@
 	background-color: #e5e5e5;
 }
 
-/* ----------------------------------------------------
- * Layout
- */
+/** Layout **/
 * {
 	scrollbar-width: thin;
 }
@@ -138,7 +132,7 @@ blockquote {
 	top: 0px;
 	left: 0px;
 	height: 100%;
-	width: 265px;
+	width: 250px;
 }
 #sidenavi > .ui-sidenavi {
 	padding: 25px 15px 5px 15px;
@@ -153,8 +147,8 @@ blockquote {
 }
 
 #content {
-	padding: 20px 15px;
-	margin: 0 0 0 265px;
+	padding: 25px;
+	margin: 0 0 0 250px;
 	width: auto;
 }
 
@@ -163,6 +157,9 @@ blockquote {
 	height: 50px;
 	margin-top: auto;
 	margin-bottom: 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
 #footnavi {
 	padding-top: 15px;
@@ -170,7 +167,7 @@ blockquote {
 }
 #footsite {
 	font-size: 80%;
-	padding: 15px 100px;
+	padding: 5px 100px;
 	text-align: center;
 }
 #footsite .ver {
@@ -185,6 +182,7 @@ blockquote {
 @media (max-width: 991px) {
 	#content {
 		margin-left: 48px;
+		padding: 20px;
 	}
 	#sidenavi {
 		width: auto;
@@ -196,30 +194,27 @@ blockquote {
 }
 @media (max-width: 767px) {
 	#content {
-		margin: 0;
+		margin-left: 0;
+		padding: 15px;
 	}
 	#sidenavi {
 		display: none;
 	}
 }
 .nosidenavi #content {
-	margin: 0px !important;
-	padding: 20px !important;
+	margin: 0px;
+	padding: 20px;
 	display: flex;
 	justify-content: center;
 }
 
 
-/* ----------------------------------------------------
- * side-navi customize
- */
+/** side-navi customize **/
 #sidenavi .card-header {
 	border-bottom: solid 1px #ccc;
 }
 
-/* ----------------------------------------------------
- * well
- */
+/** well **/
 .well {
 	min-height: 20px;
 	margin-bottom: 20px;
@@ -237,9 +232,7 @@ blockquote {
 	background-color: #333;
 }
 
-/*--------------------------------------------------
- * nav-popup
- */
+/** nav-popup **/
 .nav.nav-popup {
 	margin: 5px;
 }
@@ -250,9 +243,7 @@ blockquote {
 	margin: 5px 0;
 }
 
-/*--------------------------------------------------
- * Form
- */
+/** Form **/
 form div.desc, form div.verr {
 	font-size: 90%;
 	margin-top: 5px;
@@ -272,17 +263,13 @@ form div.verr {
 	display: inline-flex;
 }
 
-/*--------------------------------------------------
- * Search
- */
+/** Search **/
 .s-head-search {
 	float: right;
 	width: 300px;
 }
 
-/*--------------------------------------------------
- * Table
- */
+/** Table **/
 .s-table {
 	border-top: 1px solid #ccc;
 	border-bottom: 1px solid #ccc;
@@ -335,9 +322,7 @@ form div.verr {
 	background-color: transparent;
 }
 
-/*--------------------------------------------------
- * Popup
- */
+/** Popup **/
 .s-popup-confirm .ui-popup-body {
 	min-height: 80px;
 	min-width: 300px;
@@ -437,3 +422,5 @@ form div.verr {
 	white-space: pre-wrap;
 	word-break: break-all;
 }
+
+
