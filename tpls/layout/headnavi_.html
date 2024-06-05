@@ -28,7 +28,7 @@
 		<li class="userdrop">
 			<div class="dropdown">
 				<button class="btn btn-primary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
-					<i class="fas fa-user-circle"></i> {{.AuthUser.Name}} <span class="caret"></span>
+					<i class="{{T .Loc "icon.user"}}"></i> {{.AuthUser.Name}} <span class="caret"></span>
 				</button>
 				<ul class="dropdown-menu dropdown-menu-end">
 					{{if .AuthUser.IsSuper}}
