@@ -12,52 +12,50 @@
 
 #jobchain_form {
 	margin-bottom: 20px;
-}
-fieldset > form, fieldset > form#jobchain_form {
 	margin-bottom: 0;
 }
 
-#jobchain_list {
+#jobchain_history {
 	margin-top: 40px;
 }
-#jobchain_list > ul.nav-pills {
-	padding-right: 20px;
+#jobchain_tabs {
 	overflow-x: hidden;
 	overflow-y: auto;
-	max-height: 92px;
+	max-height: 94px;
 	scrollbar-width: thin;
 }
-#jobchain_list > ul.nav-pills > li {
+#jobchain_tabs > ul.nav-pills > li {
 	border: solid 1px transparent;
 	margin-left: 2px;
 }
-#jobchain_list > ul.nav-pills .nav-link {
+#jobchain_tabs > ul.nav-pills .nav-link {
 	border: solid 1px transparent;
 }
-#jobchain_list > ul.nav-pills .nav-link.active, #jobchain_list > ul.nav-pills .show > .nav-link {
+#jobchain_tabs > ul.nav-pills .nav-link.active,
+#jobchain_tabs > ul.nav-pills .show > .nav-link {
 	background-color: transparent;
 	border-color: var(--bs-nav-pills-link-active-bg);
 	color: var(--bs-nav-link-color);
 }
-#jobchain_list > ul > li i {
+#jobchain_tabs > ul > li i {
 	font-size: 150%;
 	margin-right: 5px;
 	vertical-align: middle;
 }
-#jobchain_list > ul > li[status=A] i {
+#jobchain_tabs > ul > li[status=A] i {
 	color: var(--js-aborted);
 }
-#jobchain_list > ul > li[status=C] i {
+#jobchain_tabs > ul > li[status=C] i {
 	color: var(--js-completed);
 }
-#jobchain_list > ul > li[status=P] i {
+#jobchain_tabs > ul > li[status=P] i {
 	color: var(--js-pending-bg);
 }
-#jobchain_list > ul > li[status=R] i {
+#jobchain_tabs > ul > li[status=R] i {
 	color: var(--js-running);
 }
 
-#jobchain_list .tab-content {
+#jobchain_list {
 	padding-top: 20px;
 	width: 100%;
 }
@@ -90,7 +88,7 @@ fieldset > form, fieldset > form#jobchain_form {
 	float: right;
 }
 .jobtools > .jobcaption > i {
-	font-size: 125%;
+	font-size: 150%;
 }
 .jobtools > .jobcaption > * {
 	vertical-align: middle;

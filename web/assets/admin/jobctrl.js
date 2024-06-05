@@ -28,7 +28,7 @@
 
 		var jid = $(this).closest('.job').data('jid');
 		if (!jid) {
-			jid = $('#job_list > ul').children('li[status=P], li[status=R]').data('jid');
+			jid = $('#job_tabs > ul').children('li[status=P], li[status=R]').data('jid');
 		}
 
 		$.ajax({
@@ -172,7 +172,7 @@
 			return;
 		}
 
-		var jpr = $('#job_list > ul').children('li[status=P], li[status=R]').length > 0;
+		var jpr = $('#job_tabs > ul').children('li[status=P], li[status=R]').length > 0;
 		var $b = $('#job_start').prop('disabled', jpr), lbl = $b.data('processing');
 		if (lbl) {
 			var $s = $b.find('span');
@@ -220,19 +220,8 @@
 			return;
 		}
 
-		var $jl = $('#job_list'), $jhs = $jl.children('ul');
-		if ($jhs.length == 0) {
-			$jhs = $('<ul class="nav nav-pills">');
-			$jhs.on('click', 'a', job_tab_show);
-			$jhs.on('shown.bs.tab', 'a', job_tab_shown);
-			$jl.append($jhs);
-		}
-
-		var $jobs = $jl.children('div');
-		if ($jobs.length == 0) {
-			$jobs = $('<div class="tab-content">');
-			$jl.append($jobs);
-		}
+		var $jhs = $('#job_tabs > ul');
+		var $jobs = $('#job_list');
 
 		for (var i = data.length - 1; i >= 0; i--) {
 			var job = data[i], $jh = $jhs.children('#job_head_' + job.id);
@@ -362,7 +351,7 @@
 	}
 
 	function job_list(jid) {
-		var $jhs = $('#job_list > ul');
+		var $jhs = $('#job_tabs > ul');
 
 		$.ajax({
 			url: './list',
@@ -386,6 +375,11 @@
 		$('#job_form').on('submit', job_start);
 		$('#job_start').on('click', job_start);
 		$('#job_abort').on('click', job_abort);
+
+		$('#job_tabs')
+			.on('click', 'a', job_tab_show)
+			.on('shown.bs.tab', 'a', job_tab_shown);
+
 		$('#job_list').on('click', 'button.abort', job_abort);
 
 		job_list();

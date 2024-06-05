@@ -239,6 +239,9 @@ blockquote {
 .nav.nav-popup > li > a {
 	padding: 3px 5px;
 }
+.nav.nav-popup > li > a > i {
+	margin-right: 8px;
+}
 .nav.nav-popup > li > hr {
 	margin: 5px 0;
 }

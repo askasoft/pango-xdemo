@@ -26,11 +26,18 @@
 	</fieldset>
 
 	<div class="text-center">
-		<button id="jobchain_start" class="btn btn-primary" disabled data-processing="{{T .Loc "button.processing"}}"><i class="{{T .Loc "icon.start"}}"></i> <span>{{T .Loc "button.start"}}</span></button>
+		<button id="jobchain_start" class="btn btn-success" disabled data-processing="{{T .Loc "button.processing"}}"><i class="{{T .Loc "icon.start"}}"></i> <span>{{T .Loc "button.start"}}</span></button>
 		<button id="jobchain_abort" class="btn btn-danger" disabled><i class="{{T .Loc "icon.stop"}}"></i> {{T .Loc "button.stop"}}</button>
 	</div>
 
-	<div id="jobchain_list"></div>
+	<fieldset id="jobchain_history" class="ui-fieldset" data-spy="fieldset">
+		<legend>{{T .Loc "job.label.history"}}</legend>
+		<div id="jobchain_tabs">
+			<ul class="nav nav-pills"></ul>
+		</div>
+	</fieldset>
+
+	<div id="jobchain_list" class="tab-content"></div>
 
 	<div id="jobchain_template" class="hidden">
 		<div class="jrs">

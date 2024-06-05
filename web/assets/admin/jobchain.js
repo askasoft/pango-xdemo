@@ -30,7 +30,7 @@
 
 		var cid = $(this).closest('.jobchain').data('cid');
 		if (!cid) {
-			cid = $('#jobchain_list > ul').children('li[status=P], li[status=R]').data('cid');
+			cid = $('#jobchain_tabs > ul').children('li[status=P], li[status=R]').data('cid');
 		}
 
 		$.ajax({
@@ -92,7 +92,7 @@
 			return;
 		}
 
-		var jpr = $('#jobchain_list > ul').children('li[status=P], li[status=R]').length > 0;
+		var jpr = $('#jobchain_tabs > ul').children('li[status=P], li[status=R]').length > 0;
 		var $b = $('#jobchain_start').prop('disabled', jpr), lbl = $b.data('processing');
 		if (lbl) {
 			var $s = $b.find('span');
@@ -140,19 +140,8 @@
 			return;
 		}
 
-		var $jcl = $('#jobchain_list'), $jchs = $jcl.children('ul');
-		if ($jchs.length == 0) {
-			$jchs = $('<ul class="nav nav-pills">');
-			$jchs.on('click', 'a', jobchain_tab_show);
-			$jchs.on('shown.bs.tab', 'a', jobchain_tab_shown);
-			$jcl.append($jchs);
-		}
-
-		var $jcs = $jcl.children('div');
-		if ($jcs.length == 0) {
-			$jcs = $('<div class="tab-content">');
-			$jcl.append($jcs);
-		}
+		var $jchs = $('#jobchain_tabs > ul');
+		var $jcs = $('#jobchain_list');
 
 		for (var i = data.length - 1; i >= 0; i--) {
 			var jci = data[i], $jch = $jchs.children('#jobchain_head_' + jci.id);
@@ -303,7 +292,7 @@
 	}
 
 	function jobchain_list(cid) {
-		var $jchs = $('#jobchain_list > ul');
+		var $jchs = $('#jobchain_tabs > ul');
 
 		$.ajax({
 			url: './list',
@@ -336,6 +325,11 @@
 		$('#jobchain_form').on('submit', jobchain_start);
 		$('#jobchain_start').on('click', jobchain_start);
 		$('#jobchain_abort').on('click', jobchain_abort);
+
+		$('#jobchain_tabs')
+			.on('click', 'a', jobchain_tab_show)
+			.on('shown.bs.tab', 'a', jobchain_tab_shown);
+
 		$('#jobchain_list')
 			.on('click', 'button.abort', jobchain_abort)
 			.on('click', 'div.error', jobchain_error);

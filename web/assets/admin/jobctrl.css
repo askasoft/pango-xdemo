@@ -12,52 +12,54 @@
 
 #job_form {
 	margin-bottom: 20px;
+	margin-bottom: 0;
 }
-fieldset > form, fieldset > form#job_form {
+fieldset > form {
 	margin-bottom: 0;
 }
 
-#job_list {
+#job_history {
 	margin-top: 40px;
 }
-#job_list > ul.nav-pills {
-	padding-right: 20px;
+
+#job_tabs {
 	overflow-x: hidden;
 	overflow-y: auto;
-	max-height: 92px;
+	max-height: 94px;
 	scrollbar-width: thin;
 }
-#job_list > ul.nav-pills > li {
+#job_tabs > ul.nav-pills > li {
 	border: solid 1px transparent;
 	margin-left: 2px;
 }
-#job_list > ul.nav-pills .nav-link {
+#job_tabs > ul.nav-pills .nav-link {
 	border: solid 1px transparent;
 }
-#job_list > ul.nav-pills .nav-link.active, #job_list > ul.nav-pills .show > .nav-link {
+#job_tabs > ul.nav-pills .nav-link.active,
+#job_tabs > ul.nav-pills .show > .nav-link {
 	background-color: transparent;
 	border-color: var(--bs-nav-pills-link-active-bg);
 	color: var(--bs-nav-link-color);
 }
-#job_list > ul > li i {
+#job_tabs > ul > li i {
 	font-size: 150%;
 	margin-right: 5px;
 	vertical-align: middle;
 }
-#job_list > ul > li[status=A] i {
+#job_tabs > ul > li[status=A] i {
 	color: var(--js-aborted);
 }
-#job_list > ul > li[status=C] i {
+#job_tabs > ul > li[status=C] i {
 	color: var(--js-completed);
 }
-#job_list > ul > li[status=P] i {
+#job_tabs > ul > li[status=P] i {
 	color: var(--js-pending-bg);
 }
-#job_list > ul > li[status=R] i {
+#job_tabs > ul > li[status=R] i {
 	color: var(--js-running);
 }
 
-#job_list .tab-content {
+#job_list {
 	padding-top: 20px;
 	width: 100%;
 }
