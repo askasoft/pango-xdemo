@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"net"
 	"time"
 
@@ -47,6 +48,18 @@ func (u *User) CIDRs() (cidrs []*net.IPNet) {
 		}
 	}
 	return
+}
+
+func (u *User) Initials() string {
+	i := str.Left(u.Name, 1)
+	if i != "" {
+		return i
+	}
+	return str.Left(u.Email, 1)
+}
+
+func (u *User) DisplayName() string {
+	return fmt.Sprintf("%s <%s>", u.Name, u.Email)
 }
 
 func (u *User) HasRole(role string) bool {

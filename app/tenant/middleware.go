@@ -119,7 +119,7 @@ func RoleSuperProtect(c *xin.Context) {
 }
 
 func RoleDevelProtect(c *xin.Context) {
-	RoleProtect(c, models.RoleSuper)
+	RoleProtect(c, models.RoleDevel)
 }
 
 func RoleAdminProtect(c *xin.Context) {

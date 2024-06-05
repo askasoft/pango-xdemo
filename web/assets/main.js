@@ -279,7 +279,7 @@ var main = {
 		});
 
 		// header theme switch
-		$('#header li.theme a').on('click', function() {
+		$('#header .theme a').on('click', function() {
 			var $a = $(this), t = $a.attr('href').substring(1);
 
 			localStorage.theme = t;
@@ -292,7 +292,7 @@ var main = {
 				d = l; l = s;
 			}
 			$('#footer').replaceClass(l, d);
-			$('#header li.theme a').removeClass('active');
+			$('#header .theme a').removeClass('active');
 			$a.addClass('active');
 			return false;
 		}).filter('[href="#' + localStorage.theme + '"]').trigger('click');
