@@ -316,6 +316,9 @@ form div.verr {
 	width: 1%;
 	white-space: nowrap;
 }
+.s-table td.actions button {
+	padding: 6px 8px;
+}
 
 .s-table td > ol {
 	padding-left: 20px;
