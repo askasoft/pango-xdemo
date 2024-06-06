@@ -120,11 +120,15 @@
 	// delete
 	//
 	function tenant_delete_confirm() {
-		var $tr = $(this).closest('tr'), name = $tr.find('.name').text();
-		var $p = $('#tenants_delete_popup');
-		$p.find('[name=name]').val(name);
-		$p.find('.msg > b').text(name);
-		$p.popup('show');
+		var name = $(this).closest('tr').find('.name').text();
+		$('#tenant_delete_name').attr('placeholder', name).val('');
+		$('#tenants_delete_popup').popup('show');
+		return false;
+	}
+
+	function tenant_delete_check() {
+		var $i = $(this);
+		$i.closest('form').find('button[type=submit]').prop('disabled', $i.val() != $i.attr('placeholder'));
 		return false;
 	}
 
@@ -180,15 +184,17 @@
 
 		$('#tenants_create_popup')
 			.find('form').submit(tenant_create).end()
-			.find('.ui-popup-footer button[type=submit]').click(tenant_create);
+			.find('.ui-popup-footer button[type=submit]').on('click', tenant_create);
 	
 		$('#tenants_update_popup')
 			.find('form').submit(tenant_update).end()
-			.find('.ui-popup-footer button[type=submit]').click(tenant_update);
+			.find('.ui-popup-footer button[type=submit]').on('click', tenant_update);
 	
 		$('#tenants_delete_popup')
 			.find('form').submit(tenant_delete).end()
-			.find('.ui-popup-footer button[type=submit]').click(tenant_delete);
+			.find('.ui-popup-footer button[type=submit]').on('click', tenant_delete);
+
+		$('#tenant_delete_name').on('input', tenant_delete_check);
 	}
 
 	$(window).on('load', tenants_init);

@@ -114,13 +114,17 @@
 	popup-mask="true" popup-position="center" popup-mouse="false">
 	<form>
 		<input type="hidden" name="_token_" value="{{.Token}}"/>
-		<input type="hidden" name="name" value=""/>
+		<div class="ui-popup-header">
+			<h4>{{T .Loc "tenant.delete.header"}}</h4>
+		</div>
 		<div class="ui-popup-body">
 			<i class="icon fas fa-2x fa-fw fa-triangle-exclamation text-danger"></i>
-			<div class="msg">{{HTML (T .Loc "tenant.confirm.delete")}}</div>
+			<div class="msg">{{HTML (T .Loc "tenant.delete.message")}}
+				<input id="tenant_delete_name" name="name" class="form-control"/>
+			</div>
 		</div>
 		<div class="ui-popup-footer">
-			<button type="submit" class="btn btn-danger"><i class="{{T .Loc "icon.ok"}}"></i> {{T .Loc "button.ok"}}</button>
+			<button type="submit" class="btn btn-danger" disabled><i class="{{T .Loc "icon.delete"}}"></i> {{T .Loc "button.delete"}}</button>
 			<button type="button" class="btn btn-secondary" popup-dismiss="true"><i class="{{T .Loc "icon.cancel"}}"></i> {{T .Loc "button.cancel"}}</button>
 		</div>
 	</form>
