@@ -39,7 +39,7 @@
 	--bs-btn-disabled-color: #aaa;
 	--bs-btn-disabled-border-color: #aaa;
 }
-*/
+**/
 
 /** bootswatch5 (pulse)
 [data-bs-theme=dark] .dropdown-menu {
@@ -51,16 +51,8 @@
 	--bs-btn-disabled-color: #ac8edb;
 	--bs-btn-disabled-border-color:#ac8edb;
 }
-*/
+**/
 
-
-/* copy from bootstrap3 */
-.dropdown-menu .divider {
-	height: 1px;
-	margin: 9px 0;
-	overflow: hidden;
-	background-color: #e5e5e5;
-}
 
 /** Layout **/
 * {
@@ -127,18 +119,13 @@ blockquote {
 	font-weight: bold;
 	width: 48px;
 	height: 48px;
+	margin-right: 10px;
 }
 #headnavi .username.dropdown-toggle::after {
-	position: absolute;
-	right: 0;
 	font-size: 18px;
-	bottom: 10px;
-}
-#headnavi > div > a, #headnavi > div > a:hover {
-	color: #eee;
-}
-#headnavi .dropdown-menu > li > a > i {
-	margin-right: 8px;
+	position: absolute;
+	right: 0px;
+	bottom: 8px;
 }
 
 #sidenavi {
@@ -244,6 +231,18 @@ blockquote {
 [data-bs-theme=dark] .well {
 	background-color: #292c2f;
 	box-shadow: 5px 5px 5px #333;
+}
+
+/** dropdown menu **/
+/* copy from bootstrap3 */
+.dropdown-menu .divider {
+	height: 1px;
+	margin: 9px 0;
+	overflow: hidden;
+	background-color: #e5e5e5;
+}
+.dropdown-menu > li > a > i {
+	margin-right: 8px;
 }
 
 /** nav-popup **/
