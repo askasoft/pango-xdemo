@@ -37,9 +37,11 @@
 		</form>
 	</fieldset>
 
-	<div class="text-center">
-		<button id="job_start" class="btn btn-success" disabled data-processing="{{T .Loc "button.processing"}}"><i class="{{T .Loc "icon.start"}}"></i> <span>{{T .Loc "button.start"}}</span></button>
-		<button id="job_abort" class="btn btn-danger" disabled><i class="{{T .Loc "icon.stop"}}"></i> {{T .Loc "button.stop"}}</button>
+	<div class="row px-4 py-2">
+		<div class="offset-md-3">
+			<button id="job_start" class="btn btn-success" disabled data-processing="{{T .Loc "button.processing"}}"><i class="{{T .Loc "icon.start"}}"></i> <span>{{T .Loc "button.start"}}</span></button>
+			<button id="job_abort" class="btn btn-danger" disabled><i class="{{T .Loc "icon.stop"}}"></i> {{T .Loc "button.stop"}}</button>
+		</div>
 	</div>
 
 	<fieldset id="job_history" class="ui-fieldset collapsed" data-spy="fieldset">
