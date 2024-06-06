@@ -60,7 +60,7 @@ fieldset > form {
 }
 
 #job_list {
-	padding-top: 20px;
+	margin-top: 20px;
 	width: 100%;
 }
 #job_list fieldset {

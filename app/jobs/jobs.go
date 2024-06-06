@@ -515,7 +515,7 @@ func Reappend() {
 // ------------------------------------
 // CleanOutdatedJobs iterate schemas to clean outdated jobs
 func CleanOutdatedJobs() {
-	before := time.Now().Add(-1 * app.INI.GetDuration("job", "outdatedBefore", time.Hour*240))
+	before := time.Now().Add(-1 * app.INI.GetDuration("job", "outdatedBefore", time.Hour*24*10))
 
 	_ = tenant.Iterate(func(tt tenant.Tenant) error {
 		return app.GDB.Transaction(func(db *gorm.DB) error {

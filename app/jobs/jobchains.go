@@ -245,7 +245,7 @@ func JobChainAppendJob(tt tenant.Tenant, cid int64, name string, locale string) 
 
 // CleanOutdatedJobChains iterate schemas to clean outdated job chains
 func CleanOutdatedJobChains() {
-	before := time.Now().Add(-1 * app.INI.GetDuration("jobchain", "outdatedBefore", time.Hour*24*30))
+	before := time.Now().Add(-1 * app.INI.GetDuration("jobchain", "outdatedBefore", time.Hour*24*10))
 
 	_ = tenant.Iterate(func(tt tenant.Tenant) error {
 		tjc := tt.JC()
