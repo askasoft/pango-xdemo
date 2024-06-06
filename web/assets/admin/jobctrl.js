@@ -360,6 +360,9 @@
 			beforeSend: $jhs.loadmask.delegate($jhs),
 			success: function(data) {
 				setTimeout(function() {
+					if (data && data.length && !jid) {
+						$('#job_history').fieldset('expand');
+					}
 					build_job_list(data, jid);
 					refresh_job_start();
 				}, 10);

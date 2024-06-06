@@ -301,6 +301,9 @@
 			beforeSend: $jchs.loadmask.delegate($jchs),
 			success: function(data) {
 				setTimeout(function() {
+					if (data && data.length && !cid) {
+						$('#jobchain_history').fieldset('expand');
+					}
 					build_jobchain_list(data, cid);
 					refresh_jobchain_start();
 				}, 10);
