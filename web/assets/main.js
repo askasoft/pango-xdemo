@@ -285,13 +285,6 @@ var main = {
 			localStorage.theme = t;
 
 			$('body').attr('data-bs-theme', t);
-
-			var d = 'text-bg-dark', l = 'text-bg-light';
-			if (t == 'light') {
-				var s = d;
-				d = l; l = s;
-			}
-			$('#footer').replaceClass(l, d);
 			$('#header .theme a').removeClass('active');
 			$a.addClass('active');
 			return false;

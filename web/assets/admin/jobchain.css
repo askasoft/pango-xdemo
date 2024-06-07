@@ -1,12 +1,11 @@
 :root, [data-bs-theme=light] {
 	--js-aborted: var(--bs-danger);
 	--js-completed: var(--bs-success);
-	--js-pending-bg: #dfe8ed;
+	--js-pending-bg: var(--bs-secondary-bg-subtle);
 	--js-pending-fg: #333;
 	--js-running: var(--bs-primary);
 }
 [data-bs-theme=dark] {
-	--js-pending-bg: #666;
 	--js-pending-fg: #ccc;
 }
 
@@ -16,7 +15,7 @@
 }
 
 #jobchain_history {
-	margin-top: 40px;
+	margin: 40px 0px;
 }
 #jobchain_tabs {
 	overflow-x: hidden;

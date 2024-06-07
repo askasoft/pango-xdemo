@@ -5,70 +5,65 @@
 
 <div class="s-section">
 	<div class="s-section-head">
-		<ol class="breadcrumb">
-			<li class="active"><i class="{{T .Loc "icon.demos.pets.reset"}}"></i>{{T .Loc "menu.demos.pets.reset"}}</li>
-		</ol>
+		<h2><i class="{{T .Loc "icon.demos.pets.reset"}}"></i><span>{{T .Loc "menu.demos.pets.reset"}}</span></h2>
 	</div>
 	<div class="s-section-body">
 		<div class="well">{{T .Loc "pet.reset.well"}}</div>
 
-		<fieldset data-spy="fieldset">
-			<legend>{{T .Loc "label.parameter"}}</legend>
-			<form id="jobchain_form" class="form-horizontal grey p-3">
-				<input type="hidden" name="_token_" value="{{.Token}}"/>
-				<div class="row py-1">
-					<label class="col-md-3 col-form-label">{{T .Loc "pet.clear.reset_sequence"}}</label>
-					<div class="col-md-9">
-						{{Radios "Name=" "reset_sequence" "List=" .PetResetSequenceMap "Value=" .Arg.ResetSequence}}
-					</div>
+		<form id="jobchain_form" class="form-horizontal grey p-3">
+			<input type="hidden" name="_token_" value="{{.Token}}"/>
+			<div class="row py-1">
+				<label class="col-md-3 col-form-label">{{T .Loc "pet.clear.reset_sequence"}}</label>
+				<div class="col-md-9">
+					{{Radios "Name=" "reset_sequence" "List=" .PetResetSequenceMap "Value=" .Arg.ResetSequence}}
 				</div>
-			</form>
-		</fieldset>
+			</div>
+		</form>
 
-		<div class="row px-4 py-2">
-			<div class="offset-md-3">
+		<div class="row p-2">
+			<div class="offset-md-3 col-md-9">
 				<button id="jobchain_start" class="btn btn-success" disabled data-processing="{{T .Loc "button.processing"}}"><i class="{{T .Loc "icon.start"}}"></i> <span>{{T .Loc "button.start"}}</span></button>
 				<button id="jobchain_abort" class="btn btn-danger" disabled><i class="{{T .Loc "icon.stop"}}"></i> {{T .Loc "button.stop"}}</button>
 			</div>
 		</div>
-
-		<fieldset id="jobchain_history" class="ui-fieldset" data-spy="fieldset">
-			<legend>{{T .Loc "job.label.history"}}</legend>
-			<div id="jobchain_tabs">
-				<ul class="nav nav-pills"></ul>
-			</div>
-		</fieldset>
-
-		<div id="jobchain_list" class="tab-content"></div>
-
-		<div id="jobchain_template" class="hidden">
-			<div class="jrs">
-				<div class="jnm"></div>
-				<div class="jif">
-					<div class="jpg">
-						<svg width="80" height="80" viewBox="0 0 80 80" class="pgcircle">
-							<circle class="bg"></circle>
-							<circle class="fg"></circle>
-						</svg>
-						<span class="txt">0%</span>
-					</div>
-					<div class="jss">
-						<div class="total"><label>Total</label><span></span></div>
-						<div class="skipped"><label>Skipped</label><span></span></div>
-						<div class="success"><label>Success</label><span></span></div>
-						<div class="failure"><label>Failure</label><span></span></div>
-						<div class="error"><label>Error</label><i class="fas fa-circle-exclamation"></i></div>
-					</div>
-				</div>
-			</div>
-		</div>
-
-		<div id="jobchain_maps"
-			data-jobnames="{{JSON .PetResetJobnamesMap}}"
-			data-jslabels="{{JSON .PetResetJslabelsMap}}"
-		></div>
 	</div>
 </div>
+
+<fieldset id="jobchain_history" class="ui-fieldset" data-spy="fieldset">
+	<legend>{{T .Loc "job.label.history"}}</legend>
+	<div id="jobchain_tabs">
+		<ul class="nav nav-pills"></ul>
+	</div>
+</fieldset>
+
+<div id="jobchain_list" class="tab-content"></div>
+
+<div id="jobchain_template" class="hidden">
+	<div class="jrs">
+		<div class="jnm"></div>
+		<div class="jif">
+			<div class="jpg">
+				<svg width="80" height="80" viewBox="0 0 80 80" class="pgcircle">
+					<circle class="bg"></circle>
+					<circle class="fg"></circle>
+				</svg>
+				<span class="txt">0%</span>
+			</div>
+			<div class="jss">
+				<div class="total"><label>Total</label><span></span></div>
+				<div class="skipped"><label>Skipped</label><span></span></div>
+				<div class="success"><label>Success</label><span></span></div>
+				<div class="failure"><label>Failure</label><span></span></div>
+				<div class="error"><label>Error</label><i class="fas fa-circle-exclamation"></i></div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div id="jobchain_maps"
+	data-jobnames="{{JSON .PetResetJobnamesMap}}"
+	data-jslabels="{{JSON .PetResetJslabelsMap}}"
+></div>
 
 <div id="jobchain_error_popup" class="ui-popup s-popup-error" data-spy="popup" tabindex="-1">
 	<h4 class="ui-popup-header">{{T .Loc "label.error"}}</h4>
