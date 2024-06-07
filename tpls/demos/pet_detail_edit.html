@@ -4,96 +4,98 @@
 		{{if ne .Pet.ID 0}}#{{.Pet.ID}}{{end}}
 	</h4>
 </div>
-<form class="ui-popup-body form-horizontal grey lined">
-	<input type="hidden" name="_token_" value="{{.Token}}"/>
-	<input type="hidden" id="pet_detail_id" name="id" value="{{.Pet.ID}}"/>
-	<div class="row py-3">
-		<label class="col-md-2 col-form-label required">{{T .Loc "pet.name"}}</label>
-		<div class="col-md-10">
-			<input id="pet_detail_name" name="name" type="text" class="form-control" maxlength="100" value="{{.Pet.Name}}">
-		</div>
-	</div>
-	<div class="row py-3">
-		<label class="col-md-2 col-form-label">{{T .Loc "pet.photo"}}</label>
-		{{if ne .Pet.ID 0}}
-		<div class="col-md-5"><img src="{{.Base}}/files{{.Pet.PhotoURI}}"></div>
-		<div class="col-md-5">
-		{{else}}
-		<div class="col-md-10">
-		{{end}}
-			<div data-spy="uploader" data-upload-remover="true" data-dnload-view="true"
-				data-upload-url="{{.Base}}/files/upload" data-dnload-url="{{.Base}}/files$">
-				<input type="file" name="file" class="ui-uploader-file" accept="image/*" style="display:none"/>
-				<a class="btn btn-sm btn-secondary ui-uploader-btn">{{T .Loc "button.browse"}}</a>
+<div class="ui-popup-body grey">
+	<form class="form-horizontal lined">
+		<input type="hidden" name="_token_" value="{{.Token}}"/>
+		<input type="hidden" id="pet_detail_id" name="id" value="{{.Pet.ID}}"/>
+		<div class="row py-3">
+			<label class="col-md-2 col-form-label required">{{T .Loc "pet.name"}}</label>
+			<div class="col-md-10">
+				<input id="pet_detail_name" name="name" type="text" class="form-control" maxlength="100" value="{{.Pet.Name}}">
 			</div>
 		</div>
-	</div>
-	<div class="row py-3">
-		<label class="col-md-2 col-form-label required">{{T .Loc "pet.gender"}}</label>
-		<div class="col-md-4">
-			{{Radios "Name=" "gender" "List=" .PetGenderMap "Value=" .Pet.Gender}}
+		<div class="row py-3">
+			<label class="col-md-2 col-form-label">{{T .Loc "pet.photo"}}</label>
+			{{if ne .Pet.ID 0}}
+			<div class="col-md-5"><img src="{{.Base}}/files{{.Pet.PhotoURI}}"></div>
+			<div class="col-md-5">
+			{{else}}
+			<div class="col-md-10">
+			{{end}}
+				<div data-spy="uploader" data-upload-remover="true" data-dnload-view="true"
+					data-upload-url="{{.Base}}/files/upload" data-dnload-url="{{.Base}}/files$">
+					<input type="file" name="file" class="ui-uploader-file" accept="image/*" style="display:none"/>
+					<a class="btn btn-sm btn-secondary ui-uploader-btn">{{T .Loc "button.browse"}}</a>
+				</div>
+			</div>
 		</div>
-		<label class="col-md-2 col-form-label required">{{T .Loc "pet.born_at"}}</label>
-		<div class="col-md-4">
-			<input name="born_at" type="date" class="form-control" value="{{DATE .Pet.BornAt}}">
+		<div class="row py-3">
+			<label class="col-md-2 col-form-label required">{{T .Loc "pet.gender"}}</label>
+			<div class="col-md-4">
+				{{Radios "Name=" "gender" "List=" .PetGenderMap "Value=" .Pet.Gender}}
+			</div>
+			<label class="col-md-2 col-form-label required">{{T .Loc "pet.born_at"}}</label>
+			<div class="col-md-4">
+				<input name="born_at" type="date" class="form-control" value="{{DATE .Pet.BornAt}}">
+			</div>
 		</div>
-	</div>
-	<div class="row py-3">
-		<label class="col-md-2 col-form-label required">{{T .Loc "pet.origin"}}</label>
-		<div class="col-md-10">
-			{{Select "Name=" "origin" "List=" .PetOriginMap "Value=" .Pet.Origin "class=" "wide col2" "data-spy=" "niceSelect"}}
+		<div class="row py-3">
+			<label class="col-md-2 col-form-label required">{{T .Loc "pet.origin"}}</label>
+			<div class="col-md-10">
+				{{Select "Name=" "origin" "List=" .PetOriginMap "Value=" .Pet.Origin "class=" "wide col2" "data-spy=" "niceSelect"}}
+			</div>
 		</div>
-	</div>
-	<div class="row py-3">
-		<label class="col-md-2 col-form-label required">{{T .Loc "pet.temper"}}</label>
-		<div class="col-md-10">
-			{{Radios "Name=" "temper" "List=" .PetTemperMap "Value=" .Pet.Temper}}
+		<div class="row py-3">
+			<label class="col-md-2 col-form-label required">{{T .Loc "pet.temper"}}</label>
+			<div class="col-md-10">
+				{{Radios "Name=" "temper" "List=" .PetTemperMap "Value=" .Pet.Temper}}
+			</div>
 		</div>
-	</div>
-	<div class="row py-3">
-		<label class="col-md-2 col-form-label">{{T .Loc "pet.habits"}}</label>
-		<div class="col-md-10">
-			{{Checks "Name=" "habits" "List=" .PetHabitsMap "Values=" .Pet.Habits}}
+		<div class="row py-3">
+			<label class="col-md-2 col-form-label">{{T .Loc "pet.habits"}}</label>
+			<div class="col-md-10">
+				{{Checks "Name=" "habits" "List=" .PetHabitsMap "Values=" .Pet.Habits}}
+			</div>
 		</div>
-	</div>
-	<div class="row py-3">
-		<label class="col-md-2 col-form-label">{{T .Loc "pet.amount"}}</label>
-		<div class="col-md-4">
-			<input name="amount" type="number" class="form-control" value="{{.Pet.Amount}}">
+		<div class="row py-3">
+			<label class="col-md-2 col-form-label">{{T .Loc "pet.amount"}}</label>
+			<div class="col-md-4">
+				<input name="amount" type="number" class="form-control" value="{{.Pet.Amount}}">
+			</div>
+			<label class="col-md-2 col-form-label">{{T .Loc "pet.price"}}</label>
+			<div class="col-md-4">
+				<input name="price" type="number" class="form-control" value="{{.Pet.Price}}">
+			</div>
 		</div>
-		<label class="col-md-2 col-form-label">{{T .Loc "pet.price"}}</label>
-		<div class="col-md-4">
-			<input name="price" type="number" class="form-control" value="{{.Pet.Price}}">
+		<div class="row py-3">
+			<label class="col-md-2 col-form-label">{{T .Loc "pet.shop_name"}}</label>
+			<div class="col-md-4">
+				<input name="shop_name" type="text" class="form-control" maxlength="200" value="{{.Pet.ShopName}}">
+			</div>
+			<label class="col-md-2 col-form-label">{{T .Loc "pet.shop_address"}}</label>
+			<div class="col-md-4">
+				<input name="shop_address" type="text" class="form-control" maxlength="200" value="{{.Pet.ShopAddress}}">
+			</div>
 		</div>
-	</div>
-	<div class="row py-3">
-		<label class="col-md-2 col-form-label">{{T .Loc "pet.shop_name"}}</label>
-		<div class="col-md-4">
-			<input name="shop_name" type="text" class="form-control" maxlength="200" value="{{.Pet.ShopName}}">
+		<div class="row py-3">
+			<label class="col-md-2 col-form-label">{{T .Loc "pet.shop_telephone"}}</label>
+			<div class="col-md-4">
+				<input name="shop_telephone" type="text" class="form-control" maxlength="20" value="{{.Pet.ShopTelephone}}">
+			</div>
+			<label class="col-md-2 col-form-label">{{T .Loc "pet.shop_link"}}</label>
+			<div class="col-md-4">
+				<input name="shop_link" type="text" class="form-control" maxlength="1000" value="{{.Pet.ShopLink}}">
+			</div>
 		</div>
-		<label class="col-md-2 col-form-label">{{T .Loc "pet.shop_address"}}</label>
-		<div class="col-md-4">
-			<input name="shop_address" type="text" class="form-control" maxlength="200" value="{{.Pet.ShopAddress}}">
+		<div class="row py-3">
+			<label class="col-md-2 col-form-label">{{T .Loc "pet.description"}}</label>
+			<div class="col-md-10">
+				<textarea name="description" class="form-control" rows="2">{{.Pet.Description}}</textarea>
+			</div>
 		</div>
-	</div>
-	<div class="row py-3">
-		<label class="col-md-2 col-form-label">{{T .Loc "pet.shop_telephone"}}</label>
-		<div class="col-md-4">
-			<input name="shop_telephone" type="text" class="form-control" maxlength="20" value="{{.Pet.ShopTelephone}}">
-		</div>
-		<label class="col-md-2 col-form-label">{{T .Loc "pet.shop_link"}}</label>
-		<div class="col-md-4">
-			<input name="shop_link" type="text" class="form-control" maxlength="1000" value="{{.Pet.ShopLink}}">
-		</div>
-	</div>
-	<div class="row py-3">
-		<label class="col-md-2 col-form-label">{{T .Loc "pet.description"}}</label>
-		<div class="col-md-10">
-			<textarea name="description" class="form-control" rows="2">{{.Pet.Description}}</textarea>
-		</div>
-	</div>
-	<button type="submit" class="hidden"></button>
-</form>
+		<button type="submit" class="hidden"></button>
+	</form>
+</div>
 <div class="ui-popup-footer">
 	<button type="submit" class="btn btn-primary"><i class="{{T .Loc "icon.save"}}"></i> {{T .Loc "button.save"}}</button>
 	<button type="button" class="btn btn-secondary" popup-dismiss="true"><i class="{{T .Loc "icon.close"}}"></i> {{T .Loc "button.close"}}</button>

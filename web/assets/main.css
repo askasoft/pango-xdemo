@@ -299,6 +299,14 @@ form div.verr {
 	display: inline-flex;
 }
 
+/** color **/
+.grey {
+	background-color: #f9f9f9;
+}
+[data-bs-theme=dark] .grey {
+	background-color: #292c2f;
+}
+
 /** Toolbar **/
 .s-toolbar {
 	margin-bottom: 1.5rem;

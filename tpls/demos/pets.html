@@ -38,7 +38,7 @@
 		
 		<fieldset id="pets_listfset" class="ui-fieldset collapsed" data-spy="fieldset">
 			<legend class="circle"><i class="{{T .Loc "icon.search"}}"></i>{{T .Loc "button.search"}}</legend>
-			<form id="pets_listform" class="form-horizontal grey" method="POST">
+			<form id="pets_listform" class="form-horizontal grey p-3" method="POST">
 				<input type="hidden" name="_token_" value="{{.Token}}"/>
 				<input type="hidden" name="p" value="{{.Q.Page}}"/>
 				<input type="hidden" name="l" value="{{.Q.Limit}}"/>
@@ -101,7 +101,7 @@
 						<input name="shop_name" type="text" class="form-control" textclear value="{{.Q.ShopName}}"/>
 					</div>
 				</div>
-				<div class="row py-1">
+				<div class="row pt-3 pb-2">
 					<div class="offset-md-2 col-md-10">
 						<button type="submit" class="btn btn-primary"><i class="{{T .Loc "icon.search"}}"></i> {{T .Loc "button.search"}}</button>
 						<button type="reset" class="btn btn-secondary"><i class="{{T .Loc "icon.clear"}}"></i> {{T .Loc "button.clear"}}</button>

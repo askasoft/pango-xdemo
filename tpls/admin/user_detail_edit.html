@@ -6,48 +6,50 @@
 		{{if ne .User.ID 0}}#{{.User.ID}}{{end}}
 	</h4>
 </div>
-<form class="ui-popup-body form-horizontal grey lined">
-	<input type="hidden" name="_token_" value="{{.Token}}"/>
-	<input type="hidden" id="user_detail_id" name="id" value="{{.User.ID}}"/>
-	<div class="row py-3">
-		<label class="col-md-2 col-form-label required">{{T .Loc "user.name"}}</label>
-		<div class="col-md-10">
-			<input id="user_detail_name" name="name" type="text" class="form-control" maxlength="100" value="{{.User.Name}}">
+<div class="ui-popup-body grey">
+	<form class="form-horizontal lined">
+		<input type="hidden" name="_token_" value="{{.Token}}"/>
+		<input type="hidden" id="user_detail_id" name="id" value="{{.User.ID}}"/>
+		<div class="row py-3">
+			<label class="col-md-2 col-form-label required">{{T .Loc "user.name"}}</label>
+			<div class="col-md-10">
+				<input id="user_detail_name" name="name" type="text" class="form-control" maxlength="100" value="{{.User.Name}}">
+			</div>
 		</div>
-	</div>
-	<div class="row py-3">
-		<label class="col-md-2 col-form-label required">{{T .Loc "user.email"}}</label>
-		<div class="col-md-10">
-			<input name="email" type="text" class="form-control" maxlength="100" value="{{.User.Email}}">
+		<div class="row py-3">
+			<label class="col-md-2 col-form-label required">{{T .Loc "user.email"}}</label>
+			<div class="col-md-10">
+				<input name="email" type="text" class="form-control" maxlength="100" value="{{.User.Email}}">
+			</div>
 		</div>
-	</div>
-	<div class="row py-3">
-		<label class="col-md-2 col-form-label">{{T .Loc "user.password"}}</label>
-		<div class="col-md-10">
-			<input name="password" type="text" class="form-control" maxlength="16" value="">
-			<div class="desc">{{T .Loc $pwd_desc}}</div>
+		<div class="row py-3">
+			<label class="col-md-2 col-form-label">{{T .Loc "user.password"}}</label>
+			<div class="col-md-10">
+				<input name="password" type="text" class="form-control" maxlength="16" value="">
+				<div class="desc">{{T .Loc $pwd_desc}}</div>
+			</div>
 		</div>
-	</div>
-	<div class="row py-3">
-		<label class="col-md-2 col-form-label required">{{T .Loc "user.role"}}</label>
-		<div class="col-md-10">
-			{{Radios "Name=" "role" "List=" .UserRoleMap "Value=" .User.Role}}
+		<div class="row py-3">
+			<label class="col-md-2 col-form-label required">{{T .Loc "user.role"}}</label>
+			<div class="col-md-10">
+				{{Radios "Name=" "role" "List=" .UserRoleMap "Value=" .User.Role}}
+			</div>
 		</div>
-	</div>
-	<div class="row py-3">
-		<label class="col-md-2 col-form-label required">{{T .Loc "user.status"}}</label>
-		<div class="col-md-10">
-			{{Radios "Name=" "status" "List=" .UserStatusMap "Value=" .User.Status}}
+		<div class="row py-3">
+			<label class="col-md-2 col-form-label required">{{T .Loc "user.status"}}</label>
+			<div class="col-md-10">
+				{{Radios "Name=" "status" "List=" .UserStatusMap "Value=" .User.Status}}
+			</div>
 		</div>
-	</div>
-	<div class="row py-3">
-		<label class="col-md-2 col-form-label">{{T .Loc "user.cidr"}}</label>
-		<div class="col-md-10">
-			<textarea name="cidr" class="form-control" rows="2">{{.User.CIDR}}</textarea>
+		<div class="row py-3">
+			<label class="col-md-2 col-form-label">{{T .Loc "user.cidr"}}</label>
+			<div class="col-md-10">
+				<textarea name="cidr" class="form-control" rows="2">{{.User.CIDR}}</textarea>
+			</div>
 		</div>
-	</div>
-	<button type="submit" class="hidden"></button>
-</form>
+		<button type="submit" class="hidden"></button>
+	</form>
+</div>
 <div class="ui-popup-footer">
 	<button type="submit" class="btn btn-primary"><i class="{{T .Loc "icon.save"}}"></i> {{T .Loc "button.save"}}</button>
 	<button type="button" class="btn btn-secondary" popup-dismiss="true"><i class="{{T .Loc "icon.close"}}"></i> {{T .Loc "button.close"}}</button>

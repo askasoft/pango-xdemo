@@ -4,30 +4,32 @@
 		#{{.User.ID}}
 	</h4>
 </div>
-<div class="ui-popup-body ui-view lined grey">
-	<input type="hidden" id="user_detail_id" name="id" value="{{.User.ID}}"/>
-	<div class="row py-3">
-		<label class="col ui-label">{{T .Loc "user.name"}}</label>
-		<div class="col-10 ui-value">{{.User.Name}}</div>
-	</div>
-	<div class="row py-3">
-		<label class="col ui-label">{{T .Loc "user.email"}}</label>
-		<div class="col-10 ui-value">{{.User.Email}}</div>
-	</div>
-	<div class="row py-3">
-		<label class="col ui-label">{{T .Loc "user.role"}}</label>
-		<div class="col-10 ui-value">{{.UserRoleMap.MustGet .User.Role .User.Role}}</div>
-	</div>
-	<div class="row py-3">
-		<label class="col ui-label">{{T .Loc "user.status"}}</label>
-		<div class="col-10 ui-value">{{.UserStatusMap.MustGet .User.Status .UserStatus}}
+<div class="ui-popup-body grey">
+	<div class="container ui-view lined">
+		<input type="hidden" id="user_detail_id" name="id" value="{{.User.ID}}"/>
+		<div class="row py-3">
+			<label class="col ui-label">{{T .Loc "user.name"}}</label>
+			<div class="col-10 ui-value">{{.User.Name}}</div>
+		</div>
+		<div class="row py-3">
+			<label class="col ui-label">{{T .Loc "user.email"}}</label>
+			<div class="col-10 ui-value">{{.User.Email}}</div>
+		</div>
+		<div class="row py-3">
+			<label class="col ui-label">{{T .Loc "user.role"}}</label>
+			<div class="col-10 ui-value">{{.UserRoleMap.MustGet .User.Role .User.Role}}</div>
+		</div>
+		<div class="row py-3">
+			<label class="col ui-label">{{T .Loc "user.status"}}</label>
+			<div class="col-10 ui-value">{{.UserStatusMap.MustGet .User.Status .UserStatus}}
+			</div>
+		</div>
+		<div class="row py-3">
+			<label class="col ui-label">{{T .Loc "user.cidr"}}</label>
+			<div class="col-10 ui-value">{{.User.CIDR}}</div>
 		</div>
 	</div>
-	<div class="row py-3">
-		<label class="col ui-label">{{T .Loc "user.cidr"}}</label>
-		<div class="col-10 ui-value">{{.User.CIDR}}</div>
-	</div>
-</div
+</div>
 <div class="ui-popup-footer">
 	<button type="button" class="btn btn-secondary" popup-dismiss="true"><i class="{{T .Loc "icon.close"}}"></i> {{T .Loc "button.close"}}</button>
 </div>
