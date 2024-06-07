@@ -4,52 +4,53 @@
 {{template "main_header" .}}
 
 <div class="s-section">
-	<div class="ui-headline">
+	<div class="s-section-head">
 		<ol class="breadcrumb">
 			<li class="active"><i class="{{T .Loc "icon.super.sql"}}"></i>{{T .Loc "menu.super.sql"}}</li>
 		</ol>
 	</div>
-
-	<form id="sql_form" method="POST">
-		<input type="hidden" name="_token_" value="{{.Token}}"/>
-		<div class="row py-1 text-nowrap">
-			<label class="col col-form-label">{{T .Loc "super.sql.sql"}}</label>
-			<div class="col text-end">
-				{{T .Loc "super.sql.limit"}} {{Select "Name=" "limit" "List=" .Limits "class=" "form-select"}}
-			</div>
-		</div>
-		<div class="row py-3">
-			<div class="col">
-				<textarea name="sql" class="form-control" rows="10" textclear autosize enterfire></textarea>
-			</div>
-		</div>
-		<div class="row py-1">
-			<div class="col text-center">
-				<button type="submit" class="btn btn-primary"><i class="{{T .Loc "icon.execute"}}"></i> {{T .Loc "button.execute"}}</button>
-			</div>
-		</div>
-	</form>
-
-	<ol id="sql_results" style="display:none;"></ol>
-
-	<div id="sql_result" class="hidden">
-		<li>
-			<div class="card">
-				<div class="card-header text-info">
-					<pre class="sql"></pre>
-				</div>
-				<div class="card-body">
-					<pre class="err text-danger"></pre>
-					<pre class="info text-success"></pre>
-				</div>
-				<div class="result table-responsive">
-					<table class="table table-bordered table-striped">
-						<thead></thead>
-						<tbody></tbody>
-					</table>
+	<div class="s-section-body">
+		<form id="sql_form" method="POST">
+			<input type="hidden" name="_token_" value="{{.Token}}"/>
+			<div class="row py-1 text-nowrap">
+				<label class="col col-form-label">{{T .Loc "super.sql.sql"}}</label>
+				<div class="col text-end">
+					{{T .Loc "super.sql.limit"}} {{Select "Name=" "limit" "List=" .Limits "class=" "form-select"}}
 				</div>
 			</div>
-		</li>
+			<div class="row py-3">
+				<div class="col">
+					<textarea name="sql" class="form-control" rows="10" textclear autosize enterfire></textarea>
+				</div>
+			</div>
+			<div class="row py-1">
+				<div class="col text-center">
+					<button type="submit" class="btn btn-primary"><i class="{{T .Loc "icon.execute"}}"></i> {{T .Loc "button.execute"}}</button>
+				</div>
+			</div>
+		</form>
+
+		<ol id="sql_results" style="display:none;"></ol>
+
+		<div id="sql_result" class="hidden">
+			<li>
+				<div class="card">
+					<div class="card-header text-info">
+						<pre class="sql"></pre>
+					</div>
+					<div class="card-body">
+						<pre class="err text-danger"></pre>
+						<pre class="info text-success"></pre>
+					</div>
+					<div class="result table-responsive">
+						<table class="table table-bordered table-striped">
+							<thead></thead>
+							<tbody></tbody>
+						</table>
+					</div>
+				</div>
+			</li>
+		</div>
 	</div>
 </div>
 

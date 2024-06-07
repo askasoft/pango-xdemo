@@ -4,130 +4,131 @@
 {{template "main_header" .}}
 
 <div class="s-section">
-	<div class="ui-headline">
+	<div class="s-section-head">
 		<ol class="breadcrumb">
 			<li class="active"><i class="{{T .Loc "icon.super.tenants"}}"></i>{{T .Loc "menu.super.tenants"}}</li>
 		</ol>
 	</div>
+	<div class="s-section-body">
+		<div class="s-toolbar row">
+			<div class="col-md-6">
+			</div>
+			<div class="col-md-6 text-end">
+				<button class="btn btn-sm btn-outline-primary" popup-target="#tenants_create_popup">
+					<i class="{{T .Loc "icon.new"}}"></i> {{T .Loc "button.new"}}
+				</button>
+			</div>
+		</div>
 
-	<div class="row mb-4">
-		<div class="col-md-6">
-		</div>
-		<div class="col-md-6 text-end">
-			<button class="btn btn-sm btn-outline-primary" popup-target="#tenants_create_popup">
-				<i class="{{T .Loc "icon.new"}}"></i> {{T .Loc "button.new"}}
-			</button>
-		</div>
+		<div id="tenants_alert">{{template "alerts" .}}</div>
+		
+		<fieldset id="tenants_listfset" class="ui-fieldset collapsed" data-spy="fieldset">
+			<legend class="circle"><i class="{{T .Loc "icon.search"}}"></i>{{T .Loc "button.search"}}</legend>
+			<form id="tenants_listform"  class="form-horizontal grey" method="POST">
+				<input type="hidden" name="_token_" value="{{.Token}}"/>
+				<input type="hidden" name="p" value="{{.Q.Page}}"/>
+				<input type="hidden" name="l" value="{{.Q.Limit}}"/>
+				<input type="hidden" name="c" value="{{.Q.Col}}"/>
+				<input type="hidden" name="d" value="{{.Q.Dir}}"/>
+
+				<div class="row py-1">
+					<label class="col-md-2 col-form-label">{{T .Loc "tenant.name"}}</label>
+					<div class="col-md-10">
+						<input name="name" type="text" class="form-control" textclear value="{{.Q.Name}}"/>
+					</div>
+				</div>
+				<div class="row py-1">
+					<div class="offset-md-2 col-md-10">
+						<button type="submit" class="btn btn-primary"><i class="{{T .Loc "icon.search"}}"></i> {{T .Loc "button.search"}}</button>
+						<button type="reset" class="btn btn-secondary"><i class="{{T .Loc "icon.clear"}}"></i> {{T .Loc "button.clear"}}</button>
+					</div>
+				</div>
+			</form>
+		</fieldset>
+
+		<div id="tenants_list"></div>
 	</div>
 
-	<div id="tenants_alert">{{template "alerts" .}}</div>
-	
-	<fieldset id="tenants_listfset" class="ui-fieldset collapsed" data-spy="fieldset">
-		<legend class="circle"><i class="{{T .Loc "icon.search"}}"></i>{{T .Loc "button.search"}}</legend>
-		<form id="tenants_listform"  class="form-horizontal grey" method="POST">
-			<input type="hidden" name="_token_" value="{{.Token}}"/>
-			<input type="hidden" name="p" value="{{.Q.Page}}"/>
-			<input type="hidden" name="l" value="{{.Q.Limit}}"/>
-			<input type="hidden" name="c" value="{{.Q.Col}}"/>
-			<input type="hidden" name="d" value="{{.Q.Dir}}"/>
 
-			<div class="row py-1">
+	<div id="tenants_create_popup" class="ui-popup s-popup-detail w800" data-spy="popup" tabindex="-1"
+		popup-closer="true" popup-position="center" popup-focus="#tenants_create_popup [name=name]">
+		<div class="ui-popup-header">
+			<h4><i class="{{T .Loc "icon.edit"}}"></i>
+				{{T .Loc "tenant.create.header"}}
+			</h4>
+		</div>
+		<form class="ui-popup-body form-horizontal grey lined">
+			<input type="hidden" name="_token_" value="{{.Token}}"/>
+			<div class="row py-3">
 				<label class="col-md-2 col-form-label">{{T .Loc "tenant.name"}}</label>
 				<div class="col-md-10">
-					<input name="name" type="text" class="form-control" textclear value="{{.Q.Name}}"/>
+					<input name="name" type="text" class="form-control" maxlength="30" value="" textclear>
+					<div class="desc">{{T .Loc "tenant.desc.name"}}</div>
 				</div>
 			</div>
-			<div class="row py-1">
-				<div class="offset-md-2 col-md-10">
-					<button type="submit" class="btn btn-primary"><i class="{{T .Loc "icon.search"}}"></i> {{T .Loc "button.search"}}</button>
-					<button type="reset" class="btn btn-secondary"><i class="{{T .Loc "icon.clear"}}"></i> {{T .Loc "button.clear"}}</button>
+			<div class="row py-3">
+				<label class="col-md-2 col-form-label">{{T .Loc "tenant.comment"}}</label>
+				<div class="col-md-10">
+					<textarea name="comment" class="form-control" maxlength="250" rows="2" textclear enterfire></textarea>
 				</div>
+			</div>
+			<button type="submit" class="hidden"></button>
+		</form>
+		<div class="ui-popup-footer">
+			<button type="submit" class="btn btn-primary"><i class="{{T .Loc "icon.save"}}"></i> {{T .Loc "button.create"}}</button>
+			<button type="button" class="btn btn-secondary" popup-dismiss="true"><i class="{{T .Loc "icon.close"}}"></i> {{T .Loc "button.close"}}</button>
+		</div>
+	</div>
+
+	<div id="tenants_update_popup" class="ui-popup s-popup-detail w800" data-spy="popup" tabindex="-1"
+		popup-closer="true" popup-position="center" popup-focus="#tenants_update_popup [name=comment]">
+		<div class="ui-popup-header">
+			<h4><i class="{{T .Loc "icon.edit"}}"></i>
+				{{T .Loc "tenant.update.header"}}
+			</h4>
+		</div>
+		<form class="ui-popup-body form-horizontal grey lined">
+			<input type="hidden" name="_token_" value="{{.Token}}"/>
+			<input type="hidden" name="oname" value=""/>
+			<div class="row py-3">
+				<label class="col-md-2 col-form-label">{{T .Loc "tenant.name"}}</label>
+				<div class="col-md-10">
+					<input name="name" type="text" class="form-control" textclear>
+				</div>
+			</div>
+			<div class="row py-3">
+				<label class="col-md-2 col-form-label">{{T .Loc "tenant.comment"}}</label>
+				<div class="col-md-10">
+					<textarea name="comment" class="form-control" maxlength="250" rows="2" textclear enterfire></textarea>
+				</div>
+			</div>
+			<button type="submit" class="hidden"></button>
+		</form>
+		<div class="ui-popup-footer">
+			<button type="submit" class="btn btn-primary"><i class="{{T .Loc "icon.save"}}"></i> {{T .Loc "button.save"}}</button>
+			<button type="button" class="btn btn-secondary" popup-dismiss="true"><i class="{{T .Loc "icon.close"}}"></i> {{T .Loc "button.close"}}</button>
+		</div>
+	</div>
+
+	<div id="tenants_delete_popup" class="ui-popup s-popup-confirm" data-spy="popup" tabindex="-1"
+		popup-mask="true" popup-position="center" popup-mouse="false">
+		<form>
+			<input type="hidden" name="_token_" value="{{.Token}}"/>
+			<div class="ui-popup-header">
+				<h4>{{T .Loc "tenant.delete.header"}}</h4>
+			</div>
+			<div class="ui-popup-body">
+				<i class="icon fas fa-2x fa-fw fa-triangle-exclamation text-danger"></i>
+				<div class="msg">{{HTML (T .Loc "tenant.delete.message")}}
+					<input id="tenant_delete_name" name="name" class="form-control"/>
+				</div>
+			</div>
+			<div class="ui-popup-footer">
+				<button type="submit" class="btn btn-danger" disabled><i class="{{T .Loc "icon.delete"}}"></i> {{T .Loc "button.delete"}}</button>
+				<button type="button" class="btn btn-secondary" popup-dismiss="true"><i class="{{T .Loc "icon.cancel"}}"></i> {{T .Loc "button.cancel"}}</button>
 			</div>
 		</form>
-	</fieldset>
-
-	<div id="tenants_list"></div>
-</div>
-
-
-<div id="tenants_create_popup" class="ui-popup s-popup-detail w800" data-spy="popup" tabindex="-1"
-	popup-closer="true" popup-position="center" popup-focus="#tenants_create_popup [name=name]">
-	<div class="ui-popup-header">
-		<h4><i class="{{T .Loc "icon.edit"}}"></i>
-			{{T .Loc "tenant.create.header"}}
-		</h4>
 	</div>
-	<form class="ui-popup-body form-horizontal grey lined">
-		<input type="hidden" name="_token_" value="{{.Token}}"/>
-		<div class="row py-3">
-			<label class="col-md-2 col-form-label">{{T .Loc "tenant.name"}}</label>
-			<div class="col-md-10">
-				<input name="name" type="text" class="form-control" maxlength="30" value="" textclear>
-				<div class="desc">{{T .Loc "tenant.desc.name"}}</div>
-			</div>
-		</div>
-		<div class="row py-3">
-			<label class="col-md-2 col-form-label">{{T .Loc "tenant.comment"}}</label>
-			<div class="col-md-10">
-				<textarea name="comment" class="form-control" maxlength="250" rows="2" textclear enterfire></textarea>
-			</div>
-		</div>
-		<button type="submit" class="hidden"></button>
-	</form>
-	<div class="ui-popup-footer">
-		<button type="submit" class="btn btn-primary"><i class="{{T .Loc "icon.save"}}"></i> {{T .Loc "button.create"}}</button>
-		<button type="button" class="btn btn-secondary" popup-dismiss="true"><i class="{{T .Loc "icon.close"}}"></i> {{T .Loc "button.close"}}</button>
-	</div>
-</div>
-
-<div id="tenants_update_popup" class="ui-popup s-popup-detail w800" data-spy="popup" tabindex="-1"
-	popup-closer="true" popup-position="center" popup-focus="#tenants_update_popup [name=comment]">
-	<div class="ui-popup-header">
-		<h4><i class="{{T .Loc "icon.edit"}}"></i>
-			{{T .Loc "tenant.update.header"}}
-		</h4>
-	</div>
-	<form class="ui-popup-body form-horizontal grey lined">
-		<input type="hidden" name="_token_" value="{{.Token}}"/>
-		<input type="hidden" name="oname" value=""/>
-		<div class="row py-3">
-			<label class="col-md-2 col-form-label">{{T .Loc "tenant.name"}}</label>
-			<div class="col-md-10">
-				<input name="name" type="text" class="form-control" textclear>
-			</div>
-		</div>
-		<div class="row py-3">
-			<label class="col-md-2 col-form-label">{{T .Loc "tenant.comment"}}</label>
-			<div class="col-md-10">
-				<textarea name="comment" class="form-control" maxlength="250" rows="2" textclear enterfire></textarea>
-			</div>
-		</div>
-		<button type="submit" class="hidden"></button>
-	</form>
-	<div class="ui-popup-footer">
-		<button type="submit" class="btn btn-primary"><i class="{{T .Loc "icon.save"}}"></i> {{T .Loc "button.save"}}</button>
-		<button type="button" class="btn btn-secondary" popup-dismiss="true"><i class="{{T .Loc "icon.close"}}"></i> {{T .Loc "button.close"}}</button>
-	</div>
-</div>
-
-<div id="tenants_delete_popup" class="ui-popup s-popup-confirm" data-spy="popup" tabindex="-1"
-	popup-mask="true" popup-position="center" popup-mouse="false">
-	<form>
-		<input type="hidden" name="_token_" value="{{.Token}}"/>
-		<div class="ui-popup-header">
-			<h4>{{T .Loc "tenant.delete.header"}}</h4>
-		</div>
-		<div class="ui-popup-body">
-			<i class="icon fas fa-2x fa-fw fa-triangle-exclamation text-danger"></i>
-			<div class="msg">{{HTML (T .Loc "tenant.delete.message")}}
-				<input id="tenant_delete_name" name="name" class="form-control"/>
-			</div>
-		</div>
-		<div class="ui-popup-footer">
-			<button type="submit" class="btn btn-danger" disabled><i class="{{T .Loc "icon.delete"}}"></i> {{T .Loc "button.delete"}}</button>
-			<button type="button" class="btn btn-secondary" popup-dismiss="true"><i class="{{T .Loc "icon.cancel"}}"></i> {{T .Loc "button.cancel"}}</button>
-		</div>
-	</form>
 </div>
 
 {{template "main_footer" .}}

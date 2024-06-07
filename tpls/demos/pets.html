@@ -4,115 +4,115 @@
 {{template "main_header" .}}
 
 <div class="s-section">
-	<div class="ui-headline">
+	<div class="s-section-head">
 		<ol class="breadcrumb">
 			<li class="active"><i class="{{T .Loc "icon.demos.pets.list"}}"></i>{{T .Loc "menu.demos.pets.list"}}</li>
 		</ol>
 	</div>
+	<div class="s-section-body">
+		<div class="s-toolbar row">
+			<div class="col-md-6">
+				<button class="btn btn-sm btn-outline-danger" popup-target="#pets_deletesel_popup" enableby="#pets_list td.check input">
+					<i class="{{T .Loc "icon.deletesel"}}"></i> {{T .Loc "button.deletesel"}}
+				</button>
+				<button class="btn btn-sm btn-outline-danger" popup-target="#pets_deletebat_popup">
+					<i class="{{T .Loc "icon.deletebat"}}"></i> {{T .Loc "button.deletebat"}}
+				</button>
+				<button class="btn btn-sm btn-outline-danger" popup-target="#pets_deleteall_popup">
+					<i class="{{T .Loc "icon.deleteall"}}"></i> {{T .Loc "button.deleteall"}}
+				</button>
+				<button class="btn btn-sm btn-outline-primary" id="pets_editsel" enableby="#pets_list td.check input">
+					<i class="{{T .Loc "icon.editsel"}}"></i> {{T .Loc "button.editsel"}}
+				</button>
+				<button class="btn btn-sm btn-outline-primary" id="pets_editall">
+					<i class="{{T .Loc "icon.editall"}}"></i> {{T .Loc "button.editall"}}
+				</button>
+			</div>
+			<div class="col-md-6 text-end">
+				<button id="pets_new" class="btn btn-sm btn-outline-primary"><i class="{{T .Loc "icon.new"}}"></i> {{T .Loc "button.new"}}</button>
+				<button id="pets_export" class="btn btn-sm btn-outline-primary"><i class="{{T .Loc "icon.csv"}}"></i> {{T .Loc "button.csvexp"}}</button>
+			</div>
+		</div>
 
-	<div class="row mb-4">
-		<div class="col-md-6">
-			<button class="btn btn-sm btn-outline-danger" popup-target="#pets_deletesel_popup" enableby="#pets_list td.check input">
-				<i class="{{T .Loc "icon.deletesel"}}"></i> {{T .Loc "button.deletesel"}}
-			</button>
-			<button class="btn btn-sm btn-outline-danger" popup-target="#pets_deletebat_popup">
-				<i class="{{T .Loc "icon.deletebat"}}"></i> {{T .Loc "button.deletebat"}}
-			</button>
-			<button class="btn btn-sm btn-outline-danger" popup-target="#pets_deleteall_popup">
-				<i class="{{T .Loc "icon.deleteall"}}"></i> {{T .Loc "button.deleteall"}}
-			</button>
-			<button class="btn btn-sm btn-outline-primary" id="pets_editsel" enableby="#pets_list td.check input">
-				<i class="{{T .Loc "icon.editsel"}}"></i> {{T .Loc "button.editsel"}}
-			</button>
-			<button class="btn btn-sm btn-outline-primary" id="pets_editall">
-				<i class="{{T .Loc "icon.editall"}}"></i> {{T .Loc "button.editall"}}
-			</button>
-		</div>
-		<div class="col-md-6 text-end">
-			<button id="pets_new" class="btn btn-sm btn-outline-primary"><i class="{{T .Loc "icon.new"}}"></i> {{T .Loc "button.new"}}</button>
-			<button id="pets_export" class="btn btn-sm btn-outline-primary"><i class="{{T .Loc "icon.csv"}}"></i> {{T .Loc "button.csvexp"}}</button>
-		</div>
+		<div id="pets_alert">{{template "alerts" .}}</div>
+		
+		<fieldset id="pets_listfset" class="ui-fieldset collapsed" data-spy="fieldset">
+			<legend class="circle"><i class="{{T .Loc "icon.search"}}"></i>{{T .Loc "button.search"}}</legend>
+			<form id="pets_listform" class="form-horizontal grey" method="POST">
+				<input type="hidden" name="_token_" value="{{.Token}}"/>
+				<input type="hidden" name="p" value="{{.Q.Page}}"/>
+				<input type="hidden" name="l" value="{{.Q.Limit}}"/>
+				<input type="hidden" name="c" value="{{.Q.Col}}"/>
+				<input type="hidden" name="d" value="{{.Q.Dir}}"/>
+
+				<div class="row py-1">
+					<label class="col-md-2 col-form-label">{{T .Loc "pet.id"}}</label>
+					<div class="col-md-4">
+						<input name="id" type="text" class="form-control" textclear value="{{if ne .Q.ID 0}}{{.Q.ID}}{{end}}"/>
+					</div>
+					<label class="col-md-2 col-form-label">{{T .Loc "pet.name"}}</label>
+					<div class="col-md-4">
+						<input name="name" type="text" class="form-control" textclear value="{{.Q.Name}}"/>
+					</div>
+				</div>
+				<div class="row py-1">
+					<label class="col-md-2 col-form-label">{{T .Loc "pet.gender"}}</label>
+					<div class="col-md-4">
+						{{Checks "Name=" "gender" "List=" .PetGenderMap "Values=" .Q.Gender}}
+					</div>
+					<label class="col-md-2 col-form-label">{{T .Loc "pet.born_at"}}</label>
+					<div class="col-md-4">
+						<input type="date" class="form-control" name="born_from">
+						～
+						<input type="date" class="form-control" name="born_to">
+					</div>
+				</div>
+				<div class="row py-1">
+					<label class="col-md-2 col-form-label">{{T .Loc "pet.temper"}}</label>
+					<div class="col-md-4">
+						{{Select "Name=" "temper" "List=" .PetTemperMap "Values=" .Q.Temper "Multiple=" true "class=" "wide" "data-spy=" "niceSelect"}}
+					</div>
+					<label class="col-md-2 col-form-label">{{T .Loc "pet.habits"}}</label>
+					<div class="col-md-4">
+						{{Select "Name=" "habits" "List=" .PetHabitsMap "Values=" .Q.Habits "Multiple=" true "class=" "wide" "data-spy=" "niceSelect"}}
+					</div>
+				</div>
+				<div class="row py-1">
+					<label class="col-md-2 col-form-label">{{T .Loc "pet.amount"}}</label>
+					<div class="col-md-4">
+						<input type="number" class="form-control" name="amount_min" size="16">
+						～
+						<input type="number" class="form-control" name="amount_max" size="16">
+					</div>
+					<label class="col-md-2 col-form-label">{{T .Loc "pet.price"}}</label>
+					<div class="col-md-4">
+						<input type="number" class="form-control" name="price_min" size="16">
+						～
+						<input type="number" class="form-control" name="price_max" size="16">
+					</div>
+				</div>
+				<div class="row py-1">
+					<label class="col-md-2 col-form-label">{{T .Loc "pet.origin"}}</label>
+					<div class="col-md-4">
+						{{Select "Name=" "origin" "List=" .PetOriginMap "Values=" .Q.Origin "Multiple=" true "class=" "col2 wide" "data-spy=" "niceSelect"}}
+					</div>
+					<label class="col-md-2 col-form-label">{{T .Loc "pet.shop_name"}}</label>
+					<div class="col-md-4">
+						<input name="shop_name" type="text" class="form-control" textclear value="{{.Q.ShopName}}"/>
+					</div>
+				</div>
+				<div class="row py-1">
+					<div class="offset-md-2 col-md-10">
+						<button type="submit" class="btn btn-primary"><i class="{{T .Loc "icon.search"}}"></i> {{T .Loc "button.search"}}</button>
+						<button type="reset" class="btn btn-secondary"><i class="{{T .Loc "icon.clear"}}"></i> {{T .Loc "button.clear"}}</button>
+					</div>
+				</div>
+			</form>
+		</fieldset>
+
+		<div id="pets_list"></div>
 	</div>
-
-	<div id="pets_alert">{{template "alerts" .}}</div>
-	
-	<fieldset id="pets_listfset" class="ui-fieldset collapsed" data-spy="fieldset">
-		<legend class="circle"><i class="{{T .Loc "icon.search"}}"></i>{{T .Loc "button.search"}}</legend>
-		<form id="pets_listform" class="form-horizontal grey" method="POST">
-			<input type="hidden" name="_token_" value="{{.Token}}"/>
-			<input type="hidden" name="p" value="{{.Q.Page}}"/>
-			<input type="hidden" name="l" value="{{.Q.Limit}}"/>
-			<input type="hidden" name="c" value="{{.Q.Col}}"/>
-			<input type="hidden" name="d" value="{{.Q.Dir}}"/>
-
-			<div class="row py-1">
-				<label class="col-md-2 col-form-label">{{T .Loc "pet.id"}}</label>
-				<div class="col-md-4">
-					<input name="id" type="text" class="form-control" textclear value="{{if ne .Q.ID 0}}{{.Q.ID}}{{end}}"/>
-				</div>
-				<label class="col-md-2 col-form-label">{{T .Loc "pet.name"}}</label>
-				<div class="col-md-4">
-					<input name="name" type="text" class="form-control" textclear value="{{.Q.Name}}"/>
-				</div>
-			</div>
-			<div class="row py-1">
-				<label class="col-md-2 col-form-label">{{T .Loc "pet.gender"}}</label>
-				<div class="col-md-4">
-					{{Checks "Name=" "gender" "List=" .PetGenderMap "Values=" .Q.Gender}}
-				</div>
-				<label class="col-md-2 col-form-label">{{T .Loc "pet.born_at"}}</label>
-				<div class="col-md-4">
-					<input type="date" class="form-control" name="born_from">
-					～
-					<input type="date" class="form-control" name="born_to">
-				</div>
-			</div>
-			<div class="row py-1">
-				<label class="col-md-2 col-form-label">{{T .Loc "pet.temper"}}</label>
-				<div class="col-md-4">
-					{{Select "Name=" "temper" "List=" .PetTemperMap "Values=" .Q.Temper "Multiple=" true "class=" "wide" "data-spy=" "niceSelect"}}
-				</div>
-				<label class="col-md-2 col-form-label">{{T .Loc "pet.habits"}}</label>
-				<div class="col-md-4">
-					{{Select "Name=" "habits" "List=" .PetHabitsMap "Values=" .Q.Habits "Multiple=" true "class=" "wide" "data-spy=" "niceSelect"}}
-				</div>
-			</div>
-			<div class="row py-1">
-				<label class="col-md-2 col-form-label">{{T .Loc "pet.amount"}}</label>
-				<div class="col-md-4">
-					<input type="number" class="form-control" name="amount_min" size="16">
-					～
-					<input type="number" class="form-control" name="amount_max" size="16">
-				</div>
-				<label class="col-md-2 col-form-label">{{T .Loc "pet.price"}}</label>
-				<div class="col-md-4">
-					<input type="number" class="form-control" name="price_min" size="16">
-					～
-					<input type="number" class="form-control" name="price_max" size="16">
-				</div>
-			</div>
-			<div class="row py-1">
-				<label class="col-md-2 col-form-label">{{T .Loc "pet.origin"}}</label>
-				<div class="col-md-4">
-					{{Select "Name=" "origin" "List=" .PetOriginMap "Values=" .Q.Origin "Multiple=" true "class=" "col2 wide" "data-spy=" "niceSelect"}}
-				</div>
-				<label class="col-md-2 col-form-label">{{T .Loc "pet.shop_name"}}</label>
-				<div class="col-md-4">
-					<input name="shop_name" type="text" class="form-control" textclear value="{{.Q.ShopName}}"/>
-				</div>
-			</div>
-			<div class="row py-1">
-				<div class="offset-md-2 col-md-10">
-					<button type="submit" class="btn btn-primary"><i class="{{T .Loc "icon.search"}}"></i> {{T .Loc "button.search"}}</button>
-					<button type="reset" class="btn btn-secondary"><i class="{{T .Loc "icon.clear"}}"></i> {{T .Loc "button.clear"}}</button>
-				</div>
-			</div>
-		</form>
-	</fieldset>
-
-	<div id="pets_list"></div>
 </div>
-
 <div id="pet_maps" class="hidden"
 	data-gender="{{JSON .PetGenderMap}}"
 	data-origin="{{JSON .PetOriginMap}}"

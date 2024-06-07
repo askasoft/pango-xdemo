@@ -1,23 +1,25 @@
 {{template "main_header" .}}
 
 <div class="s-section">
-	<div class="well">{{T .Loc "admin.well"}}</div>
+	<div class="s-section-body">
+		<div class="well">{{T .Loc "admin.well"}}</div>
 
-	<div class="ui-menu">
-	{{if and .AuthUser .AuthUser.IsAdmin}}
-		<a class="ui-menu-item" href="{{.Base}}/a/config/"><i class="fa-4x {{T .Loc "icon.admin.config"}}"></i><div>{{T .Loc "menu.admin.config"}}</div></a>
-		<a class="ui-menu-item" href="{{.Base}}/a/users/"><i class="fa-4x {{T .Loc "icon.admin.users"}}"></i><div>{{T .Loc "menu.admin.users"}}</div></a>
-	{{end}}
-
-	{{if and .AuthUser .AuthUser.IsSuper}}
-		<hr/>
-		{{if eq .CFG.app.tenants "true"}}
-		<a class="ui-menu-item" href="{{.Base}}/s/tenants/"><i class="fa-4x {{T .Loc "icon.super.tenants"}}"></i><div>{{T .Loc "menu.super.tenants"}}</div></a>
+		<div class="s-menu">
+		{{if and .AuthUser .AuthUser.IsAdmin}}
+			<a class="s-menu-item" href="{{.Base}}/a/config/"><i class="fa-4x {{T .Loc "icon.admin.config"}}"></i><div>{{T .Loc "menu.admin.config"}}</div></a>
+			<a class="s-menu-item" href="{{.Base}}/a/users/"><i class="fa-4x {{T .Loc "icon.admin.users"}}"></i><div>{{T .Loc "menu.admin.users"}}</div></a>
 		{{end}}
-		<a class="ui-menu-item" href="{{.Base}}/s/job/"><i class="fa-4x {{T .Loc "icon.super.job"}}"></i><div>{{T .Loc "menu.super.job"}}</div></a>
-		<a class="ui-menu-item" href="{{.Base}}/s/shell/"><i class="fa-4x {{T .Loc "icon.super.shell"}}"></i><div>{{T .Loc "menu.super.shell"}}</div></a>
-		<a class="ui-menu-item" href="{{.Base}}/s/sql/"><i class="fa-4x {{T .Loc "icon.super.sql"}}"></i><div>{{T .Loc "menu.super.sql"}}</div></a>
-	{{end}}
+
+		{{if and .AuthUser .AuthUser.IsSuper}}
+			<hr/>
+			{{if eq .CFG.app.tenants "true"}}
+			<a class="s-menu-item" href="{{.Base}}/s/tenants/"><i class="fa-4x {{T .Loc "icon.super.tenants"}}"></i><div>{{T .Loc "menu.super.tenants"}}</div></a>
+			{{end}}
+			<a class="s-menu-item" href="{{.Base}}/s/job/"><i class="fa-4x {{T .Loc "icon.super.job"}}"></i><div>{{T .Loc "menu.super.job"}}</div></a>
+			<a class="s-menu-item" href="{{.Base}}/s/shell/"><i class="fa-4x {{T .Loc "icon.super.shell"}}"></i><div>{{T .Loc "menu.super.shell"}}</div></a>
+			<a class="s-menu-item" href="{{.Base}}/s/sql/"><i class="fa-4x {{T .Loc "icon.super.sql"}}"></i><div>{{T .Loc "menu.super.sql"}}</div></a>
+		{{end}}
+		</div>
 	</div>
 </div>
 

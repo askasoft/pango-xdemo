@@ -4,42 +4,43 @@
 {{template "main_header" .}}
 
 <div class="s-section">
-	<div class="ui-headline">
+	<div class="s-section-head">
 		<ol class="breadcrumb">
 			<li class="active"><i class="{{T .Loc "icon.super.shell"}}"></i>{{T .Loc "menu.super.shell"}}</li>
 		</ol>
 	</div>
+	<div class="s-section-body">
+		<form id="shell_form" method="POST">
+			<input type="hidden" name="_token_" value="{{.Token}}"/>
+			<div class="row py-1 text-nowrap">
+				<label class="col col-form-label">{{TF .Loc "super.shell.command" .OS}}</label>
+				<div class="col text-end">
+					{{T .Loc "super.shell.timeout"}} {{Select "Name=" "timeout" "List=" .Timeouts "class=" "form-select"}}
+				</div>
+			</div>
+			<div class="row py-3">
+				<div class="col">
+					<textarea name="command" class="form-control" rows="10" textclear autosize enterfire></textarea>
+				</div>
+			</div>
+			<div class="row py-1">
+				<div class="col text-center">
+					<button type="submit" class="btn btn-primary"><i class="{{T .Loc "icon.execute"}}"></i> {{T .Loc "button.execute"}}</button>
+				</div>
+			</div>
+		</form>
 
-	<form id="shell_form" method="POST">
-		<input type="hidden" name="_token_" value="{{.Token}}"/>
-		<div class="row py-1 text-nowrap">
-			<label class="col col-form-label">{{TF .Loc "super.shell.command" .OS}}</label>
-			<div class="col text-end">
-				{{T .Loc "super.shell.timeout"}} {{Select "Name=" "timeout" "List=" .Timeouts "class=" "form-select"}}
+		<div id="shell_result" class="ui-view lined grey" style="display:none;"></div>
+
+		<div id="shell_row" class="hidden">
+			<div class="row py-3">
+				<label class="col-md-2 ui-label"></label>
+				<div class="col-md-10 ui-value"></div>
 			</div>
 		</div>
-		<div class="row py-3">
-			<div class="col">
-				<textarea name="command" class="form-control" rows="10" textclear autosize enterfire></textarea>
-			</div>
-		</div>
-		<div class="row py-1">
-			<div class="col text-center">
-				<button type="submit" class="btn btn-primary"><i class="{{T .Loc "icon.execute"}}"></i> {{T .Loc "button.execute"}}</button>
-			</div>
-		</div>
-	</form>
 
-	<div id="shell_result" class="ui-view lined grey" style="display:none;"></div>
-
-	<div id="shell_row" class="hidden">
-		<div class="row py-3">
-			<label class="col-md-2 ui-label"></label>
-			<div class="col-md-10 ui-value"></div>
-		</div>
+		<div id="shell_map" data-labels="{{JSON .Labels}}"></div>
 	</div>
-
-	<div id="shell_map" data-labels="{{JSON .Labels}}"></div>
 </div>
 
 {{template "main_footer" .}}

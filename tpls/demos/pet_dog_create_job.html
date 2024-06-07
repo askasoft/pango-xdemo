@@ -4,54 +4,55 @@
 {{template "main_header" .}}
 
 <div class="s-section">
-	<div class="ui-headline">
+	<div class="s-section-head">
 		<ol class="breadcrumb">
 			<li class="active"><i class="{{T .Loc "icon.demos.pets.dogcreate"}}"></i>{{T .Loc "menu.demos.pets.dogcreate"}}</li>
 		</ol>
 	</div>
+	<div class="s-section-body">
+		<div class="well">{{T .Loc "pet.dogcreate.well"}}</div>
 
-	<div class="well">{{T .Loc "pet.dogcreate.well"}}</div>
-
-	<fieldset data-spy="fieldset">
-		<legend>{{T .Loc "label.parameter"}}</legend>
-		<form id="job_form" class="form-horizontal grey" autocomplete="off" data-copy="{{T .Loc "button.copy"}}">
-			<input type="hidden" name="_token_" value="{{.Token}}"/>
-			<div class="row py-2">
-				<label class="col-md-3 col-form-label">{{T .Loc "label.items"}}</label>
-				<div class="col-md-9">
-					<div class="input-group wd-auto">
-						<input type="number" class="form-control" name="items" size="7" min="1" max="1000" value="{{.Arg.Items}}">
-						<span class="input-group-text">{{T .Loc "label.item"}}</span>
+		<fieldset data-spy="fieldset">
+			<legend>{{T .Loc "label.parameter"}}</legend>
+			<form id="job_form" class="form-horizontal grey" autocomplete="off" data-copy="{{T .Loc "button.copy"}}">
+				<input type="hidden" name="_token_" value="{{.Token}}"/>
+				<div class="row py-2">
+					<label class="col-md-3 col-form-label">{{T .Loc "label.items"}}</label>
+					<div class="col-md-9">
+						<div class="input-group wd-auto">
+							<input type="number" class="form-control" name="items" size="7" min="1" max="1000" value="{{.Arg.Items}}">
+							<span class="input-group-text">{{T .Loc "label.item"}}</span>
+						</div>
 					</div>
 				</div>
-			</div>
-			<div class="row py-2">
-				<label class="col-md-3 col-form-label">{{T .Loc "label.sleep"}}</label>
-				<div class="col-md-9">
-					<div class="input-group wd-auto">
-						<input type="number" class="form-control" name="sleep" size="7" min="0" max="1000" value="{{.Arg.Sleep}}">
-						<span class="input-group-text">{{T .Loc "label.millisecond"}}</span>
+				<div class="row py-2">
+					<label class="col-md-3 col-form-label">{{T .Loc "label.sleep"}}</label>
+					<div class="col-md-9">
+						<div class="input-group wd-auto">
+							<input type="number" class="form-control" name="sleep" size="7" min="0" max="1000" value="{{.Arg.Sleep}}">
+							<span class="input-group-text">{{T .Loc "label.millisecond"}}</span>
+						</div>
 					</div>
 				</div>
-			</div>
-		</form>
-	</fieldset>
+			</form>
+		</fieldset>
 
-	<div class="row px-4 py-2">
-		<div class="offset-md-3">
-			<button id="job_start" class="btn btn-success" disabled data-processing="{{T .Loc "button.processing"}}"><i class="{{T .Loc "icon.start"}}"></i> <span>{{T .Loc "button.start"}}</span></button>
-			<button id="job_abort" class="btn btn-danger" disabled><i class="{{T .Loc "icon.stop"}}"></i> {{T .Loc "button.stop"}}</button>
+		<div class="row px-4 py-2">
+			<div class="offset-md-3">
+				<button id="job_start" class="btn btn-success" disabled data-processing="{{T .Loc "button.processing"}}"><i class="{{T .Loc "icon.start"}}"></i> <span>{{T .Loc "button.start"}}</span></button>
+				<button id="job_abort" class="btn btn-danger" disabled><i class="{{T .Loc "icon.stop"}}"></i> {{T .Loc "button.stop"}}</button>
+			</div>
 		</div>
+
+		<fieldset id="job_history" class="ui-fieldset collapsed" data-spy="fieldset">
+			<legend>{{T .Loc "job.label.history"}}</legend>
+			<div id="job_tabs">
+				<ul class="nav nav-pills"></ul>
+			</div>
+		</fieldset>
+
+		<div id="job_list" class="tab-content"></div>
 	</div>
-
-	<fieldset id="job_history" class="ui-fieldset collapsed" data-spy="fieldset">
-		<legend>{{T .Loc "job.label.history"}}</legend>
-		<div id="job_tabs">
-			<ul class="nav nav-pills"></ul>
-		</div>
-	</fieldset>
-
-	<div id="job_list" class="tab-content"></div>
 </div>
 
 {{template "main_footer" .}}

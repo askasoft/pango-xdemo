@@ -4,88 +4,89 @@
 {{template "main_header" .}}
 
 <div class="s-section">
-	<div class="ui-headline">
+	<div class="s-section-head">
 		<ol class="breadcrumb">
 			<li class="active"><i class="{{T .Loc "icon.admin.users"}}"></i>{{T .Loc "menu.admin.users"}}</li>
 		</ol>
 	</div>
+	<div class="s-section-body">
+		<div class="s-toolbar row">
+			<div class="col-md-6">
+				<button class="btn btn-sm btn-outline-danger" popup-target="#users_deletesel_popup" enableby="#users_list td.check input">
+					<i class="{{T .Loc "icon.deletesel"}}"></i> {{T .Loc "button.deletesel"}}
+				</button>
+				<button class="btn btn-sm btn-outline-danger" popup-target="#users_deletebat_popup">
+					<i class="{{T .Loc "icon.deletebat"}}"></i> {{T .Loc "button.deletebat"}}
+				</button>
+				<button class="btn btn-sm btn-outline-danger" popup-target="#users_deleteall_popup">
+					<i class="{{T .Loc "icon.deleteall"}}"></i> {{T .Loc "button.deleteall"}}
+				</button>
+				<button class="btn btn-sm btn-outline-primary" id="users_editsel" enableby="#users_list td.check input">
+					<i class="{{T .Loc "icon.editsel"}}"></i> {{T .Loc "button.editsel"}}
+				</button>
+				<button class="btn btn-sm btn-outline-primary" id="users_editall">
+					<i class="{{T .Loc "icon.editall"}}"></i> {{T .Loc "button.editall"}}
+				</button>
+			</div>
+			<div class="col-md-6 text-end">
+				<button id="users_new" class="btn btn-sm btn-outline-primary"><i class="{{T .Loc "icon.new"}}"></i> {{T .Loc "button.new"}}</button>
+				<a class="btn btn-sm btn-outline-primary" href="./import/"><i class="{{T .Loc "icon.upload"}}"></i> {{T .Loc "button.import"}}</a>
+				<button id="users_export" class="btn btn-sm btn-outline-primary"><i class="{{T .Loc "icon.csv"}}"></i> {{T .Loc "button.csvexp"}}</button>
+			</div>
+		</div>
 
-	<div class="row mb-4">
-		<div class="col-md-6">
-			<button class="btn btn-sm btn-outline-danger" popup-target="#users_deletesel_popup" enableby="#users_list td.check input">
-				<i class="{{T .Loc "icon.deletesel"}}"></i> {{T .Loc "button.deletesel"}}
-			</button>
-			<button class="btn btn-sm btn-outline-danger" popup-target="#users_deletebat_popup">
-				<i class="{{T .Loc "icon.deletebat"}}"></i> {{T .Loc "button.deletebat"}}
-			</button>
-			<button class="btn btn-sm btn-outline-danger" popup-target="#users_deleteall_popup">
-				<i class="{{T .Loc "icon.deleteall"}}"></i> {{T .Loc "button.deleteall"}}
-			</button>
-			<button class="btn btn-sm btn-outline-primary" id="users_editsel" enableby="#users_list td.check input">
-				<i class="{{T .Loc "icon.editsel"}}"></i> {{T .Loc "button.editsel"}}
-			</button>
-			<button class="btn btn-sm btn-outline-primary" id="users_editall">
-				<i class="{{T .Loc "icon.editall"}}"></i> {{T .Loc "button.editall"}}
-			</button>
-		</div>
-		<div class="col-md-6 text-end">
-			<button id="users_new" class="btn btn-sm btn-outline-primary"><i class="{{T .Loc "icon.new"}}"></i> {{T .Loc "button.new"}}</button>
-			<a class="btn btn-sm btn-outline-primary" href="./import/"><i class="{{T .Loc "icon.upload"}}"></i> {{T .Loc "button.import"}}</a>
-			<button id="users_export" class="btn btn-sm btn-outline-primary"><i class="{{T .Loc "icon.csv"}}"></i> {{T .Loc "button.csvexp"}}</button>
-		</div>
+		<div id="users_alert">{{template "alerts" .}}</div>
+		
+		<fieldset id="users_listfset" class="ui-fieldset collapsed" data-spy="fieldset">
+			<legend class="circle"><i class="{{T .Loc "icon.search"}}"></i>{{T .Loc "button.search"}}</legend>
+			<form id="users_listform" class="form-horizontal grey" method="POST">
+				<input type="hidden" name="_token_" value="{{.Token}}"/>
+				<input type="hidden" name="p" value="{{.Q.Page}}"/>
+				<input type="hidden" name="l" value="{{.Q.Limit}}"/>
+				<input type="hidden" name="c" value="{{.Q.Col}}"/>
+				<input type="hidden" name="d" value="{{.Q.Dir}}"/>
+
+				<div class="row py-1">
+					<label class="col-md-2 col-form-label">{{T .Loc "user.id"}}</label>
+					<div class="col-md-4">
+						<input name="id" type="text" class="form-control" textclear value="{{if ne .Q.ID 0}}{{.Q.ID}}{{end}}"/>
+					</div>
+					<label class="col-md-2 col-form-label">{{T .Loc "user.name"}}</label>
+					<div class="col-md-4">
+						<input name="name" type="text" class="form-control" textclear value="{{.Q.Name}}"/>
+					</div>
+				</div>
+				<div class="row py-1">
+					<label class="col-md-2 col-form-label">{{T .Loc "user.email"}}</label>
+					<div class="col-md-4">
+						<input name="email" type="text" class="form-control" textclear value="{{.Q.Email}}"/>
+					</div>
+					<label class="col-md-2 col-form-label">{{T .Loc "user.cidr"}}</label>
+					<div class="col-md-4">
+						<input name="cidr" type="text" class="form-control" textclear value="{{.Q.CIDR}}"/>
+					</div>
+				</div>
+				<div class="row py-1">
+					<label class="col-md-2 col-form-label">{{T .Loc "user.role"}}</label>
+					<div class="col-md-4">
+						{{Checks "Name=" "role" "List=" .UserRoleMap "Values=" .Q.Role}}
+					</div>
+					<label class="col-md-2 col-form-label">{{T .Loc "user.status"}}</label>
+					<div class="col-md-4">
+						{{Checks "Name=" "status" "List=" .UserStatusMap "Values=" .Q.Status}}
+					</div>
+				</div>
+				<div class="row py-1">
+					<div class="offset-md-2 col-md-10">
+						<button type="submit" class="btn btn-primary"><i class="{{T .Loc "icon.search"}}"></i> {{T .Loc "button.search"}}</button>
+						<button type="reset" class="btn btn-secondary"><i class="{{T .Loc "icon.clear"}}"></i> {{T .Loc "button.clear"}}</button>
+					</div>
+				</div>
+			</form>
+		</fieldset>
+
+		<div id="users_list"></div>
 	</div>
-
-	<div id="users_alert">{{template "alerts" .}}</div>
-	
-	<fieldset id="users_listfset" class="ui-fieldset collapsed" data-spy="fieldset">
-		<legend class="circle"><i class="{{T .Loc "icon.search"}}"></i>{{T .Loc "button.search"}}</legend>
-		<form id="users_listform" class="form-horizontal grey" method="POST">
-			<input type="hidden" name="_token_" value="{{.Token}}"/>
-			<input type="hidden" name="p" value="{{.Q.Page}}"/>
-			<input type="hidden" name="l" value="{{.Q.Limit}}"/>
-			<input type="hidden" name="c" value="{{.Q.Col}}"/>
-			<input type="hidden" name="d" value="{{.Q.Dir}}"/>
-
-			<div class="row py-1">
-				<label class="col-md-2 col-form-label">{{T .Loc "user.id"}}</label>
-				<div class="col-md-4">
-					<input name="id" type="text" class="form-control" textclear value="{{if ne .Q.ID 0}}{{.Q.ID}}{{end}}"/>
-				</div>
-				<label class="col-md-2 col-form-label">{{T .Loc "user.name"}}</label>
-				<div class="col-md-4">
-					<input name="name" type="text" class="form-control" textclear value="{{.Q.Name}}"/>
-				</div>
-			</div>
-			<div class="row py-1">
-				<label class="col-md-2 col-form-label">{{T .Loc "user.email"}}</label>
-				<div class="col-md-4">
-					<input name="email" type="text" class="form-control" textclear value="{{.Q.Email}}"/>
-				</div>
-				<label class="col-md-2 col-form-label">{{T .Loc "user.cidr"}}</label>
-				<div class="col-md-4">
-					<input name="cidr" type="text" class="form-control" textclear value="{{.Q.CIDR}}"/>
-				</div>
-			</div>
-			<div class="row py-1">
-				<label class="col-md-2 col-form-label">{{T .Loc "user.role"}}</label>
-				<div class="col-md-4">
-					{{Checks "Name=" "role" "List=" .UserRoleMap "Values=" .Q.Role}}
-				</div>
-				<label class="col-md-2 col-form-label">{{T .Loc "user.status"}}</label>
-				<div class="col-md-4">
-					{{Checks "Name=" "status" "List=" .UserStatusMap "Values=" .Q.Status}}
-				</div>
-			</div>
-			<div class="row py-1">
-				<div class="offset-md-2 col-md-10">
-					<button type="submit" class="btn btn-primary"><i class="{{T .Loc "icon.search"}}"></i> {{T .Loc "button.search"}}</button>
-					<button type="reset" class="btn btn-secondary"><i class="{{T .Loc "icon.clear"}}"></i> {{T .Loc "button.clear"}}</button>
-				</div>
-			</div>
-		</form>
-	</fieldset>
-
-	<div id="users_list"></div>
 </div>
 
 <div id="user_maps" class="hidden"

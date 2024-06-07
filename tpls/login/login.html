@@ -5,44 +5,45 @@
 {{template "main_header" .}}
 
 <div class="s-section">
-	<div class="ui-headline">
+	<div class="s-section-head">
 		<ol class="breadcrumb">
 			<li class="active"><i class="{{T .Loc "icon.login"}}"></i>{{T .Loc "menu.login"}}</li>
 		</ol>
 	</div>
+	<div class="s-section-body">
+		<div class="well text-center">{{T .Loc "login.well"}}</div>
 
-	<div class="well text-center">{{T .Loc "login.well"}}</div>
+		<div id="login_alert">
+			{{template "alerts" .}}
+		</div>
 
-	<div id="login_alert">
-		{{template "alerts" .}}
+		<form id="login_form" class="form-horizontal" autocomplete="off">
+			<input type="hidden" name="_token_" value="{{.Token}}"/>
+			<input type="hidden" name="origin" value="{{.origin}}"/>
+			<div class="row py-3">
+				<label class="col-md-3 col-form-label">{{T .Loc "login.username"}}</label>
+				<div class="col-md-9">
+					<input name="username" type="text" class="form-control" maxlength="250" textclear/>
+				</div>
+			</div>
+			<div class="row py-3">
+				<label class="col-md-3 col-form-label">{{T .Loc "login.password"}}</label>
+				<div class="col-md-9">
+					<input name="password" type="password" class="form-control" maxlength="50" textclear/>
+				</div>
+			</div>
+			<div class="row py-3">
+				<div class="offset-md-3 col-md-9">
+					<button type="submit" class="btn btn-primary"><i class="{{T .Loc "icon.login"}}"></i> {{T .Loc "button.login"}}</button>
+				</div>
+			</div>
+			<div class="row py-4">
+				<div class="offset-md-3 col-md-9">
+					<a href="./pwdrst/">{{T .Loc "login.forgot"}} <i class="fas fa-circle-arrow-right"></i></a>
+				</div>
+			</div>
+		</form>
 	</div>
-
-	<form id="login_form" class="form-horizontal" autocomplete="off">
-		<input type="hidden" name="_token_" value="{{.Token}}"/>
-		<input type="hidden" name="origin" value="{{.origin}}"/>
-		<div class="row py-3">
-			<label class="col-md-3 col-form-label">{{T .Loc "login.username"}}</label>
-			<div class="col-md-9">
-				<input name="username" type="text" class="form-control" maxlength="250" textclear/>
-			</div>
-		</div>
-		<div class="row py-3">
-			<label class="col-md-3 col-form-label">{{T .Loc "login.password"}}</label>
-			<div class="col-md-9">
-				<input name="password" type="password" class="form-control" maxlength="50" textclear/>
-			</div>
-		</div>
-		<div class="row py-3">
-			<div class="offset-md-3 col-md-9">
-				<button type="submit" class="btn btn-primary"><i class="{{T .Loc "icon.login"}}"></i> {{T .Loc "button.login"}}</button>
-			</div>
-		</div>
-		<div class="row py-4">
-			<div class="offset-md-3 col-md-9">
-				<a href="./pwdrst/">{{T .Loc "login.forgot"}} <i class="fas fa-circle-arrow-right"></i></a>
-			</div>
-		</div>
-	</form>
 </div>
 
 {{template "main_footer" .}}

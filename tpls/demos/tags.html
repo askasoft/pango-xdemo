@@ -4,52 +4,53 @@
 {{template "main_header" .}}
 
 <div class="s-section">
-	<div class="ui-headline">
+	<div class="s-section-head">
 		<ol class="breadcrumb">
 			<li class="active"><i class="{{T .Loc "icon.demos.tags"}}"></i>{{T .Loc "menu.demos.tags"}}</li>
 		</ol>
 	</div>
+	<div class="s-section-body">
+		<div class="well">{{T .Loc "demos.tags.well"}}</div>
 
-	<div class="well">{{T .Loc "demos.tags.well"}}</div>
-
-	<form id="tags_form" class="form-horizontal lined" method="GET">
-		<div class="row py-3">
-			<label class="col-md-2 col-form-label required">Text</label>
-			<div class="col-md-10">
-				<input name="text" class="form-control" textclear value="{{.Arg.Text}}"/>
+		<form id="tags_form" class="form-horizontal lined" method="GET">
+			<div class="row py-3">
+				<label class="col-md-2 col-form-label required">Text</label>
+				<div class="col-md-10">
+					<input name="text" class="form-control" textclear value="{{.Arg.Text}}"/>
+				</div>
 			</div>
-		</div>
-		<div class="row py-3">
-			<label class="col-md-2 col-form-label">Checks</label>
-			<div class="col-md-10">
-				{{Checks "Name=" "checks" "List=" .ChecksList "Values=" .Arg.Checks}}
+			<div class="row py-3">
+				<label class="col-md-2 col-form-label">Checks</label>
+				<div class="col-md-10">
+					{{Checks "Name=" "checks" "List=" .ChecksList "Values=" .Arg.Checks}}
+				</div>
 			</div>
-		</div>
-		<div class="row py-3">
-			<label class="col-md-2 col-form-label">Radios</label>
-			<div class="col-md-10">
-				{{Radios "Name=" "radios" "List=" .RadiosList "Value=" .Arg.Radios "class=" "vertical"}}
+			<div class="row py-3">
+				<label class="col-md-2 col-form-label">Radios</label>
+				<div class="col-md-10">
+					{{Radios "Name=" "radios" "List=" .RadiosList "Value=" .Arg.Radios "class=" "vertical"}}
+				</div>
 			</div>
-		</div>
-		<div class="row py-3">
-			<label class="col-md-2 col-form-label">Select</label>
-			<div class="col-md-10">
-				{{Select "Name=" "select" "List=" .SelectList "Value=" .Arg.Select "class=" "form-select"}}
+			<div class="row py-3">
+				<label class="col-md-2 col-form-label">Select</label>
+				<div class="col-md-10">
+					{{Select "Name=" "select" "List=" .SelectList "Value=" .Arg.Select "class=" "form-select"}}
+				</div>
 			</div>
-		</div>
-		<div class="row py-3">
-			<label class="col-md-2 col-form-label">Textarea</label>
-			<div class="col-md-10">
-				<textarea name="textarea" class="form-control" rows="8" autosize textclear enterfire="true">{{.Arg.Textarea}}</textarea>
+			<div class="row py-3">
+				<label class="col-md-2 col-form-label">Textarea</label>
+				<div class="col-md-10">
+					<textarea name="textarea" class="form-control" rows="8" autosize textclear enterfire="true">{{.Arg.Textarea}}</textarea>
+				</div>
 			</div>
-		</div>
-		<div class="row py-3">
-			<div class="offset-md-2 col-md-10">
-				<button type="submit" class="btn btn-primary"><i class="fas fa-upload"></i> {{T .Loc "button.submit"}}</button>
-				<button type="reset" class="btn btn-secondary"><i class="fas fa-undo"></i> {{T .Loc "button.reset"}}</button>
+			<div class="row py-3">
+				<div class="offset-md-2 col-md-10">
+					<button type="submit" class="btn btn-primary"><i class="fas fa-upload"></i> {{T .Loc "button.submit"}}</button>
+					<button type="reset" class="btn btn-secondary"><i class="fas fa-undo"></i> {{T .Loc "button.reset"}}</button>
+				</div>
 			</div>
-		</div>
-	</form>
+		</form>
+	</div>
 </div>
 
 {{template "main_footer" .}}

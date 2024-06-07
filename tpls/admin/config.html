@@ -4,83 +4,84 @@
 {{template "main_header" .}}
 
 <div class="s-section">
-	<div class="ui-headline">
+	<div class="s-section-head">
 		<ol class="breadcrumb">
 			<li class="active"><i class="{{T .Loc "icon.admin.config"}}"></i>{{T .Loc "menu.admin.config"}}</li>
 		</ol>
 	</div>
-
-	{{if gt (len .Configs) 1}}
-	<ul class="nav nav-tabs">
-		{{range $i, $cc := .Configs}}
-		<li id="cch_{{$cc.Name}}" class="nav-item">
-			<a class="nav-link{{if eq $i 0}} active{{end}}" href="#cc_{{$cc.Name}}" data-bs-toggle="tab">{{T $.Loc (print "config.category.label." $cc.Name)}}</a>
-		</li>
+	<div class="s-section-body">
+		{{if gt (len .Configs) 1}}
+		<ul class="nav nav-tabs">
+			{{range $i, $cc := .Configs}}
+			<li id="cch_{{$cc.Name}}" class="nav-item">
+				<a class="nav-link{{if eq $i 0}} active{{end}}" href="#cc_{{$cc.Name}}" data-bs-toggle="tab">{{T $.Loc (print "config.category.label." $cc.Name)}}</a>
+			</li>
+			{{end}}
+		</ul>
 		{{end}}
-	</ul>
-	{{end}}
 
-	<div class="tab-content">
-		{{range $i, $cc := .Configs}}
-		<div id="cc_{{$cc.Name}}" class="tab-pane{{if eq $i 0}} active{{end}}"><div class="ccc">
-			<ul class="nav nav-pills">
-				{{range $j, $cg := $cc.Groups}}
-				<li id="cgh_{{$cg.Name}}" class="nav-item">
-					<a class="nav-link{{if eq $j 0}} active{{end}}" href="#cg_{{$cg.Name}}" data-bs-toggle="tab">{{T $.Loc (print "config.group.label." $cg.Name)}}</a>
-				</li>
-				{{end}}
-			</ul>
+		<div class="tab-content">
+			{{range $i, $cc := .Configs}}
+			<div id="cc_{{$cc.Name}}" class="tab-pane{{if eq $i 0}} active{{end}}"><div class="ccc">
+				<ul class="nav nav-pills">
+					{{range $j, $cg := $cc.Groups}}
+					<li id="cgh_{{$cg.Name}}" class="nav-item">
+						<a class="nav-link{{if eq $j 0}} active{{end}}" href="#cg_{{$cg.Name}}" data-bs-toggle="tab">{{T $.Loc (print "config.group.label." $cg.Name)}}</a>
+					</li>
+					{{end}}
+				</ul>
 
-			<div class="tab-content">
-				{{range $j, $cg := $cc.Groups}}
-				<div id="cg_{{$cg.Name}}" class="tab-pane{{if eq $j 0}} active{{end}}">
-					{{$cgw := (T $.Loc (print "config.group.well." $cg.Name))}}
-					{{if $cgw}}<div class="well">{{$cgw}}</div>{{end}}
+				<div class="tab-content">
+					{{range $j, $cg := $cc.Groups}}
+					<div id="cg_{{$cg.Name}}" class="tab-pane{{if eq $j 0}} active{{end}}">
+						{{$cgw := (T $.Loc (print "config.group.well." $cg.Name))}}
+						{{if $cgw}}<div class="well">{{$cgw}}</div>{{end}}
 
-					<form class="cfgform form-horizontal lined grey" method="POST" autocomplete="off">
-						<input type="hidden" name="_token_" value="{{$.Token}}"/>
+						<form class="cfgform form-horizontal lined grey" method="POST" autocomplete="off">
+							<input type="hidden" name="_token_" value="{{$.Token}}"/>
 
-						{{range $c := $cg.Items}}
-						<div class="row py-3">
-							<label class="col-md-3 col-form-label{{if $c.Required}} required{{end}}"
-								viewer="{{$c.Viewer}}" editor="{{$c.Editor}}">{{T $.Loc (print "config." $c.Name)}}</label>
-							<div class="col-md-9">
-							{{if eq $c.Style "C"}}
-								{{Checks "Name=" $c.Name "List=" (MapGet $.Lists $c.Name) "Values=" $c.Values "Disabled=" ($c.Readonly $.AuthUser.Role)}}
-							{{else if eq $c.Style "O"}}
-								{{Checks "Name=" $c.Name "List=" (MapGet $.Lists $c.Name) "Values=" $c.Values "Disabled=" ($c.Readonly $.AuthUser.Role) "Ordered=" true "class=" "vertical"}}
-							{{else if eq $c.Style "R"}}
-								{{Radios "Name=" $c.Name "List=" (MapGet $.Lists $c.Name) "Value=" $c.Value "Disabled=" ($c.Readonly $.AuthUser.Role)}}
-							{{else if eq $c.Style "S"}}
-								{{Select "Name=" $c.Name "List=" (MapGet $.Lists $c.Name) "Value=" $c.Value "Disabled=" ($c.Readonly $.AuthUser.Role)}}
-							{{else if eq $c.Style "M"}}
-								{{Select "Name=" $c.Name "List=" (MapGet $.Lists $c.Name) "Values=" $c.Values "Disabled=" ($c.Readonly $.AuthUser.Role) "Multiple=" true}}
-							{{else if eq $c.Style "T"}}
-								<textarea name="{{$c.Name}}" class="form-control" rows="2" textclear enterfire{{if $c.Readonly $.AuthUser.Role}} disabled{{end}}>
-{{$c.DisplayValue}}</textarea>
-							{{else if eq $c.Style "N"}}
-								<input name="{{$c.Name}}" type="number" size="20" class="form-control" textclear value="{{$c.DisplayValue}}"{{if $c.Readonly $.AuthUser.Role}} disabled{{end}}/>
-							{{else}}
-								<input name="{{$c.Name}}" type="text" class="form-control" textclear value="{{$c.DisplayValue}}"{{if $c.Readonly $.AuthUser.Role}} disabled{{end}}/>
-							{{end}}
-							{{$desc := (T $.Loc (print "config.desc." $c.Name))}}
-							{{if $desc}}
-								<div class="desc">{{HTML $desc}}</div>
-							{{end}}
+							{{range $c := $cg.Items}}
+							<div class="row py-3">
+								<label class="col-md-3 col-form-label{{if $c.Required}} required{{end}}"
+									viewer="{{$c.Viewer}}" editor="{{$c.Editor}}">{{T $.Loc (print "config." $c.Name)}}</label>
+								<div class="col-md-9">
+								{{if eq $c.Style "C"}}
+									{{Checks "Name=" $c.Name "List=" (MapGet $.Lists $c.Name) "Values=" $c.Values "Disabled=" ($c.Readonly $.AuthUser.Role)}}
+								{{else if eq $c.Style "O"}}
+									{{Checks "Name=" $c.Name "List=" (MapGet $.Lists $c.Name) "Values=" $c.Values "Disabled=" ($c.Readonly $.AuthUser.Role) "Ordered=" true "class=" "vertical"}}
+								{{else if eq $c.Style "R"}}
+									{{Radios "Name=" $c.Name "List=" (MapGet $.Lists $c.Name) "Value=" $c.Value "Disabled=" ($c.Readonly $.AuthUser.Role)}}
+								{{else if eq $c.Style "S"}}
+									{{Select "Name=" $c.Name "List=" (MapGet $.Lists $c.Name) "Value=" $c.Value "Disabled=" ($c.Readonly $.AuthUser.Role)}}
+								{{else if eq $c.Style "M"}}
+									{{Select "Name=" $c.Name "List=" (MapGet $.Lists $c.Name) "Values=" $c.Values "Disabled=" ($c.Readonly $.AuthUser.Role) "Multiple=" true}}
+								{{else if eq $c.Style "T"}}
+									<textarea name="{{$c.Name}}" class="form-control" rows="2" textclear enterfire{{if $c.Readonly $.AuthUser.Role}} disabled{{end}}>
+	{{$c.DisplayValue}}</textarea>
+								{{else if eq $c.Style "N"}}
+									<input name="{{$c.Name}}" type="number" size="20" class="form-control" textclear value="{{$c.DisplayValue}}"{{if $c.Readonly $.AuthUser.Role}} disabled{{end}}/>
+								{{else}}
+									<input name="{{$c.Name}}" type="text" class="form-control" textclear value="{{$c.DisplayValue}}"{{if $c.Readonly $.AuthUser.Role}} disabled{{end}}/>
+								{{end}}
+								{{$desc := (T $.Loc (print "config.desc." $c.Name))}}
+								{{if $desc}}
+									<div class="desc">{{HTML $desc}}</div>
+								{{end}}
+								</div>
 							</div>
-						</div>
-						{{end}}
-						<div class="row py-3">
-							<div class="offset-md-3 col-md-9">
-								<button class="btn btn-primary"><i class="{{T $.Loc "icon.save"}}"></i> {{T $.Loc "button.save"}}</button>
+							{{end}}
+							<div class="row py-3">
+								<div class="offset-md-3 col-md-9">
+									<button class="btn btn-primary"><i class="{{T $.Loc "icon.save"}}"></i> {{T $.Loc "button.save"}}</button>
+								</div>
 							</div>
-						</div>
-					</form>
+						</form>
+					</div>
+					{{end}}
 				</div>
-				{{end}}
-			</div>
-		</div></div>
-		{{end}}
+			</div></div>
+			{{end}}
+		</div>
 	</div>
 </div>
 

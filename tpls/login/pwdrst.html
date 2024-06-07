@@ -5,32 +5,33 @@
 {{template "main_header" .}}
 
 <div class="s-section">
-	<div class="ui-headline">
+	<div class="s-section-head">
 		<ol class="breadcrumb">
 			<li class="active"><i class="{{T .Loc "icon.login.pwdrst"}}"></i>{{T .Loc "menu.login.pwdrst"}}</li>
 		</ol>
 	</div>
+	<div class="s-section-body">
+		<div class="well">{{T .Loc "pwdrst.well"}}</div>
 
-	<div class="well">{{T .Loc "pwdrst.well"}}</div>
+		<div id="pwdrst_alert">
+			{{template "alerts" .}}
+		</div>
 
-	<div id="pwdrst_alert">
-		{{template "alerts" .}}
+		<form id="pwdrst_form" class="form-horizontal" autocomplete="off">
+			<input type="hidden" name="_token_" value="{{.Token}}"/>
+			<div class="row py-3">
+				<label class="col-md-3 col-form-label">{{T .Loc "pwdrst.email"}}</label>
+				<div class="col-md-9">
+					<input name="email" type="text" class="form-control" maxlength="250" textclear/>
+				</div>
+			</div>
+			<div class="row py-3">
+				<div class="offset-md-3 col-md-9">
+					<button type="submit" class="btn btn-primary"><i class="{{T .Loc "icon.sendmail"}}"></i> {{T .Loc "button.send"}}</button>
+				</div>
+			</div>
+		</form>
 	</div>
-
-	<form id="pwdrst_form" class="form-horizontal" autocomplete="off">
-		<input type="hidden" name="_token_" value="{{.Token}}"/>
-		<div class="row py-3">
-			<label class="col-md-3 col-form-label">{{T .Loc "pwdrst.email"}}</label>
-			<div class="col-md-9">
-				<input name="email" type="text" class="form-control" maxlength="250" textclear/>
-			</div>
-		</div>
-		<div class="row py-3">
-			<div class="offset-md-3 col-md-9">
-				<button type="submit" class="btn btn-primary"><i class="{{T .Loc "icon.sendmail"}}"></i> {{T .Loc "button.send"}}</button>
-			</div>
-		</div>
-	</form>
 </div>
 
 {{template "main_footer" .}}
