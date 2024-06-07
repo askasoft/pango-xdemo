@@ -1,31 +1,31 @@
 /** bootstrap5 (default) **/
 :root, [data-bs-theme=light] {
-	--blue: #1d6091;
-	--bs-primary: #1d6091;
-	--bs-primary-rgb: 29, 96, 145;
-	--bs-link-color: #337ab7;
-	--bs-link-color-rgb: 51, 122, 183;
+	--blue: #337ab7;
+	--bs-primary: #337ab7;
+	--bs-primary-rgb: 51, 122, 183;
+	--bs-link-color: var(--bs-primary);
+	--bs-link-color-rgb: var(--bs-primary-rgb);
 	--bs-link-hover-color: #23527c;
 	--bs-link-hover-color-rgb: 35, 82, 124;
 	--bs-focus-ring-color: rgba(29, 96, 145, 0.25);
 }
 .btn-primary {
-	--bs-btn-bg: #337ab7;
-	--bs-btn-border-color: #2e6da4;
+	--bs-btn-bg: var(--bs-primary);
+	--bs-btn-border-color: var(--bs-primary);
 }
 .btn-outline-primary {
-	--bs-btn-color: #337ab7;
-	--bs-btn-border-color: #337ab7;
-	--bs-btn-hover-bg: #337ab7;
-	--bs-btn-hover-border-color: #337ab7;
-	--bs-btn-active-bg: #337ab7;
-	--bs-btn-active-border-color: #337ab7;
-	--bs-btn-disabled-color: #337ab7;
-	--bs-btn-disabled-border-color: #337ab7;
+	--bs-btn-color: var(--bs-primary);
+	--bs-btn-border-color: var(--bs-primary);
+	--bs-btn-hover-bg: var(--bs-primary);
+	--bs-btn-hover-border-color: var(--bs-primary);
+	--bs-btn-active-bg: var(--bs-primary);
+	--bs-btn-active-border-color: var(--bs-primary);
+	--bs-btn-disabled-color: var(--bs-primary);
+	--bs-btn-disabled-border-color: var(--bs-primary);
 }
 .pagination {
-	--bs-pagination-active-bg: #337ab7;
-	--bs-pagination-active-border-color: #337ab7;
+	--bs-pagination-active-bg: var(--bs-primary);
+	--bs-pagination-active-border-color: var(--bs-primary);
 }
 
 /** bootswatch5 (cosmo)
@@ -218,6 +218,26 @@ blockquote {
 	border-bottom: solid 1px #ccc;
 }
 
+/** Section **/
+.s-section-head {
+	margin: 0 0 20px 0;
+	border-bottom: 4px double #ccc;
+}
+.s-section-head > h3, .s-section-head > .breadcrumb {
+	background-color: transparent;
+	font-size: 125%;
+	margin: 0;
+	padding: 8px 10px 4px 10px;
+}
+.s-section-head > h3 i, .s-section-head > .breadcrumb i {
+	font-size: 150%;
+	margin-right: 8px;
+	vertical-align: middle;
+}
+.s-section-head > h3.error > i, .s-section-head > i.error {
+	color: #DC143C;
+}
+
 /** well **/
 .well {
 	min-height: 20px;
@@ -279,10 +299,46 @@ form div.verr {
 	display: inline-flex;
 }
 
-/** Search **/
-.s-head-search {
-	float: right;
-	width: 300px;
+/** Toolbar **/
+.s-toolbar {
+	margin-bottom: 1.5rem;
+}
+.s-toolbar a, .s-toolbar button {
+	margin-bottom: 5px;
+}
+.s-toolbar-rt {
+	position: absolute;
+	right: 50px;
+	text-align: right;
+}
+
+/** Menu **/
+.s-menu-item {
+	background-color: #eee;
+	display: inline-block;
+	width: 130px;
+	height: 120px;
+	padding: 10px;
+	margin: 10px;
+	border: solid 1px #ccc;
+	border-radius: 5px;
+	text-align: center;
+	vertical-align: middle;
+	text-decoration: none;
+}
+.s-menu-item:hover {
+	background-color: #FFF8DC;
+	text-decoration: none;
+}
+.s-menu-item > div {
+	line-height: 1em;
+	padding: 10px 0 0 0;
+}
+[data-bs-theme=dark] .s-menu-item {
+	background-color: #292c2f;
+}
+[data-bs-theme=dark] .s-menu-item:hover {
+	background-color: #393c3f;
 }
 
 /** Table **/
