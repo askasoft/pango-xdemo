@@ -52,14 +52,14 @@
 								{{else if eq $c.Style "R"}}
 									{{Radios "Name=" $c.Name "List=" (MapGet $.Lists $c.Name) "Value=" $c.Value "Disabled=" ($c.Readonly $.AuthUser.Role)}}
 								{{else if eq $c.Style "S"}}
-									{{Select "Name=" $c.Name "List=" (MapGet $.Lists $c.Name) "Value=" $c.Value "Disabled=" ($c.Readonly $.AuthUser.Role)}}
+									{{Select "Name=" $c.Name "List=" (MapGet $.Lists $c.Name) "Value=" $c.Value "Disabled=" ($c.Readonly $.AuthUser.Role) "data-spy=" "niceSelect" "class=" "wide"}}
 								{{else if eq $c.Style "M"}}
-									{{Select "Name=" $c.Name "List=" (MapGet $.Lists $c.Name) "Values=" $c.Values "Disabled=" ($c.Readonly $.AuthUser.Role) "Multiple=" true}}
+									{{Select "Name=" $c.Name "List=" (MapGet $.Lists $c.Name) "Multiple=" true "Values=" $c.Values "Disabled=" ($c.Readonly $.AuthUser.Role) "data-spy=" "niceSelect" "class=" "wide"}}
 								{{else if eq $c.Style "T"}}
 									<textarea name="{{$c.Name}}" class="form-control" rows="2" textclear enterfire{{if $c.Readonly $.AuthUser.Role}} disabled{{end}}>
 {{$c.DisplayValue}}</textarea>
 								{{else if eq $c.Style "N"}}
-									<input name="{{$c.Name}}" type="number" size="20" class="form-control" textclear value="{{$c.DisplayValue}}"{{if $c.Readonly $.AuthUser.Role}} disabled{{end}}/>
+									<input name="{{$c.Name}}" type="number" size="10" class="form-control" textclear value="{{$c.DisplayValue}}"{{if $c.Readonly $.AuthUser.Role}} disabled{{end}}/>
 								{{else}}
 									<input name="{{$c.Name}}" type="text" class="form-control" textclear value="{{$c.DisplayValue}}"{{if $c.Readonly $.AuthUser.Role}} disabled{{end}}/>
 								{{end}}
