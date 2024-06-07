@@ -16,7 +16,7 @@
 			<legend>{{T .Loc "label.parameter"}}</legend>
 			<form id="job_form" class="form-horizontal grey p-3" autocomplete="off" data-copy="{{T .Loc "button.copy"}}">
 				<input type="hidden" name="_token_" value="{{.Token}}"/>
-				<div class="row py-2">
+				<div class="row py-1">
 					<label class="col-md-3 col-form-label">{{T .Loc "pet.clear.reset_sequence"}}</label>
 					<div class="col-md-9">
 						{{Radios "Name=" "reset_sequence" "List=" .PetResetSequenceMap "Value=" .Arg.ResetSequence}}
