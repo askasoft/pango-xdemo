@@ -170,8 +170,7 @@ body {
 }
 
 #footer {
-	background-color: var(--bs-body-bg);
-	border-radius: 0;
+	border-top: solid 1px var(--bs-border-color);
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -337,12 +336,10 @@ form div.verr {
 	display: inline-flex;
 }
 
+
 /** color **/
 .grey {
-	background-color: #f9f9f9;
-}
-[data-bs-theme=dark] .grey {
-	background-color: #292c2f;
+	background-color: var(--bs-tertiary-bg);
 }
 
 /** toolbar **/
@@ -398,7 +395,7 @@ form div.verr {
 }
 
 .s-table > thead > tr > th {
-	background-color: var(--bs-body-bg);
+	background-color: var(--bs-tertiary-bg);
 	vertical-align: middle;
 }
 .s-table th.created_at, .s-table td.created_at,
