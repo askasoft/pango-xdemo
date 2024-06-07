@@ -57,7 +57,7 @@
 									{{Select "Name=" $c.Name "List=" (MapGet $.Lists $c.Name) "Values=" $c.Values "Disabled=" ($c.Readonly $.AuthUser.Role) "Multiple=" true}}
 								{{else if eq $c.Style "T"}}
 									<textarea name="{{$c.Name}}" class="form-control" rows="2" textclear enterfire{{if $c.Readonly $.AuthUser.Role}} disabled{{end}}>
-	{{$c.DisplayValue}}</textarea>
+{{$c.DisplayValue}}</textarea>
 								{{else if eq $c.Style "N"}}
 									<input name="{{$c.Name}}" type="number" size="20" class="form-control" textclear value="{{$c.DisplayValue}}"{{if $c.Readonly $.AuthUser.Role}} disabled{{end}}/>
 								{{else}}
