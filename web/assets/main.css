@@ -27,6 +27,9 @@
 	--bs-pagination-active-bg: var(--bs-primary);
 	--bs-pagination-active-border-color: var(--bs-primary);
 }
+.nav-pills {
+	--bs-nav-pills-link-active-bg: var(--bs-primary);
+}
 
 /** bootswatch5 (cosmo)
 [data-bs-theme=dark] .btn-outline-secondary {
@@ -126,6 +129,12 @@ blockquote {
 	position: absolute;
 	right: 0px;
 	bottom: 8px;
+}
+#headnavi .username:hover {
+	border-color: var(--bs-btn-hover-bg);
+}
+#headnavi .username.dropdown-toggle:hover::after {
+	border-top-color: var(--bs-btn-hover-bg);
 }
 
 #sidenavi {
