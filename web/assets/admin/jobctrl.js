@@ -270,12 +270,12 @@
 	}
 
 	function build_job_param(job) {
-		var $jf = $('#job_form'), legend = $jf.prev('legend').text();
-		if (!legend || !(job.file || job.param)) {
+		var $jf = $('#job_form'), $lg = $jf.prev('legend');
+		if (!(job.file || job.param) || !$lg.text()) {
 			return $('<hr/>');
 		}
 
-		var $fset = $('<fieldset>', { 'class': 'ui-fieldset collapsed' }).append($('<legend>').text(legend));
+		var $fset = $('<fieldset>', { 'class': 'ui-fieldset' + (!$lg.data('expand') ? ' collapsed' : '') }).append($('<legend>').text($lg.text()));
 
 		var $cf = $jf.clone().attr('id', 'job_param_' + job.id);
 		$cf.on('submit', function() { return false; });
@@ -294,11 +294,16 @@
 			var params = main.safe_parse_json(job.param);
 			for (var k in params) {
 				var v = params[k];
-				if (typeof(v) == 'string') {
+				switch (typeof(v)) {
+				case 'string':
 					var d = new Date(v);
 					if (d.getTime() > 0 ) {
 						params[k] = main.format_date(d);
 					}
+					break;
+				case 'boolean':
+					params[k] = v + '';
+					break;
 				}
 			}
 			$cf.formValues(params);

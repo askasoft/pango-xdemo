@@ -12,7 +12,7 @@ type PetClearArg struct {
 	ArgLocale
 	ArgChain
 
-	ResetSequence bool `json:"reset_sequence,omitempty" form:"reset_sequence"`
+	ResetSequence bool `json:"reset_sequence" form:"reset_sequence"`
 }
 
 func NewPetClearArg(locale string) *PetClearArg {

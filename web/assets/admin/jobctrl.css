@@ -67,6 +67,9 @@ fieldset > form {
 	margin-bottom: 20px;
 	position: relative;
 }
+#job_list form.grey, #job_list .input-group-text {
+	background-color: transparent;
+}
 #job_list form button.copy {
 	position: absolute;
 	top: -30px;
