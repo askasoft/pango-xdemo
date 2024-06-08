@@ -250,9 +250,6 @@ body {
 .ui-sidenavi ul.nav > li > a:focus, .ui-sidenavi ul.nav > li > a:hover {
 	background-color: var(--bs-secondary-bg);
 }
-/* [data-bs-theme=dark] .ui-sidenavi ul.nav > li > a:focus, [data-bs-theme=dark] .ui-sidenavi ul.nav > li > a:hover {
-	background-color: #393c3f;
-} */
 
 /** section **/
 .s-section {
@@ -332,7 +329,6 @@ form div.verr {
 .input-group.w-auto {
 	display: inline-flex;
 }
-
 
 /** color **/
 .grey {
