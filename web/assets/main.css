@@ -337,10 +337,12 @@ form div.verr {
 
 /** toolbar **/
 .s-toolbar {
+	display: flex;
+	flex-wrap: wrap;
 	margin-bottom: 1.5rem;
 }
-.s-toolbar a, .s-toolbar button {
-	margin-bottom: 5px;
+.s-toolbar > * {
+	margin: 0 5px 5px 0;
 }
 .s-toolbar-rt {
 	position: absolute;

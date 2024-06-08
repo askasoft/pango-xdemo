@@ -8,29 +8,33 @@
 		<h2><i class="{{T .Loc "icon.admin.users"}}"></i><span>{{T .Loc "menu.admin.users"}}</span></h2>
 	</div>
 	<div class="s-section-body">
-		<div class="s-toolbar row">
-			<div class="col-md-6">
-				<button class="btn btn-sm btn-outline-danger" popup-target="#users_deletesel_popup" enableby="#users_list td.check input">
-					<i class="{{T .Loc "icon.deletesel"}}"></i> {{T .Loc "button.deletesel"}}
-				</button>
-				<button class="btn btn-sm btn-outline-danger" popup-target="#users_deletebat_popup">
-					<i class="{{T .Loc "icon.deletebat"}}"></i> {{T .Loc "button.deletebat"}}
-				</button>
-				<button class="btn btn-sm btn-outline-danger" popup-target="#users_deleteall_popup">
-					<i class="{{T .Loc "icon.deleteall"}}"></i> {{T .Loc "button.deleteall"}}
-				</button>
-				<button class="btn btn-sm btn-outline-primary" id="users_editsel" enableby="#users_list td.check input">
-					<i class="{{T .Loc "icon.editsel"}}"></i> {{T .Loc "button.editsel"}}
-				</button>
-				<button class="btn btn-sm btn-outline-primary" id="users_editall">
-					<i class="{{T .Loc "icon.editall"}}"></i> {{T .Loc "button.editall"}}
-				</button>
-			</div>
-			<div class="col-md-6 text-end">
-				<button id="users_new" class="btn btn-sm btn-outline-primary"><i class="{{T .Loc "icon.new"}}"></i> {{T .Loc "button.new"}}</button>
-				<a class="btn btn-sm btn-outline-primary" href="./import/"><i class="{{T .Loc "icon.upload"}}"></i> {{T .Loc "button.import"}}</a>
-				<button id="users_export" class="btn btn-sm btn-outline-primary"><i class="{{T .Loc "icon.csv"}}"></i> {{T .Loc "button.csvexp"}}</button>
-			</div>
+		<div class="s-toolbar">
+			<button class="btn btn-sm btn-outline-danger" popup-target="#users_deletesel_popup" enableby="#users_list td.check input">
+				<i class="{{T .Loc "icon.deletesel"}}"></i> {{T .Loc "button.deletesel"}}
+			</button>
+			<button class="btn btn-sm btn-outline-danger" popup-target="#users_deletebat_popup">
+				<i class="{{T .Loc "icon.deletebat"}}"></i> {{T .Loc "button.deletebat"}}
+			</button>
+			<button class="btn btn-sm btn-outline-danger" popup-target="#users_deleteall_popup">
+				<i class="{{T .Loc "icon.deleteall"}}"></i> {{T .Loc "button.deleteall"}}
+			</button>
+			<div class="me-auto"></div>
+			<button class="btn btn-sm btn-outline-primary" id="users_new">
+				<i class="{{T .Loc "icon.new"}}"></i> {{T .Loc "button.new"}}
+			</button>
+			<button class="btn btn-sm btn-outline-primary" id="users_editsel" enableby="#users_list td.check input">
+				<i class="{{T .Loc "icon.editsel"}}"></i> {{T .Loc "button.editsel"}}
+			</button>
+			<button class="btn btn-sm btn-outline-primary" id="users_editall">
+				<i class="{{T .Loc "icon.editall"}}"></i> {{T .Loc "button.editall"}}
+			</button>
+			<div class="ms-auto"></div>
+			<a class="btn btn-sm btn-outline-primary" href="./import/">
+				<i class="{{T .Loc "icon.upload"}}"></i> {{T .Loc "button.import"}}
+			</a>
+			<button class="btn btn-sm btn-outline-primary" id="users_export">
+				<i class="{{T .Loc "icon.csv"}}"></i> {{T .Loc "button.csvexp"}}
+			</button>
 		</div>
 
 		<div id="users_alert">{{template "alerts" .}}</div>

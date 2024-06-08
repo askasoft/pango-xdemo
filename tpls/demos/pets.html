@@ -8,28 +8,29 @@
 		<h2><i class="{{T .Loc "icon.demos.pets.list"}}"></i><span>{{T .Loc "menu.demos.pets.list"}}</span></h2>
 	</div>
 	<div class="s-section-body">
-		<div class="s-toolbar row">
-			<div class="col-md-6">
-				<button class="btn btn-sm btn-outline-danger" popup-target="#pets_deletesel_popup" enableby="#pets_list td.check input">
-					<i class="{{T .Loc "icon.deletesel"}}"></i> {{T .Loc "button.deletesel"}}
-				</button>
-				<button class="btn btn-sm btn-outline-danger" popup-target="#pets_deletebat_popup">
-					<i class="{{T .Loc "icon.deletebat"}}"></i> {{T .Loc "button.deletebat"}}
-				</button>
-				<button class="btn btn-sm btn-outline-danger" popup-target="#pets_deleteall_popup">
-					<i class="{{T .Loc "icon.deleteall"}}"></i> {{T .Loc "button.deleteall"}}
-				</button>
-				<button class="btn btn-sm btn-outline-primary" id="pets_editsel" enableby="#pets_list td.check input">
-					<i class="{{T .Loc "icon.editsel"}}"></i> {{T .Loc "button.editsel"}}
-				</button>
-				<button class="btn btn-sm btn-outline-primary" id="pets_editall">
-					<i class="{{T .Loc "icon.editall"}}"></i> {{T .Loc "button.editall"}}
-				</button>
-			</div>
-			<div class="col-md-6 text-end">
-				<button id="pets_new" class="btn btn-sm btn-outline-primary"><i class="{{T .Loc "icon.new"}}"></i> {{T .Loc "button.new"}}</button>
-				<button id="pets_export" class="btn btn-sm btn-outline-primary"><i class="{{T .Loc "icon.csv"}}"></i> {{T .Loc "button.csvexp"}}</button>
-			</div>
+		<div class="s-toolbar">
+			<button class="btn btn-sm btn-outline-danger" popup-target="#pets_deletesel_popup" enableby="#pets_list td.check input">
+				<i class="{{T .Loc "icon.deletesel"}}"></i> {{T .Loc "button.deletesel"}}
+			</button>
+			<button class="btn btn-sm btn-outline-danger" popup-target="#pets_deletebat_popup">
+				<i class="{{T .Loc "icon.deletebat"}}"></i> {{T .Loc "button.deletebat"}}
+			</button>
+			<button class="btn btn-sm btn-outline-danger" popup-target="#pets_deleteall_popup">
+				<i class="{{T .Loc "icon.deleteall"}}"></i> {{T .Loc "button.deleteall"}}
+			</button>
+			<div class="ms-auto"></div>
+			<button class="btn btn-sm btn-outline-primary" id="pets_editsel" enableby="#pets_list td.check input">
+				<i class="{{T .Loc "icon.editsel"}}"></i> {{T .Loc "button.editsel"}}
+			</button>
+			<button class="btn btn-sm btn-outline-primary" id="pets_editall">
+				<i class="{{T .Loc "icon.editall"}}"></i> {{T .Loc "button.editall"}}
+			</button>
+			<button class="btn btn-sm btn-outline-primary" id="pets_new">
+				<i class="{{T .Loc "icon.new"}}"></i> {{T .Loc "button.new"}}
+			</button>
+			<button class="btn btn-sm btn-outline-primary" id="pets_export">
+				<i class="{{T .Loc "icon.csv"}}"></i> {{T .Loc "button.csvexp"}}
+			</button>
 		</div>
 
 		<div id="pets_alert">{{template "alerts" .}}</div>

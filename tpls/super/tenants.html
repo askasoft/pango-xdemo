@@ -7,14 +7,11 @@
 		<h2><i class="{{T .Loc "icon.super.tenants"}}"></i><span>{{T .Loc "menu.super.tenants"}}</span></h2>
 	</div>
 	<div class="s-section-body">
-		<div class="s-toolbar row">
-			<div class="col-md-6">
-			</div>
-			<div class="col-md-6 text-end">
-				<button class="btn btn-sm btn-outline-primary" popup-target="#tenants_create_popup">
-					<i class="{{T .Loc "icon.new"}}"></i> {{T .Loc "button.new"}}
-				</button>
-			</div>
+		<div class="s-toolbar">
+			<div class="ms-auto"></div>
+			<button class="btn btn-sm btn-outline-primary" popup-target="#tenants_create_popup">
+				<i class="{{T .Loc "icon.new"}}"></i> {{T .Loc "button.new"}}
+			</button>
 		</div>
 
 		<div id="tenants_alert">{{template "alerts" .}}</div>
