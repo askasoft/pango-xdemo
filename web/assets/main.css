@@ -329,10 +329,7 @@ form div.verr {
 .ui-fieldset > legend.circle > i {
 	margin-right: 8px;
 }
-.wd-auto {
-	width: auto;
-}
-.input-group.wd-auto {
+.input-group.w-auto {
 	display: inline-flex;
 }
 
