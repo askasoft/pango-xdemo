@@ -178,6 +178,7 @@ body {
 	margin-top: auto;
 	margin-bottom: 0;
 	margin-left: 250px;
+	position: relative;
 	width: auto;
 }
 #footnavi {
@@ -185,17 +186,19 @@ body {
 	text-align: center;
 }
 #footsite {
-	font-size: 80%;
-	padding: 5px 100px;
+	padding: 5px 10px;
 	text-align: center;
+	z-index: 1;
 }
-#footsite .ver {
+#footer .cpr, #footer .pwr, #footer .ver {
+	font-size: 80%;
+	white-space: nowrap;
+}
+#footer .ver {
 	color: #999;
 	position: absolute;
-	right: 15px;
-}
-#footsite .cpr, #footsite .pwr, #footsite .ver {
-	white-space: nowrap;
+	right: 5px;
+	bottom: 5px;
 }
 
 @media (max-width: 991px) {
