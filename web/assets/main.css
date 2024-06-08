@@ -439,11 +439,11 @@ form div.verr {
 
 /** popup **/
 .s-popup-confirm .ui-popup-body {
-	min-height: 80px;
+	min-height: 90px;
 	min-width: 300px;
 }
 .s-popup-confirm .msg {
-	padding: 5px 10px 5px 60px;
+	padding: 5px 10px 5px 70px;
 	white-space: pre-wrap;
 }
 .s-popup-confirm .icon {
