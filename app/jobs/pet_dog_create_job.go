@@ -70,8 +70,8 @@ func (pdc *PetDogCreateJob) run() error {
 			break
 		}
 
-		if pdc.PingAborted() {
-			return xjm.ErrJobAborted
+		if err := pdc.Ping(); err != nil {
+			return err
 		}
 
 		pdc.Step++

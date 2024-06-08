@@ -70,8 +70,8 @@ func (pcc *PetCatCreateJob) run() error {
 			break
 		}
 
-		if pcc.PingAborted() {
-			return xjm.ErrJobAborted
+		if err := pcc.Ping(); err != nil {
+			return err
 		}
 
 		pcc.Step++

@@ -295,33 +295,34 @@ func (jr *JobRunner) Done(err error) {
 	}
 
 	if errors.Is(err, xjm.ErrJobAborted) {
-		reason := ""
-		if job, err := jr.GetJob(); err != nil {
+		job, err := jr.GetJob()
+		if err != nil {
 			jr.Log.Error(err.Error())
-		} else {
-			reason = job.Error
+			return
 		}
 
-		// NOTE:
-		// It's necessary to call jobChainAbort() again.
-		// The jobChainContinue() method may update job chain status to 'R' to a aborted job chain.
-		if err := jr.jobChainAbort(reason); err != nil {
-			jr.Log.Error(err.Error())
+		if job.Status == xjm.JobStatusAborted {
+			// NOTE:
+			// It's necessary to call JobChainAbort() again.
+			// The JobChainCheckout()/JobChainContinue() method may update job chain status to 'R' to a aborted job chain.
+			if err := jr.jobChainAbort(job.Error); err != nil {
+				jr.Log.Error(err.Error())
+			}
+			jr.Log.Warn("ABORTED.")
+			return
 		}
-		jr.Log.Warn("ABORTED.")
+
+		// ErrJobAborted should only occurred for Aborted Status
+		jr.Log.Errorf("Invalid Aborted Job #%d (%d): %s", jr.JobID(), jr.RunnerID(), xjm.MustEncode(job))
 		return
 	}
 
 	if errors.Is(err, ErrClient) {
 		jr.Log.Warn(err)
-		if err := jr.Abort(err.Error()); err != nil {
-			jr.Log.Error(err)
-		}
-		jr.Log.Warn("ABORTED.")
-		return
+	} else {
+		jr.Log.Error(err)
 	}
 
-	jr.Log.Error(err)
 	if err := jr.Abort(err.Error()); err != nil {
 		jr.Log.Error(err)
 	}

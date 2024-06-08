@@ -148,8 +148,8 @@ func (uci *UserCsvImportJob) doReadCsv(callback func(rec *csvUserRecord) error) 
 	i := 0
 	cr := csv.NewReader(bp)
 	for {
-		if uci.PingAborted() {
-			return xjm.ErrJobAborted
+		if err := uci.Ping(); err != nil {
+			return err
 		}
 
 		i++
@@ -241,8 +241,8 @@ func (uci *UserCsvImportJob) importRecord(rec *csvUserRecord) error {
 	uci.Step = rec.Line - 1
 	uci.Log.Infof(tbs.GetText(uci.Locale, "user.import.csv.step.info"), uci.Progress(), rec.ID, rec.Name, rec.Email)
 
-	if uci.PingAborted() {
-		return xjm.ErrJobAborted
+	if err := uci.Ping(); err != nil {
+		return err
 	}
 
 	user := &models.User{
