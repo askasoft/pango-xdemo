@@ -96,6 +96,7 @@ fieldset > form {
 
 #job_list table {
 	font-family: Menlo, Monaco, Consolas, monospace;
+	--bs-table-bg: transparent;
 }
 #job_list tr > td {
 	padding: 1px 5px;
