@@ -6,6 +6,7 @@
 
 		<div class="s-menu">
 		{{if and .AuthUser .AuthUser.IsAdmin}}
+			<hr>
 			<a class="s-menu-item" href="{{.Base}}/a/config/"><i class="fa-4x {{T .Loc "icon.admin.config"}}"></i><div>{{T .Loc "menu.admin.config"}}</div></a>
 			<a class="s-menu-item" href="{{.Base}}/a/users/"><i class="fa-4x {{T .Loc "icon.admin.users"}}"></i><div>{{T .Loc "menu.admin.users"}}</div></a>
 		{{end}}
