@@ -58,7 +58,71 @@ func JobChainStart(tt tenant.Tenant, chainName string, states []*JobRunState, jo
 	return
 }
 
-func JobChainCheckout(jr *JobRunner) error {
+func JobFindAndAbortChain(tt tenant.Tenant, jid int64, reason string) error {
+	tjc := tt.JC()
+
+	if jc, err := tjc.FindJobChain("", true); err != nil {
+		fmt.Println(jc.Name)
+		return err
+	}
+
+	err := tjc.IterJobChains(func(jc *xjm.JobChain) error {
+		ok, err := JobAbortChain(tjc, jc, jid, reason)
+		if err != nil {
+			return err
+		}
+		if ok {
+			return xjm.ErrJobAborted
+		}
+		return nil
+	}, "", 0, 0, true, xjm.JobChainRunning)
+
+	if errors.Is(err, xjm.ErrJobAborted) {
+		return nil
+	}
+
+	return err
+}
+
+func JobAbortChain(tjc xjm.JobChainer, jc *xjm.JobChain, jid int64, reason string) (bool, error) {
+	status := xjm.JobChainAborted
+	if jc.Status == xjm.JobChainAborted || jc.Status == xjm.JobChainCompleted {
+		status = ""
+	}
+
+	states := JobChainDecodeStates(jc.States)
+	for _, sta := range states {
+		if sta.JID == jid {
+			sta.Status = xjm.JobStatusAborted
+			if reason != "" {
+				sta.Error = reason
+			}
+			state := JobChainEncodeStates(states)
+			return true, tjc.UpdateJobChain(jc.ID, status, state)
+		}
+	}
+	return false, nil
+}
+
+func JobChainAbort(tjc xjm.JobChainer, tjm xjm.JobManager, jc *xjm.JobChain, reason string) error {
+	states := JobChainDecodeStates(jc.States)
+	for _, sta := range states {
+		if sta.JID != 0 && (sta.Status == xjm.JobStatusPending || sta.Status == xjm.JobStatusRunning) {
+			if err := tjm.AbortJob(sta.JID, reason); err != nil && !errors.Is(err, xjm.ErrJobMissing) {
+				return err
+			}
+			_ = tjm.AddJobLog(sta.JID, time.Now(), xjm.JobLogLevelWarn, reason)
+		}
+	}
+
+	return tjc.UpdateJobChain(jc.ID, xjm.JobChainAborted)
+}
+
+func (jr *JobRunner) jobChainCheckout() error {
+	if jr.ChainID == 0 {
+		return nil
+	}
+
 	tjc := jr.Tenant.JC()
 
 	jc, err := tjc.GetJobChain(jr.ChainID)
@@ -85,7 +149,11 @@ func JobChainCheckout(jr *JobRunner) error {
 	return fmt.Errorf("Failed to Checkout JobChain %s#%d on %s", jc.Name, jc.ID, jr.JobName())
 }
 
-func JobChainRunning(jr *JobRunner, state iState) error {
+func (jr *JobRunner) jobChainRunning(state iState) error {
+	if jr.ChainID == 0 {
+		return nil
+	}
+
 	tjc := jr.Tenant.JC()
 
 	jc, err := tjc.GetJobChain(jr.ChainID)
@@ -106,53 +174,11 @@ func JobChainRunning(jr *JobRunner, state iState) error {
 	return fmt.Errorf("Failed to Update JobChain %s#%d on %s#%d", jc.Name, jc.ID, jr.JobName(), jr.JobID())
 }
 
-func JobChainFindAndAbort(tt tenant.Tenant, jid int64, reason string) error {
-	tjc := tt.JC()
-
-	if jc, err := tjc.FindJobChain("", true); err != nil {
-		fmt.Println(jc.Name)
-		return err
-	}
-
-	err := tjc.IterJobChains(func(jc *xjm.JobChain) error {
-		ok, err := jobChainAbort(tjc, jc, jid, reason)
-		if err != nil {
-			return err
-		}
-		if ok {
-			return xjm.ErrJobAborted
-		}
-		return nil
-	}, "", 0, 0, true, xjm.JobChainRunning)
-
-	if errors.Is(err, xjm.ErrJobAborted) {
+func (jr *JobRunner) jobChainAbort(reason string) error {
+	if jr.ChainID == 0 {
 		return nil
 	}
 
-	return err
-}
-
-func jobChainAbort(tjc xjm.JobChainer, jc *xjm.JobChain, jid int64, reason string) (bool, error) {
-	status := xjm.JobChainAborted
-	if jc.Status == xjm.JobChainAborted || jc.Status == xjm.JobChainCompleted {
-		status = ""
-	}
-
-	states := JobChainDecodeStates(jc.States)
-	for _, sta := range states {
-		if sta.JID == jid {
-			sta.Status = xjm.JobStatusAborted
-			if reason != "" {
-				sta.Error = reason
-			}
-			state := JobChainEncodeStates(states)
-			return true, tjc.UpdateJobChain(jc.ID, status, state)
-		}
-	}
-	return false, nil
-}
-
-func JobChainAbort(jr *JobRunner, reason string) error {
 	tjc := jr.Tenant.JC()
 
 	jc, err := tjc.GetJobChain(jr.ChainID)
@@ -160,7 +186,7 @@ func JobChainAbort(jr *JobRunner, reason string) error {
 		return err
 	}
 
-	ok, err := jobChainAbort(tjc, jc, jr.JobID(), reason)
+	ok, err := JobAbortChain(tjc, jc, jr.JobID(), reason)
 	if err != nil {
 		return err
 	}
@@ -170,7 +196,11 @@ func JobChainAbort(jr *JobRunner, reason string) error {
 	return fmt.Errorf("Failed to Abort JobChain %s#%d on %s#%d", jc.Name, jc.ID, jr.JobName(), jr.JobID())
 }
 
-func JobChainContinue(jr *JobRunner) error {
+func (jr *JobRunner) jobChainContinue() error {
+	if jr.ChainID == 0 {
+		return nil
+	}
+
 	tjc := jr.Tenant.JC()
 
 	jc, err := tjc.GetJobChain(jr.ChainID)

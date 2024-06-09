@@ -181,17 +181,7 @@ func (jcc *JobChainController) Abort(c *xin.Context) {
 
 	reason := tbs.GetText(c.Locale, "job.abort.userabort", "User canceled.")
 
-	states := jobs.JobChainDecodeStates(jc.States)
-	for _, sta := range states {
-		if sta.JID != 0 && (sta.Status == xjm.JobStatusPending || sta.Status == xjm.JobStatusRunning) {
-			if err := tjm.AbortJob(sta.JID, reason); err != nil && !errors.Is(err, xjm.ErrJobMissing) {
-				c.Logger.Warnf("Failed to abort job #%d %q: %v", sta.JID, sta.Name, err)
-			}
-			_ = tjm.AddJobLog(sta.JID, time.Now(), xjm.JobLogLevelWarn, reason)
-		}
-	}
-
-	if err := tjc.UpdateJobChain(cid, xjm.JobChainAborted); err != nil {
+	if err := jobs.JobChainAbort(tjc, tjm, jc, reason); err != nil {
 		c.Logger.Errorf("Failed to abort job chain #%d: %v", cid, err)
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, E(c))

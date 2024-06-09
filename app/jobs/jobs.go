@@ -219,15 +219,6 @@ func (jr *JobRunner) Checkout() error {
 	return jr.jobChainCheckout()
 }
 
-func (jr *JobRunner) jobChainCheckout() error {
-	if jr.ChainID != 0 {
-		if err := JobChainCheckout(jr); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
 func (jr *JobRunner) Running(state iState) error {
 	if err := jr.JobRunner.Running(xjm.MustEncode(state)); err != nil {
 		return err
@@ -236,29 +227,11 @@ func (jr *JobRunner) Running(state iState) error {
 	return jr.jobChainRunning(state)
 }
 
-func (jr *JobRunner) jobChainRunning(state iState) error {
-	if jr.ChainID != 0 {
-		if err := JobChainRunning(jr, state); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
 func (jr *JobRunner) Abort(reason string) error {
 	if err := jr.JobRunner.Abort(reason); err != nil {
 		return err
 	}
 	return jr.jobChainAbort(reason)
-}
-
-func (jr *JobRunner) jobChainAbort(reason string) error {
-	if jr.ChainID != 0 {
-		if err := JobChainAbort(jr, reason); err != nil {
-			return err
-		}
-	}
-	return nil
 }
 
 func (jr *JobRunner) Done(err error) {
@@ -303,8 +276,8 @@ func (jr *JobRunner) Done(err error) {
 
 		if job.Status == xjm.JobStatusAborted {
 			// NOTE:
-			// It's necessary to call JobChainAbort() again.
-			// The JobChainCheckout()/JobChainContinue() method may update job chain status to 'R' to a aborted job chain.
+			// It's necessary to call jobChainAbort() again.
+			// The jobChainCheckout()/jobChainContinue() method may update job chain status to 'R' to a aborted job chain.
 			if err := jr.jobChainAbort(job.Error); err != nil {
 				jr.Log.Error(err.Error())
 			}
@@ -327,15 +300,6 @@ func (jr *JobRunner) Done(err error) {
 		jr.Log.Error(err)
 	}
 	jr.Log.Warn("ABORTED.")
-}
-
-func (jr *JobRunner) jobChainContinue() error {
-	if jr.ChainID != 0 {
-		if err := JobChainContinue(jr); err != nil {
-			return err
-		}
-	}
-	return nil
 }
 
 //------------------------------------
