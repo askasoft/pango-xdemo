@@ -37,7 +37,7 @@
 		
 		<fieldset id="pets_listfset" class="ui-fieldset collapsed" data-spy="fieldset">
 			<legend class="circle"><i class="{{T .Loc "icon.search"}}"></i>{{T .Loc "button.search"}}</legend>
-			<form id="pets_listform" class="form-horizontal grey p-3" method="POST">
+			<form id="pets_listform" class="form-horizontal grey padded" method="POST">
 				<input type="hidden" name="_token_" value="{{.Token}}"/>
 				<input type="hidden" name="p" value="{{.Q.Page}}"/>
 				<input type="hidden" name="l" value="{{.Q.Limit}}"/>
@@ -154,71 +154,72 @@
 			{{T .Loc "button.deletebat"}}
 		</h4>
 	</div>
-	<form class="ui-popup-body form-horizontal grey lined">
-		<input type="hidden" name="_token_" value="{{.Token}}"/>
+	<div class="ui-popup-body grey">
+		<form class="form-horizontal lined">
+			<input type="hidden" name="_token_" value="{{.Token}}"/>
 
-		<div class="well">{{T .Loc "pet.deletebat.well"}}</div>
+			<div class="well text-center">{{T .Loc "pet.deletebat.well"}}</div>
 
-		<div class="row py-1">
-			<label class="col-md-2 col-form-label">{{T .Loc "pet.name"}}</label>
-			<div class="col-md-10">
-				<input name="name" type="text" class="form-control" textclear value="{{.Q.Name}}"/>
+			<div class="row py-3">
+				<label class="col-md-2 col-form-label">{{T .Loc "pet.name"}}</label>
+				<div class="col-md-10">
+					<input name="name" type="text" class="form-control" textclear value="{{.Q.Name}}"/>
+				</div>
 			</div>
-		</div>
-		<div class="row py-1">
-			<label class="col-md-2 col-form-label">{{T .Loc "pet.gender"}}</label>
-			<div class="col-md-10">
-				{{Checks "Name=" "gender" "List=" .PetGenderMap "Values=" .Q.Gender}}
+			<div class="row py-3">
+				<label class="col-md-2 col-form-label">{{T .Loc "pet.gender"}}</label>
+				<div class="col-md-10">
+					{{Checks "Name=" "gender" "List=" .PetGenderMap "Values=" .Q.Gender}}
+				</div>
 			</div>
-		</div>
-		<div class="row py-1">
-			<label class="col-md-2 col-form-label">{{T .Loc "pet.born_at"}}</label>
-			<div class="col-md-10">
-				<input type="date" class="form-control" name="born_from">
-				～
-				<input type="date" class="form-control" name="born_to">
+			<div class="row py-3">
+				<label class="col-md-2 col-form-label">{{T .Loc "pet.born_at"}}</label>
+				<div class="col-md-10">
+					<input type="date" class="form-control" name="born_from">
+					～
+					<input type="date" class="form-control" name="born_to">
+				</div>
 			</div>
-		</div>
-		<div class="row py-1">
-			<label class="col-md-2 col-form-label">{{T .Loc "pet.origin"}}</label>
-			<div class="col-md-10">
-				{{Select "Name=" "origin" "List=" .PetOriginMap "Values=" .Q.Origin "Multiple=" true "class=" "col2 wide" "data-spy=" "niceSelect"}}
+			<div class="row py-3">
+				<label class="col-md-2 col-form-label">{{T .Loc "pet.origin"}}</label>
+				<div class="col-md-10">
+					{{Select "Name=" "origin" "List=" .PetOriginMap "Values=" .Q.Origin "Multiple=" true "class=" "col2 wide" "data-spy=" "niceSelect"}}
+				</div>
 			</div>
-		</div>
-		<div class="row py-1">
-			<label class="col-md-2 col-form-label">{{T .Loc "pet.temper"}}</label>
-			<div class="col-md-4">
-				{{Select "Name=" "temper" "List=" .PetTemperMap "Values=" .Q.Temper "Multiple=" true "class=" "wide" "data-spy=" "niceSelect"}}
+			<div class="row py-3">
+				<label class="col-md-2 col-form-label">{{T .Loc "pet.temper"}}</label>
+				<div class="col-md-4">
+					{{Select "Name=" "temper" "List=" .PetTemperMap "Values=" .Q.Temper "Multiple=" true "class=" "wide" "data-spy=" "niceSelect"}}
+				</div>
+				<label class="col-md-2 col-form-label">{{T .Loc "pet.habits"}}</label>
+				<div class="col-md-4">
+					{{Select "Name=" "habits" "List=" .PetHabitsMap "Values=" .Q.Habits "Multiple=" true "class=" "wide" "data-spy=" "niceSelect"}}
+				</div>
 			</div>
-			<label class="col-md-2 col-form-label">{{T .Loc "pet.habits"}}</label>
-			<div class="col-md-4">
-				{{Select "Name=" "habits" "List=" .PetHabitsMap "Values=" .Q.Habits "Multiple=" true "class=" "wide" "data-spy=" "niceSelect"}}
+			<div class="row py-3">
+				<label class="col-md-2 col-form-label">{{T .Loc "pet.amount"}}</label>
+				<div class="col-md-10">
+					<input type="number" class="form-control" name="amount_min" size="14">
+					～
+					<input type="number" class="form-control" name="amount_max" size="14">
+				</div>
 			</div>
-		</div>
-		<div class="row py-1">
-			<label class="col-md-2 col-form-label">{{T .Loc "pet.amount"}}</label>
-			<div class="col-md-10">
-				<input type="number" class="form-control" name="amount_min" size="14">
-				～
-				<input type="number" class="form-control" name="amount_max" size="14">
+			<div class="row py-3">
+				<label class="col-md-2 col-form-label">{{T .Loc "pet.price"}}</label>
+				<div class="col-md-10">
+					<input type="number" class="form-control" name="price_min" size="14">
+					～
+					<input type="number" class="form-control" name="price_max" size="14">
+				</div>
 			</div>
-		</div>
-		<div class="row py-1">
-			<label class="col-md-2 col-form-label">{{T .Loc "pet.price"}}</label>
-			<div class="col-md-10">
-				<input type="number" class="form-control" name="price_min" size="14">
-				～
-				<input type="number" class="form-control" name="price_max" size="14">
+			<div class="row py-3">
+				<label class="col-md-2 col-form-label">{{T .Loc "pet.shop_name"}}</label>
+				<div class="col-md-10">
+					<input name="shop_name" type="text" class="form-control" textclear value="{{.Q.ShopName}}"/>
+				</div>
 			</div>
-		</div>
-		<div class="row py-1">
-			<label class="col-md-2 col-form-label">{{T .Loc "pet.shop_name"}}</label>
-			<div class="col-md-10">
-				<input name="shop_name" type="text" class="form-control" textclear value="{{.Q.ShopName}}"/>
-			</div>
-		</div>
-		<button type="submit" class="hidden"></button>
-	</form>
+		</form>
+	</div>
 	<div class="ui-popup-footer">
 		<button type="submit" class="btn btn-danger"><i class="{{T .Loc "icon.deletebat"}}"></i> {{T .Loc "button.deletebat"}}</button>
 		<button type="button" class="btn btn-secondary" popup-dismiss="true"><i class="{{T .Loc "icon.cancel"}}"></i> {{T .Loc "button.cancel"}}</button>
@@ -233,39 +234,41 @@
 			<span class="editall">{{T .Loc "button.editall"}}</span>
 		</h4>
 	</div>
-	<form class="ui-popup-body form-horizontal grey lined" autocomplete="off">
-		<input type="hidden" name="_token_" value="{{.Token}}"/>
-		<input type="hidden" name="id"/>
-		<div class="row py-3">
-			<label class="col-md-2 col-form-label required">{{T .Loc "pet.gender"}} <input type="checkbox"></label>
-			<div class="col-md-4">
-				{{Radios "Name=" "gender" "List=" .PetGenderMap "Value=" "M" "Disabled=" true}}
+	<div class="ui-popup-body grey">
+		<form class="form-horizontal lined" autocomplete="off">
+			<input type="hidden" name="_token_" value="{{.Token}}"/>
+			<input type="hidden" name="id"/>
+			<div class="row py-3">
+				<label class="col-md-2 col-form-label required">{{T .Loc "pet.gender"}} <input type="checkbox"></label>
+				<div class="col-md-4">
+					{{Radios "Name=" "gender" "List=" .PetGenderMap "Value=" "M" "Disabled=" true}}
+				</div>
+				<label class="col-md-2 col-form-label required">{{T .Loc "pet.born_at"}} <input type="checkbox" name="uborn_at" value="true"></label>
+				<div class="col-md-4">
+					<input name="born_at" type="date" class="form-control" disabled>
+				</div>
 			</div>
-			<label class="col-md-2 col-form-label required">{{T .Loc "pet.born_at"}} <input type="checkbox" name="uborn_at" value="true"></label>
-			<div class="col-md-4">
-				<input name="born_at" type="date" class="form-control" disabled>
+			<div class="row py-3">
+				<label class="col-md-2 col-form-label required">{{T .Loc "pet.origin"}} <input type="checkbox" data-niceselect="true"></label>
+				<div class="col-md-10">
+					{{Select "Name=" "origin" "List=" .PetOriginMap "class=" "wide col2" "data-spy=" "niceSelect" "Disabled=" true}}
+				</div>
 			</div>
-		</div>
-		<div class="row py-3">
-			<label class="col-md-2 col-form-label required">{{T .Loc "pet.origin"}} <input type="checkbox" data-niceselect="true"></label>
-			<div class="col-md-10">
-				{{Select "Name=" "origin" "List=" .PetOriginMap "class=" "wide col2" "data-spy=" "niceSelect" "Disabled=" true}}
+			<div class="row py-3">
+				<label class="col-md-2 col-form-label">{{T .Loc "pet.temper"}} <input type="checkbox"></label>
+				<div class="col-md-10">
+					{{Radios "Name=" "temper" "List=" .PetTemperMap "Value=" "N" "Disabled=" true}}
+				</div>
 			</div>
-		</div>
-		<div class="row py-3">
-			<label class="col-md-2 col-form-label">{{T .Loc "pet.temper"}} <input type="checkbox"></label>
-			<div class="col-md-10">
-				{{Radios "Name=" "temper" "List=" .PetTemperMap "Value=" "N" "Disabled=" true}}
+			<div class="row py-3">
+				<label class="col-md-2 col-form-label">{{T .Loc "pet.habits"}} <input type="checkbox" name="uhabits" value="true"></label>
+				<div class="col-md-10">
+					{{Checks "Name=" "habits" "List=" .PetHabitsMap "Disabled=" true}}
+				</div>
 			</div>
-		</div>
-		<div class="row py-3">
-			<label class="col-md-2 col-form-label">{{T .Loc "pet.habits"}} <input type="checkbox" name="uhabits" value="true"></label>
-			<div class="col-md-10">
-				{{Checks "Name=" "habits" "List=" .PetHabitsMap "Disabled=" true}}
-			</div>
-		</div>
-		<button type="submit" class="hidden"></button>
-	</form>
+			<button type="submit" class="hidden"></button>
+		</form>
+	</div>
 	<div class="ui-popup-footer">
 		<button type="submit" class="btn btn-primary" enableby="#pets_bulkedit_popup .col-form-label > input"><i class="{{T .Loc "icon.save"}}"></i> {{T .Loc "button.update"}}</button>
 		<button type="button" class="btn btn-secondary" popup-dismiss="true"><i class="{{T .Loc "icon.cancel"}}"></i> {{T .Loc "button.cancel"}}</button>

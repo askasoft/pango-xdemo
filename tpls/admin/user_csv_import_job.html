@@ -10,7 +10,7 @@
 	<div class="s-section-body">
 		<div class="well">{{T .Loc "user.import.csv.well"}}</div>
 
-		<form id="job_form" class="form-horizontal grey p-3" enctype="multipart/form-data" autocomplete="off"
+		<form id="job_form" class="form-horizontal grey padded" enctype="multipart/form-data" autocomplete="off"
 			data-form="{{T .Loc "user.import.csv.file"}}">
 			<input type="hidden" name="_token_" value="{{.Token}}"/>
 			<div class="row py-1">
@@ -21,7 +21,7 @@
 			</div>
 		</form>
 
-		<div class="row px-4 py-2">
+		<div class="row mt-4 mb-2">
 			<div class="offset-md-3 col-md-9">
 				<button id="job_start" class="btn btn-success" disabled data-processing="{{T .Loc "button.processing"}}"><i class="{{T .Loc "icon.start"}}"></i> <span>{{T .Loc "button.start"}}</span></button>
 				<button id="job_abort" class="btn btn-danger" disabled><i class="{{T .Loc "icon.stop"}}"></i> {{T .Loc "button.stop"}}</button>

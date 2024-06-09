@@ -10,7 +10,7 @@
 	<div class="s-section-body">
 		<div class="well">{{T .Loc "pet.reset.well"}}</div>
 
-		<form id="jobchain_form" class="form-horizontal grey p-3">
+		<form id="jobchain_form" class="form-horizontal grey padded">
 			<input type="hidden" name="_token_" value="{{.Token}}"/>
 			<div class="row py-1">
 				<label class="col-md-3 col-form-label">{{T .Loc "pet.clear.reset_sequence"}}</label>
@@ -20,7 +20,7 @@
 			</div>
 		</form>
 
-		<div class="row p-2">
+		<div class="row mt-4 mb-2">
 			<div class="offset-md-3 col-md-9">
 				<button id="jobchain_start" class="btn btn-success" disabled data-processing="{{T .Loc "button.processing"}}"><i class="{{T .Loc "icon.start"}}"></i> <span>{{T .Loc "button.start"}}</span></button>
 				<button id="jobchain_abort" class="btn btn-danger" disabled><i class="{{T .Loc "icon.stop"}}"></i> {{T .Loc "button.stop"}}</button>

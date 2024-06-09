@@ -41,7 +41,7 @@
 		
 		<fieldset id="users_listfset" class="ui-fieldset collapsed" data-spy="fieldset">
 			<legend class="circle"><i class="{{T .Loc "icon.search"}}"></i>{{T .Loc "button.search"}}</legend>
-			<form id="users_listform" class="form-horizontal grey p-3" method="POST">
+			<form id="users_listform" class="form-horizontal grey padded" method="POST">
 				<input type="hidden" name="_token_" value="{{.Token}}"/>
 				<input type="hidden" name="p" value="{{.Q.Page}}"/>
 				<input type="hidden" name="l" value="{{.Q.Limit}}"/>
@@ -131,43 +131,44 @@
 			{{T .Loc "button.deletebat"}}
 		</h4>
 	</div>
-	<form class="ui-popup-body form-horizontal grey lined">
-		<input type="hidden" name="_token_" value="{{.Token}}"/>
+	<div class="ui-popup-body grey">
+		<form class="form-horizontal lined">
+			<input type="hidden" name="_token_" value="{{.Token}}"/>
 
-		<div class="well">{{T .Loc "user.deletebat.well"}}</div>
+			<div class="well text-center">{{T .Loc "user.deletebat.well"}}</div>
 
-		<div class="row py-1">
-			<label class="col-md-2 col-form-label">{{T .Loc "user.name"}}</label>
-			<div class="col-md-10">
-				<input name="name" type="text" class="form-control" textclear value="{{.Q.Name}}"/>
+			<div class="row py-3">
+				<label class="col-md-2 col-form-label">{{T .Loc "user.name"}}</label>
+				<div class="col-md-10">
+					<input name="name" type="text" class="form-control" textclear value="{{.Q.Name}}"/>
+				</div>
 			</div>
-		</div>
-		<div class="row py-1">
-			<label class="col-md-2 col-form-label">{{T .Loc "user.email"}}</label>
-			<div class="col-md-10">
-				<input name="email" type="text" class="form-control" textclear value="{{.Q.Email}}"/>
+			<div class="row py-3">
+				<label class="col-md-2 col-form-label">{{T .Loc "user.email"}}</label>
+				<div class="col-md-10">
+					<input name="email" type="text" class="form-control" textclear value="{{.Q.Email}}"/>
+				</div>
 			</div>
-		</div>
-		<div class="row py-1">
-			<label class="col-md-2 col-form-label">{{T .Loc "user.cidr"}}</label>
-			<div class="col-md-10">
-				<input name="cidr" type="text" class="form-control" textclear value="{{.Q.CIDR}}"/>
+			<div class="row py-3">
+				<label class="col-md-2 col-form-label">{{T .Loc "user.cidr"}}</label>
+				<div class="col-md-10">
+					<input name="cidr" type="text" class="form-control" textclear value="{{.Q.CIDR}}"/>
+				</div>
 			</div>
-		</div>
-		<div class="row py-1">
-			<label class="col-md-2 col-form-label">{{T .Loc "user.role"}}</label>
-			<div class="col-md-10">
-				{{Checks "Name=" "role" "List=" .UserRoleMap "Values=" .Q.Role}}
+			<div class="row py-3">
+				<label class="col-md-2 col-form-label">{{T .Loc "user.role"}}</label>
+				<div class="col-md-10">
+					{{Checks "Name=" "role" "List=" .UserRoleMap "Values=" .Q.Role}}
+				</div>
 			</div>
-		</div>
-		<div class="row py-1">
-			<label class="col-md-2 col-form-label">{{T .Loc "user.status"}}</label>
-			<div class="col-md-10">
-				{{Checks "Name=" "status" "List=" .UserStatusMap "Values=" .Q.Status}}
+			<div class="row py-3">
+				<label class="col-md-2 col-form-label">{{T .Loc "user.status"}}</label>
+				<div class="col-md-10">
+					{{Checks "Name=" "status" "List=" .UserStatusMap "Values=" .Q.Status}}
+				</div>
 			</div>
-		</div>
-		<button type="submit" class="hidden"></button>
-	</form>
+		</form>
+	</div>
 	<div class="ui-popup-footer">
 		<button type="submit" class="btn btn-danger"><i class="{{T .Loc "icon.deletebat"}}"></i> {{T .Loc "button.deletebat"}}</button>
 		<button type="button" class="btn btn-secondary" popup-dismiss="true"><i class="{{T .Loc "icon.cancel"}}"></i> {{T .Loc "button.cancel"}}</button>
@@ -182,29 +183,31 @@
 			<span class="editall">{{T .Loc "button.editall"}}</span>
 		</h4>
 	</div>
-	<form class="ui-popup-body form-horizontal grey lined" autocomplete="off">
-		<input type="hidden" name="_token_" value="{{.Token}}"/>
-		<input type="hidden" name="id"/>
-		<div class="row py-3">
-			<label class="col-md-2 col-form-label">{{T .Loc "user.role"}} <input type="checkbox"></label>
-			<div class="col-md-10">
-				{{Radios "Name=" "role" "List=" .UserRoleMap "Value=" "V" "Disabled=" true}}
+	<div class="ui-popup-body grey">
+		<form class="form-horizontal lined" autocomplete="off">
+			<input type="hidden" name="_token_" value="{{.Token}}"/>
+			<input type="hidden" name="id"/>
+			<div class="row py-3">
+				<label class="col-md-2 col-form-label">{{T .Loc "user.role"}} <input type="checkbox"></label>
+				<div class="col-md-10">
+					{{Radios "Name=" "role" "List=" .UserRoleMap "Value=" "V" "Disabled=" true}}
+				</div>
 			</div>
-		</div>
-		<div class="row py-3">
-			<label class="col-md-2 col-form-label">{{T .Loc "user.status"}} <input type="checkbox"></label>
-			<div class="col-md-10">
-				{{Radios "Name=" "status" "List=" .UserStatusMap "Value=" "A" "Disabled=" true}}
+			<div class="row py-3">
+				<label class="col-md-2 col-form-label">{{T .Loc "user.status"}} <input type="checkbox"></label>
+				<div class="col-md-10">
+					{{Radios "Name=" "status" "List=" .UserStatusMap "Value=" "A" "Disabled=" true}}
+				</div>
 			</div>
-		</div>
-		<div class="row py-3">
-			<label class="col-md-2 col-form-label">{{T .Loc "user.cidr"}} <input type="checkbox" name="ucidr" value="true"></label>
-			<div class="col-md-10">
-				<textarea name="cidr" class="form-control" rows="2" disabled enterfire textclear></textarea>
+			<div class="row py-3">
+				<label class="col-md-2 col-form-label">{{T .Loc "user.cidr"}} <input type="checkbox" name="ucidr" value="true"></label>
+				<div class="col-md-10">
+					<textarea name="cidr" class="form-control" rows="2" disabled enterfire textclear></textarea>
+				</div>
 			</div>
-		</div>
-		<button type="submit" class="hidden" enableby="#users_bulkedit_popup .col-form-label > input"></button>
-	</form>
+			<button type="submit" class="hidden" enableby="#users_bulkedit_popup .col-form-label > input"></button>
+		</form>
+	</div>
 	<div class="ui-popup-footer">
 		<button type="submit" class="btn btn-primary" enableby="#users_bulkedit_popup .col-form-label > input"><i class="{{T .Loc "icon.save"}}"></i> {{T .Loc "button.update"}}</button>
 		<button type="button" class="btn btn-secondary" popup-dismiss="true"><i class="{{T .Loc "icon.cancel"}}"></i> {{T .Loc "button.cancel"}}</button>

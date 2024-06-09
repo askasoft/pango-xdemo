@@ -35,7 +35,7 @@
 						{{$cgw := (T $.Loc (print "config.group.well." $cg.Name))}}
 						{{if $cgw}}<div class="well">{{$cgw}}</div>{{end}}
 
-						<form class="cfgform form-horizontal lined grey rounded p-3" method="POST" autocomplete="off">
+						<form class="cfgform form-horizontal lined grey padded rounded" method="POST" autocomplete="off">
 							<input type="hidden" name="_token_" value="{{$.Token}}"/>
 
 							{{range $c := $cg.Items}}

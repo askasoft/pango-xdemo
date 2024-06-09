@@ -18,7 +18,7 @@
 		
 		<fieldset id="tenants_listfset" class="ui-fieldset collapsed" data-spy="fieldset">
 			<legend class="circle"><i class="{{T .Loc "icon.search"}}"></i>{{T .Loc "button.search"}}</legend>
-			<form id="tenants_listform"  class="form-horizontal grey p-3" method="POST">
+			<form id="tenants_listform"  class="form-horizontal grey padded" method="POST">
 				<input type="hidden" name="_token_" value="{{.Token}}"/>
 				<input type="hidden" name="p" value="{{.Q.Page}}"/>
 				<input type="hidden" name="l" value="{{.Q.Limit}}"/>
@@ -51,25 +51,23 @@
 			{{T .Loc "tenant.create.header"}}
 		</h4>
 	</div>
-	<div class="ui-popup-body grey">
-		<form class="form-horizontal grey lined">
-			<input type="hidden" name="_token_" value="{{.Token}}"/>
-			<div class="row py-3">
-				<label class="col-md-2 col-form-label">{{T .Loc "tenant.name"}}</label>
-				<div class="col-md-10">
-					<input name="name" type="text" class="form-control" maxlength="30" value="" textclear>
-					<div class="desc">{{T .Loc "tenant.desc.name"}}</div>
-				</div>
+	<form class="ui-popup-body form-horizontal lined grey">
+		<input type="hidden" name="_token_" value="{{.Token}}"/>
+		<div class="row py-3">
+			<label class="col-md-2 col-form-label">{{T .Loc "tenant.name"}}</label>
+			<div class="col-md-10">
+				<input name="name" type="text" class="form-control" maxlength="30" value="" textclear>
+				<div class="desc">{{T .Loc "tenant.desc.name"}}</div>
 			</div>
-			<div class="row py-3">
-				<label class="col-md-2 col-form-label">{{T .Loc "tenant.comment"}}</label>
-				<div class="col-md-10">
-					<textarea name="comment" class="form-control" maxlength="250" rows="2" textclear enterfire></textarea>
-				</div>
+		</div>
+		<div class="row py-3">
+			<label class="col-md-2 col-form-label">{{T .Loc "tenant.comment"}}</label>
+			<div class="col-md-10">
+				<textarea name="comment" class="form-control" maxlength="250" rows="2" textclear enterfire></textarea>
 			</div>
-			<button type="submit" class="hidden"></button>
-		</form>
-	</div>
+		</div>
+		<button type="submit" class="hidden"></button>
+	</form>
 	<div class="ui-popup-footer">
 		<button type="submit" class="btn btn-primary"><i class="{{T .Loc "icon.save"}}"></i> {{T .Loc "button.create"}}</button>
 		<button type="button" class="btn btn-secondary" popup-dismiss="true"><i class="{{T .Loc "icon.close"}}"></i> {{T .Loc "button.close"}}</button>
@@ -84,7 +82,7 @@
 		</h4>
 	</div>
 	<div class="ui-popup-body grey">
-		<form class="form-horizontal grey lined">
+		<form class="form-horizontal lined">
 			<input type="hidden" name="_token_" value="{{.Token}}"/>
 			<input type="hidden" name="oname" value=""/>
 			<div class="row py-3">

@@ -337,6 +337,11 @@ form div.verr {
 	background-color: var(--bs-tertiary-bg);
 }
 
+/** sizeing **/
+.padded {
+	padding: 15px;
+}
+
 /** toolbar **/
 .s-toolbar {
 	display: flex;
