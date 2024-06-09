@@ -10,18 +10,16 @@
 	<div class="s-section-body">
 		<div class="well">{{T .Loc "user.import.csv.well"}}</div>
 
-		<fieldset data-spy="fieldset">
-			<legend>{{T .Loc "user.import.csv.legend"}}</legend>
-			<form id="job_form" class="form-horizontal grey p-3" enctype="multipart/form-data" autocomplete="off">
-				<input type="hidden" name="_token_" value="{{.Token}}"/>
-				<div class="row py-1">
-					<label class="col-md-3 col-form-label">{{T .Loc "user.import.csv.file"}}</label>
-					<div class="col-md-9">
-						<input type="file" name="file" accept=".csv" class="form-control">
-					</div>
+		<form id="job_form" class="form-horizontal grey p-3" enctype="multipart/form-data" autocomplete="off"
+			data-form="{{T .Loc "user.import.csv.file"}}">
+			<input type="hidden" name="_token_" value="{{.Token}}"/>
+			<div class="row py-1">
+				<label class="col-md-3 col-form-label">{{T .Loc "user.import.csv.file"}}</label>
+				<div class="col-md-9">
+					<input type="file" name="file" accept=".csv" class="form-control">
 				</div>
-			</form>
-		</fieldset>
+			</div>
+		</form>
 
 		<div class="row px-4 py-2">
 			<div class="offset-md-3 col-md-9">

@@ -270,12 +270,14 @@
 	}
 
 	function build_job_param(job) {
-		var $jf = $('#job_form'), $lg = $jf.prev('legend');
-		if (!(job.file || job.param) || !$lg.text()) {
+		var $jf = $('#job_form');
+		if (!(job.file || job.param) || !$jf.data('form')) {
 			return $('<hr/>');
 		}
 
-		var $fset = $('<fieldset>', { 'class': 'ui-fieldset' + (!$lg.data('expand') ? ' collapsed' : '') }).append($('<legend>').text($lg.text()));
+		var $fset = $('<fieldset>', { 'class': 'ui-fieldset' + (!$jf.data('expand') ? ' collapsed' : '') });
+		
+		$fset.append($('<legend>').text($jf.data('form')));
 
 		var $cf = $jf.clone().attr('id', 'job_param_' + job.id);
 		$cf.on('submit', function() { return false; });

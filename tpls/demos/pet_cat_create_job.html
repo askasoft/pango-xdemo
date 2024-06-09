@@ -10,30 +10,28 @@
 	<div class="s-section-body">
 		<div class="well">{{T .Loc "pet.catcreate.well"}}</div>
 
-		<fieldset data-spy="fieldset">
-			<legend>{{T .Loc "label.parameter"}}</legend>
-			<form id="job_form" class="form-horizontal grey p-3" autocomplete="off" data-copy="{{T .Loc "button.copy"}}">
-				<input type="hidden" name="_token_" value="{{.Token}}"/>
-				<div class="row py-1">
-					<label class="col-md-3 col-form-label">{{T .Loc "label.items"}}</label>
-					<div class="col-md-9">
-						<div class="input-group w-auto">
-							<input type="number" class="form-control" name="items" size="7" min="1" max="1000" value="{{.Arg.Items}}">
-							<span class="input-group-text">{{T .Loc "label.item"}}</span>
-						</div>
+		<form id="job_form" class="form-horizontal grey p-3" autocomplete="off"
+			data-form="{{T .Loc "label.parameter"}}" data-copy="{{T .Loc "button.copy"}}">
+			<input type="hidden" name="_token_" value="{{.Token}}"/>
+			<div class="row py-1">
+				<label class="col-md-3 col-form-label">{{T .Loc "label.items"}}</label>
+				<div class="col-md-9">
+					<div class="input-group w-auto">
+						<input type="number" class="form-control" name="items" size="7" min="1" max="1000" value="{{.Arg.Items}}">
+						<span class="input-group-text">{{T .Loc "label.item"}}</span>
 					</div>
 				</div>
-				<div class="row py-1">
-					<label class="col-md-3 col-form-label">{{T .Loc "label.sleep"}}</label>
-					<div class="col-md-9">
-						<div class="input-group w-auto">
-							<input type="number" class="form-control" name="sleep" size="7" min="0" max="1000" value="{{.Arg.Sleep}}">
-							<span class="input-group-text">{{T .Loc "label.millisecond"}}</span>
-						</div>
+			</div>
+			<div class="row py-1">
+				<label class="col-md-3 col-form-label">{{T .Loc "label.sleep"}}</label>
+				<div class="col-md-9">
+					<div class="input-group w-auto">
+						<input type="number" class="form-control" name="sleep" size="7" min="0" max="1000" value="{{.Arg.Sleep}}">
+						<span class="input-group-text">{{T .Loc "label.millisecond"}}</span>
 					</div>
 				</div>
-			</form>
-		</fieldset>
+			</div>
+		</form>
 
 		<div class="row px-4 py-2">
 			<div class="offset-md-3 col-md-9">
