@@ -1,9 +1,7 @@
 /** bootstrap5 (default) **/
 :root, [data-bs-theme=light] {
-	/* --blue: #2c3e50;
-	--bs-primary: #2c3e50;
+	/* --bs-primary: #2c3e50;
 	--bs-primary-rgb: 44, 62, 80; */
-	--blue: #337ab7;
 	--bs-primary: #337ab7;
 	--bs-primary-rgb: 51, 122, 183;
 	--bs-link-color: var(--bs-primary);
@@ -166,7 +164,6 @@ body {
 #content {
 	padding: 25px 25px 50px 25px;
 	margin: 0 0 0 250px;
-	width: auto;
 }
 
 #footer {
@@ -179,7 +176,6 @@ body {
 	margin-bottom: 0;
 	margin-left: 250px;
 	position: relative;
-	width: auto;
 }
 #footnavi {
 	padding-top: 15px;

@@ -2,17 +2,19 @@
 <div id="headnavi" class="d-flex align-items-center justify-content-end">
 	<div class="theme">
 		<div class="btn-group btn-group-sm">
-			<a class="btn btn-primary" href="#light" title="{{T .Loc "theme.light"}}"><i class="fa-fw fas fa-sun"></i></a>
-			<a class="btn btn-primary active" href="#dark" title="{{T .Loc "theme.dark"}}"><i class="fa-fw fas fa-moon"></i></a>
+			<a class="btn btn-outline-primary" href="#light" title="{{T .Loc "theme.light"}}"><i class="fa-fw fas fa-sun"></i></a>
+			<a class="btn btn-outline-primary active" href="#dark" title="{{T .Loc "theme.dark"}}"><i class="fa-fw fas fa-moon"></i></a>
 		</div>
 	</div>
 	<div class="maindrop dropdown">
-		<button class="btn btn-sm btn-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+		<button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
 			<i class="fas fa-bars"></i>
 		</button>
 		<ul class="dropdown-menu dropdown-menu-end">
 			<li><a class="dropdown-item" href="{{.Base}}/demos/tags/"><i class="{{T .Loc "icon.demos.tags"}}"></i><span>{{T .Loc "menu.demos.tags"}}</span></a></li>
 			<li><a class="dropdown-item" href="{{.Base}}/demos/uploads/"><i class="{{T .Loc "icon.demos.uploads"}}"></i><span>{{T .Loc "menu.demos.uploads"}}</span></a></li>
+			<li><a class="dropdown-item" href="{{.Base}}/403/"><i class="fas fa-ban"></i><span>403</span></a></li>
+			<li><a class="dropdown-item" href="{{.Base}}/404/"><i class="fas fa-compass"></i><span>404</span></a></li>
 			<li class="divider"></li>
 			<li><a class="dropdown-item" href="{{.Base}}/demos/pets/"><i class="{{T .Loc "icon.demos.pets.list"}}"></i><span>{{T .Loc "menu.demos.pets.list"}}</span></a></li>
 			<li><a class="dropdown-item" href="{{.Base}}/demos/pets/jobs/clear/"><i class="{{T .Loc "icon.demos.pets.clear"}}"></i><span>{{T .Loc "menu.demos.pets.clear"}}</span></a></li>

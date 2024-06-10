@@ -33,6 +33,8 @@ func initRouter() {
 	app.VAD = app.XIN.Validator.Engine().(*vad.Validate)
 	app.VAD.RegisterValidation("cidrs", vadutil.ValidateCIDRs)
 
+	app.XIN.NoRoute(handlers.NotFound)
+
 	app.XAL = xmw.NewAccessLogger(nil)
 	app.XRL = xmw.NewRequestLimiter(0)
 	app.XHZ = xmw.DefaultHTTPGziper()
@@ -183,6 +185,8 @@ func configHandlers() {
 
 	rg := r.Group(app.Base)
 	rg.GET("/", app.XCN.Handler(), handlers.Index)
+	rg.GET("/403", app.XCN.Handler(), handlers.Forbidden)
+	rg.GET("/404", app.XCN.Handler(), handlers.NotFound)
 	rg.HEAD("/healthcheck", handlers.HealthCheck)
 	rg.GET("/healthcheck", handlers.HealthCheck)
 	rg.GET("/panic", handlers.Panic)
