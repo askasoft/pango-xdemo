@@ -13,17 +13,19 @@
 		<form id="jobchain_form" class="form-horizontal grey padded">
 			<input type="hidden" name="_token_" value="{{.Token}}"/>
 			<div class="row py-1">
-				<label class="col-md-3 col-form-label">{{T .Loc "pet.clear.reset_sequence"}}</label>
-				<div class="col-md-9">
+				<label class="col-md-2 col-form-label">{{T .Loc "pet.clear.reset_sequence"}}</label>
+				<div class="col-md-10">
 					{{Radios "Name=" "reset_sequence" "List=" .PetResetSequenceMap "Value=" .Arg.ResetSequence}}
 				</div>
 			</div>
 		</form>
 
-		<div class="row mt-4 mb-2">
-			<div class="offset-md-3 col-md-9">
-				<button id="jobchain_start" class="btn btn-success" disabled data-processing="{{T .Loc "button.processing"}}"><i class="{{T .Loc "icon.start"}}"></i> <span>{{T .Loc "button.start"}}</span></button>
-				<button id="jobchain_abort" class="btn btn-danger" disabled><i class="{{T .Loc "icon.stop"}}"></i> {{T .Loc "button.stop"}}</button>
+		<div class="container mt-4 mb-2">
+			<div class="row">
+				<div class="offset-md-2 col-md-10">
+					<button id="jobchain_start" class="btn btn-success" disabled data-processing="{{T .Loc "button.processing"}}"><i class="{{T .Loc "icon.start"}}"></i> <span>{{T .Loc "button.start"}}</span></button>
+					<button id="jobchain_abort" class="btn btn-danger" disabled><i class="{{T .Loc "icon.stop"}}"></i> {{T .Loc "button.stop"}}</button>
+				</div>
 			</div>
 		</div>
 	</div>

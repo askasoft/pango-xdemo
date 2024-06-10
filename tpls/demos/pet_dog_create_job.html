@@ -14,8 +14,8 @@
 			data-form="{{T .Loc "label.parameter"}}" data-copy="{{T .Loc "button.copy"}}">
 			<input type="hidden" name="_token_" value="{{.Token}}"/>
 			<div class="row py-1">
-				<label class="col-md-3 col-form-label">{{T .Loc "label.items"}}</label>
-				<div class="col-md-9">
+				<label class="col-md-2 col-form-label">{{T .Loc "label.items"}}</label>
+				<div class="col-md-10">
 					<div class="input-group w-auto">
 						<input type="number" class="form-control" name="items" size="7" min="1" max="1000" value="{{.Arg.Items}}">
 						<span class="input-group-text">{{T .Loc "label.item"}}</span>
@@ -23,8 +23,8 @@
 				</div>
 			</div>
 			<div class="row py-1">
-				<label class="col-md-3 col-form-label">{{T .Loc "label.sleep"}}</label>
-				<div class="col-md-9">
+				<label class="col-md-2 col-form-label">{{T .Loc "label.sleep"}}</label>
+				<div class="col-md-10">
 					<div class="input-group w-auto">
 						<input type="number" class="form-control" name="sleep" size="7" min="0" max="1000" value="{{.Arg.Sleep}}">
 						<span class="input-group-text">{{T .Loc "label.millisecond"}}</span>
@@ -33,10 +33,12 @@
 			</div>
 		</form>
 
-		<div class="row mt-4 mb-2">
-			<div class="offset-md-3 col-md-9">
-				<button id="job_start" class="btn btn-success" disabled data-processing="{{T .Loc "button.processing"}}"><i class="{{T .Loc "icon.start"}}"></i> <span>{{T .Loc "button.start"}}</span></button>
-				<button id="job_abort" class="btn btn-danger" disabled><i class="{{T .Loc "icon.stop"}}"></i> {{T .Loc "button.stop"}}</button>
+		<div class="container mt-4 mb-2">
+			<div class="row">
+				<div class="offset-md-2 col-md-10">
+					<button id="job_start" class="btn btn-success" disabled data-processing="{{T .Loc "button.processing"}}"><i class="{{T .Loc "icon.start"}}"></i> <span>{{T .Loc "button.start"}}</span></button>
+					<button id="job_abort" class="btn btn-danger" disabled><i class="{{T .Loc "icon.stop"}}"></i> {{T .Loc "button.stop"}}</button>
+				</div>
 			</div>
 		</div>
 	</div>

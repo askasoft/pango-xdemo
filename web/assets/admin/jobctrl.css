@@ -10,11 +10,11 @@
 	--js-pending-fg: #ccc;
 }
 
-#job_form {
-	margin-bottom: 20px;
+fieldset > form {
 	margin-bottom: 0;
 }
-fieldset > form {
+#job_form {
+	margin-bottom: 20px;
 	margin-bottom: 0;
 }
 

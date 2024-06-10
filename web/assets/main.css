@@ -284,9 +284,7 @@ body {
 
 /** well **/
 .well {
-	min-height: 20px;
 	margin-bottom: 20px;
-	padding: 10px 0;
 	white-space: pre-wrap;
 }
 
@@ -437,10 +435,7 @@ form div.verr {
 	overflow-y: auto;
 }
 .s-table td > div > hr {
-	border-top: 1px dashed #00f;
-}
-.s-table td.error * {
-	color: #a94442;
+	border-top: 1px dashed var(--bs-primary);
 }
 .s-table tr.ui-blink-1s td, .s-table tr.ui-blink-1s2 td {
 	background-color: transparent;
