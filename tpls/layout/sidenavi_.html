@@ -37,9 +37,6 @@
 			</div>
 			<div class="card-body">
 				<ul class="nav flex-column">
-					{{if eq .CFG.app.tenants "true"}}
-					<li class="nav-item"><a class="nav-link" href="{{.Base}}/s/tenants/"><i class="{{T .Loc "icon.super.tenants"}}"></i><span>{{T .Loc "menu.super.tenants"}}</span></a></li>
-					{{end}}
 					<li class="nav-item"><a class="nav-link" href="{{.Base}}/s/job/"><i class="{{T .Loc "icon.super.job"}}"></i><span>{{T .Loc "menu.super.job"}}</span></a></li>
 					<li class="nav-item"><a class="nav-link" href="{{.Base}}/s/shell/"><i class="{{T .Loc "icon.super.shell"}}"></i><span>{{T .Loc "menu.super.shell"}}</span></a></li>
 					<li class="nav-item"><a class="nav-link" href="{{.Base}}/s/sql/"><i class="{{T .Loc "icon.super.sql"}}"></i><span>{{T .Loc "menu.super.sql"}}</span></a></li>
@@ -57,6 +54,9 @@
 			</div>
 			<div class="card-body">
 				<ul class="nav flex-column">
+					{{if eq .CFG.app.tenants "true"}}
+					<li class="nav-item"><a class="nav-link" href="{{.Base}}/s/tenants/"><i class="{{T .Loc "icon.super.tenants"}}"></i><span>{{T .Loc "menu.super.tenants"}}</span></a></li>
+					{{end}}
 					<li class="nav-item"><a class="nav-link" href="{{.Base}}/a/users/"><i class="{{T .Loc "icon.admin.users"}}"></i><span>{{T .Loc "menu.admin.users"}}</span></a></li>
 					<li class="nav-item"><a class="nav-link" href="{{.Base}}/a/config/"><i class="{{T .Loc "icon.admin.config"}}"></i><span>{{T .Loc "menu.admin.config"}}</span></a></li>
 				</ul>

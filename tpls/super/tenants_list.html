@@ -23,7 +23,7 @@
 			<td class="actions">
 				{{if ne $.Tenant $t.Name}}
 				<button class="btn btn-outline-primary edit" title="{{T $.Loc "button.edit"}}"><i class="{{T $.Loc "icon.edit"}}"></i></button>
-				<button class="btn btn-outline-primary delete" title="{{T $.Loc "button.delete"}}"><i class="{{T $.Loc "icon.delete"}}"></i></button>
+				<button class="btn btn-outline-danger delete" title="{{T $.Loc "button.delete"}}"><i class="{{T $.Loc "icon.delete"}}"></i></button>
 				{{end}}
 			</td>
 		</tr>
@@ -40,7 +40,7 @@
 		<td class="comment"><pre></pre></td>
 		<td class="actions">
 			<button class="btn btn-outline-primary edit" title="{{T .Loc "button.edit"}}"><i class="{{T .Loc "icon.edit"}}"></i></button>
-			<button class="btn btn-outline-primary delete" title="{{T $.Loc "button.delete"}}"><i class="{{T $.Loc "icon.delete"}}"></i></button>
+			<button class="btn btn-outline-danger delete" title="{{T $.Loc "button.delete"}}"><i class="{{T $.Loc "icon.delete"}}"></i></button>
 		</td>
 	</tr>
 </table>
