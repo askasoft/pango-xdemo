@@ -200,6 +200,9 @@ func configHandlers() {
 	addUserHandlers(rg.Group("/u"))
 	addAdminHandlers(rg.Group("/a"))
 	addSuperHandlers(rg.Group("/s"))
+
+	// any other path
+	r.Use(app.XCN.Handler())
 }
 
 func addStaticHandlers(rg *xin.RouterGroup) {
