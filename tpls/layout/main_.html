@@ -2,10 +2,10 @@
 <!DOCTYPE html>
 <html lang="{{.Loc}}">
 {{template "head" .}}
-<body data-bs-theme="dark"{{if eq .Ctx.Attrs.sidenavi false}} class="nosidenavi"{{end}}>
+<body data-bs-theme="dark"{{if .Ctx.Attrs.nosidenavi}} class="nosidenavi"{{end}}>
 {{template "header" .}}
 
-{{if ne .Ctx.Attrs.sidenavi false}}
+{{if not .Ctx.Attrs.nosidenavi}}
 {{template "sidenavi" .}}
 {{end}}
 
