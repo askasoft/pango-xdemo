@@ -224,16 +224,16 @@ func addAPIHandlers(rg *xin.RouterGroup) {
 	rg.OPTIONS("/*path", xin.Next)
 
 	rg = rg.Group("")
-	rg.Use(tenant.CheckTenant) // schema protect
-	rg.Use(app.XBA.Handler())  // Basic auth
-	rg.Use(tenant.IPProtect)   // IP protect
+	rg.Use(CheckTenant)       // schema protect
+	rg.Use(app.XBA.Handler()) // Basic auth
+	rg.Use(IPProtect)         // IP protect
 
 	rg.GET("/get", api.Get)
 	rg.POST("/post", api.Post)
 }
 
 func addFilesHandlers(rg *xin.RouterGroup) {
-	rg.Use(tenant.CheckTenant) // schema protect
+	rg.Use(CheckTenant) // schema protect
 	rg.POST("/upload", files.Upload)
 	rg.POST("/uploads", files.Uploads)
 
@@ -246,8 +246,8 @@ func addFilesHandlers(rg *xin.RouterGroup) {
 }
 
 func addLoginHandlers(rg *xin.RouterGroup) {
-	rg.Use(tenant.CheckTenant) // schema protect
-	rg.Use(app.XTP.Handler())  // token protect
+	rg.Use(CheckTenant)       // schema protect
+	rg.Use(app.XTP.Handler()) // token protect
 	rg.Use(app.XCN.Handler())
 
 	rg.GET("/", login.Index)
@@ -264,8 +264,8 @@ func addLoginPasswordResetHandlers(rg *xin.RouterGroup) {
 }
 
 func addDemosHandlers(rg *xin.RouterGroup) {
-	rg.Use(tenant.CheckTenant) // schema protect
-	rg.Use(app.XTP.Handler())  // token protect
+	rg.Use(CheckTenant)       // schema protect
+	rg.Use(app.XTP.Handler()) // token protect
 	rg.Use(app.XCN.Handler())
 
 	addDemosPetsHandlers(rg.Group("/pets"))
@@ -334,10 +334,10 @@ func addDemosPetResetHandlers(rg *xin.RouterGroup) {
 }
 
 func addUserHandlers(rg *xin.RouterGroup) {
-	rg.Use(tenant.CheckTenant) // schema protect
-	rg.Use(app.XCA.Handler())  // cookie auth
-	rg.Use(tenant.IPProtect)   // IP protect
-	rg.Use(app.XTP.Handler())  // token protect
+	rg.Use(CheckTenant)       // schema protect
+	rg.Use(app.XCA.Handler()) // cookie auth
+	rg.Use(IPProtect)         // IP protect
+	rg.Use(app.XTP.Handler()) // token protect
 
 	addUserPwdchgHandlers(rg.Group("/pwdchg"))
 }
@@ -348,11 +348,11 @@ func addUserPwdchgHandlers(rg *xin.RouterGroup) {
 }
 
 func addAdminHandlers(rg *xin.RouterGroup) {
-	rg.Use(tenant.CheckTenant)      // schema protect
-	rg.Use(app.XCA.Handler())       // cookie auth
-	rg.Use(tenant.IPProtect)        // IP protect
-	rg.Use(tenant.RoleAdminProtect) // role protect
-	rg.Use(app.XTP.Handler())       // token protect
+	rg.Use(CheckTenant)       // schema protect
+	rg.Use(app.XCA.Handler()) // cookie auth
+	rg.Use(IPProtect)         // IP protect
+	rg.Use(RoleAdminProtect)  // role protect
+	rg.Use(app.XTP.Handler()) // token protect
 
 	rg.GET("/", admin.Index)
 
@@ -398,11 +398,11 @@ func addAdminUserCsvImportHandlers(rg *xin.RouterGroup) {
 }
 
 func addSuperHandlers(rg *xin.RouterGroup) {
-	rg.Use(tenant.CheckTenant)      // schema protect
-	rg.Use(app.XCA.Handler())       // cookie auth
-	rg.Use(tenant.IPProtect)        // IP protect
-	rg.Use(tenant.RoleSuperProtect) // role protect
-	rg.Use(app.XTP.Handler())       // token protect
+	rg.Use(CheckTenant)       // schema protect
+	rg.Use(app.XCA.Handler()) // cookie auth
+	rg.Use(IPProtect)         // IP protect
+	rg.Use(RoleSuperProtect)  // role protect
+	rg.Use(app.XTP.Handler()) // token protect
 
 	// rg.GET("/", super.Index)
 

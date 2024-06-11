@@ -2,10 +2,12 @@ package tenant
 
 import (
 	"errors"
+	"net"
 	"sync"
 
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/models"
+	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pango/xmw"
 	"gorm.io/gorm"
@@ -95,4 +97,58 @@ func CheckClientAndFindUser(c *xin.Context, username string) (xmw.AuthUser, erro
 		return nil, nil
 	}
 	return FindUser(c, username)
+}
+
+func CheckClientIP(c *xin.Context, u *models.User) bool {
+	cidrs := u.CIDRs()
+	if len(cidrs) == 0 {
+		tt := FromCtx(c)
+		cidrs = tt.GetCIDRs()
+	}
+
+	ip := net.ParseIP(c.ClientIP())
+	if ip == nil {
+		return false
+	}
+
+	if len(cidrs) > 0 {
+		trusted := false
+		for _, cidr := range cidrs {
+			if cidr.Contains(ip) {
+				trusted = true
+				break
+			}
+		}
+		return trusted
+	}
+
+	return true
+}
+
+//----------------------------------------------------
+// handlers
+
+func AuthPassed(c *xin.Context) {
+	cip := c.ClientIP()
+	app.AFIPS.Delete(cip)
+	c.Next()
+}
+
+func AuthFailed(c *xin.Context) {
+	cip := c.ClientIP()
+
+	err := app.AFIPS.Increment(cip, 1, 1)
+	if err != nil {
+		log.Errorf("Failed to increment AFIPS for '%s'", cip)
+	}
+}
+
+func BasicAuthFailed(c *xin.Context) {
+	AuthFailed(c)
+	app.XBA.Unauthorized(c)
+}
+
+func CookieAuthFailed(c *xin.Context) {
+	AuthFailed(c)
+	app.XCA.Unauthorized(c)
 }
