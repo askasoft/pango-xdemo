@@ -1,11 +1,46 @@
 {{template "main_header" .}}
 
-<div class="d-flex flex-column align-items-center text-secondary">
-	<h1 style="font-size: 5em; margin: 0.5em;">404 Not Found</h1>
+<style>
+.e404 {
+	font-size: 2em;
+}
+.e404 h1 {
+	font-size: 1.2em;
+	margin: 0.5em 0 1em 0;
+}
+.e404 i {
+	font-size: 8em;
+}
+@media (min-width: 768px) {
+	.e404 h1 {
+		font-size: 1.4em;
+	}
+	.e404 i {
+		font-size: 10em;
+	}
+}
+@media (min-width: 992px) {
+	.e404 h1 {
+		font-size: 1.7em;
+	}
+	.e404 i {
+		font-size: 13em;
+	}
+}
+@media (min-width: 1200px) {
+	.e404 h1 {
+		font-size: 2em;
+	}
+	.e404 i {
+		font-size: 15em;
+	}
+}
+</style>
 
-	<div style="font-size: 25em;">
-		<i class="far fa-compass fa-spin"></i>
-	</div>
+<div class="e404 d-flex flex-column align-items-center text-secondary font-monospace">
+	<h1>404 Not Found</h1>
+
+	<i class="far fa-compass fa-spin"></i>
 </div>
 
 {{template "main_footer" .}}
