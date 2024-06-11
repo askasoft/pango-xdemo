@@ -11,9 +11,10 @@
 	}
 
 	function pets_search(evt, callback) {
-		var $f = $('#pets_listform');
+		var $f = $('#pets_listform'), vs = main.form_input_values($f);
 
-		main.sssave(sskey, main.form_input_values($f));
+		main.sssave(sskey, vs);
+		main.location_replace_search(vs);
 
 		$.ajax({
 			url: './list',

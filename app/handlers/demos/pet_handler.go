@@ -153,7 +153,6 @@ func PetIndex(c *xin.Context) {
 	h := handlers.H(c)
 
 	pq, _ := petListArgs(c)
-	pq.Normalize(c)
 
 	h["Q"] = pq
 

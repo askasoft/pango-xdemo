@@ -78,6 +78,19 @@ var main = {
 		}
 	},
 
+	// replace location search
+	location_replace_search: function(vs) {
+		var p = $.extend({}, vs);
+
+		delete p.p; // page
+		delete p.l; // limit
+		delete p.c; // sort column
+		delete p.d; // sort direction
+
+		var q = $.param(p);
+		history.replaceState(null, null, location.href.split('?')[0] + (q ? '?' + q : ''));
+	},
+
 	// load mask
 	loadmask: function() {
 		$('body').loadmask();
@@ -187,7 +200,13 @@ var main = {
 	// form input (not hidden) values
 	form_input_values: function($f) {
 		var vs = $f.formValues();
+
 		delete vs._token_;
+		for (var k in vs) {
+			if (!vs[k]) {
+				delete vs[k];
+			}
+		}
 		return vs;
 	},
 	form_has_inputs: function($f) {
