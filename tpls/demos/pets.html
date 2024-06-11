@@ -19,15 +19,16 @@
 				<i class="{{T .Loc "icon.deleteall"}}"></i> {{T .Loc "button.deleteall"}}
 			</button>
 			<div class="ms-auto"></div>
+			<button class="btn btn-sm btn-outline-primary" id="pets_new">
+				<i class="{{T .Loc "icon.new"}}"></i> {{T .Loc "button.new"}}
+			</button>
 			<button class="btn btn-sm btn-outline-primary" id="pets_editsel" enableby="#pets_list td.check input">
 				<i class="{{T .Loc "icon.editsel"}}"></i> {{T .Loc "button.editsel"}}
 			</button>
 			<button class="btn btn-sm btn-outline-primary" id="pets_editall">
 				<i class="{{T .Loc "icon.editall"}}"></i> {{T .Loc "button.editall"}}
 			</button>
-			<button class="btn btn-sm btn-outline-primary" id="pets_new">
-				<i class="{{T .Loc "icon.new"}}"></i> {{T .Loc "button.new"}}
-			</button>
+			<div class="me-auto"></div>
 			<button class="btn btn-sm btn-outline-primary" id="pets_export">
 				<i class="{{T .Loc "icon.csv"}}"></i> {{T .Loc "button.csvexp"}}
 			</button>
@@ -228,7 +229,7 @@
 
 <div id="pets_bulkedit_popup" class="ui-popup s-popup-detail w800" data-spy="popup" tabindex="-1"
 	popup-position="center" popup-mouse="false">
-	<div class="ui-popup-body">
+	<div class="ui-popup-header">
 		<h4><i class="editsel {{T .Loc "icon.editsel"}}"></i><i class="editall {{T .Loc "icon.editall"}}"></i>
 			<span class="editsel">{{T .Loc "button.editsel"}}</span>
 			<span class="editall">{{T .Loc "button.editall"}}</span>

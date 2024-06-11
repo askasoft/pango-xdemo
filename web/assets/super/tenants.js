@@ -40,6 +40,11 @@
 	//----------------------------------------------------
 	// create
 	//
+	function tenant_new() {
+		$('#tenants_create_popup').popup('show');
+		return false;
+	}
+
 	function tenant_create() {
 		var $p = $('#tenants_create_popup').popup('update', { keyboard: false });
 
@@ -179,6 +184,7 @@
 			.submit();
 
 		$('#tenants_list')
+			.on('click', 'button.new', tenant_new)
 			.on('click', 'button.edit', tenant_edit)
 			.on('click', 'button.delete', tenant_delete_confirm);
 

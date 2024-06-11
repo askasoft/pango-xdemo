@@ -7,13 +7,6 @@
 		<h2><i class="{{T .Loc "icon.super.tenants"}}"></i><span>{{T .Loc "menu.super.tenants"}}</span></h2>
 	</div>
 	<div class="s-section-body">
-		<div class="s-toolbar">
-			<div class="ms-auto"></div>
-			<button class="btn btn-sm btn-outline-primary" popup-target="#tenants_create_popup">
-				<i class="{{T .Loc "icon.new"}}"></i> {{T .Loc "button.new"}}
-			</button>
-		</div>
-
 		<div id="tenants_alert">{{template "alerts" .}}</div>
 		
 		<fieldset id="tenants_listfset" class="ui-fieldset collapsed" data-spy="fieldset">

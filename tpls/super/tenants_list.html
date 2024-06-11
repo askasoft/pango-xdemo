@@ -9,7 +9,11 @@
 			<th class="name sortable" data-sort-col="name">{{T .Loc "tenant.name"}}</th>
 			<th class="domain">{{T .Loc "tenant.domain"}}</th>
 			<th class="comment sortable" data-sort-col="comment">{{T .Loc "tenant.comment"}}</th>
-			<th class="actions"></th>
+			<th class="actions">
+				<button class="new btn btn-outline-primary">
+					<i class="{{T .Loc "icon.new"}}"></i> {{T .Loc "button.new"}}
+				</button>
+			</th>
 		</tr>
 	</thead>
 	<tbody>
