@@ -5,8 +5,12 @@ import (
 	"gorm.io/gorm/clause"
 )
 
-func GormOrderBy(col string, desc bool) any {
-	return clause.OrderByColumn{Column: clause.Column{Name: col}, Desc: desc}
+func GormOrderBy(col string, desc ...bool) any {
+	o := clause.OrderByColumn{Column: clause.Column{Name: col}}
+	if len(desc) > 0 {
+		o.Desc = desc[0]
+	}
+	return o
 }
 
 func Sorter2OrderBy(s *args.Sorter) any {

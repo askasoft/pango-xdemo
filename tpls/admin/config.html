@@ -8,6 +8,16 @@
 		<h2><i class="{{T .Loc "icon.admin.config"}}"></i><span>{{T .Loc "menu.admin.config"}}</span></h2>
 	</div>
 	<div class="s-section-body">
+		<div class="s-toolbar">
+			<div class="ms-auto"></div>
+			<button class="btn btn-sm btn-outline-primary" popup-target="#configs_import_popup">
+				<i class="{{T .Loc "icon.upload"}}"></i> {{T .Loc "button.import"}}
+			</button>
+			<button class="btn btn-sm btn-outline-primary" id="configs_export">
+				<i class="{{T .Loc "icon.dnload"}}"></i> {{T .Loc "button.export"}}
+			</button>
+		</div>
+
 		{{if gt (len .Configs) 1}}
 		<ul class="nav nav-tabs">
 			{{range $i, $cc := .Configs}}
@@ -80,6 +90,30 @@
 			</div></div>
 			{{end}}
 		</div>
+	</div>
+</div>
+
+<div id="configs_import_popup" class="ui-popup s-popup-detail w800" data-spy="popup" tabindex="-1"
+	popup-position="center" popup-mouse="false">
+	<div class="ui-popup-header">
+		<h4><i class="{{T .Loc "icon.upload"}}"></i>
+			<span>{{T .Loc "config.import.head"}}</span>
+		</h4>
+	</div>
+	<div class="ui-popup-body grey">
+		<form class="form-horizontal lined" autocomplete="off">
+			<input type="hidden" name="_token_" value="{{.Token}}"/>
+			<div class="row py-3">
+				<label class="col-md-2 col-form-label">{{T .Loc "config.import.file"}}</label>
+				<div class="col-md-10">
+					<input type="file" name="file" accept=".csv" class="form-control">
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="ui-popup-footer">
+		<button type="submit" class="btn btn-primary"><i class="{{T .Loc "icon.upload"}}"></i> {{T .Loc "button.import"}}</button>
+		<button type="button" class="btn btn-secondary" popup-dismiss="true"><i class="{{T .Loc "icon.cancel"}}"></i> {{T .Loc "button.cancel"}}</button>
 	</div>
 </div>
 

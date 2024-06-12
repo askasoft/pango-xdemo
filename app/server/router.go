@@ -366,6 +366,8 @@ func addAdminHandlers(rg *xin.RouterGroup) {
 func addAdminConfigHandlers(rg *xin.RouterGroup) {
 	rg.GET("/", admin.ConfigIndex)
 	rg.POST("/save", admin.ConfigSave)
+	rg.POST("/export", admin.ConfigExport)
+	rg.POST("/import", admin.ConfigImport)
 }
 
 func addAdminUserHandlers(rg *xin.RouterGroup) {
