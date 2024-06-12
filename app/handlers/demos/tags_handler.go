@@ -1,6 +1,7 @@
 package demos
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/askasoft/pango-xdemo/app/handlers"
@@ -37,6 +38,18 @@ func TagsIndex(c *xin.Context) {
 	h["RadiosList"] = radios
 	h["SelectList"] = selects
 	h["Arg"] = a
+
+	c.AddError(errors.New(str.Repeat("Error message. ", 20)))
+	h["Success"] = str.Repeat("Success message. ", 20)
+	h["Successes"] = []string{
+		"Success message 1.",
+		"Success message 2.",
+	}
+	h["Warning"] = str.Repeat("Warning message. ", 20)
+	h["Warnings"] = []string{
+		"Warning message 1.",
+		"Warning message 2.",
+	}
 
 	c.HTML(http.StatusOK, "demos/tags", h)
 }

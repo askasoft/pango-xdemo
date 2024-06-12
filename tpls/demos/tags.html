@@ -5,8 +5,13 @@
 		<h2><i class="{{T .Loc "icon.demos.tags"}}"></i><span>{{T .Loc "menu.demos.tags"}}</span></h2>
 	</div>
 	<div class="s-section-body">
-		<div class="well">{{T .Loc "demos.tags.well"}}</div>
+		<div class="well text-center">{{T .Loc "demos.tags.well"}}</div>
 
+		<fieldset id="tags_alert" class="ui-fieldset collapsed" data-spy="fieldset">
+			<legend>Alerts</legend>
+			{{template "alerts" .}}
+		</fieldset>
+		
 		<form id="tags_form" class="form-horizontal lined" method="GET">
 			<div class="row py-3">
 				<label class="col-md-2 col-form-label required">Text</label>
