@@ -1,12 +1,9 @@
-:root, [data-bs-theme=light] {
-	--js-aborted: var(--bs-danger);
-	--js-completed: var(--bs-success);
-	--js-pending-bg: var(--bs-secondary-bg-subtle);
-	--js-pending-fg: #333;
-	--js-running: var(--bs-primary);
-}
-[data-bs-theme=dark] {
-	--js-pending-fg: #ccc;
+#jobchain_tabs, #jobchain_list {
+	--js-aborted: var(--bs-danger, #dc3545);
+	--js-completed: var(--bs-success, #198754);
+	--js-pending: var(--bs-secondary-color, rgba(33, 37, 41, 0.75));
+	--js-running: var(--bs-primary, #337ab7);
+	--js-progress-bg: var(--bs-secondary-bg-subtle, #e2e3e5);
 }
 
 #jobchain_form {
@@ -37,8 +34,8 @@
 	color: var(--bs-nav-link-color);
 }
 #jobchain_tabs > ul > li i {
-	font-size: 150%;
-	margin-right: 5px;
+	font-size: 1.5em;
+	margin-right: 0.5rem;
 	vertical-align: middle;
 }
 #jobchain_tabs > ul > li[status=A] i {
@@ -48,7 +45,7 @@
 	color: var(--js-completed);
 }
 #jobchain_tabs > ul > li[status=P] i {
-	color: var(--js-pending-bg);
+	color: var(--js-pending);
 }
 #jobchain_tabs > ul > li[status=R] i {
 	color: var(--js-running);
@@ -71,7 +68,7 @@
 	border-color: var(--js-completed);
 }
 .jobchain[status=P] {
-	border-color: var(--js-pending-bg);
+	border-color: var(--js-pending);
 }
 .jobchain[status=R] {
 	border-color: var(--js-running);
@@ -102,7 +99,7 @@
 	color: var(--js-completed);
 }
 .jobchain[status=P] .jobcaption {
-	color: var(--js-pending-fg);
+	color: var(--js-pending);
 }
 .jobchain[status=R] .jobcaption {
 	color: var(--js-running);
@@ -124,35 +121,41 @@
 	top: 5px;
 	right: -62px;
 	border: 16px solid transparent;
-	border-left: 28px solid var(--js-pending-bg);
+	border-left: 28px solid var(--js-progress-bg);
 	box-sizing: border-box;
 }
 .jrs:last-child:before, .jrs:last-child:after {
 	display: none;
 }
 .jnm {
-	border: solid 1px transparent;
-	color: #fff;
+	border: solid 2px transparent;
 	margin: 0 0 5px 0;
 	padding: 10px 15px;
 	text-align: center;
 }
 .jrs[status=A] .jnm {
-	background-color: var(--js-aborted);
 	border-color: var(--js-aborted);
 }
 .jrs[status=C] .jnm {
-	background-color: var(--js-completed);
 	border-color: var(--js-completed);
 }
 .jrs[status=P] .jnm {
-	border: solid 1px var(--js-running);
-	color: var(--js-pending-fg);
+	border-color: var(--js-pending);
+	border-style: dashed;
 }
 .jrs[status=R] .jnm {
-	background-color: var(--js-running);
 	border-color: var(--js-running);
+	background: linear-gradient(90deg, var(--js-progress-bg), var(--js-running), var(--js-progress-bg));
+	background-size: 200% 100%;
+	background-position: 0% 0;
+	animation: bg-running 4s alternate infinite;
 }
+@keyframes bg-running {
+	100% {
+		background-position: 100% 0;
+	}
+}
+
 .jif {
 	display: flex;
 }
@@ -192,7 +195,7 @@
 	cursor: pointer;
 }
 
-@keyframes pgrotate {
+@keyframes pg-rotate {
 	100% {
 		transform: rotate(360deg);
 	}
@@ -214,7 +217,7 @@
 	fill: none;
 }
 .pgcircle circle.bg {
-	stroke: var(--js-pending-bg);
+	stroke: var(--js-progress-bg);
 }
 .pgcircle circle.fg {
 	transform: rotate(-90deg);
@@ -239,5 +242,5 @@
 	stroke-linecap: round;
 	stroke-dasharray: var(--dash) calc(var(--circumference) - var(--dash));
 	transform: rotate(0deg);
-	animation: pgrotate 2s linear infinite;
+	animation: pg-rotate 2s linear infinite;
 }

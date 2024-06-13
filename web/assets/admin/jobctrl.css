@@ -1,13 +1,8 @@
-:root, [data-bs-theme=light] {
-	--js-aborted: var(--bs-danger);
-	--js-completed: var(--bs-success);
-	--js-pending-bg: #dfe8ed;
-	--js-pending-fg: #333;
-	--js-running: var(--bs-primary);
-}
-[data-bs-theme=dark] {
-	--js-pending-bg: #666;
-	--js-pending-fg: #ccc;
+#job_tabs, #job_list {
+	--js-aborted: var(--bs-danger, #dc3545);
+	--js-completed: var(--bs-success, #198754);
+	--js-pending: var(--bs-secondary-color, rgba(33, 37, 41, 0.75));
+	--js-running: var(--bs-primary, #337ab7);
 }
 
 fieldset > form {
@@ -42,8 +37,8 @@ fieldset > form {
 	color: var(--bs-nav-link-color);
 }
 #job_tabs > ul > li i {
-	font-size: 150%;
-	margin-right: 5px;
+	font-size: 1.5em;
+	margin-right: 0.5rem;
 	vertical-align: middle;
 }
 #job_tabs > ul > li[status=A] i {
@@ -53,7 +48,7 @@ fieldset > form {
 	color: var(--js-completed);
 }
 #job_tabs > ul > li[status=P] i {
-	color: var(--js-pending-bg);
+	color: var(--js-pending);
 }
 #job_tabs > ul > li[status=R] i {
 	color: var(--js-running);
