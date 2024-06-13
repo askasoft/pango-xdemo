@@ -99,6 +99,16 @@ var main = {
 		$('body').unloadmask();
 	},
 
+	// ajax setup token header
+	ajax_setup: function() {
+		var o = XMLHttpRequest.prototype.open;
+		XMLHttpRequest.prototype.open = function(){
+			var xhr = o.apply(this, arguments);
+			this.setRequestHeader('X-CSRF-TOKEN', main.token);
+			return xhr;
+		};
+	},
+
 	// ajaf error handler
 	ajaf_error: function(data) {
 		data = main.safe_parse_json(data);
@@ -289,9 +299,6 @@ var main = {
 	},
 
 	init: function() {
-		// get meta properties
-		$.extend(main, main.meta_props());
-
 		// sidenavi
 		$('#sidenavi i').each(function() {
 			$(this).attr('title', $(this).next('span').text());
@@ -329,8 +336,13 @@ var main = {
 		transition: 'zoomIn'
 	});
 
-	// load init
-	$(main.init);
+	// get meta properties
+	$.extend(main, main.meta_props());
 
+	// ajax setup
+	main.ajax_setup();
+
+	// load init
+	$(window).on('load', main.init);
 })(jQuery);
 

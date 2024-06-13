@@ -8,8 +8,7 @@
 		<h2><i class="{{T .Loc "icon.super.shell"}}"></i><span>{{T .Loc "menu.super.shell"}}</span></h2>
 	</div>
 	<div class="s-section-body">
-		<form id="shell_form" method="POST">
-			<input type="hidden" name="_token_" value="{{.Token}}"/>
+		<form id="shell_form" class="label-left" method="POST">
 			<div class="row py-1 text-nowrap">
 				<label class="col col-form-label">{{TF .Loc "super.shell.command" .OS}}</label>
 				<div class="col text-end">

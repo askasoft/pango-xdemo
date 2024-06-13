@@ -37,7 +37,6 @@
 			url: './abort',
 			method: 'POST',
 			data: {
-				_token_: main.token,
 				cid: cid
 			},
 			dataType: 'json',

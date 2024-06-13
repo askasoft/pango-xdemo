@@ -34,9 +34,6 @@
 		$.ajaf({
 			url: './export',
 			method: 'POST',
-			data: {
-				_token_: main.token
-			},
 			beforeSend: main.loadmask,
 			error: main.ajax_error,
 			complete: main.unloadmask

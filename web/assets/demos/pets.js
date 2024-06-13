@@ -263,7 +263,6 @@
 			url: './deletes',
 			method: 'POST',
 			data: {
-				_token_: main.token,
 				id: ids
 			},
 			dataType: 'json',
