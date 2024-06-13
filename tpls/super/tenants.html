@@ -11,7 +11,7 @@
 		
 		<fieldset id="tenants_listfset" class="ui-fieldset collapsed" data-spy="fieldset">
 			<legend class="circle"><i class="{{T .Loc "icon.search"}}"></i>{{T .Loc "button.search"}}</legend>
-			<form id="tenants_listform"  class="form-horizontal grey padded" method="POST">
+			<form id="tenants_listform"  class="ui-form grey padded" method="POST">
 				<input type="hidden" name="_token_" value="{{.Token}}"/>
 				<input type="hidden" name="p" value="{{.Q.Page}}"/>
 				<input type="hidden" name="l" value="{{.Q.Limit}}"/>
@@ -44,7 +44,7 @@
 			{{T .Loc "tenant.create.header"}}
 		</h4>
 	</div>
-	<form class="ui-popup-body form-horizontal lined grey">
+	<form class="ui-popup-body ui-form lined grey">
 		<input type="hidden" name="_token_" value="{{.Token}}"/>
 		<div class="row">
 			<label class="col-md-2 col-form-label">{{T .Loc "tenant.name"}}</label>
@@ -75,7 +75,7 @@
 		</h4>
 	</div>
 	<div class="ui-popup-body grey">
-		<form class="form-horizontal lined">
+		<form class="ui-form lined">
 			<input type="hidden" name="_token_" value="{{.Token}}"/>
 			<input type="hidden" name="oname" value=""/>
 			<div class="row">

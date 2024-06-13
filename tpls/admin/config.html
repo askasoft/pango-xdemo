@@ -45,7 +45,7 @@
 						{{$cgw := (T $.Loc (print "config.group.well." $cg.Name))}}
 						{{if $cgw}}<div class="well">{{$cgw}}</div>{{end}}
 
-						<form class="cfgform form-horizontal lined grey padded rounded" method="POST" autocomplete="off">
+						<form class="cfgform ui-form lined grey padded rounded" method="POST" autocomplete="off">
 							<input type="hidden" name="_token_" value="{{$.Token}}"/>
 
 							{{range $c := $cg.Items}}
@@ -101,7 +101,7 @@
 		</h4>
 	</div>
 	<div class="ui-popup-body grey">
-		<form class="form-horizontal lined" autocomplete="off">
+		<form class="ui-form lined" autocomplete="off">
 			<input type="hidden" name="_token_" value="{{.Token}}"/>
 			<div class="row">
 				<label class="col-md-2 col-form-label">{{T .Loc "config.import.file"}}</label>
