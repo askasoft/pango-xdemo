@@ -146,9 +146,6 @@ func Shutdown() {
 	}
 	log.Info("Server exit.")
 
-	// close DB
-	closeDatabase()
-
 	// close log
 	log.Close()
 }

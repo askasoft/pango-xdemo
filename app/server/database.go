@@ -76,17 +76,6 @@ func openDatabase() error {
 	return nil
 }
 
-func closeDatabase() {
-	if app.GDB != nil {
-		db, err := app.GDB.DB()
-		if err != nil {
-			db.Close()
-		}
-		app.GDB = nil
-		app.SDB = nil
-	}
-}
-
 func dbMigrate() error {
 	if err := dbMigrateSchemas(); err != nil {
 		return err
