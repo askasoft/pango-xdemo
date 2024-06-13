@@ -101,12 +101,9 @@ var main = {
 
 	// ajax setup token header
 	ajax_setup: function() {
-		var o = XMLHttpRequest.prototype.open;
-		XMLHttpRequest.prototype.open = function(){
-			var xhr = o.apply(this, arguments);
-			this.setRequestHeader('X-CSRF-TOKEN', main.token);
-			return xhr;
-		};
+		$.ajaxPrefilter(function(options, original, xhr) {
+			xhr.setRequestHeader('X-CSRF-TOKEN', main.token);
+		});
 	},
 
 	// ajaf error handler
