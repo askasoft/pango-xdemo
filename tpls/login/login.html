@@ -15,22 +15,22 @@
 			{{template "alerts" .}}
 		</div>
 
-		<form id="login_form" class="form-horizontal" autocomplete="off">
+		<form id="login_form" class="form-horizontal ui-row-py3" autocomplete="off">
 			<input type="hidden" name="_token_" value="{{.Token}}"/>
 			<input type="hidden" name="origin" value="{{.origin}}"/>
-			<div class="row py-3">
+			<div class="row">
 				<label class="col-md-3 col-form-label">{{T .Loc "login.username"}}</label>
 				<div class="col-md-9">
 					<input name="username" type="text" class="form-control" maxlength="250" textclear/>
 				</div>
 			</div>
-			<div class="row py-3">
+			<div class="row">
 				<label class="col-md-3 col-form-label">{{T .Loc "login.password"}}</label>
 				<div class="col-md-9">
 					<input name="password" type="password" class="form-control" maxlength="50" textclear/>
 				</div>
 			</div>
-			<div class="row py-3">
+			<div class="row">
 				<div class="offset-md-3 col-md-9">
 					<button type="submit" class="btn btn-primary"><i class="{{T .Loc "icon.login"}}"></i> {{T .Loc "button.login"}}</button>
 				</div>

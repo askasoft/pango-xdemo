@@ -18,7 +18,7 @@
 				<input type="hidden" name="c" value="{{.Q.Col}}"/>
 				<input type="hidden" name="d" value="{{.Q.Dir}}"/>
 
-				<div class="row py-1">
+				<div class="row">
 					<label class="col-md-2 col-form-label">{{T .Loc "tenant.name"}}</label>
 					<div class="col-md-10">
 						<input name="name" type="text" class="form-control" textclear value="{{.Q.Name}}"/>
@@ -46,14 +46,14 @@
 	</div>
 	<form class="ui-popup-body form-horizontal lined grey">
 		<input type="hidden" name="_token_" value="{{.Token}}"/>
-		<div class="row py-3">
+		<div class="row">
 			<label class="col-md-2 col-form-label">{{T .Loc "tenant.name"}}</label>
 			<div class="col-md-10">
 				<input name="name" type="text" class="form-control" maxlength="30" value="" textclear>
 				<div class="desc">{{T .Loc "tenant.desc.name"}}</div>
 			</div>
 		</div>
-		<div class="row py-3">
+		<div class="row">
 			<label class="col-md-2 col-form-label">{{T .Loc "tenant.comment"}}</label>
 			<div class="col-md-10">
 				<textarea name="comment" class="form-control" maxlength="250" rows="2" textclear enterfire></textarea>
@@ -78,13 +78,13 @@
 		<form class="form-horizontal lined">
 			<input type="hidden" name="_token_" value="{{.Token}}"/>
 			<input type="hidden" name="oname" value=""/>
-			<div class="row py-3">
+			<div class="row">
 				<label class="col-md-2 col-form-label">{{T .Loc "tenant.name"}}</label>
 				<div class="col-md-10">
 					<input name="name" type="text" class="form-control" textclear>
 				</div>
 			</div>
-			<div class="row py-3">
+			<div class="row">
 				<label class="col-md-2 col-form-label">{{T .Loc "tenant.comment"}}</label>
 				<div class="col-md-10">
 					<textarea name="comment" class="form-control" maxlength="250" rows="2" textclear enterfire></textarea>

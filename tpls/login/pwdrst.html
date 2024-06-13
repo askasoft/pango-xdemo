@@ -15,15 +15,15 @@
 			{{template "alerts" .}}
 		</div>
 
-		<form id="pwdrst_form" class="form-horizontal" autocomplete="off">
+		<form id="pwdrst_form" class="form-horizontal ui-row-py3" autocomplete="off">
 			<input type="hidden" name="_token_" value="{{.Token}}"/>
-			<div class="row py-3">
+			<div class="row">
 				<label class="col-md-3 col-form-label">{{T .Loc "pwdrst.email"}}</label>
 				<div class="col-md-9">
 					<input name="email" type="text" class="form-control" maxlength="250" textclear/>
 				</div>
 			</div>
-			<div class="row py-3">
+			<div class="row">
 				<div class="offset-md-3 col-md-9">
 					<button type="submit" class="btn btn-primary"><i class="{{T .Loc "icon.sendmail"}}"></i> {{T .Loc "button.send"}}</button>
 				</div>

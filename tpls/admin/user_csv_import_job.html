@@ -13,7 +13,7 @@
 		<form id="job_form" class="form-horizontal grey padded" enctype="multipart/form-data" autocomplete="off"
 			data-form="{{T .Loc "user.import.csv.file"}}">
 			<input type="hidden" name="_token_" value="{{.Token}}"/>
-			<div class="row py-1">
+			<div class="row">
 				<label class="col-md-2 col-form-label">{{T .Loc "user.import.csv.file"}}</label>
 				<div class="col-md-10">
 					<input type="file" name="file" accept=".csv" class="form-control">

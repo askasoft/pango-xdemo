@@ -48,7 +48,7 @@
 				<input type="hidden" name="c" value="{{.Q.Col}}"/>
 				<input type="hidden" name="d" value="{{.Q.Dir}}"/>
 
-				<div class="row py-1">
+				<div class="row">
 					<label class="col-md-2 col-form-label">{{T .Loc "user.id"}}</label>
 					<div class="col-md-4">
 						<input name="id" type="text" class="form-control" textclear value="{{if ne .Q.ID 0}}{{.Q.ID}}{{end}}"/>
@@ -58,7 +58,7 @@
 						<input name="name" type="text" class="form-control" textclear value="{{.Q.Name}}"/>
 					</div>
 				</div>
-				<div class="row py-1">
+				<div class="row">
 					<label class="col-md-2 col-form-label">{{T .Loc "user.email"}}</label>
 					<div class="col-md-4">
 						<input name="email" type="text" class="form-control" textclear value="{{.Q.Email}}"/>
@@ -68,7 +68,7 @@
 						<input name="cidr" type="text" class="form-control" textclear value="{{.Q.CIDR}}"/>
 					</div>
 				</div>
-				<div class="row py-1">
+				<div class="row">
 					<label class="col-md-2 col-form-label">{{T .Loc "user.role"}}</label>
 					<div class="col-md-4">
 						{{Checks "Name=" "role" "List=" .UserRoleMap "Values=" .Q.Role}}
@@ -137,31 +137,31 @@
 
 			<div class="well text-center">{{T .Loc "user.deletebat.well"}}</div>
 
-			<div class="row py-3">
+			<div class="row">
 				<label class="col-md-2 col-form-label">{{T .Loc "user.name"}}</label>
 				<div class="col-md-10">
 					<input name="name" type="text" class="form-control" textclear value="{{.Q.Name}}"/>
 				</div>
 			</div>
-			<div class="row py-3">
+			<div class="row">
 				<label class="col-md-2 col-form-label">{{T .Loc "user.email"}}</label>
 				<div class="col-md-10">
 					<input name="email" type="text" class="form-control" textclear value="{{.Q.Email}}"/>
 				</div>
 			</div>
-			<div class="row py-3">
+			<div class="row">
 				<label class="col-md-2 col-form-label">{{T .Loc "user.cidr"}}</label>
 				<div class="col-md-10">
 					<input name="cidr" type="text" class="form-control" textclear value="{{.Q.CIDR}}"/>
 				</div>
 			</div>
-			<div class="row py-3">
+			<div class="row">
 				<label class="col-md-2 col-form-label">{{T .Loc "user.role"}}</label>
 				<div class="col-md-10">
 					{{Checks "Name=" "role" "List=" .UserRoleMap "Values=" .Q.Role}}
 				</div>
 			</div>
-			<div class="row py-3">
+			<div class="row">
 				<label class="col-md-2 col-form-label">{{T .Loc "user.status"}}</label>
 				<div class="col-md-10">
 					{{Checks "Name=" "status" "List=" .UserStatusMap "Values=" .Q.Status}}
@@ -187,19 +187,19 @@
 		<form class="form-horizontal lined" autocomplete="off">
 			<input type="hidden" name="_token_" value="{{.Token}}"/>
 			<input type="hidden" name="id"/>
-			<div class="row py-3">
+			<div class="row">
 				<label class="col-md-2 col-form-label">{{T .Loc "user.role"}} <input type="checkbox"></label>
 				<div class="col-md-10">
 					{{Radios "Name=" "role" "List=" .UserRoleMap "Value=" "V" "Disabled=" true}}
 				</div>
 			</div>
-			<div class="row py-3">
+			<div class="row">
 				<label class="col-md-2 col-form-label">{{T .Loc "user.status"}} <input type="checkbox"></label>
 				<div class="col-md-10">
 					{{Radios "Name=" "status" "List=" .UserStatusMap "Value=" "A" "Disabled=" true}}
 				</div>
 			</div>
-			<div class="row py-3">
+			<div class="row">
 				<label class="col-md-2 col-form-label">{{T .Loc "user.cidr"}} <input type="checkbox" name="ucidr" value="true"></label>
 				<div class="col-md-10">
 					<textarea name="cidr" class="form-control" rows="2" disabled enterfire textclear></textarea>

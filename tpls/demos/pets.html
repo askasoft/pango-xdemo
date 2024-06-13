@@ -45,7 +45,7 @@
 				<input type="hidden" name="c" value="{{.Q.Col}}"/>
 				<input type="hidden" name="d" value="{{.Q.Dir}}"/>
 
-				<div class="row py-1">
+				<div class="row">
 					<label class="col-md-2 col-form-label">{{T .Loc "pet.id"}}</label>
 					<div class="col-md-4">
 						<input name="id" type="text" class="form-control" textclear value="{{if ne .Q.ID 0}}{{.Q.ID}}{{end}}"/>
@@ -55,7 +55,7 @@
 						<input name="name" type="text" class="form-control" textclear value="{{.Q.Name}}"/>
 					</div>
 				</div>
-				<div class="row py-1">
+				<div class="row">
 					<label class="col-md-2 col-form-label">{{T .Loc "pet.gender"}}</label>
 					<div class="col-md-4">
 						{{Checks "Name=" "gender" "List=" .PetGenderMap "Values=" .Q.Gender}}
@@ -67,7 +67,7 @@
 						<input type="date" class="form-control" name="born_to">
 					</div>
 				</div>
-				<div class="row py-1">
+				<div class="row">
 					<label class="col-md-2 col-form-label">{{T .Loc "pet.temper"}}</label>
 					<div class="col-md-4">
 						{{Select "Name=" "temper" "List=" .PetTemperMap "Values=" .Q.Temper "Multiple=" true "class=" "wide" "data-spy=" "niceSelect"}}
@@ -77,7 +77,7 @@
 						{{Select "Name=" "habits" "List=" .PetHabitsMap "Values=" .Q.Habits "Multiple=" true "class=" "wide" "data-spy=" "niceSelect"}}
 					</div>
 				</div>
-				<div class="row py-1">
+				<div class="row">
 					<label class="col-md-2 col-form-label">{{T .Loc "pet.amount"}}</label>
 					<div class="col-md-4">
 						<input type="number" class="form-control" name="amount_min" size="14">
@@ -91,7 +91,7 @@
 						<input type="number" class="form-control" name="price_max" size="14">
 					</div>
 				</div>
-				<div class="row py-1">
+				<div class="row">
 					<label class="col-md-2 col-form-label">{{T .Loc "pet.origin"}}</label>
 					<div class="col-md-4">
 						{{Select "Name=" "origin" "List=" .PetOriginMap "Values=" .Q.Origin "Multiple=" true "class=" "col2 wide" "data-spy=" "niceSelect"}}
@@ -161,19 +161,19 @@
 
 			<div class="well text-center">{{T .Loc "pet.deletebat.well"}}</div>
 
-			<div class="row py-3">
+			<div class="row">
 				<label class="col-md-2 col-form-label">{{T .Loc "pet.name"}}</label>
 				<div class="col-md-10">
 					<input name="name" type="text" class="form-control" textclear value="{{.Q.Name}}"/>
 				</div>
 			</div>
-			<div class="row py-3">
+			<div class="row">
 				<label class="col-md-2 col-form-label">{{T .Loc "pet.gender"}}</label>
 				<div class="col-md-10">
 					{{Checks "Name=" "gender" "List=" .PetGenderMap "Values=" .Q.Gender}}
 				</div>
 			</div>
-			<div class="row py-3">
+			<div class="row">
 				<label class="col-md-2 col-form-label">{{T .Loc "pet.born_at"}}</label>
 				<div class="col-md-10">
 					<input type="date" class="form-control" name="born_from">
@@ -181,13 +181,13 @@
 					<input type="date" class="form-control" name="born_to">
 				</div>
 			</div>
-			<div class="row py-3">
+			<div class="row">
 				<label class="col-md-2 col-form-label">{{T .Loc "pet.origin"}}</label>
 				<div class="col-md-10">
 					{{Select "Name=" "origin" "List=" .PetOriginMap "Values=" .Q.Origin "Multiple=" true "class=" "col2 wide" "data-spy=" "niceSelect"}}
 				</div>
 			</div>
-			<div class="row py-3">
+			<div class="row">
 				<label class="col-md-2 col-form-label">{{T .Loc "pet.temper"}}</label>
 				<div class="col-md-4">
 					{{Select "Name=" "temper" "List=" .PetTemperMap "Values=" .Q.Temper "Multiple=" true "class=" "wide" "data-spy=" "niceSelect"}}
@@ -197,7 +197,7 @@
 					{{Select "Name=" "habits" "List=" .PetHabitsMap "Values=" .Q.Habits "Multiple=" true "class=" "wide" "data-spy=" "niceSelect"}}
 				</div>
 			</div>
-			<div class="row py-3">
+			<div class="row">
 				<label class="col-md-2 col-form-label">{{T .Loc "pet.amount"}}</label>
 				<div class="col-md-10">
 					<input type="number" class="form-control" name="amount_min" size="14">
@@ -205,7 +205,7 @@
 					<input type="number" class="form-control" name="amount_max" size="14">
 				</div>
 			</div>
-			<div class="row py-3">
+			<div class="row">
 				<label class="col-md-2 col-form-label">{{T .Loc "pet.price"}}</label>
 				<div class="col-md-10">
 					<input type="number" class="form-control" name="price_min" size="14">
@@ -213,7 +213,7 @@
 					<input type="number" class="form-control" name="price_max" size="14">
 				</div>
 			</div>
-			<div class="row py-3">
+			<div class="row">
 				<label class="col-md-2 col-form-label">{{T .Loc "pet.shop_name"}}</label>
 				<div class="col-md-10">
 					<input name="shop_name" type="text" class="form-control" textclear value="{{.Q.ShopName}}"/>
@@ -239,7 +239,7 @@
 		<form class="form-horizontal lined" autocomplete="off">
 			<input type="hidden" name="_token_" value="{{.Token}}"/>
 			<input type="hidden" name="id"/>
-			<div class="row py-3">
+			<div class="row">
 				<label class="col-md-2 col-form-label required">{{T .Loc "pet.gender"}} <input type="checkbox"></label>
 				<div class="col-md-4">
 					{{Radios "Name=" "gender" "List=" .PetGenderMap "Value=" "M" "Disabled=" true}}
@@ -249,19 +249,19 @@
 					<input name="born_at" type="date" class="form-control" disabled>
 				</div>
 			</div>
-			<div class="row py-3">
+			<div class="row">
 				<label class="col-md-2 col-form-label required">{{T .Loc "pet.origin"}} <input type="checkbox" data-niceselect="true"></label>
 				<div class="col-md-10">
 					{{Select "Name=" "origin" "List=" .PetOriginMap "class=" "wide col2" "data-spy=" "niceSelect" "Disabled=" true}}
 				</div>
 			</div>
-			<div class="row py-3">
+			<div class="row">
 				<label class="col-md-2 col-form-label">{{T .Loc "pet.temper"}} <input type="checkbox"></label>
 				<div class="col-md-10">
 					{{Radios "Name=" "temper" "List=" .PetTemperMap "Value=" "N" "Disabled=" true}}
 				</div>
 			</div>
-			<div class="row py-3">
+			<div class="row">
 				<label class="col-md-2 col-form-label">{{T .Loc "pet.habits"}} <input type="checkbox" name="uhabits" value="true"></label>
 				<div class="col-md-10">
 					{{Checks "Name=" "habits" "List=" .PetHabitsMap "Disabled=" true}}

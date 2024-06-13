@@ -11,27 +11,27 @@
 			{{template "alerts" .}}
 		</div>
 
-		<form id="pwdchg_form" class="form-horizontal" autocomplete="off">
+		<form id="pwdchg_form" class="form-horizontal ui-row-py3" autocomplete="off">
 			<input type="hidden" name="_token_" value="{{.Token}}"/>
-			<div class="row py-3">
+			<div class="row">
 				<label class="col-md-2 col-form-label">{{T .Loc "pwdchg.oldpwd"}}</label>
 				<div class="col-md-10">
 					<input name="oldpwd" type="password" class="form-control" size="40" maxlength="16" textclear/>
 				</div>
 			</div>
-			<div class="row py-3">
+			<div class="row">
 				<label class="col-md-2 col-form-label">{{T .Loc "pwdchg.newpwd"}}</label>
 				<div class="col-md-10">
 					<input name="newpwd" type="password" class="form-control" size="40" maxlength="16" textclear/>
 				</div>
 			</div>
-			<div class="row py-3">
+			<div class="row">
 				<label class="col-md-2 col-form-label">{{T .Loc "pwdchg.conpwd"}}</label>
 				<div class="col-md-10">
 					<input name="conpwd" type="password" class="form-control" size="40" maxlength="16" textclear/>
 				</div>
 			</div>
-			<div class="row py-3">
+			<div class="row">
 				<div class="offset-md-2 col-md-10">
 					<button type="submit" class="btn btn-primary">
 						<i class="{{T .Loc "icon.save"}}"></i>

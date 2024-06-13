@@ -12,7 +12,7 @@
 
 		<form id="jobchain_form" class="form-horizontal grey padded">
 			<input type="hidden" name="_token_" value="{{.Token}}"/>
-			<div class="row py-1">
+			<div class="row">
 				<label class="col-md-2 col-form-label">{{T .Loc "pet.clear.reset_sequence"}}</label>
 				<div class="col-md-10">
 					{{Radios "Name=" "reset_sequence" "List=" .PetResetSequenceMap "Value=" .Arg.ResetSequence}}
