@@ -43,7 +43,9 @@
 					{{range $j, $cg := $cc.Groups}}
 					<div id="cg_{{$cg.Name}}" class="tab-pane{{if eq $j 0}} active{{end}}">
 						{{$cgw := (T $.Loc (print "config.group.well." $cg.Name))}}
-						{{if $cgw}}<div class="well">{{$cgw}}</div>{{end}}
+						{{if $cgw}}
+						<div class="well"><div class="offset-md-2 col">{{$cgw}}</div></div>
+						{{end}}
 
 						<form class="cfgform ui-form lined grey padded rounded" method="POST" autocomplete="off">
 							{{range $c := $cg.Items}}

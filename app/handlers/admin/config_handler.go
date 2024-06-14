@@ -80,15 +80,19 @@ func ConfigIndex(c *xin.Context) {
 	configs := configList(c)
 
 	lists := map[string]any{}
-	for _, cfg := range configs {
-		list := tbs.GetText(c.Locale, "config.list."+cfg.Name)
-		if list != "" {
-			lhm := cog.NewLinkedHashMap[string, string]()
-			err := lhm.UnmarshalJSON(str.UnsafeBytes(list))
-			if err != nil {
-				c.Logger.Errorf("Invalid JSON config.list.%s: %v", cfg.Name, err)
+	for _, cc := range configs {
+		for _, cg := range cc.Groups {
+			for _, cfg := range cg.Items {
+				list := tbs.GetText(c.Locale, "config.list."+cfg.Name)
+				if list != "" {
+					lhm := cog.NewLinkedHashMap[string, string]()
+					err := lhm.UnmarshalJSON(str.UnsafeBytes(list))
+					if err != nil {
+						c.Logger.Errorf("Invalid JSON config.list.%s: %v", cfg.Name, err)
+					}
+					lists[cfg.Name] = lhm
+				}
 			}
-			lists[cfg.Name] = lhm
 		}
 	}
 
