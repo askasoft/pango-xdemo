@@ -48,37 +48,37 @@
 				<input type="hidden" name="d" value="{{.Q.Dir}}"/>
 
 				<div class="row">
-					<label class="col-md-2 col-form-label">{{T .Loc "user.id"}}</label>
-					<div class="col-md-4">
+					<label class="col-md-2 col-xxl-1 col-form-label">{{T .Loc "user.id"}}</label>
+					<div class="col-md-4 col-xxl-5">
 						<input name="id" type="text" class="form-control" textclear value="{{if ne .Q.ID 0}}{{.Q.ID}}{{end}}"/>
 					</div>
-					<label class="col-md-2 col-form-label">{{T .Loc "user.name"}}</label>
-					<div class="col-md-4">
+					<label class="col-md-2 col-xxl-1 col-form-label">{{T .Loc "user.name"}}</label>
+					<div class="col-md-4 col-xxl-5">
 						<input name="name" type="text" class="form-control" textclear value="{{.Q.Name}}"/>
 					</div>
 				</div>
 				<div class="row">
-					<label class="col-md-2 col-form-label">{{T .Loc "user.email"}}</label>
-					<div class="col-md-4">
+					<label class="col-md-2 col-xxl-1 col-form-label">{{T .Loc "user.email"}}</label>
+					<div class="col-md-4 col-xxl-5">
 						<input name="email" type="text" class="form-control" textclear value="{{.Q.Email}}"/>
 					</div>
-					<label class="col-md-2 col-form-label">{{T .Loc "user.cidr"}}</label>
-					<div class="col-md-4">
+					<label class="col-md-2 col-xxl-1 col-form-label">{{T .Loc "user.cidr"}}</label>
+					<div class="col-md-4 col-xxl-5">
 						<input name="cidr" type="text" class="form-control" textclear value="{{.Q.CIDR}}"/>
 					</div>
 				</div>
 				<div class="row">
-					<label class="col-md-2 col-form-label">{{T .Loc "user.role"}}</label>
-					<div class="col-md-4">
+					<label class="col-md-2 col-xxl-1 col-form-label">{{T .Loc "user.role"}}</label>
+					<div class="col-md-4 col-xxl-5">
 						{{Checks "Name=" "role" "List=" .UserRoleMap "Values=" .Q.Role}}
 					</div>
-					<label class="col-md-2 col-form-label">{{T .Loc "user.status"}}</label>
-					<div class="col-md-4">
+					<label class="col-md-2 col-xxl-1 col-form-label">{{T .Loc "user.status"}}</label>
+					<div class="col-md-4 col-xxl-5">
 						{{Checks "Name=" "status" "List=" .UserStatusMap "Values=" .Q.Status}}
 					</div>
 				</div>
 				<div class="row pt-3 pb-2">
-					<div class="offset-md-2 col-md-10">
+					<div class="offset-md-2 offset-xxl-1">
 						<button type="submit" class="btn btn-primary"><i class="{{T .Loc "icon.search"}}"></i> {{T .Loc "button.search"}}</button>
 						<button type="reset" class="btn btn-secondary"><i class="{{T .Loc "icon.clear"}}"></i> {{T .Loc "button.clear"}}</button>
 					</div>
@@ -123,8 +123,9 @@
 	</form>
 </div>
 
-<div id="users_deletebat_popup" class="ui-popup s-popup-detail w800" data-spy="popup" tabindex="-1"
-	popup-mask="true" popup-mouse="false" popup-focus="#users_deletebat_popup [name=name]">
+<div id="users_deletebat_popup" class="ui-popup s-popup-detail" data-spy="popup" tabindex="-1"
+	popup-position="center" popup-mask="true" popup-mouse="false" popup-closer="true"
+	popup-focus="#users_deletebat_popup [name=name]">
 	<div class="ui-popup-header">
 		<h4><i class="{{T .Loc "icon.deletebat"}}"></i>
 			{{T .Loc "button.deletebat"}}
@@ -172,8 +173,8 @@
 	</div>
 </div>
 
-<div id="users_bulkedit_popup" class="ui-popup s-popup-detail w800" data-spy="popup" tabindex="-1"
-	popup-position="center" popup-mouse="false">
+<div id="users_bulkedit_popup" class="ui-popup s-popup-detail" data-spy="popup" tabindex="-1"
+	popup-position="center" popup-mouse="false" popup-closer="true">
 	<div class="ui-popup-header">
 		<h4><i class="editsel {{T .Loc "icon.editsel"}}"></i><i class="editall {{T .Loc "icon.editall"}}"></i>
 			<span class="editsel">{{T .Loc "button.editsel"}}</span>
@@ -210,8 +211,8 @@
 	</div>
 </div>
 
-<div id="users_detail_popup" class="ui-popup s-popup-detail w800" data-spy="popup" tabindex="-1"
-	popup-position="center" popup-keyboard="false" popup-mouse="false" popup-mask="false" popup-closer="true" popup-loader="true"
-	popup-focus="#user_detail_name"></div>
+<div id="users_detail_popup" class="ui-popup s-popup-detail" data-spy="popup" tabindex="-1"
+	popup-position="center" popup-keyboard="false" popup-mouse="false" popup-mask="false" popup-closer="true"
+	popup-loader="true" popup-focus="#user_detail_name"></div>
 
 {{template "main_footer" .}}

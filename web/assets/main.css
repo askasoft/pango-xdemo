@@ -463,36 +463,22 @@ form div.verr {
 }
 
 .s-popup-detail {
-	width: 80vw;
-	min-width: 600px;
-}
-.s-popup-detail.wide {
 	width: 90vw;
-}
-.s-popup-detail.w600 {
-	width: 600px;
-}
-.s-popup-detail.w800 {
-	width: 800px;
-}
-.s-popup-detail.w1000 {
-	width: 1000px;
-}
-.s-popup-detail.mw600 {
-	max-width: 600px;
-}
-.s-popup-detail.mw800 {
-	max-width: 800px;
-}
-.s-popup-detail.mw1000 {
-	max-width: 1000px;
+	max-width: 767px;
 }
 .s-popup-detail .ui-popup-body {
-	max-height: 70vh;
+	min-height: 150px;
+	max-height: calc(100vh - 200px);
 	overflow-y: auto;
 }
-.s-popup-detail.wide .ui-popup-body {
-	max-height: 80vh;
+.s-popup-detail.medium {
+	max-width: 991px;
+}
+.s-popup-detail.large {
+	max-width: 1199px;
+}
+.s-popup-detail.xlarge {
+	max-width: 90vw;
 }
 .s-popup-detail .ui-popup-body pre {
 	white-space: pre-wrap;
