@@ -263,7 +263,8 @@ func addLoginHandlers(rg *xin.RouterGroup) {
 func addLoginPasswordResetHandlers(rg *xin.RouterGroup) {
 	rg.GET("/", login.PasswordResetIndex)
 	rg.POST("/send", login.PasswordResetSend)
-	rg.GET("/reset/:token", login.PasswordResetReset)
+	rg.GET("/reset/:token", login.PasswordResetConfirm)
+	rg.POST("/reset/:token", login.PasswordResetExecute)
 }
 
 func addDemosHandlers(rg *xin.RouterGroup) {

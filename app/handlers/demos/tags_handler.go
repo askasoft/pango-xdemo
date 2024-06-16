@@ -40,15 +40,20 @@ func TagsIndex(c *xin.Context) {
 	h["Arg"] = a
 
 	c.AddError(errors.New(str.Repeat("Error message. ", 20)))
-	h["Success"] = str.Repeat("Success message. ", 20)
-	h["Successes"] = []string{
-		"Success message 1.",
-		"Success message 2.",
-	}
 	h["Warning"] = str.Repeat("Warning message. ", 20)
 	h["Warnings"] = []string{
 		"Warning message 1.",
 		"Warning message 2.",
+	}
+	h["Message"] = str.Repeat("Information message. ", 20)
+	h["Messages"] = []string{
+		"Information message 1.",
+		"Information message 2.",
+	}
+	h["Success"] = str.Repeat("Success message. ", 20)
+	h["Successes"] = []string{
+		"Success message 1.",
+		"Success message 2.",
 	}
 
 	c.HTML(http.StatusOK, "demos/tags", h)

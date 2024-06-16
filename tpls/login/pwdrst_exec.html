@@ -1,0 +1,47 @@
+{{MapSet .Ctx.Attrs "styles" (Array "login/login.css")}}
+{{MapSet .Ctx.Attrs "scripts" (Array "login/pwdrst.js")}}
+{{MapSet .Ctx.Attrs "nosidenavi" true}}
+
+{{template "main_header" .}}
+
+<div class="s-section">
+	<div class="s-section-head">
+		<h2><i class="{{T .Loc "icon.login.pwdrst"}}"></i><span>{{T .Loc "menu.login.pwdrst"}}</span></h2>
+	</div>
+	<div class="s-section-body">
+		<div id="pwdrst_alert">
+			{{template "alerts" .}}
+		</div>
+
+		<br>
+
+		{{if .Ctx.Errors}}
+		<div class="text-center">
+			<a class="btn btn-secondary" href="/"><i class="fas fa-circle-arrow-right"></i> {{T .Loc "button.home"}}</a>
+		</div>
+		{{else}}
+		<form id="pwdrst_exec" class="ui-form ui-row-py3" autocomplete="off">
+			<div class="row">
+				<label class="col-md-3 col-form-label">{{T .Loc "pwdrst.newpwd"}}</label>
+				<div class="col-md-9">
+					<input name="newpwd" type="password" class="form-control" maxlength="16" textclear/>
+				</div>
+			</div>
+			<div class="row">
+				<label class="col-md-3 col-form-label">{{T .Loc "pwdrst.conpwd"}}</label>
+				<div class="col-md-9">
+					<input name="conpwd" type="password" class="form-control" maxlength="16" textclear/>
+				</div>
+			</div>
+			<div class="row">
+				<div class="offset-md-3 col-md-9">
+					<button type="submit" class="btn btn-primary"><i class="{{T .Loc "icon.rotate"}}"></i> {{T .Loc "button.reset"}}</button>
+					<a class="btn btn-secondary" href="/"><i class="fas fa-circle-arrow-right"></i> {{T .Loc "button.home"}}</a>
+				</div>
+			</div>
+		</form>
+		{{end}}
+	</div>
+</div>
+
+{{template "main_footer" .}}

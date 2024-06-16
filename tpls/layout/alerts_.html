@@ -22,6 +22,19 @@
 	</ul>
 </div>
 {{end}}
+{{if or .Message .Messages}}
+<div class="alert alert-primary alert-dismissible">
+	<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+	<ul class="fa-ul">
+		{{if .Message}}
+		<li><span class="fa-li"><i class="fas fa-circle-info"></i></span><span>{{.Message}}</span></li>
+		{{end}}
+		{{range $m := .Messages}}
+		<li><span class="fa-li"><i class="fas fa-circle-info"></i></span><span>{{$m}}</span></li>
+		{{end}}
+	</ul>
+</div>
+{{end}}
 {{if or .Success .Successes}}
 <div class="alert alert-success alert-dismissible">
 	<button type="button" class="btn-close" data-bs-dismiss="alert"></button>

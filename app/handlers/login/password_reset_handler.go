@@ -16,6 +16,7 @@ import (
 	"github.com/askasoft/pango-xdemo/app/utils/cptutil"
 	"github.com/askasoft/pango-xdemo/app/utils/smtputil"
 	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
+	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/tbs"
 	"github.com/askasoft/pango/vad"
@@ -35,10 +36,15 @@ func (pts *PwdRstToken) String() string {
 	return str.UnsafeString(bs)
 }
 
+type PwdRstArg struct {
+	Newpwd string `form:"newpwd" validate:"required,btwlen=8 ~ 16,printascii"`
+	Conpwd string `form:"conpwd" validate:"required,eqfield=Newpwd"`
+}
+
 func PasswordResetIndex(c *xin.Context) {
 	h := handlers.H(c)
 
-	c.HTML(http.StatusOK, "login/pwdrst", h)
+	c.HTML(http.StatusOK, "login/pwdrst_mail", h)
 }
 
 func PasswordResetSend(c *xin.Context) {
@@ -58,8 +64,8 @@ func PasswordResetSend(c *xin.Context) {
 	}
 
 	if user == nil {
-		c.AddError(&vadutil.ParamError{Param: "email", Message: tbs.GetText(c.Locale, "pwdrst.error.email")})
-		c.JSON(http.StatusBadRequest, handlers.E(c))
+		// show success message even user is not found
+		c.JSON(http.StatusOK, xin.H{"success": tbs.Format(c.Locale, "pwdrst.success.sent", email)})
 		return
 	}
 
@@ -67,19 +73,25 @@ func PasswordResetSend(c *xin.Context) {
 	tkenc := cptutil.MustEncrypt(app.Secret(), token.String())
 	rsurl := fmt.Sprintf("%s://%s%s/login/pwdrst/reset/%s", str.If(c.IsSecure(), "https", "http"), c.Request.Host, app.Base, tkenc)
 
+	tkexp := num.Itoa(int(app.INI.GetDuration("login", "passwordResetTokenExpires", time.Minute*10).Minutes()))
+
 	sr := strings.NewReplacer(
 		"{{SITE_NAME}}", tbs.GetText(c.Locale, "title"),
 		"{{USER_NAME}}", user.(*models.User).Name,
+		"{{USER_EMAIL}}", user.(*models.User).Email,
 		"{{REQUEST_DATE}}", models.FormatTime(time.Now()),
 		"{{RESET_URL}}", rsurl,
+		"{{EXPIRES}}", tkexp,
 	)
 	subject := sr.Replace(tbs.GetText(c.Locale, "pwdrst.email.send.subject"))
 
 	sr = strings.NewReplacer(
 		"{{SITE_NAME}}", html.EscapeString(tbs.GetText(c.Locale, "title")),
 		"{{USER_NAME}}", html.EscapeString(user.(*models.User).Name),
+		"{{USER_EMAIL}}", html.EscapeString(user.(*models.User).Email),
 		"{{REQUEST_DATE}}", html.EscapeString(models.FormatTime(time.Now())),
 		"{{RESET_URL}}", rsurl,
+		"{{EXPIRES}}", tkexp,
 	)
 	message := sr.Replace(tbs.GetText(c.Locale, "pwdrst.email.send.message"))
 
@@ -93,27 +105,45 @@ func PasswordResetSend(c *xin.Context) {
 	c.JSON(http.StatusOK, xin.H{"success": tbs.Format(c.Locale, "pwdrst.success.sent", email)})
 }
 
-func PasswordResetReset(c *xin.Context) {
+func passwordResetToken(c *xin.Context) *PwdRstToken {
 	tkenc := c.Param("token")
 	tkstr, err := cptutil.Decrypt(app.Secret(), tkenc)
 	if tkenc == "" || err != nil {
-		c.AddError(errors.New(tbs.GetText(c.Locale, "pwdrst.error.link")))
-		c.HTML(http.StatusOK, "login/pwdrst_reset", handlers.H(c))
-		return
+		c.AddError(errors.New(tbs.GetText(c.Locale, "pwdrst.error.invalid")))
+		return nil
 	}
 
 	token := &PwdRstToken{}
 	if err := json.Unmarshal(str.UnsafeBytes(tkstr), token); err != nil {
-		c.AddError(errors.New(tbs.GetText(c.Locale, "pwdrst.error.link")))
-		c.HTML(http.StatusOK, "login/pwdrst_reset", handlers.H(c))
-		return
+		c.AddError(errors.New(tbs.GetText(c.Locale, "pwdrst.error.invalid")))
+		return nil
 	}
 
-	tkexp := app.INI.GetDuration("login", "passwordResetTokenExpires", time.Hour*2)
-	tktm := time.UnixMicro(token.Timestamp)
-	if tktm.Add(tkexp).After(time.Now()) {
-		c.AddError(errors.New(tbs.GetText(c.Locale, "pwdrst.error.timeout")))
-		c.HTML(http.StatusOK, "login/pwdrst_reset", handlers.H(c))
+	tkexp := app.INI.GetDuration("login", "passwordResetTokenExpires", time.Minute*10)
+	tktm := time.UnixMilli(token.Timestamp)
+	if time.Since(tktm) > tkexp {
+		c.AddError(errors.New(tbs.GetText(c.Locale, "pwdrst.error.expired")))
+		return nil
+	}
+
+	return token
+}
+
+func PasswordResetConfirm(c *xin.Context) {
+	token := passwordResetToken(c)
+
+	h := handlers.H(c)
+	if token != nil {
+		h["Message"] = tbs.Format(c.Locale, "pwdrst.confirm", token.Email)
+	}
+
+	c.HTML(http.StatusOK, "login/pwdrst_exec", h)
+}
+
+func PasswordResetExecute(c *xin.Context) {
+	token := passwordResetToken(c)
+	if token == nil {
+		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}
 
@@ -121,50 +151,55 @@ func PasswordResetReset(c *xin.Context) {
 	if err != nil {
 		c.Logger.Error(err)
 		c.AddError(err)
-		c.HTML(http.StatusOK, "login/pwdrst_reset", handlers.H(c))
+		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}
 	if user == nil {
-		c.AddError(errors.New(tbs.GetText(c.Locale, "pwdrst.error.link")))
-		c.HTML(http.StatusOK, "login/pwdrst_reset", handlers.H(c))
+		c.AddError(errors.New(tbs.GetText(c.Locale, "pwdrst.error.invalid")))
+		c.JSON(http.StatusBadRequest, handlers.E(c))
+		return
+	}
+
+	pra := &PwdRstArg{}
+	if err := c.Bind(pra); err != nil {
+		vadutil.AddBindErrors(c, err, "pwdrst.")
+		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}
 
 	tt := tenant.FromCtx(c)
 
-	password := str.RandLetterNumbers(16)
 	mu := user.(*models.User)
-	mu.SetPassword(password)
+	mu.SetPassword(pra.Newpwd)
 
 	if err := app.GDB.Table(tt.TableUsers()).Where("id = ?", mu.ID).Update("password", mu.Password).Error; err != nil {
-		c.Logger.Error(err)
-		c.AddError(err)
-		c.HTML(http.StatusOK, "login/pwdrst_reset", handlers.H(c))
-		return
-	}
-
-	sr := strings.NewReplacer(
-		"{{SITE_NAME}}", tbs.GetText(c.Locale, "title"),
-		"{{USER_NAME}}", user.(*models.User).Name,
-		"{{PASSWORD}}", password,
-	)
-	subject := sr.Replace(tbs.GetText(c.Locale, "pwdrst.email.reset.subject"))
-
-	sr = strings.NewReplacer(
-		"{{SITE_NAME}}", html.EscapeString(tbs.GetText(c.Locale, "title")),
-		"{{USER_NAME}}", html.EscapeString(user.(*models.User).Name),
-		"{{PASSWORD}}", html.EscapeString(password),
-	)
-	message := sr.Replace(tbs.GetText(c.Locale, "pwdrst.email.reset.message"))
-
-	if err := smtputil.SendHTMLMail(token.Email, subject, message); err != nil {
 		c.Logger.Error(err)
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return
 	}
 
-	h := handlers.H(c)
-	h["Success"] = tbs.Format(c.Locale, "pwdrst.success.reset", token.Email)
-	c.HTML(http.StatusOK, "login/pwdrst_reset", h)
+	sr := strings.NewReplacer(
+		"{{SITE_NAME}}", tbs.GetText(c.Locale, "title"),
+		"{{USER_NAME}}", user.(*models.User).Name,
+		"{{USER_EMAIL}}", user.(*models.User).Email,
+		"{{RESET_DATE}}", models.FormatTime(time.Now()),
+	)
+	subject := sr.Replace(tbs.GetText(c.Locale, "pwdrst.email.reset.subject"))
+
+	sr = strings.NewReplacer(
+		"{{SITE_NAME}}", html.EscapeString(tbs.GetText(c.Locale, "title")),
+		"{{USER_NAME}}", html.EscapeString(user.(*models.User).Name),
+		"{{USER_EMAIL}}", html.EscapeString(user.(*models.User).Email),
+		"{{RESET_DATE}}", html.EscapeString(models.FormatTime(time.Now())),
+	)
+	message := sr.Replace(tbs.GetText(c.Locale, "pwdrst.email.reset.message"))
+
+	if err := smtputil.SendHTMLMail(token.Email, subject, message); err != nil {
+		c.Logger.Error(err)
+	}
+
+	c.JSON(http.StatusOK, xin.H{
+		"success": tbs.Format(c.Locale, "pwdrst.success.reset", token.Email),
+	})
 }
