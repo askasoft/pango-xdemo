@@ -198,9 +198,12 @@ var main = {
 		$l.find('[data-spy="pager"]').pager();
 		$l.find('[data-spy="sortable"]').sortable();
 	},
-	list_builder: function($l) {
+	list_builder: function($l, callback) {
 		return function(data) {
 			main.list_build($l, data);
+			if (callback) {
+				setTimeout(callback, 100);
+			}
 		};
 	},
 

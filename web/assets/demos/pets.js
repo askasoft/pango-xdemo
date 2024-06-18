@@ -24,12 +24,7 @@
 				main.form_clear_invalid($f);
 				main.loadmask();
 			},
-			success: function(data) {
-				main.list_build($('#pets_list'), data);
-				if (callback) {
-					setTimeout(callback, 100);
-				}
-			},
+			success: main.list_builder($('#pets_list'), callback),
 			error: main.form_ajax_error($f),
 			complete: main.unloadmask
 		});
