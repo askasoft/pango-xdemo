@@ -87,7 +87,7 @@ var main = {
 		delete p.c; // sort column
 		delete p.d; // sort direction
 
-		var q = $.param(p);
+		var q = $.param(p, true);
 		history.replaceState(null, null, location.href.split('?')[0] + (q ? '?' + q : ''));
 	},
 
