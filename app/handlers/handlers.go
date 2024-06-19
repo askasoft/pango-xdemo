@@ -8,22 +8,16 @@ import (
 )
 
 func Index(c *xin.Context) {
-	h := H(c)
-
-	c.HTML(http.StatusOK, "index", h)
+	c.HTML(http.StatusOK, "index", H(c))
 }
 
 func NotFound(c *xin.Context) {
-	h := H(c)
-
-	c.HTML(http.StatusNotFound, "404", h)
+	c.HTML(http.StatusNotFound, "404", H(c))
 	c.Abort()
 }
 
 func Forbidden(c *xin.Context) {
-	h := H(c)
-
-	c.HTML(http.StatusForbidden, "403", h)
+	c.HTML(http.StatusForbidden, "403", H(c))
 	c.Abort()
 }
 

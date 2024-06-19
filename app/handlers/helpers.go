@@ -34,10 +34,7 @@ func H(c *xin.Context) xin.H {
 	tt := tenant.FromCtx(c)
 	au := tenant.GetAuthUser(c)
 
-	dcm := tt.GetConfigMap()
-
 	h := xin.H{
-		"DCM":      dcm,
 		"CFG":      app.CFG,
 		"INI":      app.INI,
 		"VER":      app.Version,
