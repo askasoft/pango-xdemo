@@ -15,11 +15,12 @@ import (
 	"github.com/askasoft/pango/sqx"
 	"github.com/askasoft/pango/sqx/pqx"
 	"github.com/askasoft/pango/xin"
-	"github.com/askasoft/pango/xvw/args"
 	"gorm.io/gorm"
 )
 
 type PetQuery struct {
+	gormutil.BaseQuery
+
 	ID        int64     `form:"id,strip" json:"id"`
 	Name      string    `form:"name,strip" json:"name"`
 	BornFrom  time.Time `form:"born_from,strip" json:"born_from"`
@@ -33,9 +34,6 @@ type PetQuery struct {
 	PriceMin  string    `form:"price_min" json:"price_min"`
 	PriceMax  string    `form:"price_max" json:"price_max"`
 	ShopName  string    `form:"shop_name,strip" json:"shop_name"`
-
-	args.Pager
-	args.Sorter
 }
 
 func (pq *PetQuery) Normalize(c *xin.Context) {
@@ -126,17 +124,16 @@ func countPets(tt tenant.Tenant, pq *PetQuery) (int, error) {
 func findPets(tt tenant.Tenant, pq *PetQuery) (arts []*models.Pet, err error) {
 	tx := filterPets(tt, pq)
 
-	ob := gormutil.Sorter2OrderBy(&pq.Sorter)
-	tx = tx.Offset(pq.Start()).Limit(pq.Limit).Order(ob)
+	tx = pq.AddOrder(tx, "id")
+	tx = pq.AddPager(tx)
 
 	err = tx.Omit("shop_address", "shop_link", "description").Find(&arts).Error
 	return
 }
 
 func petListArgs(c *xin.Context) (pq *PetQuery, err error) {
-	pq = &PetQuery{
-		Sorter: args.Sorter{Col: "id", Dir: "desc"},
-	}
+	pq = &PetQuery{}
+	pq.Col, pq.Dir = "id", "desc"
 
 	err = c.Bind(pq)
 	return

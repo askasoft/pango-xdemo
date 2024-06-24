@@ -12,20 +12,18 @@ import (
 	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
 	"github.com/askasoft/pango/sqx"
 	"github.com/askasoft/pango/xin"
-	"github.com/askasoft/pango/xvw/args"
 	"gorm.io/gorm"
 )
 
 type UserQuery struct {
+	gormutil.BaseQuery
+
 	ID     int64    `json:"id" form:"id,strip"`
 	Name   string   `json:"name" form:"name,strip"`
 	Email  string   `json:"email" form:"email,strip"`
 	Role   []string `json:"role" form:"role,strip"`
 	Status []string `json:"status" form:"status,strip"`
 	CIDR   string   `json:"cidr" form:"cidr,strip"`
-
-	args.Pager
-	args.Sorter
 }
 
 func (uq *UserQuery) Normalize(c *xin.Context) {
@@ -96,17 +94,16 @@ func countUsers(c *xin.Context, uq *UserQuery) (int, error) {
 func findUsers(c *xin.Context, uq *UserQuery) (usrs []*models.User, err error) {
 	tx := filterUsers(c, uq)
 
-	ob := gormutil.Sorter2OrderBy(&uq.Sorter)
-	tx = tx.Offset(uq.Start()).Limit(uq.Limit).Order(ob)
+	tx = uq.AddOrder(tx, "id")
+	tx = uq.AddPager(tx)
 
 	err = tx.Find(&usrs).Error
 	return
 }
 
 func userListArgs(c *xin.Context) (uq *UserQuery, err error) {
-	uq = &UserQuery{
-		Sorter: args.Sorter{Col: "id", Dir: "asc"},
-	}
+	uq = &UserQuery{}
+	uq.Col, uq.Dir = "id", "asc"
 
 	err = c.Bind(uq)
 	return

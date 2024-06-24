@@ -11,7 +11,6 @@ import (
 	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
 	"github.com/askasoft/pango/sqx"
 	"github.com/askasoft/pango/xin"
-	"github.com/askasoft/pango/xvw/args"
 	"gorm.io/gorm"
 )
 
@@ -21,10 +20,9 @@ type TenantInfo struct {
 }
 
 type TenantQuery struct {
-	Name string `json:"name" form:"name,strip"`
+	gormutil.BaseQuery
 
-	args.Pager
-	args.Sorter
+	Name string `json:"name" form:"name,strip"`
 }
 
 func (tq *TenantQuery) Normalize(c *xin.Context) {
@@ -61,8 +59,8 @@ func countTenants(tq *TenantQuery) (int, error) {
 func findTenants(tq *TenantQuery) (tenants []*TenantInfo, err error) {
 	tx := filterTenants(tq).Select("schema_name AS name, obj_description(schema_name::regnamespace, 'pg_namespace') AS comment")
 
-	ob := gormutil.Sorter2OrderBy(&tq.Sorter)
-	tx = tx.Offset(tq.Start()).Limit(tq.Limit).Order(ob)
+	tx = tq.AddOrder(tx, "id")
+	tx = tq.AddPager(tx)
 
 	r := tx.Find(&tenants)
 	err = r.Error
@@ -70,9 +68,8 @@ func findTenants(tq *TenantQuery) (tenants []*TenantInfo, err error) {
 }
 
 func tenantListArgs(c *xin.Context) (tq *TenantQuery, err error) {
-	tq = &TenantQuery{
-		Sorter: args.Sorter{Col: "name", Dir: "asc"},
-	}
+	tq = &TenantQuery{}
+	tq.Col, tq.Dir = "name", "asc"
 
 	err = c.Bind(tq)
 	return
