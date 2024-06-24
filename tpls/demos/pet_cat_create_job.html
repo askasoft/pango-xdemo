@@ -10,14 +10,13 @@
 	<div class="s-section-body">
 		<div class="well">{{T .Loc "pet.catcreate.well"}}</div>
 
-		<form id="job_form" class="ui-form grey padded" autocomplete="off"
-			data-form="{{T .Loc "label.parameter"}}" data-copy="{{T .Loc "button.copy"}}">
+		<form id="job_form" class="ui-form grey padded" data-form="{{T .Loc "label.parameter"}}" data-copy="{{T .Loc "button.copy"}}">
 			<div class="row">
 				<label class="col-md-2 col-form-label">{{T .Loc "label.items"}}</label>
 				<div class="col-md-10">
 					<div class="input-group w-auto">
 						<input type="number" class="form-control" name="items" size="7" min="1" max="1000" value="{{.Arg.Items}}">
-						<span class="input-group-text">{{T .Loc "label.item"}}</span>
+						<span class="input-group-text">{{T .Loc "label.unit.item"}}</span>
 					</div>
 				</div>
 			</div>
@@ -26,7 +25,7 @@
 				<div class="col-md-10">
 					<div class="input-group w-auto">
 						<input type="number" class="form-control" name="sleep" size="7" min="0" max="1000" value="{{.Arg.Sleep}}">
-						<span class="input-group-text">{{T .Loc "label.millisecond"}}</span>
+						<span class="input-group-text">{{T .Loc "label.unit.millisecond"}}</span>
 					</div>
 				</div>
 			</div>
