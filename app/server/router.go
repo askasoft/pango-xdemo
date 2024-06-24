@@ -273,10 +273,12 @@ func addDemosHandlers(rg *xin.RouterGroup) {
 	rg.Use(app.XCN.Handler())
 
 	addDemosPetsHandlers(rg.Group("/pets"))
+	addDemosChineseHandlers(rg.Group("/chiconv"))
 
 	rg.GET("/tags/", demos.TagsIndex)
 	rg.POST("/tags/", demos.TagsIndex)
 	rg.GET("/uploads/", demos.UploadsIndex)
+
 }
 
 func addDemosPetsHandlers(rg *xin.RouterGroup) {
@@ -335,6 +337,12 @@ func addDemosPetResetHandlers(rg *xin.RouterGroup) {
 	rg.GET("/status", demos.PetResetJobChainCtrl.Status)
 	rg.POST("/start", demos.PetResetJobChainCtrl.Start)
 	rg.POST("/abort", demos.PetResetJobChainCtrl.Abort)
+}
+
+func addDemosChineseHandlers(rg *xin.RouterGroup) {
+	rg.GET("/", demos.ChiconvIndex)
+	rg.POST("/s2t", demos.ChiconvS2T)
+	rg.POST("/t2s", demos.ChiconvT2S)
 }
 
 func addUserHandlers(rg *xin.RouterGroup) {

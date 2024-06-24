@@ -1,0 +1,27 @@
+{{MapSet .Ctx.Attrs "scripts" (Array "demos/chiconv.js")}}
+
+{{template "main_header" .}}
+
+<div class="s-section">
+	<div class="s-section-head">
+		<h2><i class="{{T .Loc "icon.demos.chiconv"}}"></i><span>{{T .Loc "menu.demos.chiconv"}}</span></h2>
+	</div>
+	<div id="chiconv" class="s-section-body label-bold">
+		<div class="row">
+			<div class="col-md-5">
+				<label class="col-form-label">{{T .Loc "chiconv.simplified"}}</label>
+				<textarea id="simplified" class="form-control" rows="10" textclear autosize enterfire="#s2t">自然语言处理是人工智能领域中的一个重要方向。</textarea>
+			</div>
+			<div class="col-md-2 py-3 d-flex flex-column justify-content-center">
+				<button id="s2t" class="btn btn-primary my-1">{{T .Loc "chiconv.s2t"}}</button>
+				<button id="t2s" class="btn btn-secondary my-1">{{T .Loc "chiconv.t2s"}}</button>
+			</div>
+			<div class="col-md-5">
+				<label class="col-form-label">{{T .Loc "chiconv.traditional"}}</label>
+				<textarea id="traditional" class="form-control" rows="10" textclear autosize enterfire="#t2s">自然語言處理是人工智能領域中的一個重要方向。</textarea>
+			</div>
+		</div>
+	</div>
+</div>
+
+{{template "main_footer" .}}
