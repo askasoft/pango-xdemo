@@ -9,7 +9,7 @@ import (
 	"github.com/askasoft/pango/xin"
 )
 
-var PetCatCreateJobCtrl = handlers.NewJobHandler(newPetCatCreateJobController)
+var PetCatCreateJobHandler = handlers.NewJobHandler(newPetCatCreateJobController)
 
 func newPetCatCreateJobController() handlers.JobCtrl {
 	jc := &PetCatCreateJobController{

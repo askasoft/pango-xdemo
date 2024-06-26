@@ -9,7 +9,7 @@ import (
 	"github.com/askasoft/pango/xin"
 )
 
-var PetResetJobChainCtrl = handlers.NewJobChainHandler(newPetResetJobChainController)
+var PetResetJobChainHandler = handlers.NewJobChainHandler(newPetResetJobChainController)
 
 func newPetResetJobChainController() handlers.JobChainCtrl {
 	jc := &PetResetJobChainController{

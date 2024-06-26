@@ -9,7 +9,7 @@ import (
 	"github.com/askasoft/pango/xin"
 )
 
-var PetClearJobCtrl = handlers.NewJobHandler(newPetClearJobController)
+var PetClearJobHandler = handlers.NewJobHandler(newPetClearJobController)
 
 func newPetClearJobController() handlers.JobCtrl {
 	jc := &PetClearJobController{

@@ -17,7 +17,7 @@ import (
 	"github.com/askasoft/pango/xin"
 )
 
-var UserCsvImportJobCtrl = handlers.NewJobHandler(newUserCsvImportJobController)
+var UserCsvImportJobHandler = handlers.NewJobHandler(newUserCsvImportJobController)
 
 func newUserCsvImportJobController() handlers.JobCtrl {
 	jc := &UserCsvImportJobController{

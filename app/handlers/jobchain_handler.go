@@ -22,22 +22,30 @@ type JobChainHandler struct {
 	create func() JobChainCtrl
 }
 
-func (jh *JobChainHandler) Index(c *xin.Context) {
-	jh.create().Index(c)
+func (jch *JobChainHandler) Index(c *xin.Context) {
+	jch.create().Index(c)
 }
 
-func (jh *JobChainHandler) List(c *xin.Context) {
-	jh.create().List(c)
+func (jch *JobChainHandler) List(c *xin.Context) {
+	jch.create().List(c)
 }
 
-func (jh *JobChainHandler) Start(c *xin.Context) {
-	jh.create().Start(c)
+func (jch *JobChainHandler) Start(c *xin.Context) {
+	jch.create().Start(c)
 }
 
-func (jh *JobChainHandler) Abort(c *xin.Context) {
-	jh.create().Abort(c)
+func (jch *JobChainHandler) Abort(c *xin.Context) {
+	jch.create().Abort(c)
 }
 
-func (jh *JobChainHandler) Status(c *xin.Context) {
-	jh.create().Status(c)
+func (jch *JobChainHandler) Status(c *xin.Context) {
+	jch.create().Status(c)
+}
+
+func (jch *JobChainHandler) Router(rg *xin.RouterGroup) {
+	rg.GET("/", jch.Index)
+	rg.GET("/list", jch.List)
+	rg.GET("/status", jch.Status)
+	rg.POST("/start", jch.Start)
+	rg.POST("/abort", jch.Abort)
 }

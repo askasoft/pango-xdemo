@@ -46,3 +46,12 @@ func (jh *JobHandler) Start(c *xin.Context) {
 func (jh *JobHandler) Abort(c *xin.Context) {
 	jh.create().Abort(c)
 }
+
+func (jh *JobHandler) Router(rg *xin.RouterGroup) {
+	rg.GET("/", jh.Index)
+	rg.GET("/list", jh.List)
+	rg.GET("/logs", jh.Logs)
+	rg.GET("/status", jh.Status)
+	rg.POST("/start", jh.Start)
+	rg.POST("/abort", jh.Abort)
+}
