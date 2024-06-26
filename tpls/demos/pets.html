@@ -237,7 +237,7 @@
 				<div class="col-md-4">
 					{{Radios "Name=" "gender" "List=" .PetGenderMap "Value=" "M" "Disabled=" true}}
 				</div>
-				<label class="col-md-2 col-form-label required">{{T .Loc "pet.born_at"}} <input type="checkbox" name="uborn_at" value="true"></label>
+				<label class="col-md-2 col-form-label required">{{T .Loc "pet.born_at"}} <input type="checkbox"></label>
 				<div class="col-md-4">
 					<input name="born_at" type="date" class="form-control" disabled>
 				</div>
@@ -255,7 +255,7 @@
 				</div>
 			</div>
 			<div class="row">
-				<label class="col-md-2 col-form-label">{{T .Loc "pet.habits"}} <input type="checkbox" name="uhabits" value="true"></label>
+				<label class="col-md-2 col-form-label">{{T .Loc "pet.habits"}} <input type="checkbox" name="habits" value=""></label>
 				<div class="col-md-10">
 					{{Checks "Name=" "habits" "List=" .PetHabitsMap "Disabled=" true}}
 				</div>

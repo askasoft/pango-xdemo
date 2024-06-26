@@ -342,7 +342,7 @@
 					if (us.role) {
 						$trs.find('td.role').text(URM[us.role]);
 					}
-					if (us.ucidr) {
+					if ('cidr' in us) {
 						$trs.find('td.cidr > pre').text(us.cidr);
 					}
 					main.blink($trs);

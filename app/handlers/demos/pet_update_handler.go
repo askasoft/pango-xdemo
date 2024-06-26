@@ -215,14 +215,12 @@ func PetUpdate(c *xin.Context) {
 }
 
 type PetUpdatesArg struct {
-	ID      string          `json:"id,omitempty" form:"id,strip"`
-	Gender  string          `json:"gender" form:"gender,strip"`
-	BornAt  time.Time       `json:"born_at" form:"born_at"`
-	UbornAt bool            `json:"uborn_at" form:"uborn_at"`
-	Origin  string          `json:"origin" form:"origin,strip"`
-	Temper  string          `json:"temper" form:"temper,strip"`
-	Habits  pqx.StringArray `json:"habits" form:"habits,strip"`
-	Uhabits bool            `json:"uhabits" form:"uhabits"`
+	ID     string           `json:"id,omitempty" form:"id,strip"`
+	Gender string           `json:"gender" form:"gender,strip"`
+	BornAt *time.Time       `json:"born_at" form:"born_at"`
+	Origin string           `json:"origin" form:"origin,strip"`
+	Temper string           `json:"temper" form:"temper,strip"`
+	Habits *pqx.StringArray `json:"habits" form:"habits,strip"`
 }
 
 func PetUpdates(c *xin.Context) {
@@ -230,14 +228,14 @@ func PetUpdates(c *xin.Context) {
 	if err := c.Bind(pua); err != nil {
 		vadutil.AddBindErrors(c, err, "pet.")
 	}
-	if pua.UbornAt && pua.BornAt.IsZero() {
+	if pua.Gender == "" && pua.BornAt == nil && pua.Origin == "" && pua.Temper == "" && pua.Habits == nil {
+		c.AddError(errors.New(tbs.GetText(c.Locale, "error.request.invalid")))
+	}
+	if pua.BornAt != nil && pua.BornAt.IsZero() {
 		c.AddError(&vadutil.ParamError{
 			Param:   "born_at",
 			Message: tbs.Format(c.Locale, "error.param.required", tbs.GetText(c.Locale, "pet.born_at")),
 		})
-	}
-	if pua.Gender == "" && !pua.UbornAt && pua.Origin == "" && pua.Temper == "" && !pua.Uhabits {
-		c.AddError(errors.New(tbs.GetText(c.Locale, "error.request.invalid")))
 	}
 
 	if len(c.Errors) > 0 {
@@ -273,8 +271,8 @@ func PetUpdates(c *xin.Context) {
 			pet.Gender = pua.Gender
 			cols = append(cols, "gender")
 		}
-		if !pua.BornAt.IsZero() {
-			pet.BornAt = pua.BornAt
+		if pua.BornAt != nil {
+			pet.BornAt = *pua.BornAt
 			cols = append(cols, "born_at")
 		}
 		if pua.Origin != "" {
@@ -285,8 +283,8 @@ func PetUpdates(c *xin.Context) {
 			pet.Temper = pua.Temper
 			cols = append(cols, "temper")
 		}
-		if pua.Uhabits {
-			pet.Habits = pua.Habits
+		if pua.Habits != nil {
+			pet.Habits = str.Strips(*pua.Habits)
 			cols = append(cols, "habits")
 		}
 

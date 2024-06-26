@@ -201,11 +201,10 @@ func UserUpdate(c *xin.Context) {
 }
 
 type UserUpdatesArg struct {
-	ID     string `json:"id,omitempty" form:"id,strip"`
-	Role   string `json:"role" form:"role,strip"`
-	Status string `json:"status" form:"status,strip"`
-	CIDR   string `json:"cidr" form:"cidr,strip"`
-	Ucidr  bool   `json:"ucidr" form:"ucidr"`
+	ID     string  `json:"id,omitempty" form:"id,strip"`
+	Role   string  `json:"role" form:"role,strip"`
+	Status string  `json:"status" form:"status,strip"`
+	CIDR   *string `json:"cidr" form:"cidr,strip"`
 }
 
 func UserUpdates(c *xin.Context) {
@@ -216,7 +215,7 @@ func UserUpdates(c *xin.Context) {
 	userValidateRole(c, uua.Role)
 	userValidateStatus(c, uua.Status)
 
-	if uua.Role == "" && uua.Status == "" && !uua.Ucidr {
+	if uua.Role == "" && uua.Status == "" && uua.CIDR == nil {
 		c.AddError(errors.New(tbs.GetText(c.Locale, "error.request.invalid")))
 	}
 
@@ -261,8 +260,8 @@ func UserUpdates(c *xin.Context) {
 			user.Status = uua.Status
 			cols = append(cols, "status")
 		}
-		if uua.Ucidr {
-			user.CIDR = uua.CIDR
+		if uua.CIDR != nil {
+			user.CIDR = *uua.CIDR
 			cols = append(cols, "cidr")
 		}
 

@@ -345,7 +345,7 @@
 					if (us.gender) {
 						$trs.find('td.gender').text(PGM[us.gender]);
 					}
-					if (us.uborn_at) {
+					if (us.born_at) {
 						$trs.find('td.born_at').text(main.format_date(us.born_at));
 					}
 					if (us.origin) {
@@ -354,7 +354,7 @@
 					if (us.temper) {
 						$trs.find('td.temper').text(PTM[us.temper]);
 					}
-					if (us.uhabits) {
+					if (us.habits) {
 						var hs = [];
 						$.each(us.habits, function(i, h) {
 							hs.push($('<b>').text(PHM[h]));
