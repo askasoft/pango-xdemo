@@ -204,7 +204,7 @@ type UserUpdatesArg struct {
 	ID     string  `json:"id,omitempty" form:"id,strip"`
 	Role   string  `json:"role" form:"role,strip"`
 	Status string  `json:"status" form:"status,strip"`
-	CIDR   *string `json:"cidr" form:"cidr,strip"`
+	CIDR   *string `json:"cidr" form:"cidr,strip" validate:"omitempty,cidrs"`
 }
 
 func UserUpdates(c *xin.Context) {
