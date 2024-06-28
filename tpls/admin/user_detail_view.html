@@ -1,5 +1,5 @@
 <div class="ui-popup-header">
-	<h4><i class="{{T .Loc "icon.user.detail"}}"></i>
+	<h4>{{I "user.detail"}}
 		{{T .Loc "user.detail.header"}}
 		#{{.User.ID}}
 	</h4>
@@ -31,7 +31,7 @@
 	</div>
 </div>
 <div class="ui-popup-footer">
-	<button type="button" class="btn btn-secondary" popup-dismiss="true"><i class="{{T .Loc "icon.close"}}"></i> {{T .Loc "button.close"}}</button>
+	<button type="button" class="btn btn-secondary" popup-dismiss="true">{{I "close"}} {{T .Loc "button.close"}}</button>
 </div>
 <i class="prev" action="edit"></i>
 <i class="next" action="edit"></i>

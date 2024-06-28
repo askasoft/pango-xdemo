@@ -11,17 +11,17 @@
 			<i class="fas fa-bars"></i>
 		</button>
 		<ul class="dropdown-menu dropdown-menu-end">
-			<li><a class="dropdown-item" href="{{.Base}}/demos/tags/"><i class="{{T .Loc "icon.demos.tags"}}"></i><span>{{T .Loc "menu.demos.tags"}}</span></a></li>
-			<li><a class="dropdown-item" href="{{.Base}}/demos/uploads/"><i class="{{T .Loc "icon.demos.uploads"}}"></i><span>{{T .Loc "menu.demos.uploads"}}</span></a></li>
-			<li><a class="dropdown-item" href="{{.Base}}/demos/chiconv/"><i class="{{T .Loc "icon.demos.chiconv"}}"></i><span>{{T .Loc "menu.demos.chiconv"}}</span></a></li>
+			<li><a class="dropdown-item" href="{{.Base}}/demos/tags/">{{I "demos.tags"}}<span>{{T .Loc "menu.demos.tags"}}</span></a></li>
+			<li><a class="dropdown-item" href="{{.Base}}/demos/uploads/">{{I "demos.uploads"}}<span>{{T .Loc "menu.demos.uploads"}}</span></a></li>
+			<li><a class="dropdown-item" href="{{.Base}}/demos/chiconv/">{{I "demos.chiconv"}}<span>{{T .Loc "menu.demos.chiconv"}}</span></a></li>
 			<li><a class="dropdown-item" href="{{.Base}}/403/"><i class="fas fa-ban"></i><span>403</span></a></li>
 			<li><a class="dropdown-item" href="{{.Base}}/404/"><i class="fas fa-compass"></i><span>404</span></a></li>
 			<li class="divider"></li>
-			<li><a class="dropdown-item" href="{{.Base}}/demos/pets/"><i class="{{T .Loc "icon.demos.pets.list"}}"></i><span>{{T .Loc "menu.demos.pets.list"}}</span></a></li>
-			<li><a class="dropdown-item" href="{{.Base}}/demos/pets/jobs/clear/"><i class="{{T .Loc "icon.demos.pets.clear"}}"></i><span>{{T .Loc "menu.demos.pets.clear"}}</span></a></li>
-			<li><a class="dropdown-item" href="{{.Base}}/demos/pets/jobs/catcreate/"><i class="{{T .Loc "icon.demos.pets.catcreate"}}"></i><span>{{T .Loc "menu.demos.pets.catcreate"}}</span></a></li>
-			<li><a class="dropdown-item" href="{{.Base}}/demos/pets/jobs/dogcreate/"><i class="{{T .Loc "icon.demos.pets.dogcreate"}}"></i><span>{{T .Loc "menu.demos.pets.dogcreate"}}</span></a></li>
-			<li><a class="dropdown-item" href="{{.Base}}/demos/pets/jobs/reset/"><i class="{{T .Loc "icon.demos.pets.reset"}}"></i><span>{{T .Loc "menu.demos.pets.reset"}}</span></a></li>
+			<li><a class="dropdown-item" href="{{.Base}}/demos/pets/">{{I "demos.pets.list"}}<span>{{T .Loc "menu.demos.pets.list"}}</span></a></li>
+			<li><a class="dropdown-item" href="{{.Base}}/demos/pets/jobs/clear/">{{I "demos.pets.clear"}}<span>{{T .Loc "menu.demos.pets.clear"}}</span></a></li>
+			<li><a class="dropdown-item" href="{{.Base}}/demos/pets/jobs/catcreate/">{{I "demos.pets.catcreate"}}<span>{{T .Loc "menu.demos.pets.catcreate"}}</span></a></li>
+			<li><a class="dropdown-item" href="{{.Base}}/demos/pets/jobs/dogcreate/">{{I "demos.pets.dogcreate"}}<span>{{T .Loc "menu.demos.pets.dogcreate"}}</span></a></li>
+			<li><a class="dropdown-item" href="{{.Base}}/demos/pets/jobs/reset/">{{I "demos.pets.reset"}}<span>{{T .Loc "menu.demos.pets.reset"}}</span></a></li>
 		</ul>
 	</div>
 	{{if .AuthUser}}
@@ -31,27 +31,27 @@
 		</button>
 		<ul class="dropdown-menu dropdown-menu-end">
 			{{if .AuthUser.IsSuper}}
-			<li><a class="dropdown-item" href="{{.Base}}/s/job/"><i class="{{T .Loc "icon.super.job"}}"></i><span>{{T .Loc "menu.super.job"}}</span></a></li>
-			<li><a class="dropdown-item" href="{{.Base}}/s/shell/"><i class="{{T .Loc "icon.super.shell"}}"></i><span>{{T .Loc "menu.super.shell"}}</span></a></li>
-			<li><a class="dropdown-item" href="{{.Base}}/s/sql/"><i class="{{T .Loc "icon.super.sql"}}"></i><span>{{T .Loc "menu.super.sql"}}</span></a></li>
+			<li><a class="dropdown-item" href="{{.Base}}/s/job/">{{I "super.job"}}<span>{{T .Loc "menu.super.job"}}</span></a></li>
+			<li><a class="dropdown-item" href="{{.Base}}/s/shell/">{{I "super.shell"}}<span>{{T .Loc "menu.super.shell"}}</span></a></li>
+			<li><a class="dropdown-item" href="{{.Base}}/s/sql/">{{I "super.sql"}}<span>{{T .Loc "menu.super.sql"}}</span></a></li>
 			<li class="divider"></li>
 			{{end}}
 			{{if and .AuthUser.IsSuper (eq .CFG.app.tenants "true")}}
-			<li><a class="dropdown-item" href="{{.Base}}/s/tenants/"><i class="{{T .Loc "icon.super.tenants"}}"></i><span>{{T .Loc "menu.super.tenants"}}</span></a></li>
+			<li><a class="dropdown-item" href="{{.Base}}/s/tenants/">{{I "super.tenants"}}<span>{{T .Loc "menu.super.tenants"}}</span></a></li>
 			{{end}}
 			{{if .AuthUser.IsAdmin}}
-			<li><a class="dropdown-item" href="{{.Base}}/a/users/"><i class="{{T .Loc "icon.admin.users"}}"></i><span>{{T .Loc "menu.admin.users"}}</span></a></li>
-			<li><a class="dropdown-item" href="{{.Base}}/a/config/"><i class="{{T .Loc "icon.admin.config"}}"></i><span>{{T .Loc "menu.admin.config"}}</span></a></li>
+			<li><a class="dropdown-item" href="{{.Base}}/a/users/">{{I "admin.users"}}<span>{{T .Loc "menu.admin.users"}}</span></a></li>
+			<li><a class="dropdown-item" href="{{.Base}}/a/config/">{{I "admin.config"}}<span>{{T .Loc "menu.admin.config"}}</span></a></li>
 			<li class="divider"></li>
 			{{end}}
-			<li><a class="dropdown-item" href="{{.Base}}/u/pwdchg/"><i class="{{T .Loc "icon.user.pwdchg"}}"></i><span>{{T .Loc "menu.user.pwdchg"}}</span></a></li>
-			<li><a class="dropdown-item" href="{{.Base}}/login/logout"><i class="{{T .Loc "icon.logout"}}"></i><span>{{T .Loc "menu.logout"}}</span></a></li>
+			<li><a class="dropdown-item" href="{{.Base}}/u/pwdchg/">{{I "user.pwdchg"}}<span>{{T .Loc "menu.user.pwdchg"}}</span></a></li>
+			<li><a class="dropdown-item" href="{{.Base}}/login/logout">{{I "logout"}}<span>{{T .Loc "menu.logout"}}</span></a></li>
 		</ul>
 	</div>
 	{{else}}
 	<div>
 		<a class="btn btn-primary" href="{{.Base}}/login/">
-			<i class="{{T .Loc "icon.login"}}"></i>
+			{{I "login"}}
 			<span>{{T .Loc "menu.login"}}</span>
 		</a>
 	</div>

@@ -4,13 +4,13 @@
 
 <div class="s-section">
 	<div class="s-section-head">
-		<h2><i class="{{T .Loc "icon.super.tenants"}}"></i><span>{{T .Loc "menu.super.tenants"}}</span></h2>
+		<h2>{{I "super.tenants"}}<span>{{T .Loc "menu.super.tenants"}}</span></h2>
 	</div>
 	<div class="s-section-body">
 		<div id="tenants_alert">{{template "alerts" .}}</div>
 		
 		<fieldset id="tenants_listfset" class="ui-fieldset collapsed" data-spy="fieldset">
-			<legend class="circle"><i class="{{T .Loc "icon.search"}}"></i>{{T .Loc "button.search"}}</legend>
+			<legend class="circle">{{I "search"}}{{T .Loc "button.search"}}</legend>
 			<form id="tenants_listform"  class="ui-form grey padded" method="POST">
 				<input type="hidden" name="p" value="{{.Q.Page}}"/>
 				<input type="hidden" name="l" value="{{.Q.Limit}}"/>
@@ -25,8 +25,8 @@
 				</div>
 				<div class="row pt-3 pb-2">
 					<div class="offset-md-2 col-md-10">
-						<button type="submit" class="btn btn-primary"><i class="{{T .Loc "icon.search"}}"></i> {{T .Loc "button.search"}}</button>
-						<button type="reset" class="btn btn-secondary"><i class="{{T .Loc "icon.clear"}}"></i> {{T .Loc "button.clear"}}</button>
+						<button type="submit" class="btn btn-primary">{{I "search"}} {{T .Loc "button.search"}}</button>
+						<button type="reset" class="btn btn-secondary">{{I "clear"}} {{T .Loc "button.clear"}}</button>
 					</div>
 				</div>
 			</form>
@@ -40,7 +40,7 @@
 	popup-position="center" popup-mouse="false" popup-closer="true"
 	popup-focus="#tenants_create_popup [name=name]">
 	<div class="ui-popup-header">
-		<h4><i class="{{T .Loc "icon.edit"}}"></i>
+		<h4>{{I "edit"}}
 			{{T .Loc "tenant.create.header"}}
 		</h4>
 	</div>
@@ -61,8 +61,8 @@
 		<button type="submit" class="hidden"></button>
 	</form>
 	<div class="ui-popup-footer">
-		<button type="submit" class="btn btn-primary"><i class="{{T .Loc "icon.save"}}"></i> {{T .Loc "button.create"}}</button>
-		<button type="button" class="btn btn-secondary" popup-dismiss="true"><i class="{{T .Loc "icon.close"}}"></i> {{T .Loc "button.close"}}</button>
+		<button type="submit" class="btn btn-primary">{{I "save"}} {{T .Loc "button.create"}}</button>
+		<button type="button" class="btn btn-secondary" popup-dismiss="true">{{I "close"}} {{T .Loc "button.close"}}</button>
 	</div>
 </div>
 
@@ -70,7 +70,7 @@
 	popup-position="center" popup-mouse="false" popup-closer="true"
 	popup-focus="#tenants_update_popup [name=comment]">
 	<div class="ui-popup-header">
-		<h4><i class="{{T .Loc "icon.edit"}}"></i>
+		<h4>{{I "edit"}}
 			{{T .Loc "tenant.update.header"}}
 		</h4>
 	</div>
@@ -93,8 +93,8 @@
 		</form>
 	</div>
 	<div class="ui-popup-footer">
-		<button type="submit" class="btn btn-primary"><i class="{{T .Loc "icon.save"}}"></i> {{T .Loc "button.save"}}</button>
-		<button type="button" class="btn btn-secondary" popup-dismiss="true"><i class="{{T .Loc "icon.close"}}"></i> {{T .Loc "button.close"}}</button>
+		<button type="submit" class="btn btn-primary">{{I "save"}} {{T .Loc "button.save"}}</button>
+		<button type="button" class="btn btn-secondary" popup-dismiss="true">{{I "close"}} {{T .Loc "button.close"}}</button>
 	</div>
 </div>
 
@@ -111,8 +111,8 @@
 			</div>
 		</div>
 		<div class="ui-popup-footer">
-			<button type="submit" class="btn btn-danger" disabled><i class="{{T .Loc "icon.delete"}}"></i> {{T .Loc "button.delete"}}</button>
-			<button type="button" class="btn btn-secondary" popup-dismiss="true"><i class="{{T .Loc "icon.cancel"}}"></i> {{T .Loc "button.cancel"}}</button>
+			<button type="submit" class="btn btn-danger" disabled>{{I "delete"}} {{T .Loc "button.delete"}}</button>
+			<button type="button" class="btn btn-secondary" popup-dismiss="true">{{I "cancel"}} {{T .Loc "button.cancel"}}</button>
 		</div>
 	</form>
 </div>

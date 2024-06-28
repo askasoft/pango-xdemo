@@ -5,16 +5,16 @@
 
 <div class="s-section">
 	<div class="s-section-head">
-		<h2><i class="{{T .Loc "icon.admin.config"}}"></i><span>{{T .Loc "menu.admin.config"}}</span></h2>
+		<h2>{{I "admin.config"}}<span>{{T .Loc "menu.admin.config"}}</span></h2>
 	</div>
 	<div class="s-section-body">
 		<div class="s-toolbar">
 			<div class="ms-auto"></div>
 			<button class="btn btn-sm btn-outline-primary" popup-target="#configs_import_popup">
-				<i class="{{T .Loc "icon.upload"}}"></i> {{T .Loc "button.import"}}
+				{{I "upload"}} {{T .Loc "button.import"}}
 			</button>
 			<button class="btn btn-sm btn-outline-primary" id="configs_export">
-				<i class="{{T .Loc "icon.dnload"}}"></i> {{T .Loc "button.export"}}
+				{{I "dnload"}} {{T .Loc "button.export"}}
 			</button>
 		</div>
 
@@ -80,7 +80,7 @@
 							{{end}}
 							<div class="row">
 								<div class="offset-md-2 col-md-10">
-									<button class="btn btn-primary"><i class="{{T $.Loc "icon.save"}}"></i> {{T $.Loc "button.save"}}</button>
+									<button class="btn btn-primary">{{I "save"}} {{T $.Loc "button.save"}}</button>
 								</div>
 							</div>
 						</form>
@@ -96,7 +96,7 @@
 <div id="configs_import_popup" class="ui-popup s-popup-detail" data-spy="popup" tabindex="-1"
 	popup-position="center" popup-mouse="false" popup-closer="true">
 	<div class="ui-popup-header">
-		<h4><i class="{{T .Loc "icon.upload"}}"></i>
+		<h4>{{I "upload"}}
 			<span>{{T .Loc "config.import.head"}}</span>
 		</h4>
 	</div>
@@ -111,8 +111,8 @@
 		</form>
 	</div>
 	<div class="ui-popup-footer">
-		<button type="submit" class="btn btn-primary"><i class="{{T .Loc "icon.upload"}}"></i> {{T .Loc "button.import"}}</button>
-		<button type="button" class="btn btn-secondary" popup-dismiss="true"><i class="{{T .Loc "icon.cancel"}}"></i> {{T .Loc "button.cancel"}}</button>
+		<button type="submit" class="btn btn-primary">{{I "upload"}} {{T .Loc "button.import"}}</button>
+		<button type="button" class="btn btn-secondary" popup-dismiss="true">{{I "cancel"}} {{T .Loc "button.cancel"}}</button>
 	</div>
 </div>
 

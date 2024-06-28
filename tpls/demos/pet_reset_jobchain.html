@@ -5,7 +5,7 @@
 
 <div class="s-section">
 	<div class="s-section-head">
-		<h2><i class="{{T .Loc "icon.demos.pets.reset"}}"></i><span>{{T .Loc "menu.demos.pets.reset"}}</span></h2>
+		<h2>{{I "demos.pets.reset"}}<span>{{T .Loc "menu.demos.pets.reset"}}</span></h2>
 	</div>
 	<div class="s-section-body">
 		<div class="well">{{T .Loc "pet.reset.well"}}</div>
@@ -22,8 +22,8 @@
 		<div class="container">
 			<div class="row">
 				<div class="offset-md-2 col-md-10">
-					<button id="jobchain_start" class="btn btn-success" disabled data-processing="{{T .Loc "button.processing"}}"><i class="{{T .Loc "icon.start"}}"></i> <span>{{T .Loc "button.start"}}</span></button>
-					<button id="jobchain_abort" class="btn btn-danger" disabled><i class="{{T .Loc "icon.stop"}}"></i> {{T .Loc "button.stop"}}</button>
+					<button id="jobchain_start" class="btn btn-success" disabled data-processing="{{T .Loc "button.processing"}}">{{I "start"}} <span>{{T .Loc "button.start"}}</span></button>
+					<button id="jobchain_abort" class="btn btn-danger" disabled>{{I "stop"}} {{T .Loc "button.stop"}}</button>
 				</div>
 			</div>
 		</div>
@@ -70,7 +70,7 @@
 	<h4 class="ui-popup-header">{{T .Loc "label.error"}}</h4>
 	<div class="ui-popup-body"></div>
 	<div class="ui-popup-footer">
-		<button type="button" class="btn btn-secondary" popup-dismiss="true"><i class="{{T .Loc "icon.close"}}"></i> {{T .Loc "button.close"}}</button>
+		<button type="button" class="btn btn-secondary" popup-dismiss="true">{{I "close"}} {{T .Loc "button.close"}}</button>
 	</div>
 </div>
 

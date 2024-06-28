@@ -1,5 +1,5 @@
 <div class="ui-popup-header">
-	<h4><i class="{{T .Loc "icon.edit"}}"></i>
+	<h4>{{I "edit"}}
 		{{T .Loc "pet.detail.header"}}
 		{{if ne .Pet.ID 0}}#{{.Pet.ID}}{{end}}
 	</h4>
@@ -96,8 +96,8 @@
 	</form>
 </div>
 <div class="ui-popup-footer">
-	<button type="submit" class="btn btn-primary"><i class="{{T .Loc "icon.save"}}"></i> {{T .Loc "button.save"}}</button>
-	<button type="button" class="btn btn-secondary" popup-dismiss="true"><i class="{{T .Loc "icon.close"}}"></i> {{T .Loc "button.close"}}</button>
+	<button type="submit" class="btn btn-primary">{{I "save"}} {{T .Loc "button.save"}}</button>
+	<button type="button" class="btn btn-secondary" popup-dismiss="true">{{I "close"}} {{T .Loc "button.close"}}</button>
 </div>
 <i class="prev" action="edit"></i>
 <i class="next" action="edit"></i>

@@ -5,42 +5,42 @@
 
 <div class="s-section">
 	<div class="s-section-head">
-		<h2><i class="{{T .Loc "icon.admin.users"}}"></i><span>{{T .Loc "menu.admin.users"}}</span></h2>
+		<h2>{{I "admin.users"}}<span>{{T .Loc "menu.admin.users"}}</span></h2>
 	</div>
 	<div class="s-section-body">
 		<div class="s-toolbar">
 			<button class="btn btn-sm btn-outline-danger" popup-target="#users_deletesel_popup" enableby="#users_list td.check input">
-				<i class="{{T .Loc "icon.deletesel"}}"></i> {{T .Loc "button.deletesel"}}
+				{{I "deletesel"}} {{T .Loc "button.deletesel"}}
 			</button>
 			<button class="btn btn-sm btn-outline-danger" popup-target="#users_deletebat_popup">
-				<i class="{{T .Loc "icon.deletebat"}}"></i> {{T .Loc "button.deletebat"}}
+				{{I "deletebat"}} {{T .Loc "button.deletebat"}}
 			</button>
 			<button class="btn btn-sm btn-outline-danger" popup-target="#users_deleteall_popup">
-				<i class="{{T .Loc "icon.deleteall"}}"></i> {{T .Loc "button.deleteall"}}
+				{{I "deleteall"}} {{T .Loc "button.deleteall"}}
 			</button>
 			<div class="me-auto"></div>
 			<button class="btn btn-sm btn-outline-primary" id="users_new">
-				<i class="{{T .Loc "icon.new"}}"></i> {{T .Loc "button.new"}}
+				{{I "new"}} {{T .Loc "button.new"}}
 			</button>
 			<button class="btn btn-sm btn-outline-primary" id="users_editsel" enableby="#users_list td.check input">
-				<i class="{{T .Loc "icon.editsel"}}"></i> {{T .Loc "button.editsel"}}
+				{{I "editsel"}} {{T .Loc "button.editsel"}}
 			</button>
 			<button class="btn btn-sm btn-outline-primary" id="users_editall">
-				<i class="{{T .Loc "icon.editall"}}"></i> {{T .Loc "button.editall"}}
+				{{I "editall"}} {{T .Loc "button.editall"}}
 			</button>
 			<div class="ms-auto"></div>
 			<a class="btn btn-sm btn-outline-primary" href="./import/">
-				<i class="{{T .Loc "icon.upload"}}"></i> {{T .Loc "button.import"}}
+				{{I "upload"}} {{T .Loc "button.import"}}
 			</a>
 			<button class="btn btn-sm btn-outline-primary" id="users_export">
-				<i class="{{T .Loc "icon.csv"}}"></i> {{T .Loc "button.csvexp"}}
+				{{I "csv"}} {{T .Loc "button.csvexp"}}
 			</button>
 		</div>
 
 		<div id="users_alert">{{template "alerts" .}}</div>
 		
 		<fieldset id="users_listfset" class="ui-fieldset collapsed" data-spy="fieldset">
-			<legend class="circle"><i class="{{T .Loc "icon.search"}}"></i>{{T .Loc "button.search"}}</legend>
+			<legend class="circle">{{I "search"}}{{T .Loc "button.search"}}</legend>
 			<form id="users_listform" class="ui-form grey padded" method="POST">
 				<input type="hidden" name="p" value="{{.Q.Page}}"/>
 				<input type="hidden" name="l" value="{{.Q.Limit}}"/>
@@ -79,8 +79,8 @@
 				</div>
 				<div class="row pt-3 pb-2">
 					<div class="offset-md-2 offset-xxl-1 col">
-						<button type="submit" class="btn btn-primary"><i class="{{T .Loc "icon.search"}}"></i> {{T .Loc "button.search"}}</button>
-						<button type="reset" class="btn btn-secondary"><i class="{{T .Loc "icon.clear"}}"></i> {{T .Loc "button.clear"}}</button>
+						<button type="submit" class="btn btn-primary">{{I "search"}} {{T .Loc "button.search"}}</button>
+						<button type="reset" class="btn btn-secondary">{{I "clear"}} {{T .Loc "button.clear"}}</button>
 					</div>
 				</div>
 			</form>
@@ -103,8 +103,8 @@
 			<div class="msg">{{T .Loc "user.confirm.deletesel"}}</div>
 		</div>
 		<div class="ui-popup-footer">
-			<button type="submit" class="btn btn-danger"><i class="{{T .Loc "icon.ok"}}"></i> {{T .Loc "button.ok"}}</button>
-			<button type="button" class="btn btn-secondary" popup-dismiss="true"><i class="{{T .Loc "icon.cancel"}}"></i> {{T .Loc "button.cancel"}}</button>
+			<button type="submit" class="btn btn-danger">{{I "ok"}} {{T .Loc "button.ok"}}</button>
+			<button type="button" class="btn btn-secondary" popup-dismiss="true">{{I "cancel"}} {{T .Loc "button.cancel"}}</button>
 		</div>
 	</form>
 </div>
@@ -117,8 +117,8 @@
 			<div class="msg">{{T .Loc "user.confirm.deleteall"}}</div>
 		</div>
 		<div class="ui-popup-footer">
-			<button type="submit" class="btn btn-danger"><i class="{{T .Loc "icon.ok"}}"></i> {{T .Loc "button.ok"}}</button>
-			<button type="button" class="btn btn-secondary" popup-dismiss="true"><i class="{{T .Loc "icon.cancel"}}"></i> {{T .Loc "button.cancel"}}</button>
+			<button type="submit" class="btn btn-danger">{{I "ok"}} {{T .Loc "button.ok"}}</button>
+			<button type="button" class="btn btn-secondary" popup-dismiss="true">{{I "cancel"}} {{T .Loc "button.cancel"}}</button>
 		</div>
 	</form>
 </div>
@@ -127,7 +127,7 @@
 	popup-position="center" popup-mask="true" popup-mouse="false" popup-closer="true"
 	popup-focus="#users_deletebat_popup [name=name]">
 	<div class="ui-popup-header">
-		<h4><i class="{{T .Loc "icon.deletebat"}}"></i>
+		<h4>{{I "deletebat"}}
 			{{T .Loc "button.deletebat"}}
 		</h4>
 	</div>
@@ -168,15 +168,15 @@
 		</form>
 	</div>
 	<div class="ui-popup-footer">
-		<button type="submit" class="btn btn-danger"><i class="{{T .Loc "icon.deletebat"}}"></i> {{T .Loc "button.deletebat"}}</button>
-		<button type="button" class="btn btn-secondary" popup-dismiss="true"><i class="{{T .Loc "icon.cancel"}}"></i> {{T .Loc "button.cancel"}}</button>
+		<button type="submit" class="btn btn-danger">{{I "deletebat"}} {{T .Loc "button.deletebat"}}</button>
+		<button type="button" class="btn btn-secondary" popup-dismiss="true">{{I "cancel"}} {{T .Loc "button.cancel"}}</button>
 	</div>
 </div>
 
 <div id="users_bulkedit_popup" class="ui-popup s-popup-detail medium" data-spy="popup" tabindex="-1"
 	popup-position="center" popup-mouse="false" popup-closer="true">
 	<div class="ui-popup-header">
-		<h4><i class="editsel {{T .Loc "icon.editsel"}}"></i><i class="editall {{T .Loc "icon.editall"}}"></i>
+		<h4>{{I "editsel" "editsel"}}{{I "editall" "editall"}}
 			<span class="editsel">{{T .Loc "button.editsel"}}</span>
 			<span class="editall">{{T .Loc "button.editall"}}</span>
 		</h4>
@@ -206,8 +206,8 @@
 		</form>
 	</div>
 	<div class="ui-popup-footer">
-		<button type="submit" class="btn btn-primary" enableby="#users_bulkedit_popup .col-form-label > input"><i class="{{T .Loc "icon.save"}}"></i> {{T .Loc "button.update"}}</button>
-		<button type="button" class="btn btn-secondary" popup-dismiss="true"><i class="{{T .Loc "icon.cancel"}}"></i> {{T .Loc "button.cancel"}}</button>
+		<button type="submit" class="btn btn-primary" enableby="#users_bulkedit_popup .col-form-label > input">{{I "save"}} {{T .Loc "button.update"}}</button>
+		<button type="button" class="btn btn-secondary" popup-dismiss="true">{{I "cancel"}} {{T .Loc "button.cancel"}}</button>
 	</div>
 </div>
 

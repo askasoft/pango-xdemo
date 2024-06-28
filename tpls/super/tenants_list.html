@@ -11,7 +11,7 @@
 			<th class="comment sortable" data-sort-col="comment">{{T .Loc "tenant.comment"}}</th>
 			<th class="actions">
 				<button class="new btn btn-outline-primary">
-					<i class="{{T .Loc "icon.new"}}"></i> {{T .Loc "button.new"}}
+					{{I "new"}} {{T .Loc "button.new"}}
 				</button>
 			</th>
 		</tr>
@@ -26,8 +26,8 @@
 			<td class="comment"><pre>{{$t.Comment}}</pre></td>
 			<td class="actions">
 				{{if ne $.Tenant $t.Name}}
-				<button class="btn btn-outline-primary edit" title="{{T $.Loc "button.edit"}}"><i class="{{T $.Loc "icon.edit"}}"></i></button>
-				<button class="btn btn-outline-danger delete" title="{{T $.Loc "button.delete"}}"><i class="{{T $.Loc "icon.delete"}}"></i></button>
+				<button class="btn btn-outline-primary edit" title="{{T $.Loc "button.edit"}}">{{I "edit"}}</button>
+				<button class="btn btn-outline-danger delete" title="{{T $.Loc "button.delete"}}">{{I "delete"}}</button>
 				{{end}}
 			</td>
 		</tr>
@@ -43,8 +43,8 @@
 		<td class="domain"><a href="#" target="_blank"></a></td>
 		<td class="comment"><pre></pre></td>
 		<td class="actions">
-			<button class="btn btn-outline-primary edit" title="{{T .Loc "button.edit"}}"><i class="{{T .Loc "icon.edit"}}"></i></button>
-			<button class="btn btn-outline-danger delete" title="{{T $.Loc "button.delete"}}"><i class="{{T $.Loc "icon.delete"}}"></i></button>
+			<button class="btn btn-outline-primary edit" title="{{T .Loc "button.edit"}}">{{I "edit"}}</button>
+			<button class="btn btn-outline-danger delete" title="{{T $.Loc "button.delete"}}">{{I "delete"}}</button>
 		</td>
 	</tr>
 </table>

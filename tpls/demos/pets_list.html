@@ -38,8 +38,8 @@
 			<td class="created_at ro">{{TIME $p.CreatedAt}}</td>
 			<td class="updated_at">{{TIME $p.UpdatedAt}}</td>
 			<td class="actions">
-				<button class="btn btn-outline-primary view" title="{{T $.Loc "button.view"}}"><i class="{{T $.Loc "icon.view"}}"></i></button>
-				<button class="btn btn-outline-primary edit" title="{{T $.Loc "button.edit"}}"><i class="{{T $.Loc "icon.edit"}}"></i></button>
+				<button class="btn btn-outline-primary view" title="{{T $.Loc "button.view"}}">{{I "view"}}</button>
+				<button class="btn btn-outline-primary edit" title="{{T $.Loc "button.edit"}}">{{I "edit"}}</button>
 			</td>
 		</tr>
 		{{end}}
@@ -63,8 +63,8 @@
 		<td class="created_at"></td>
 		<td class="updated_at"></td>
 		<td class="actions">
-			<button class="btn btn-outline-primary view" title="{{T .Loc "button.view"}}"><i class="{{T .Loc "icon.view"}}"></i></button>
-			<button class="btn btn-outline-primary edit" title="{{T .Loc "button.edit"}}"><i class="{{T .Loc "icon.edit"}}"></i></button>
+			<button class="btn btn-outline-primary view" title="{{T .Loc "button.view"}}">{{I "view"}}</button>
+			<button class="btn btn-outline-primary edit" title="{{T .Loc "button.edit"}}">{{I "edit"}}</button>
 		</td>
 	</tr>
 </table>
