@@ -372,31 +372,6 @@
 		return false;
 	}
 
-	function pets_editsel_click() {
-		var ids = main.get_table_checked_ids($('#pets_table'));
-		$('#pets_bulkedit_popup')
-			.find('.editsel').show().end()
-			.find('.editall').hide().end()
-			.find('input[name=id]').val(ids.join(',')).end()
-			.popup('show');
-	}
-
-	function pets_editall_click() {
-		$('#pets_bulkedit_popup')
-			.find('.editsel').hide().end()
-			.find('.editall').show().end()
-			.find('input[name=id]').val('*').end()
-			.popup('show');
-	}
-
-	function pets_bulkedit_input_change() {
-		var $t = $(this), c = $t.prop('checked');
-		var $i = $t.parent().next().find(':input').prop('disabled', !c);
-		if ($t.data('niceselect')) {
-			$i.niceSelect('update');
-		}
-	}
-
 
 	//----------------------------------------------------
 	// init
@@ -434,11 +409,11 @@
 			.find('form').on('submit', pets_deletebat).end()
 			.find('.ui-popup-footer button[type=submit]').on('click', pets_deletebat);
 
-			$('#pets_editsel').on('click', pets_editsel_click);
-		$('#pets_editall').on('click', pets_editall_click);
+			$('#pets_editsel').on('click', main.bulkedit_editsel_click('pets'));
+		$('#pets_editall').on('click', main.bulkedit_editall_click('pets'));
 
 		$('#pets_bulkedit_popup')
-			.find('.col-form-label > input').on('change', pets_bulkedit_input_change).end()
+			.find('.col-form-label > input').on('change', main.bulkedit_label_click).end()
 			.find('form').on('submit', pets_updates).end()
 			.find('.ui-popup-footer button[type=submit]').on('click', pets_updates);
 	}

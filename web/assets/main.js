@@ -255,6 +255,34 @@ var main = {
 		};
 	},
 
+	// bulk edit
+	bulkedit_editsel_click: function(name) {
+		return function() {
+			var ids = main.get_table_checked_ids($('#' + name + '_table'));
+			$('#' + name + '_bulkedit_popup')
+				.find('.editsel').show().end()
+				.find('.editall').hide().end()
+				.find('input[name=id]').val(ids.join(',')).end()
+				.popup('show');
+		};
+	},
+	bulkedit_editall_click: function(name) {
+		return function() {
+			$('#' + name + '_bulkedit_popup')
+				.find('.editsel').hide().end()
+				.find('.editall').show().end()
+				.find('input[name=id]').val('*').end()
+				.popup('show');
+		};
+	},
+	bulkedit_label_click: function() {
+		var $t = $(this), $i = $t.parent().next().find(':input');
+		$i.prop('disabled', !$t.prop('checked'));
+		if ($i.data('spy') == 'niceSelect') {
+			$i.niceSelect('update');
+		}
+	},
+
 	// table
 	get_table_trs: function(px, ids) {
 		var trs = [];
@@ -287,6 +315,8 @@ var main = {
 			($c.length ? $c : $td).text(v);
 		}
 	},
+
+	// blink
 	blink_start: function($e) {
 		$e.addClass('ui-blink-1s');
 	},

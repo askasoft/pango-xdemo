@@ -356,28 +356,6 @@
 		return false;
 	}
 
-	function users_editsel_click() {
-		var ids = main.get_table_checked_ids($('#users_table'));
-		$('#users_bulkedit_popup')
-			.find('.editsel').show().end()
-			.find('.editall').hide().end()
-			.find('input[name=id]').val(ids.join(',')).end()
-			.popup('show');
-	}
-
-	function users_editall_click() {
-		$('#users_bulkedit_popup')
-			.find('.editsel').hide().end()
-			.find('.editall').show().end()
-			.find('input[name=id]').val('*').end()
-			.popup('show');
-	}
-
-	function users_bulkedit_input_change() {
-		var $t = $(this);
-		$t.parent().next().find(':input').prop('disabled', !$t.prop('checked'));
-	}
-
 
 	//----------------------------------------------------
 	// init
@@ -399,8 +377,8 @@
 
 		$('#users_new').on('click', user_new);
 		$('#users_export').on('click', users_export);
-		$('#users_editsel').on('click', users_editsel_click);
-		$('#users_editall').on('click', users_editall_click);
+		$('#users_editsel').on('click', main.bulkedit_editsel_click('users'));
+		$('#users_editall').on('click', main.bulkedit_editall_click('users'));
 
 		$('#users_list')
 			.on('click', 'button.view', function() { return user_detail(this, false); })
@@ -418,7 +396,7 @@
 			.find('.ui-popup-footer button[type=submit]').on('click', users_deletebat);
 
 		$('#users_bulkedit_popup')
-			.find('.col-form-label > input').on('change', users_bulkedit_input_change).end()
+			.find('.col-form-label > input').on('change', main.bulkedit_label_click).end()
 			.find('form').on('submit', users_updates).end()
 			.find('.ui-popup-footer button[type=submit]').on('click', users_updates);
 	}
