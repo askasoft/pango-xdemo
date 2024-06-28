@@ -59,7 +59,7 @@ func countTenants(tq *TenantQuery) (int, error) {
 func findTenants(tq *TenantQuery) (tenants []*TenantInfo, err error) {
 	tx := filterTenants(tq).Select("schema_name AS name, obj_description(schema_name::regnamespace, 'pg_namespace') AS comment")
 
-	tx = tq.AddOrder(tx, "id")
+	tx = tq.AddOrder(tx, "name")
 	tx = tq.AddPager(tx)
 
 	r := tx.Find(&tenants)
