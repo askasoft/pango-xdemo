@@ -9,6 +9,7 @@ import (
 	"github.com/askasoft/pango-xdemo/app/handlers"
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/tenant"
+	"github.com/askasoft/pango-xdemo/app/utils/argutil"
 	"github.com/askasoft/pango-xdemo/app/utils/pgutil"
 	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
 	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
@@ -202,9 +203,13 @@ func UserUpdate(c *xin.Context) {
 
 type UserUpdatesArg struct {
 	ID     string  `json:"id,omitempty" form:"id,strip"`
-	Role   string  `json:"role" form:"role,strip"`
-	Status string  `json:"status" form:"status,strip"`
-	CIDR   *string `json:"cidr" form:"cidr,strip" validate:"omitempty,cidrs"`
+	Role   string  `json:"role,omitempty" form:"role,strip"`
+	Status string  `json:"status,omitempty" form:"status,strip"`
+	CIDR   *string `json:"cidr,omitempty" form:"cidr,strip" validate:"omitempty,cidrs"`
+}
+
+func (uua *UserUpdatesArg) IsEmpty() bool {
+	return uua.Role == "" && uua.Status == "" && uua.CIDR == nil
 }
 
 func UserUpdates(c *xin.Context) {
@@ -215,16 +220,15 @@ func UserUpdates(c *xin.Context) {
 	userValidateRole(c, uua.Role)
 	userValidateStatus(c, uua.Status)
 
-	if uua.Role == "" && uua.Status == "" && uua.CIDR == nil {
+	if uua.IsEmpty() {
 		c.AddError(errors.New(tbs.GetText(c.Locale, "error.request.invalid")))
 	}
-
 	if len(c.Errors) > 0 {
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}
 
-	ids, ida := handlers.SplitIDs(uua.ID)
+	ids, ida := argutil.SplitIDs(uua.ID)
 	if len(ids) == 0 && !ida {
 		c.AddError(vadutil.ErrInvalidID(c))
 		c.JSON(http.StatusBadRequest, handlers.E(c))
@@ -282,7 +286,7 @@ func UserUpdates(c *xin.Context) {
 }
 
 func UserDeletes(c *xin.Context) {
-	ids, ida := handlers.SplitIDs(c.PostForm("id"))
+	ids, ida := argutil.SplitIDs(c.PostForm("id"))
 	if len(ids) == 0 && !ida {
 		c.AddError(vadutil.ErrInvalidID(c))
 		c.JSON(http.StatusBadRequest, handlers.E(c))

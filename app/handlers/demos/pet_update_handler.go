@@ -10,6 +10,7 @@ import (
 	"github.com/askasoft/pango-xdemo/app/handlers"
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/tenant"
+	"github.com/askasoft/pango-xdemo/app/utils/argutil"
 	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
 	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
 	"github.com/askasoft/pango/num"
@@ -216,11 +217,15 @@ func PetUpdate(c *xin.Context) {
 
 type PetUpdatesArg struct {
 	ID     string           `json:"id,omitempty" form:"id,strip"`
-	Gender string           `json:"gender" form:"gender,strip"`
-	BornAt *time.Time       `json:"born_at" form:"born_at"`
-	Origin string           `json:"origin" form:"origin,strip"`
-	Temper string           `json:"temper" form:"temper,strip"`
-	Habits *pqx.StringArray `json:"habits" form:"habits,strip"`
+	Gender string           `json:"gender,omitempty" form:"gender,strip"`
+	BornAt *time.Time       `json:"born_at,omitempty" form:"born_at"`
+	Origin string           `json:"origin,omitempty" form:"origin,strip"`
+	Temper string           `json:"temper,omitempty" form:"temper,strip"`
+	Habits *pqx.StringArray `json:"habits,omitempty" form:"habits,strip"`
+}
+
+func (pua *PetUpdatesArg) IsEmpty() bool {
+	return pua.Gender == "" && pua.BornAt == nil && pua.Origin == "" && pua.Temper == "" && pua.Habits == nil
 }
 
 func PetUpdates(c *xin.Context) {
@@ -228,7 +233,7 @@ func PetUpdates(c *xin.Context) {
 	if err := c.Bind(pua); err != nil {
 		vadutil.AddBindErrors(c, err, "pet.")
 	}
-	if pua.Gender == "" && pua.BornAt == nil && pua.Origin == "" && pua.Temper == "" && pua.Habits == nil {
+	if pua.IsEmpty() {
 		c.AddError(errors.New(tbs.GetText(c.Locale, "error.request.invalid")))
 	}
 	if pua.BornAt != nil && pua.BornAt.IsZero() {
@@ -243,7 +248,7 @@ func PetUpdates(c *xin.Context) {
 		return
 	}
 
-	ids, ida := handlers.SplitIDs(pua.ID)
+	ids, ida := argutil.SplitIDs(pua.ID)
 	if len(ids) == 0 && !ida {
 		c.AddError(vadutil.ErrInvalidID(c))
 		c.JSON(http.StatusBadRequest, handlers.E(c))
@@ -305,7 +310,7 @@ func PetUpdates(c *xin.Context) {
 }
 
 func PetDeletes(c *xin.Context) {
-	ids, ida := handlers.SplitIDs(c.PostForm("id"))
+	ids, ida := argutil.SplitIDs(c.PostForm("id"))
 	if len(ids) == 0 && !ida {
 		c.AddError(vadutil.ErrInvalidID(c))
 		c.JSON(http.StatusBadRequest, handlers.E(c))
