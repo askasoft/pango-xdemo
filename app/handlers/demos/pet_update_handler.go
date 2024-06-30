@@ -257,54 +257,49 @@ func PetUpdates(c *xin.Context) {
 
 	tt := tenant.FromCtx(c)
 
-	var cnt int64
-	err := app.GDB.Session(&gorm.Session{AllowGlobalUpdate: true}).Transaction(func(db *gorm.DB) error {
-		tx := db.Table(tt.TablePets())
+	db := app.GDB.Session(&gorm.Session{AllowGlobalUpdate: true})
+	tx := db.Table(tt.TablePets())
 
-		if len(ids) > 0 {
-			tx = tx.Where("id IN ?", ids)
-		}
+	if len(ids) > 0 {
+		tx = tx.Where("id IN ?", ids)
+	}
 
-		pet := &models.Pet{}
+	pet := &models.Pet{}
+	pet.UpdatedAt = time.Now()
 
-		pet.UpdatedAt = time.Now()
+	cols := make([]string, 0, 8)
+	cols = append(cols, "updated_at")
 
-		cols := make([]string, 0, 8)
-		cols = append(cols, "updated_at")
+	if pua.Gender != "" {
+		pet.Gender = pua.Gender
+		cols = append(cols, "gender")
+	}
+	if pua.BornAt != nil {
+		pet.BornAt = *pua.BornAt
+		cols = append(cols, "born_at")
+	}
+	if pua.Origin != "" {
+		pet.Origin = pua.Origin
+		cols = append(cols, "origin")
+	}
+	if pua.Temper != "" {
+		pet.Temper = pua.Temper
+		cols = append(cols, "temper")
+	}
+	if pua.Habits != nil {
+		pet.Habits = str.Strips(*pua.Habits)
+		cols = append(cols, "habits")
+	}
 
-		if pua.Gender != "" {
-			pet.Gender = pua.Gender
-			cols = append(cols, "gender")
-		}
-		if pua.BornAt != nil {
-			pet.BornAt = *pua.BornAt
-			cols = append(cols, "born_at")
-		}
-		if pua.Origin != "" {
-			pet.Origin = pua.Origin
-			cols = append(cols, "origin")
-		}
-		if pua.Temper != "" {
-			pet.Temper = pua.Temper
-			cols = append(cols, "temper")
-		}
-		if pua.Habits != nil {
-			pet.Habits = str.Strips(*pua.Habits)
-			cols = append(cols, "habits")
-		}
-
-		r := tx.Select(cols).Updates(pet)
-		cnt = r.RowsAffected
-		return r.Error
-	})
-	if err != nil {
-		c.AddError(err)
+	r := tx.Select(cols).Updates(pet)
+	if r.Error != nil {
+		c.AddError(r.Error)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return
 	}
 
 	c.JSON(http.StatusOK, xin.H{
-		"success": tbs.Format(c.Locale, "pet.success.updates", cnt),
+		"success": tbs.Format(c.Locale, "pet.success.updates", r.RowsAffected),
 		"updates": pua,
 	})
 }

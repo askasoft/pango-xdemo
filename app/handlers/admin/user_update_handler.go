@@ -238,49 +238,43 @@ func UserUpdates(c *xin.Context) {
 	au := tenant.AuthUser(c)
 	tt := tenant.FromCtx(c)
 
-	var cnt int64
-	err := app.GDB.Transaction(func(db *gorm.DB) error {
-		tx := db.Table(tt.TableUsers())
+	tx := app.GDB.Table(tt.TableUsers())
 
-		tx = tx.Where("id <> ?", au.ID)
-		tx = tx.Where("role >= ?", au.Role)
+	tx = tx.Where("id <> ?", au.ID)
+	tx = tx.Where("role >= ?", au.Role)
 
-		if len(ids) > 0 {
-			tx = tx.Where("id IN ?", ids)
-		}
+	if len(ids) > 0 {
+		tx = tx.Where("id IN ?", ids)
+	}
 
-		user := &models.User{}
+	user := &models.User{}
+	user.UpdatedAt = time.Now()
 
-		user.UpdatedAt = time.Now()
+	cols := make([]string, 0, 4)
+	cols = append(cols, "updated_at")
 
-		cols := make([]string, 0, 4)
-		cols = append(cols, "updated_at")
+	if uua.Role != "" {
+		user.Role = uua.Role
+		cols = append(cols, "role")
+	}
+	if uua.Status != "" {
+		user.Status = uua.Status
+		cols = append(cols, "status")
+	}
+	if uua.CIDR != nil {
+		user.CIDR = *uua.CIDR
+		cols = append(cols, "cidr")
+	}
 
-		if uua.Role != "" {
-			user.Role = uua.Role
-			cols = append(cols, "role")
-		}
-		if uua.Status != "" {
-			user.Status = uua.Status
-			cols = append(cols, "status")
-		}
-		if uua.CIDR != nil {
-			user.CIDR = *uua.CIDR
-			cols = append(cols, "cidr")
-		}
-
-		r := tx.Select(cols).Updates(user)
-		cnt = r.RowsAffected
-		return r.Error
-	})
-	if err != nil {
-		c.AddError(err)
+	r := tx.Select(cols).Updates(user)
+	if r.Error != nil {
+		c.AddError(r.Error)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return
 	}
 
 	c.JSON(http.StatusOK, xin.H{
-		"success": tbs.Format(c.Locale, "user.success.updates", cnt),
+		"success": tbs.Format(c.Locale, "user.success.updates", r.RowsAffected),
 		"updates": uua,
 	})
 }
