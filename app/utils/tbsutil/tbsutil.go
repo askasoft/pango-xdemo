@@ -11,6 +11,39 @@ import (
 	"github.com/askasoft/pango/tbs"
 )
 
+func GetStrings(locale, name string) []string {
+	return str.Fields(tbs.GetText(locale, name))
+}
+
+func GetLinkedHashMap(locale, name string) *cog.LinkedHashMap[string, string] {
+	m := &cog.LinkedHashMap[string, string]{}
+	err := m.UnmarshalJSON(str.UnsafeBytes(tbs.GetText(locale, name)))
+	if err != nil {
+		panic(err)
+	}
+	return m
+}
+
+func GetReverseMap(locale, name string) map[string]string {
+	m := make(map[string]string)
+	err := json.Unmarshal(str.UnsafeBytes(tbs.GetText(locale, name)), &m)
+	if err != nil {
+		panic(err)
+	}
+	return mag.Reverse(m)
+}
+
+func GetAllReverseMap(name string) map[string]string {
+	am := make(map[string]string)
+
+	for _, lang := range app.Locales {
+		rm := GetReverseMap(lang, name)
+		mag.Copy(am, rm)
+	}
+
+	return am
+}
+
 func GetPagerLimits(locale string) []int {
 	ss := str.Fields(tbs.GetText(locale, "pager.limits.list", "20 50 100"))
 	ps := make([]int, len(ss))
@@ -68,33 +101,4 @@ func GetPetResetJobnamesMap(locale string) *cog.LinkedHashMap[string, string] {
 
 func GetPetResetJslabelsMap(locale string) *cog.LinkedHashMap[string, string] {
 	return GetLinkedHashMap(locale, "pet.reset.jslabels")
-}
-
-func GetLinkedHashMap(locale, name string) *cog.LinkedHashMap[string, string] {
-	m := &cog.LinkedHashMap[string, string]{}
-	err := m.UnmarshalJSON(str.UnsafeBytes(tbs.GetText(locale, name)))
-	if err != nil {
-		panic(err)
-	}
-	return m
-}
-
-func GetReverseMap(locale, name string) map[string]string {
-	m := make(map[string]string)
-	err := json.Unmarshal(str.UnsafeBytes(tbs.GetText(locale, name)), &m)
-	if err != nil {
-		panic(err)
-	}
-	return mag.Reverse(m)
-}
-
-func GetAllReverseMap(name string) map[string]string {
-	am := make(map[string]string)
-
-	for _, lang := range app.Locales {
-		rm := GetReverseMap(lang, name)
-		mag.Copy(am, rm)
-	}
-
-	return am
 }

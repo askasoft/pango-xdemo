@@ -21,7 +21,7 @@ func ShellIndex(c *xin.Context) {
 	h := handlers.H(c)
 
 	h["OS"] = str.Capitalize(runtime.GOOS)
-	h["Timeouts"] = tbsutil.GetLinkedHashMap(c.Locale, "super.shell.timeouts")
+	h["Timeouts"] = tbsutil.GetStrings(c.Locale, "super.shell.timeouts")
 
 	labels := cog.NewLinkedHashMap(
 		cog.KV("code", tbs.GetText(c.Locale, "super.shell.label.code")),

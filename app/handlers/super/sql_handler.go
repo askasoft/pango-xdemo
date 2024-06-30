@@ -20,7 +20,7 @@ import (
 func SqlIndex(c *xin.Context) {
 	h := handlers.H(c)
 
-	h["Limits"] = tbsutil.GetLinkedHashMap(c.Locale, "super.sql.limits")
+	h["Limits"] = tbsutil.GetStrings(c.Locale, "super.sql.limits")
 
 	c.HTML(http.StatusOK, "super/sql", h)
 }
