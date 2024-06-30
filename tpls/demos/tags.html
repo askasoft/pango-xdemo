@@ -12,7 +12,7 @@
 			{{template "alerts" .}}
 		</fieldset>
 		
-		<form id="tags_form" class="ui-form lined" method="GET">
+		<form id="tags_form" class="ui-form lined" autocomplete="off">
 			<div class="row">
 				<label class="col-md-2 col-form-label required">Text</label>
 				<div class="col-md-10">
@@ -20,21 +20,51 @@
 				</div>
 			</div>
 			<div class="row">
-				<label class="col-md-2 col-form-label">Checks</label>
+				<label class="col-md-2 col-form-label">Horizontal Checks</label>
 				<div class="col-md-10">
-					{{Checks "Name=" "checks" "List=" .ChecksList "Values=" .Arg.Checks}}
+					{{Checks "Name=" "hchecks" "List=" .ChecksList "Values=" .Arg.Hchecks}}
 				</div>
 			</div>
 			<div class="row">
-				<label class="col-md-2 col-form-label">Radios</label>
+				<label class="col-md-2 col-form-label">Vertical Checks</label>
 				<div class="col-md-10">
-					{{Radios "Name=" "radios" "List=" .RadiosList "Value=" .Arg.Radios "class=" "vertical"}}
+					{{Checks "Name=" "vchecks" "List=" .ChecksList "Values=" .Arg.Vchecks "class=" "vertical"}}
 				</div>
 			</div>
 			<div class="row">
-				<label class="col-md-2 col-form-label">Select</label>
+				<label class="col-md-2 col-form-label">Ordered Checks</label>
 				<div class="col-md-10">
-					{{Select "Name=" "select" "List=" .SelectList "Value=" .Arg.Select "class=" "form-select"}}
+					{{Checks "Name=" "ochecks" "List=" .ChecksList "Values=" .Arg.Ochecks "Ordered=" true "class=" "vertical"}}
+				</div>
+			</div>
+			<div class="row">
+				<label class="col-md-2 col-form-label">Horizontal Radios</label>
+				<div class="col-md-10">
+					{{Radios "Name=" "hradios" "List=" .RadiosList "Value=" .Arg.Hradios}}
+				</div>
+			</div>
+			<div class="row">
+				<label class="col-md-2 col-form-label">Vertical Radios</label>
+				<div class="col-md-10">
+					{{Radios "Name=" "vradios" "List=" .RadiosList "Value=" .Arg.Vradios "class=" "vertical"}}
+				</div>
+			</div>
+			<div class="row">
+				<label class="col-md-2 col-form-label">Form Select</label>
+				<div class="col-md-10">
+					{{Select "Name=" "fselect" "List=" .SelectList "Value=" .Arg.Fselect "class=" "form-select"}}
+				</div>
+			</div>
+			<div class="row">
+				<label class="col-md-2 col-form-label">Nice Select</label>
+				<div class="col-md-10">
+					{{Select "Name=" "nselect" "List=" .SelectList "Value=" .Arg.Nselect "data-spy=" "niceSelect"}}
+				</div>
+			</div>
+			<div class="row">
+				<label class="col-md-2 col-form-label">Multiple Select</label>
+				<div class="col-md-10">
+					{{Select "Name=" "mselect" "List=" .SelectList "Values=" .Arg.Mselect "Multiple=" true "data-spy=" "niceSelect" "class=" "wide"}}
 				</div>
 			</div>
 			<div class="row">

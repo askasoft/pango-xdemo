@@ -13,16 +13,23 @@ import (
 
 type tagsArg struct {
 	Text     string   `form:"text"`
-	Checks   []string `form:"checks"`
-	Radios   string   `form:"radios"`
-	Select   string   `form:"select"`
+	Hchecks  []string `form:"hchecks"`
+	Vchecks  []string `form:"vchecks"`
+	Ochecks  []string `form:"ochecks"`
+	Hradios  string   `form:"hradios"`
+	Vradios  string   `form:"vradios"`
+	Fselect  string   `form:"fselect"`
+	Nselect  string   `form:"nselect"`
+	Mselect  []string `form:"mselect"`
 	Textarea string   `form:"textarea"`
 }
 
 func TagsIndex(c *xin.Context) {
 	h := handlers.H(c)
 
-	a := &tagsArg{}
+	a := &tagsArg{
+		Ochecks: []string{"c2"},
+	}
 	_ = c.Bind(a)
 
 	checks := &cog.LinkedHashMap[string, string]{}
