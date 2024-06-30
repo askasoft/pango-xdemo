@@ -12,10 +12,6 @@ fieldset > form {
 	margin-bottom: 20px;
 }
 
-#job_history {
-	margin: 40px 0px;
-}
-
 #job_tabs {
 	overflow-x: hidden;
 	overflow-y: auto;
