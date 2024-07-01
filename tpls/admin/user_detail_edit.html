@@ -12,19 +12,19 @@
 		<div class="row">
 			<label class="col-md-2 col-form-label required">{{T .Loc "user.name"}}</label>
 			<div class="col-md-10">
-				<input name="name" type="text" class="form-control" maxlength="100" value="{{.User.Name}}">
+				<input name="name" type="text" class="form-control" maxlength="100" textclear value="{{.User.Name}}">
 			</div>
 		</div>
 		<div class="row">
 			<label class="col-md-2 col-form-label required">{{T .Loc "user.email"}}</label>
 			<div class="col-md-10">
-				<input name="email" type="text" class="form-control" maxlength="100" value="{{.User.Email}}">
+				<input name="email" type="text" class="form-control" maxlength="100" textclear value="{{.User.Email}}">
 			</div>
 		</div>
 		<div class="row">
 			<label class="col-md-2 col-form-label">{{T .Loc "user.password"}}</label>
 			<div class="col-md-10">
-				<input name="password" type="text" class="form-control" maxlength="16" value="">
+				<input name="password" type="text" class="form-control" maxlength="16" textclear value="">
 				<div class="desc">{{T .Loc $pwd_desc}}</div>
 			</div>
 		</div>
@@ -43,7 +43,7 @@
 		<div class="row">
 			<label class="col-md-2 col-form-label">{{T .Loc "user.cidr"}}</label>
 			<div class="col-md-10">
-				<textarea name="cidr" class="form-control" rows="2">{{.User.CIDR}}</textarea>
+				<textarea name="cidr" class="form-control" rows="2" autosize enterfire textclear>{{.User.CIDR}}</textarea>
 			</div>
 		</div>
 		<button type="submit" class="hidden"></button>

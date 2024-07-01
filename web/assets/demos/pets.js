@@ -135,29 +135,13 @@
 	}
 
 	function pets_detail_popup_loaded() {
-		$('#pets_detail_popup')
-			.find('form').on('submit', pet_detail_submit).end()
-			.find('.ui-popup-footer button[type=submit]').on('click', pet_detail_submit);
-
-		var $p = $('#pets_detail_popup > .prev').on('click', pet_detail_prev);
-		var $n = $('#pets_detail_popup > .next').on('click', pet_detail_next);
-		
-		var id = $('#pet_detail_id').val(), $tr = $('#pet_' + id);
-		var prev = $tr.prev('tr').length || $('#pets_list > .ui-pager > .pagination > .page-item.prev.disabled').length == 0;
-		var next = $tr.next('tr').length || $('#pets_list > .ui-pager > .pagination > .page-item.next.disabled').length == 0;
-
-		$p[(id != '0' && prev) ? 'show' : 'hide']();
-		$n[(id != '0' && next) ? 'show' : 'hide']();
+		var $d = $('#pets_detail_popup');
+		main.detail_popup_submit($d, pet_detail_submit);
+		main.detail_popup_prevnext($d, $('#pets_list'), '#pet_', pet_detail_prev, pet_detail_next);
 	}
 
 	function pets_detail_popup_shown() {
-		$('#pets_detail_popup')
-			.find('.ui-popup-body').prop('scrollTop', 0).end()
-			.find('[data-spy="niceSelect"]').niceSelect().end()
-			.find('[data-spy="uploader"]').uploader().end()
-			.find('input[type="text"]').textclear().end()
-			.find('textarea').autosize().textclear().enterfire();
-		$(window).trigger('resize');
+		main.detail_popup_shown($('#pets_detail_popup'));
 	}
 
 

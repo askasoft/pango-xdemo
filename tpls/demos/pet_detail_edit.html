@@ -10,7 +10,7 @@
 		<div class="row">
 			<label class="col-md-2 col-form-label required">{{T .Loc "pet.name"}}</label>
 			<div class="col-md-10">
-				<input name="name" type="text" class="form-control" maxlength="100" value="{{.Pet.Name}}">
+				<input name="name" type="text" class="form-control" maxlength="100" textclear value="{{.Pet.Name}}">
 			</div>
 		</div>
 		<div class="row">
@@ -69,27 +69,27 @@
 		<div class="row">
 			<label class="col-md-2 col-form-label">{{T .Loc "pet.shop_name"}}</label>
 			<div class="col-md-4">
-				<input name="shop_name" type="text" class="form-control" maxlength="200" value="{{.Pet.ShopName}}">
+				<input name="shop_name" type="text" class="form-control" maxlength="200" textclear value="{{.Pet.ShopName}}">
 			</div>
 			<label class="col-md-2 col-form-label">{{T .Loc "pet.shop_address"}}</label>
 			<div class="col-md-4">
-				<input name="shop_address" type="text" class="form-control" maxlength="200" value="{{.Pet.ShopAddress}}">
+				<input name="shop_address" type="text" class="form-control" maxlength="200" textclear value="{{.Pet.ShopAddress}}">
 			</div>
 		</div>
 		<div class="row">
 			<label class="col-md-2 col-form-label">{{T .Loc "pet.shop_telephone"}}</label>
 			<div class="col-md-4">
-				<input name="shop_telephone" type="text" class="form-control" maxlength="20" value="{{.Pet.ShopTelephone}}">
+				<input name="shop_telephone" type="text" class="form-control" maxlength="20" textclear value="{{.Pet.ShopTelephone}}">
 			</div>
 			<label class="col-md-2 col-form-label">{{T .Loc "pet.shop_link"}}</label>
 			<div class="col-md-4">
-				<input name="shop_link" type="text" class="form-control" maxlength="1000" value="{{.Pet.ShopLink}}">
+				<input name="shop_link" type="text" class="form-control" maxlength="1000" textclear value="{{.Pet.ShopLink}}">
 			</div>
 		</div>
 		<div class="row">
 			<label class="col-md-2 col-form-label">{{T .Loc "pet.description"}}</label>
 			<div class="col-md-10">
-				<textarea name="description" class="form-control" rows="2">{{.Pet.Description}}</textarea>
+				<textarea name="description" class="form-control" rows="2" autosize enterfire textclear>{{.Pet.Description}}</textarea>
 			</div>
 		</div>
 		<button type="submit" class="hidden"></button>

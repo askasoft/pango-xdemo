@@ -135,29 +135,13 @@
 	}
 
 	function user_detail_popup_loaded() {
-		$('#users_detail_popup')
-			.find('form').on('submit', user_detail_submit).end()
-			.find('.ui-popup-footer button[type=submit]').on('click', user_detail_submit);
-
-		var $p = $('#users_detail_popup > .prev').on('click', user_detail_prev);
-		var $n = $('#users_detail_popup > .next').on('click', user_detail_next);
-		
-		var id = $('#user_detail_id').val(), $tr = $('#user_' + id);
-		var prev = $tr.prev('tr').length || $('#users_list > .ui-pager > .pagination > .page-item.prev.disabled').length == 0;
-		var next = $tr.next('tr').length || $('#users_list > .ui-pager > .pagination > .page-item.next.disabled').length == 0;
-
-		$p[(id != '0' && prev) ? 'show' : 'hide']();
-		$n[(id != '0' && next) ? 'show' : 'hide']();
+		var $d = $('#users_detail_popup');
+		main.detail_popup_submit($d, user_detail_submit);
+		main.detail_popup_prevnext($d, $('#users_list'), '#user_', user_detail_prev, user_detail_next);
 	}
 
 	function user_detail_popup_shown() {
-		$('#users_detail_popup')
-			.find('.ui-popup-body').prop('scrollTop', 0).end()
-			.find('[data-spy="niceSelect"]').niceSelect().end()
-			.find('[data-spy="uploader"]').uploader().end()
-			.find('input[type="text"]').textclear().end()
-			.find('textarea').autosize().textclear().enterfire();
-		$(window).trigger('resize');
+		main.detail_popup_shown($('#users_detail_popup'));
 	}
 
 

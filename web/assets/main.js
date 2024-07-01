@@ -175,38 +175,6 @@ var main = {
 		}
 	},
 
-	// list
-	list_events: function(name) {
-		var $l = $('#' + name + '_list'), $f = $('#' + name + '_listform'), tb = '#' + name + '_table';
-
-		$l.on('goto.pager', '.ui-pager', function(evt, pno) {
-			$f.find('input[name="p"]').val(pno).end().submit();
-		});
-		$l.on('change', '.ui-pager select', function() {
-			$f.find('input[name="l"]').val($(this).val()).end().submit();
-		});
-		$l.on('sort.sortable', tb, function(evt, col, dir) {
-			$f.find('input[name="c"]').val(col);
-			$f.find('input[name="d"]').val(dir);
-			$f.submit();
-		});
-	},
-	list_build: function($l, data) {
-		$l.html(data);
-
-		$l.find('[checkall]').checkall();
-		$l.find('[data-spy="pager"]').pager();
-		$l.find('[data-spy="sortable"]').sortable();
-	},
-	list_builder: function($l, callback) {
-		return function(data) {
-			main.list_build($l, data);
-			if (callback) {
-				setTimeout(callback, 100);
-			}
-		};
-	},
-
 	// form input (not hidden) values
 	form_input_values: function($f) {
 		var vs = $f.formValues();
@@ -253,6 +221,93 @@ var main = {
 		return function() {
 			$f.unloadmask();
 		};
+	},
+
+	// list
+	list_events: function(name) {
+		var $l = $('#' + name + '_list'), $f = $('#' + name + '_listform'), tb = '#' + name + '_table';
+
+		$l.on('goto.pager', '.ui-pager', function(evt, pno) {
+			$f.find('input[name="p"]').val(pno).end().submit();
+		});
+		$l.on('change', '.ui-pager select', function() {
+			$f.find('input[name="l"]').val($(this).val()).end().submit();
+		});
+		$l.on('sort.sortable', tb, function(evt, col, dir) {
+			$f.find('input[name="c"]').val(col);
+			$f.find('input[name="d"]').val(dir);
+			$f.submit();
+		});
+	},
+	list_build: function($l, data) {
+		$l.html(data);
+
+		$l.find('[checkall]').checkall();
+		$l.find('[data-spy="pager"]').pager();
+		$l.find('[data-spy="sortable"]').sortable();
+	},
+	list_builder: function($l, callback) {
+		return function(data) {
+			main.list_build($l, data);
+			if (callback) {
+				setTimeout(callback, 100);
+			}
+		};
+	},
+
+	// detail popup
+	detail_popup_shown: function($d) {
+		$d.find('.ui-popup-body').prop('scrollTop', 0);
+		$d.find('[data-spy="fieldset"]').fieldset();
+		$d.find('[data-spy="niceSelect"]').niceSelect();
+		$d.find('[data-spy="uploader"]').uploader();
+		$d.find('[textclear]').textclear();
+		$d.find('textarea[autosize]').autosize();
+		$d.find('textarea[enterfire]').enterfire();
+		$(window).trigger('resize');
+	},
+	detail_popup_shown2: function($d) {
+		$d.find('.ui-popup-body > *').prop('scrollTop', 0);
+		main.detail_popup_shown($d);
+	},
+	detail_popup_submit: function($d, submit) {
+		$d.find('form').on('submit', submit);
+		$d.find('.ui-popup-footer button[type=submit]').on('click', submit);
+	},
+	detail_popup_prevnext: function($d, $l, idpx, prev, next) {
+		var $p = $d.find('.prev'), $n = $d.find('.next');
+		$d.on('keydown', main.detail_popup_keydown($d));
+
+		$p.on('click', prev);
+		$n.on('click', next);
+		
+		var id = $d.find('input[name=id]').val(), $tr = $(idpx + id), $pg = $l.find('.ui-pager > .pagination');
+		var prev = $tr.prev('tr').length || $pg.find('.page-item.prev.disabled').length == 0;
+		var next = $tr.next('tr').length || $pg.find('.page-item.next.disabled').length == 0;
+		$p[(id != '0' && prev) ? 'show' : 'hide']();
+		$n[(id != '0' && next) ? 'show' : 'hide']();
+	},
+	detail_popup_keydown: function($d) {
+		return function(evt) {
+			if (evt.altKey) {
+				switch (evt.key) {
+				case 'ArrowLeft':
+					evt.preventDefault();
+					var $p = $d.children('.prev');
+					if (!$p.is(':hidden')) {
+						$p.trigger('click');
+					}
+					break;
+				case 'ArrowRight':
+					evt.preventDefault();
+					var $n = $d.children('.next');
+					if (!$n.is(':hidden')) {
+						$n.trigger('click');
+					}
+					break;
+				}
+			}
+		}
 	},
 
 	// bulk edit
