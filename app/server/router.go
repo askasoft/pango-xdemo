@@ -179,16 +179,17 @@ func configHandlers() {
 	r.Use(app.XHZ.Handler())
 	r.Use(app.XHD.Handler())
 	r.Use(xin.Recovery())
-	r.Use(app.XSR.Handler())
 	r.Use(app.XLL.Handler())
 	r.Use(app.XRH.Handler())
 
 	rg := r.Group(app.Base)
+	rg.HEAD("/healthcheck", handlers.HealthCheck)
+	rg.GET("/healthcheck", handlers.HealthCheck)
+
+	rg.Use(app.XSR.Handler())
 	rg.GET("/", app.XCN.Handler(), handlers.Index)
 	rg.GET("/403", app.XCN.Handler(), handlers.Forbidden)
 	rg.GET("/404", app.XCN.Handler(), handlers.NotFound)
-	rg.HEAD("/healthcheck", handlers.HealthCheck)
-	rg.GET("/healthcheck", handlers.HealthCheck)
 	rg.GET("/panic", handlers.Panic)
 
 	addStaticHandlers(rg)
