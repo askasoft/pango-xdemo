@@ -24,6 +24,6 @@
 label[editor="$"] {
 	color: #A02B93;
 }
-label[editor="@"] {
+label[editor="%"] {
 	color: #045C92;
 }

@@ -28,6 +28,10 @@ func H(c *xin.Context) xin.H {
 		"Tenant":   tt,
 		"AuthUser": au,
 	}
+
+	if au != nil {
+		h["DCM"] = tt.GetConfigMap()
+	}
 	return h
 }
 

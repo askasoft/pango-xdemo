@@ -13,7 +13,7 @@ const (
 	UserStartID = int64(101)
 
 	RoleSuper   = "$"
-	RoleDevel   = "@"
+	RoleDevel   = "%"
 	RoleAdmin   = "A"
 	RoleEditor  = "E"
 	RoleViewer  = "V"
