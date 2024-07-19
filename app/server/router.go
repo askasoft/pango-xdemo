@@ -37,7 +37,7 @@ func initRouter() {
 
 	app.XAL = xmw.NewAccessLogger(nil)
 	app.XRL = xmw.NewRequestLimiter(0)
-	app.XHZ = xmw.DefaultHTTPGziper()
+	app.XRC = xmw.DefaultResponseCompressor()
 	app.XHD = xmw.NewHTTPDumper(app.XIN.Logger.GetOutputer("XHD", log.LevelInfo))
 	app.XSR = xmw.NewHTTPSRedirector()
 	app.XLL = xmw.NewLocalizer()
@@ -72,7 +72,7 @@ func configMiddleware() {
 	app.XRL.MaxBodySize = svc.GetSize("httpMaxRequestBodySize", 8<<20)
 	app.XRL.BodyTooLarge = bodyTooLarge
 
-	app.XHZ.Disable(!svc.GetBool("httpGzip"))
+	app.XRC.Disable(!svc.GetBool("httpGzip"))
 	app.XHD.Disable(!svc.GetBool("httpDump"))
 	app.XSR.Disable(!svc.GetBool("httpsRedirect"))
 	app.XLL.Locales = app.Locales
@@ -176,7 +176,7 @@ func configHandlers() {
 
 	r.Use(app.XAL.Handler())
 	r.Use(app.XRL.Handler())
-	r.Use(app.XHZ.Handler())
+	r.Use(app.XRC.Handler())
 	r.Use(app.XHD.Handler())
 	r.Use(xin.Recovery())
 	r.Use(app.XLL.Handler())

@@ -89,8 +89,8 @@ var (
 	// XRL global xin request limiter
 	XRL *xmw.RequestLimiter
 
-	// XHZ global xin http gziper
-	XHZ *xmw.HTTPGziper
+	// XRC global xin response compressor
+	XRC *xmw.ResponseCompressor
 
 	// XHD global xin http dumper
 	XHD *xmw.HTTPDumper
