@@ -8,6 +8,7 @@
 			<th class="check"><input type="checkbox" checkall="#pets_table td.check > input"/></th>
 			<th class="id sortable" data-sort-col="id">{{T .Loc "pet.id"}}</th>
 			<th class="name sortable" data-sort-col="name">{{T .Loc "pet.name"}}</th>
+			<th class="actions"></th>
 			<th class="gender sortable" data-sort-col="gender">{{T .Loc "pet.gender"}}</th>
 			<th class="born_at sortable" data-sort-col="born_at">{{T .Loc "pet.born_at"}}</th>
 			<th class="origin sortable" data-sort-col="origin">{{T .Loc "pet.origin"}}</th>
@@ -18,7 +19,6 @@
 			<th class="shop_name sortable" data-sort-col="shop_name">{{T .Loc "pet.shop_name"}}</th>
 			<th class="created_at sortable" data-sort-col="created_at">{{T .Loc "pet.created_at"}}</th>
 			<th class="updated_at sortable" data-sort-col="updated_at">{{T .Loc "pet.updated_at"}}</th>
-			<th class="actions"></th>
 		</tr>
 	</thead>
 	<tbody>
@@ -27,6 +27,10 @@
 			<td class="check"><input type="checkbox" value="{{$p.ID}}"/></td>
 			<td class="id ro">{{$p.ID}}</td>
 			<td class="name">{{$p.Name}}</td>
+			<td class="actions">
+				<button class="btn btn-outline-primary view" title="{{T $.Loc "button.view"}}">{{I "view"}}</button>
+				<button class="btn btn-outline-primary edit" title="{{T $.Loc "button.edit"}}">{{I "edit"}}</button>
+			</td>
 			<td class="gender">{{$.PetGenderMap.MustGet $p.Gender $p.Gender}}</td>
 			<td class="born_at date">{{DATE $p.BornAt}}</td>
 			<td class="origin">{{$.PetOriginMap.MustGet $p.Origin $p.Origin}}</td>
@@ -37,10 +41,6 @@
 			<td class="shop_name">{{$p.ShopName}}</td>
 			<td class="created_at ro">{{TIME $p.CreatedAt}}</td>
 			<td class="updated_at">{{TIME $p.UpdatedAt}}</td>
-			<td class="actions">
-				<button class="btn btn-outline-primary view" title="{{T $.Loc "button.view"}}">{{I "view"}}</button>
-				<button class="btn btn-outline-primary edit" title="{{T $.Loc "button.edit"}}">{{I "edit"}}</button>
-			</td>
 		</tr>
 		{{end}}
 	</tbody>
@@ -52,6 +52,10 @@
 		<td class="check"></td>
 		<td class="id"></td>
 		<td class="name"></td>
+		<td class="actions">
+			<button class="btn btn-outline-primary view" title="{{T .Loc "button.view"}}">{{I "view"}}</button>
+			<button class="btn btn-outline-primary edit" title="{{T .Loc "button.edit"}}">{{I "edit"}}</button>
+		</td>
 		<td class="gender"></td>
 		<td class="born_at date"></td>
 		<td class="origin"></td>
@@ -62,10 +66,6 @@
 		<td class="shop_name"></td>
 		<td class="created_at"></td>
 		<td class="updated_at"></td>
-		<td class="actions">
-			<button class="btn btn-outline-primary view" title="{{T .Loc "button.view"}}">{{I "view"}}</button>
-			<button class="btn btn-outline-primary edit" title="{{T .Loc "button.edit"}}">{{I "edit"}}</button>
-		</td>
 	</tr>
 </table>
 
