@@ -6,18 +6,15 @@
 <div class="s-section">
 	<div class="s-section-head">
 		<h2>{{I "admin.config"}}<span>{{T .Loc "menu.admin.config"}}</span></h2>
+		<div class="ms-auto"></div>
+		<button class="btn btn-sm btn-outline-primary" popup-target="#configs_import_popup">
+			{{I "upload"}} {{T .Loc "button.import"}}
+		</button>
+		<button class="btn btn-sm btn-outline-primary" id="configs_export">
+			{{I "dnload"}} {{T .Loc "button.export"}}
+		</button>
 	</div>
 	<div class="s-section-body">
-		<div class="s-toolbar">
-			<div class="ms-auto"></div>
-			<button class="btn btn-sm btn-outline-primary" popup-target="#configs_import_popup">
-				{{I "upload"}} {{T .Loc "button.import"}}
-			</button>
-			<button class="btn btn-sm btn-outline-primary" id="configs_export">
-				{{I "dnload"}} {{T .Loc "button.export"}}
-			</button>
-		</div>
-
 		{{if gt (len .Configs) 1}}
 		<ul class="nav nav-tabs">
 			{{range $i, $cc := .Configs}}
@@ -79,7 +76,7 @@
 							</div>
 							{{end}}
 							<div class="row">
-								<div class="offset-md-2 col-md-10">
+								<div class="offset-md-2 col">
 									<button class="btn btn-primary">{{I "save"}} {{T $.Loc "button.save"}}</button>
 								</div>
 							</div>

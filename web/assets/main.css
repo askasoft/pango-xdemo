@@ -255,8 +255,13 @@ body {
 	margin-bottom: 40px;
 }
 .s-section-head {
+	display: flex;
+	flex-wrap: wrap;
 	margin-bottom: 10px;
 	padding: 10px;
+}
+.s-section-head > * {
+	margin: 0 5px 5px 0;
 }
 .s-section-head > h2 {
 	font-size: 1.5rem;
@@ -267,7 +272,7 @@ body {
 .s-section-head > h2 > * {
 	vertical-align: middle;
 }
-.s-section-head i {
+.s-section-head > h2 > i {
 	font-size: 125%;
 	margin-right: 8px;
 }
@@ -345,6 +350,9 @@ form div.verr {
 /** sizeing **/
 .padded {
 	padding: 15px;
+}
+.onerow * {
+	margin-bottom: 0.25rem;
 }
 
 /** toolbar **/
