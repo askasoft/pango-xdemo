@@ -133,7 +133,7 @@ var main = {
 			};
 		}
 
-		err = err || status || 'Server error';
+		err = xhr.responseText || (xhr.status ? xhr.status + ' ' : '') + (err || status || 'Server error!');
 		if (xhr.responseJSON) {
 			err = xhr.responseJSON.error || JSON.stringify(xhr.responseJSON, null, 4) || err;
 		}
@@ -172,6 +172,12 @@ var main = {
 				icon: 'warning',
 				text: data.warning
 			});
+		}
+	},
+	popup_ajax_fail: function(paf) {
+		return function(xhr, status, err) {
+			main.ajax_error(xhr, status, err);
+			paf.call(this, xhr, status, err);
 		}
 	},
 
@@ -426,6 +432,9 @@ var main = {
 
 	// ajax setup
 	main.ajax_setup();
+
+	// popup setup
+	$.popup.defaults.ajaxFail = main.popup_ajax_fail($.popup.defaults.ajaxFail);
 
 	// load init
 	$(window).on('load', main.init);
