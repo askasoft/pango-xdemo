@@ -5,11 +5,12 @@ import (
 	"github.com/askasoft/pango-xdemo/app/jobs"
 	"github.com/askasoft/pango-xdemo/app/tasks"
 	"github.com/askasoft/pango/cog"
+	"github.com/askasoft/pango/cog/linkedhashmap"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/sch"
 )
 
-var schedules = cog.NewLinkedHashMap(
+var schedules = linkedhashmap.NewLinkedHashMap(
 	cog.KV("tmpClean", tasks.CleanTemporaryFiles),
 	cog.KV("jobStart", jobs.Starts),
 	cog.KV("jobReappend", jobs.Reappend),

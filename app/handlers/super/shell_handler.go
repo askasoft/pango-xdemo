@@ -12,6 +12,7 @@ import (
 	"github.com/askasoft/pango-xdemo/app/handlers"
 	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
 	"github.com/askasoft/pango/cog"
+	"github.com/askasoft/pango/cog/linkedhashmap"
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/tbs"
 	"github.com/askasoft/pango/xin"
@@ -23,7 +24,7 @@ func ShellIndex(c *xin.Context) {
 	h["OS"] = str.Capitalize(runtime.GOOS)
 	h["Timeouts"] = tbsutil.GetStrings(c.Locale, "super.shell.timeouts")
 
-	labels := cog.NewLinkedHashMap(
+	labels := linkedhashmap.NewLinkedHashMap(
 		cog.KV("code", tbs.GetText(c.Locale, "super.shell.label.code")),
 		cog.KV("time", tbs.GetText(c.Locale, "super.shell.label.time")),
 		cog.KV("output", tbs.GetText(c.Locale, "super.shell.label.output")),

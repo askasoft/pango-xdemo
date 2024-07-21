@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/askasoft/pango-xdemo/app/handlers"
-	"github.com/askasoft/pango/cog"
+	"github.com/askasoft/pango/cog/linkedhashmap"
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/tbs"
 	"github.com/askasoft/pango/xin"
@@ -32,13 +32,13 @@ func TagsIndex(c *xin.Context) {
 	}
 	_ = c.Bind(a)
 
-	checks := &cog.LinkedHashMap[string, string]{}
+	checks := &linkedhashmap.LinkedHashMap[string, string]{}
 	_ = checks.UnmarshalJSON(str.UnsafeBytes(tbs.GetText(c.Locale, "demos.tags.checks")))
 
-	radios := &cog.LinkedHashMap[string, string]{}
+	radios := &linkedhashmap.LinkedHashMap[string, string]{}
 	_ = radios.UnmarshalJSON(str.UnsafeBytes(tbs.GetText(c.Locale, "demos.tags.radios")))
 
-	selects := &cog.LinkedHashMap[string, string]{}
+	selects := &linkedhashmap.LinkedHashMap[string, string]{}
 	_ = selects.UnmarshalJSON(str.UnsafeBytes(tbs.GetText(c.Locale, "demos.tags.selects")))
 
 	h["ChecksList"] = checks

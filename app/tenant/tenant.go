@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/askasoft/pango-xdemo/app"
-	"github.com/askasoft/pango/cog"
+	"github.com/askasoft/pango/cog/linkedhashset"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/sqx"
 	"github.com/askasoft/pango/sqx/sqlx"
@@ -64,7 +64,7 @@ func ListTenants() ([]Tenant, error) {
 
 	ds := app.INI.GetString("database", "schema", "public")
 
-	ts := cog.NewLinkedHashSet(Tenant(""))
+	ts := linkedhashset.NewLinkedHashSet(Tenant(""))
 
 	sm := &Schemata{}
 	for rows.Next() {

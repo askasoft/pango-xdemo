@@ -11,7 +11,8 @@ import (
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango/asg"
-	"github.com/askasoft/pango/cog"
+	"github.com/askasoft/pango/cmp"
+	"github.com/askasoft/pango/cog/treemap"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/str"
@@ -307,12 +308,12 @@ func (jr *JobRunner) Done(err error) {
 var ttjobs = NewTenantJobs()
 
 func NewTenantJobs() *TenantJobs {
-	return &TenantJobs{rs: cog.NewTreeMap[string, []*xjm.Job](cog.CompareString)}
+	return &TenantJobs{rs: treemap.NewTreeMap[string, []*xjm.Job](cmp.CompareString)}
 }
 
 type TenantJobs struct {
 	mu sync.Mutex
-	rs *cog.TreeMap[string, []*xjm.Job]
+	rs *treemap.TreeMap[string, []*xjm.Job]
 }
 
 func (tj *TenantJobs) Total() int {

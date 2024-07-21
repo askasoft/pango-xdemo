@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 
 	"github.com/askasoft/pango-xdemo/app"
-	"github.com/askasoft/pango/cog"
+	"github.com/askasoft/pango/cog/linkedhashmap"
 	"github.com/askasoft/pango/mag"
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/str"
@@ -15,8 +15,8 @@ func GetStrings(locale, name string) []string {
 	return str.Fields(tbs.GetText(locale, name))
 }
 
-func GetLinkedHashMap(locale, name string) *cog.LinkedHashMap[string, string] {
-	m := &cog.LinkedHashMap[string, string]{}
+func GetLinkedHashMap(locale, name string) *linkedhashmap.LinkedHashMap[string, string] {
+	m := &linkedhashmap.LinkedHashMap[string, string]{}
 	err := m.UnmarshalJSON(str.UnsafeBytes(tbs.GetText(locale, name)))
 	if err != nil {
 		panic(err)
@@ -53,27 +53,27 @@ func GetPagerLimits(locale string) []int {
 	return ps
 }
 
-func GetBoolMap(locale string) *cog.LinkedHashMap[string, string] {
+func GetBoolMap(locale string) *linkedhashmap.LinkedHashMap[string, string] {
 	return GetLinkedHashMap(locale, "maps.bool")
 }
 
-func GetPetGenderMap(locale string) *cog.LinkedHashMap[string, string] {
+func GetPetGenderMap(locale string) *linkedhashmap.LinkedHashMap[string, string] {
 	return GetLinkedHashMap(locale, "pet.map.gender")
 }
 
-func GetPetOriginMap(locale string) *cog.LinkedHashMap[string, string] {
+func GetPetOriginMap(locale string) *linkedhashmap.LinkedHashMap[string, string] {
 	return GetLinkedHashMap(locale, "pet.map.origin")
 }
 
-func GetPetTemperMap(locale string) *cog.LinkedHashMap[string, string] {
+func GetPetTemperMap(locale string) *linkedhashmap.LinkedHashMap[string, string] {
 	return GetLinkedHashMap(locale, "pet.map.temper")
 }
 
-func GetPetHabitsMap(locale string) *cog.LinkedHashMap[string, string] {
+func GetPetHabitsMap(locale string) *linkedhashmap.LinkedHashMap[string, string] {
 	return GetLinkedHashMap(locale, "pet.map.habits")
 }
 
-func GetUserStatusMap(locale string) *cog.LinkedHashMap[string, string] {
+func GetUserStatusMap(locale string) *linkedhashmap.LinkedHashMap[string, string] {
 	return GetLinkedHashMap(locale, "user.map.status")
 }
 
@@ -81,7 +81,7 @@ func GetUserStatusReverseMap() map[string]string {
 	return GetAllReverseMap("user.map.status")
 }
 
-func GetUserRoleMap(locale string, role string) *cog.LinkedHashMap[string, string] {
+func GetUserRoleMap(locale string, role string) *linkedhashmap.LinkedHashMap[string, string] {
 	urm := GetLinkedHashMap(locale, "user.map.role")
 	for it := urm.Iterator(); it.Next(); {
 		if it.Key() < role {
@@ -95,10 +95,10 @@ func GetUserRoleReverseMap() map[string]string {
 	return GetAllReverseMap("user.map.role")
 }
 
-func GetPetResetJobnamesMap(locale string) *cog.LinkedHashMap[string, string] {
+func GetPetResetJobnamesMap(locale string) *linkedhashmap.LinkedHashMap[string, string] {
 	return GetLinkedHashMap(locale, "pet.reset.jobnames")
 }
 
-func GetPetResetJslabelsMap(locale string) *cog.LinkedHashMap[string, string] {
+func GetPetResetJslabelsMap(locale string) *linkedhashmap.LinkedHashMap[string, string] {
 	return GetLinkedHashMap(locale, "pet.reset.jslabels")
 }

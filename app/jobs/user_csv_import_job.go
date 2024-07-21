@@ -14,7 +14,7 @@ import (
 	"github.com/askasoft/pango-xdemo/app/utils/csvutil"
 	"github.com/askasoft/pango-xdemo/app/utils/pgutil"
 	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
-	"github.com/askasoft/pango/cog"
+	"github.com/askasoft/pango/cog/linkedhashmap"
 	"github.com/askasoft/pango/iox"
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/str"
@@ -47,8 +47,8 @@ type UserCsvImportJob struct {
 	data []byte
 	head csvUserHeader
 
-	roleMap   *cog.LinkedHashMap[string, string]
-	statusMap *cog.LinkedHashMap[string, string]
+	roleMap   *linkedhashmap.LinkedHashMap[string, string]
+	statusMap *linkedhashmap.LinkedHashMap[string, string]
 
 	roleRevMap   map[string]string
 	statusRevMap map[string]string

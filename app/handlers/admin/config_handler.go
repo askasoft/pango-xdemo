@@ -13,7 +13,7 @@ import (
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango-xdemo/app/utils/gormutil"
 	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
-	"github.com/askasoft/pango/cog"
+	"github.com/askasoft/pango/cog/linkedhashmap"
 	"github.com/askasoft/pango/doc/csvx"
 	"github.com/askasoft/pango/iox"
 	"github.com/askasoft/pango/str"
@@ -85,7 +85,7 @@ func ConfigIndex(c *xin.Context) {
 			for _, cfg := range cg.Items {
 				list := tbs.GetText(c.Locale, "config.list."+cfg.Name)
 				if list != "" {
-					lhm := cog.NewLinkedHashMap[string, string]()
+					lhm := linkedhashmap.NewLinkedHashMap[string, string]()
 					err := lhm.UnmarshalJSON(str.UnsafeBytes(list))
 					if err != nil {
 						c.Logger.Errorf("Invalid JSON config.list.%s: %v", cfg.Name, err)
