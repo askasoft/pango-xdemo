@@ -29,10 +29,11 @@ func (s *service) Flag() {
 
 // PrintCommand print custom command
 func (s *service) PrintCommand(out io.Writer) {
-	fmt.Fprintln(out, "    migrate [kind]...")
+	fmt.Fprintln(out, "    migrate <kind> [schema]...")
 	fmt.Fprintln(out, "      kind=schema       migrate database schemas.")
 	fmt.Fprintln(out, "      kind=config       migrate tenant configurations.")
 	fmt.Fprintln(out, "      kind=super        migrate tenant super user.")
+	fmt.Fprintln(out, "      schema=...        specify schemas to migrate.")
 	fmt.Fprintln(out, "    execsql <file>      execute sql file.")
 	fmt.Fprintln(out, "    encrypt [key] <str> encrypt string.")
 	fmt.Fprintln(out, "    decrypt [key] <str> decrypt string.")
@@ -53,24 +54,28 @@ func (s *service) Exec(cmd string) {
 			app.Exit(app.ExitErrDB)
 		}
 
+		sub := ""
 		args := flag.Args()[1:]
-		for _, arg := range args {
-			switch arg {
-			case "schema":
-				if err := dbMigrateSchemas(); err != nil {
-					log.Fatal(err) //nolint: all
-					app.Exit(app.ExitErrDB)
-				}
-			case "config":
-				if err := dbMigrateConfigs(); err != nil {
-					log.Fatal(err) //nolint: all
-					app.Exit(app.ExitErrDB)
-				}
-			case "super":
-				if err := dbMigrateSupers(); err != nil {
-					log.Fatal(err) //nolint: all
-					app.Exit(app.ExitErrDB)
-				}
+		if len(args) > 0 {
+			sub = args[0]
+			args = args[1:]
+		}
+
+		switch sub {
+		case "schema":
+			if err := dbMigrateSchemas(args...); err != nil {
+				log.Fatal(err) //nolint: all
+				app.Exit(app.ExitErrDB)
+			}
+		case "config":
+			if err := dbMigrateConfigs(args...); err != nil {
+				log.Fatal(err) //nolint: all
+				app.Exit(app.ExitErrDB)
+			}
+		case "super":
+			if err := dbMigrateSupers(args...); err != nil {
+				log.Fatal(err) //nolint: all
+				app.Exit(app.ExitErrDB)
 			}
 		}
 

@@ -84,31 +84,54 @@ func dbMigrate() error {
 	return dbMigrateConfigs()
 }
 
-func dbMigrateSchemas() error {
-	return tenant.Iterate(func(tt tenant.Tenant) error {
-		return tt.MigrateSchema()
-	})
+func dbMigrateSchemas(schemas ...string) error {
+	if len(schemas) == 0 {
+		return tenant.Iterate(func(tt tenant.Tenant) error {
+			return tt.MigrateSchema()
+		})
+	}
+
+	for _, s := range schemas {
+		if err := tenant.Tenant(s).MigrateSchema(); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
-func dbMigrateConfigs() error {
+func dbMigrateConfigs(schemas ...string) error {
 	configs, err := tenant.ReadConfigFile()
 	if err != nil {
 		return err
 	}
 
-	err = tenant.Iterate(func(tt tenant.Tenant) error {
-		return tt.MigrateConfig(configs)
-	})
+	if len(schemas) == 0 {
+		return tenant.Iterate(func(tt tenant.Tenant) error {
+			return tt.MigrateConfig(configs)
+		})
+	}
 
-	return err
+	for _, s := range schemas {
+		if err := tenant.Tenant(s).MigrateConfig(configs); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
-func dbMigrateSupers() error {
-	err := tenant.Iterate(func(tt tenant.Tenant) error {
-		return tt.MigrateSuper()
-	})
+func dbMigrateSupers(schemas ...string) error {
+	if len(schemas) == 0 {
+		return tenant.Iterate(func(tt tenant.Tenant) error {
+			return tt.MigrateSuper()
+		})
+	}
 
-	return err
+	for _, s := range schemas {
+		if err := tenant.Tenant(s).MigrateSuper(); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func dbExecSQL(sqlfile string) error {
