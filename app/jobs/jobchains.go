@@ -33,6 +33,15 @@ func JobChainEncodeStates(states []*JobRunState) string {
 	return xjm.MustEncode(states)
 }
 
+func JobChainInitStates(jns []string) []*JobRunState {
+	states := make([]*JobRunState, len(jns))
+	for i, jn := range jns {
+		js := &JobRunState{Name: jn, Status: xjm.JobStatusPending}
+		states[i] = js
+	}
+	return states
+}
+
 func JobChainStart(tt tenant.Tenant, chainName string, states []*JobRunState, jobName string, jobFile string, jobParam ISetChainID) (cid int64, err error) {
 	state := JobChainEncodeStates(states)
 

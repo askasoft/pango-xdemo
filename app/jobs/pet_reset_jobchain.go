@@ -2,7 +2,6 @@ package jobs
 
 import (
 	"github.com/askasoft/pango-xdemo/app/tenant"
-	"github.com/askasoft/pango/xjm"
 )
 
 func PetResetJobChainStart(tt tenant.Tenant) error {
@@ -22,10 +21,6 @@ func PetResetJobChainStart(tt tenant.Tenant) error {
 func PetResetCreateStates() []*JobRunState {
 	jns := []string{JobNamePetClear, JobNamePetCatCreate, JobNamePetDogCreate}
 
-	states := make([]*JobRunState, len(jns))
-	for i, jn := range jns {
-		js := &JobRunState{Name: jn, Status: xjm.JobStatusPending}
-		states[i] = js
-	}
+	states := JobChainInitStates(jns)
 	return states
 }
