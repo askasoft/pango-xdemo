@@ -79,18 +79,18 @@
 	//----------------------------------------------------
 	// detail
 	//
-	function pet_detail(self, edit) {
-		return pet_detail_show($(self).closest('tr'), edit);
+	function pet_detail(self, action) {
+		return pet_detail_show($(self).closest('tr'), action);
 	}
 
-	function pet_detail_show($tr, edit) {
+	function pet_detail_show($tr, action) {
 		var params = { id: $tr.attr('id').replace('pet_', '') };
 
 		$('#pets_detail_popup').popup({
 			loaded: false,
-			keyboard: !edit,
+			keyboard: action == 'view',
 			ajax: {
-				url: edit ? "edit" : "view",
+				url: action,
 				method: 'GET',
 				data: params
 			}
@@ -99,33 +99,35 @@
 		return false;
 	}
 
+	function pet_detail_action_trigger(action) {
+		$('#pets_table > tbody > tr:last-child').find('button.' + action).trigger('click');
+	}
+
 	function pet_detail_prev() {
+		var action = $(this).attr('action');
 		var id = $('#pet_detail_id').val(), $tr = $('#pet_' + id);
 
 		$('#pets_detail_popup').popup('hide', $tr);
 
 		var $pv = $tr.prev('tr');
 		if ($pv.length) {
-			pet_detail_show($pv, $(this).attr('action') == 'edit');
+			pet_detail_show($pv, action);
 		} else {
-			pets_prev_page(function() {
-				$('#pets_table > tbody > tr:last-child').find('button.edit').trigger('click');
-			});
+			pets_prev_page(pet_detail_action_trigger.bind(this, action));
 		}
 	}
 
 	function pet_detail_next() {
+		var action = $(this).attr('action');
 		var id = $('#pet_detail_id').val(), $tr = $('#pet_' + id);
 
 		$('#pets_detail_popup').popup('hide', $tr);
 
 		var $nx = $tr.next('tr');
 		if ($nx.length) {
-			pet_detail_show($nx, $(this).attr('action') == 'edit');
+			pet_detail_show($nx, action);
 		} else {
-			pets_next_page(function() {
-				$('#pets_table > tbody > tr:first-child').find('button.edit').trigger('click');
-			});
+			pets_next_page(pet_detail_action_trigger.bind(this, action));
 		}
 	}
 
@@ -379,8 +381,8 @@
 		$('#pets_new').on('click', pet_new);
 	
 		$('#pets_list')
-			.on('click', 'button.view', function() { return pet_detail(this, false); })
-			.on('click', 'button.edit', function() { return pet_detail(this, true); });
+			.on('click', 'button.view', function() { return pet_detail(this, 'view'); })
+			.on('click', 'button.edit', function() { return pet_detail(this, 'edit'); });
 
 		$('#pets_detail_popup')
 			.on('loaded.popup', pets_detail_popup_loaded)

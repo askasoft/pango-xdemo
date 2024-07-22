@@ -79,18 +79,18 @@
 	//----------------------------------------------------
 	// detail
 	//
-	function user_detail(self, edit) {
-		return user_detail_show($(self).closest('tr'), edit);
+	function user_detail(self, action) {
+		return user_detail_show($(self).closest('tr'), action);
 	}
 
-	function user_detail_show($tr, edit) {
+	function user_detail_show($tr, action) {
 		var params = { id: $tr.attr('id').replace('user_', '') };
 
 		$('#users_detail_popup').popup({
 			loaded: false,
-			keyboard: !edit,
+			keyboard: action == 'view',
 			ajax: {
-				url: edit ? "edit" : "view",
+				url: action,
 				method: 'GET',
 				data: params
 			}
@@ -99,33 +99,35 @@
 		return false;
 	}
 
+	function user_detail_action_trigger(action) {
+		$('#users_table > tbody > tr:last-child').find('button.' + action).trigger('click');
+	}
+	
 	function user_detail_prev() {
+		var action = $(this).attr('action');
 		var id = $('#user_detail_id').val(), $tr = $('#user_' + id);
 
 		$('#users_detail_popup').popup('hide', $tr);
 
 		var $pv = $tr.prev('tr');
 		if ($pv.length) {
-			user_detail_show($pv, $(this).attr('action') == 'edit');
+			user_detail_show($pv, action);
 		} else {
-			users_prev_page(function() {
-				$('#users_table > tbody > tr:last-child').find('button.edit').trigger('click');
-			});
+			users_prev_page(user_detail_action_trigger.bind(this, action));
 		}
 	}
 
 	function user_detail_next() {
+		var action = $(this).attr('action');
 		var id = $('#user_detail_id').val(), $tr = $('#user_' + id);
 
 		$('#users_detail_popup').popup('hide', $tr);
 
 		var $nx = $tr.next('tr');
 		if ($nx.length) {
-			user_detail_show($nx, $(this).attr('action') == 'edit');
+			user_detail_show($nx, action);
 		} else {
-			users_next_page(function() {
-				$('#users_table > tbody > tr:first-child').find('button.edit').trigger('click');
-			});
+			users_next_page(user_detail_action_trigger.bind(this, action));
 		}
 	}
 
@@ -365,8 +367,8 @@
 		$('#users_editall').on('click', main.bulkedit_editall_click('users'));
 
 		$('#users_list')
-			.on('click', 'button.view', function() { return user_detail(this, false); })
-			.on('click', 'button.edit', function() { return user_detail(this, true); });
+			.on('click', 'button.view', function() { return user_detail(this, "view"); })
+			.on('click', 'button.edit', function() { return user_detail(this, "edit"); });
 
 		$('#users_detail_popup')
 			.on('loaded.popup', user_detail_popup_loaded)
