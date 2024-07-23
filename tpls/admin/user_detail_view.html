@@ -8,30 +8,30 @@
 	<div class="container ui-view lined label-bold">
 		<input type="hidden" id="user_detail_id" name="id" value="{{.User.ID}}"/>
 		<div class="row">
-			<label class="col-md2 ui-label">{{T .Loc "user.name"}}</label>
+			<label class="col-md-2 ui-label">{{T .Loc "user.name"}}</label>
 			<div class="col-md-10 ui-value">{{.User.Name}}</div>
 		</div>
 		<div class="row">
-			<label class="col-md2 ui-label">{{T .Loc "user.email"}}</label>
+			<label class="col-md-2 ui-label">{{T .Loc "user.email"}}</label>
 			<div class="col-md-10 ui-value">{{.User.Email}}</div>
 		</div>
 		<div class="row">
-			<label class="col-md2 ui-label">{{T .Loc "user.role"}}</label>
+			<label class="col-md-2 ui-label">{{T .Loc "user.role"}}</label>
 			<div class="col-md-10 ui-value">{{.UserRoleMap.MustGet .User.Role .User.Role}}</div>
 		</div>
 		<div class="row">
-			<label class="col-md2 ui-label">{{T .Loc "user.status"}}</label>
+			<label class="col-md-2 ui-label">{{T .Loc "user.status"}}</label>
 			<div class="col-md-10 ui-value">{{.UserStatusMap.MustGet .User.Status .User.Status}}
 			</div>
 		</div>
 		<div class="row">
-			<label class="col-md2 ui-label">{{T .Loc "user.cidr"}}</label>
-			<div class="col-md-10 ui-value">{{.User.CIDR}}</div>
+			<label class="col-md-2 ui-label">{{T .Loc "user.cidr"}}</label>
+			<div class="col-md-10 ui-value"><pre>{{.User.CIDR}}</pre></div>
 		</div>
 	</div>
 </div>
 <div class="ui-popup-footer">
 	<button type="button" class="btn btn-secondary" popup-dismiss="true">{{I "close"}} {{T .Loc "button.close"}}</button>
 </div>
-<i class="prev" action="edit"></i>
-<i class="next" action="edit"></i>
+<i class="prev" action="view"></i>
+<i class="next" action="view"></i>
