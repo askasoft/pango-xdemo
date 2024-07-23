@@ -432,25 +432,18 @@ form div.verr {
 }
 .s-table td.actions button {
 	padding: 6px 8px;
+	margin: 0 0 5px 0;
 }
 
-.s-table td > ol {
-	padding-left: 20px;
-}
-.s-table td pre {
+.s-table td > pre {
 	background-color: transparent;
 	border: 0 none;
 	margin: 0;
 	padding: 0;
 	white-space: pre-wrap;
-}
-
-.s-table td > pre, .s-table td > div {
+	word-break: break-all;
 	max-height: 3em;
 	overflow-y: auto;
-}
-.s-table td > div > hr {
-	border-top: 1px dashed var(--bs-primary);
 }
 .s-table tr.ui-blink-1s td, .s-table tr.ui-blink-1s2 td {
 	background-color: transparent;
@@ -533,6 +526,23 @@ form div.verr {
 }
 .s-popup-detail > .prev:hover:before, .s-popup-detail > .next:hover:after {
 	border-color: var(--bs-light);
+}
+
+.s-popup-detail.xcol2 .ui-popup-header {
+	display: flex;
+}
+.s-popup-detail.xcol2 .ui-popup-header > * {
+	width: 50%;
+}
+.s-popup-detail.xcol2 .ui-popup-body {
+	display: flex;
+	padding: 0;
+}
+.s-popup-detail.xcol2 .ui-popup-body > div {
+	flex: 0 0 50%;
+	padding: 10px 20px;
+	max-height: 100%;
+	overflow-y: auto;
 }
 
 .s-popup-error .ui-popup-body {

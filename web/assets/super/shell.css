@@ -1,9 +1,0 @@
-#shell_result {
-	margin-top: 40px;
-}
-#shell_result .ui-label {
-	font-weight: bold;
-}
-#shell_result .ui-value {
-	white-space: pre-wrap;
-}

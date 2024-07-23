@@ -20,7 +20,7 @@
 				for (var p in data) {
 					var $r = $t.clone();
 					$r.find('.ui-label').text(lbls[p] || p);
-					$r.find('.ui-value').text(data[p]);
+					$r.find('.ui-value > pre').text(data[p]);
 					$sr.append($r);
 				}
 				$sr.show();

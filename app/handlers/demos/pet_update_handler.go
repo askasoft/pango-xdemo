@@ -182,8 +182,10 @@ func PetUpdate(c *xin.Context) {
 			"amount",
 			"price",
 			"shop_name",
+			"shop_link",
 			"shop_address",
 			"shop_telephone",
+			"description",
 			"updated_at",
 		)
 		r := tx.Updates(&pet.Pet)
