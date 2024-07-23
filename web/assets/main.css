@@ -419,18 +419,15 @@ form div.verr {
 	min-width: 110px;
 }
 
+.s-table th.id, .s-table td.id,
+.s-table th.no, .s-table td.no,
 .s-table th.check, .s-table td.check,
 .s-table th.error, .s-table td.error,
-.s-table th.id, .s-table td.id,
-.s-table th.no, .s-table td.no {
-	width: 1%;
-	white-space: nowrap;
-}
 .s-table th.actions, .s-table td.actions {
 	width: 1%;
 	white-space: nowrap;
 }
-.s-table td.actions button {
+.s-table td.error > .btn, .s-table td.actions > .btn {
 	padding: 6px 8px;
 	margin: 0 0 5px 0;
 }

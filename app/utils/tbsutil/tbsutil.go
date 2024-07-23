@@ -57,22 +57,6 @@ func GetBoolMap(locale string) *linkedhashmap.LinkedHashMap[string, string] {
 	return GetLinkedHashMap(locale, "maps.bool")
 }
 
-func GetPetGenderMap(locale string) *linkedhashmap.LinkedHashMap[string, string] {
-	return GetLinkedHashMap(locale, "pet.map.gender")
-}
-
-func GetPetOriginMap(locale string) *linkedhashmap.LinkedHashMap[string, string] {
-	return GetLinkedHashMap(locale, "pet.map.origin")
-}
-
-func GetPetTemperMap(locale string) *linkedhashmap.LinkedHashMap[string, string] {
-	return GetLinkedHashMap(locale, "pet.map.temper")
-}
-
-func GetPetHabitsMap(locale string) *linkedhashmap.LinkedHashMap[string, string] {
-	return GetLinkedHashMap(locale, "pet.map.habits")
-}
-
 func GetUserStatusMap(locale string) *linkedhashmap.LinkedHashMap[string, string] {
 	return GetLinkedHashMap(locale, "user.map.status")
 }
@@ -95,6 +79,22 @@ func GetUserRoleReverseMap() map[string]string {
 	return GetAllReverseMap("user.map.role")
 }
 
+func GetPetGenderMap(locale string) *linkedhashmap.LinkedHashMap[string, string] {
+	return GetLinkedHashMap(locale, "pet.map.gender")
+}
+
+func GetPetOriginMap(locale string) *linkedhashmap.LinkedHashMap[string, string] {
+	return GetLinkedHashMap(locale, "pet.map.origin")
+}
+
+func GetPetTemperMap(locale string) *linkedhashmap.LinkedHashMap[string, string] {
+	return GetLinkedHashMap(locale, "pet.map.temper")
+}
+
+func GetPetHabitsMap(locale string) *linkedhashmap.LinkedHashMap[string, string] {
+	return GetLinkedHashMap(locale, "pet.map.habits")
+}
+
 func GetPetResetJobnamesMap(locale string) *linkedhashmap.LinkedHashMap[string, string] {
 	return GetLinkedHashMap(locale, "pet.reset.jobnames")
 }
@@ -102,3 +102,4 @@ func GetPetResetJobnamesMap(locale string) *linkedhashmap.LinkedHashMap[string, 
 func GetPetResetJslabelsMap(locale string) *linkedhashmap.LinkedHashMap[string, string] {
 	return GetLinkedHashMap(locale, "pet.reset.jslabels")
 }
+

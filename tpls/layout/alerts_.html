@@ -4,7 +4,7 @@
 	<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 	<ul class="fa-ul">
 		{{range $e := .Ctx.Errors}}
-		<li><span class="fa-li"><i class="fas fa-circle-exclamation"></i></span><span>{{$e}}</span></li>
+		<li><span class="fa-li"><i class="fas fa-fw fa-circle-exclamation"></i></span><span>{{$e}}</span></li>
 		{{end}}
 	</ul>
 </div>
@@ -14,10 +14,10 @@
 	<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 	<ul class="fa-ul">
 		{{if .Warning}}
-		<li><span class="fa-li"><i class="fas fa-triangle-exclamation"></i></span><span>{{.Warning}}</span></li>
+		<li><span class="fa-li"><i class="fas fa-fw fa-triangle-exclamation"></i></span><span>{{.Warning}}</span></li>
 		{{end}}
 		{{range $w := .Warnings}}
-		<li><span class="fa-li"><i class="fas fa-triangle-exclamation"></i></span><span>{{$w}}</span></li>
+		<li><span class="fa-li"><i class="fas fa-fw fa-triangle-exclamation"></i></span><span>{{$w}}</span></li>
 		{{end}}
 	</ul>
 </div>
@@ -27,10 +27,10 @@
 	<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 	<ul class="fa-ul">
 		{{if .Message}}
-		<li><span class="fa-li"><i class="fas fa-circle-info"></i></span><span>{{.Message}}</span></li>
+		<li><span class="fa-li"><i class="fas fa-fw fa-circle-info"></i></span><span>{{.Message}}</span></li>
 		{{end}}
 		{{range $m := .Messages}}
-		<li><span class="fa-li"><i class="fas fa-circle-info"></i></span><span>{{$m}}</span></li>
+		<li><span class="fa-li"><i class="fas fa-fw fa-circle-info"></i></span><span>{{$m}}</span></li>
 		{{end}}
 	</ul>
 </div>
@@ -40,10 +40,10 @@
 	<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 	<ul class="fa-ul">
 		{{if .Success}}
-		<li><span class="fa-li"><i class="fas fa-check"></i></span><span>{{.Success}}</span></li>
+		<li><span class="fa-li"><i class="fas fa-fw fa-check"></i></span><span>{{.Success}}</span></li>
 		{{end}}
 		{{range $s := .Successes}}
-		<li><span class="fa-li"><i class="fas fa-check"></i></span><span>{{$s}}</span></li>
+		<li><span class="fa-li"><i class="fas fa-fw fa-check"></i></span><span>{{$s}}</span></li>
 		{{end}}
 	</ul>
 </div>

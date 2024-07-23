@@ -160,9 +160,14 @@ func ConfigSave(c *xin.Context) {
 		tx = tx.Where("editor >= ?", au.Role)
 		r := tx.Select("value", "updated_at").Updates(cfg)
 		if r.Error != nil {
-			c.Logger.Warn(r.Error)
-			c.AddError(&vadutil.ParamError{Param: cfg.Name, Message: r.Error.Error()})
-		} else if r.RowsAffected != 1 {
+			c.Logger.Error(r.Error)
+			c.Errors = []error{r.Error}
+			c.JSON(http.StatusInternalServerError, handlers.E(c))
+			db.Rollback()
+			return
+		}
+
+		if r.RowsAffected != 1 {
 			msg := tbs.Format(c.Locale, "error.param.invalid", cfg.Name)
 			c.Logger.Warn(msg)
 			c.AddError(&vadutil.ParamError{Param: cfg.Name, Message: msg})
