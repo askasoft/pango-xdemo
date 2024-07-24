@@ -113,7 +113,7 @@
 		if ($pv.length) {
 			pet_detail_show($pv, action);
 		} else {
-			pets_prev_page(pet_detail_action_trigger.bind(this, action));
+			pets_prev_page(pet_detail_action_trigger.callback(action));
 		}
 	}
 
@@ -127,7 +127,7 @@
 		if ($nx.length) {
 			pet_detail_show($nx, action);
 		} else {
-			pets_next_page(pet_detail_action_trigger.bind(this, action));
+			pets_next_page(pet_detail_action_trigger.callback(action));
 		}
 	}
 
