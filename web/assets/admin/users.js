@@ -137,9 +137,7 @@
 	}
 
 	function user_detail_popup_loaded() {
-		var $d = $('#users_detail_popup');
-		main.detail_popup_submit($d, user_detail_submit);
-		main.detail_popup_prevnext($d, $('#users_list'), '#user_', user_detail_prev, user_detail_next);
+		main.detail_popup_prevnext($('#users_detail_popup'), $('#users_list'), '#user_');
 	}
 
 	function user_detail_popup_shown() {
@@ -372,7 +370,12 @@
 
 		$('#users_detail_popup')
 			.on('loaded.popup', user_detail_popup_loaded)
-			.on('shown.popup', user_detail_popup_shown);
+			.on('shown.popup', user_detail_popup_shown)
+			.on('keydown', main.detail_popup_keydown)
+			.on('click', '.prev', user_detail_prev)
+			.on('click', '.next', user_detail_next)
+			.on('submit', 'form', user_detail_submit)
+			.on('click', '.ui-popup-footer button[type=submit]', user_detail_submit);
 
 		$('#users_deletesel_popup form').on('submit', function() { return users_deletes(false); });
 		$('#users_deleteall_popup form').on('submit', function() { return users_deletes(true); });

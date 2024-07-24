@@ -276,42 +276,33 @@ var main = {
 		$d.find('.ui-popup-body > *').prop('scrollTop', 0);
 		main.detail_popup_shown($d);
 	},
-	detail_popup_submit: function($d, submit) {
-		$d.find('form').on('submit', submit);
-		$d.find('.ui-popup-footer button[type=submit]').on('click', submit);
-	},
-	detail_popup_prevnext: function($d, $l, idpx, prev, next) {
+	detail_popup_prevnext: function($d, $l, idpx) {
 		var $p = $d.find('.prev'), $n = $d.find('.next');
-		$d.on('keydown', main.detail_popup_keydown($d));
 
-		$p.on('click', prev);
-		$n.on('click', next);
-		
 		var id = $d.find('input[name=id]').val(), $tr = $(idpx + id), $pg = $l.find('.ui-pager > .pagination');
 		var prev = $tr.prev('tr').length || $pg.find('.page-item.prev.disabled').length == 0;
 		var next = $tr.next('tr').length || $pg.find('.page-item.next.disabled').length == 0;
+
 		$p[(id != '0' && prev) ? 'show' : 'hide']();
 		$n[(id != '0' && next) ? 'show' : 'hide']();
 	},
-	detail_popup_keydown: function($d) {
-		return function(evt) {
-			if (evt.altKey) {
-				switch (evt.key) {
-				case 'ArrowLeft':
-					evt.preventDefault();
-					var $p = $d.children('.prev');
-					if (!$p.is(':hidden')) {
-						$p.trigger('click');
-					}
-					break;
-				case 'ArrowRight':
-					evt.preventDefault();
-					var $n = $d.children('.next');
-					if (!$n.is(':hidden')) {
-						$n.trigger('click');
-					}
-					break;
+	detail_popup_keydown: function(evt) {
+		if (evt.altKey) {
+			switch (evt.key) {
+			case 'ArrowLeft':
+				evt.preventDefault();
+				var $p = $(this).children('.prev');
+				if (!$p.is(':hidden')) {
+					$p.trigger('click');
 				}
+				break;
+			case 'ArrowRight':
+				evt.preventDefault();
+				var $n = $(this).children('.next');
+				if (!$n.is(':hidden')) {
+					$n.trigger('click');
+				}
+				break;
 			}
 		}
 	},

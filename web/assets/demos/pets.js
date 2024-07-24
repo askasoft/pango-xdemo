@@ -137,9 +137,7 @@
 	}
 
 	function pets_detail_popup_loaded() {
-		var $d = $('#pets_detail_popup');
-		main.detail_popup_submit($d, pet_detail_submit);
-		main.detail_popup_prevnext($d, $('#pets_list'), '#pet_', pet_detail_prev, pet_detail_next);
+		main.detail_popup_prevnext($('#pets_detail_popup'), $('#pets_list'), '#pet_');
 	}
 
 	function pets_detail_popup_shown() {
@@ -386,7 +384,12 @@
 
 		$('#pets_detail_popup')
 			.on('loaded.popup', pets_detail_popup_loaded)
-			.on('shown.popup', pets_detail_popup_shown);
+			.on('shown.popup', pets_detail_popup_shown)
+			.on('keydown', main.detail_popup_keydown)
+			.on('click', '.prev', pet_detail_prev)
+			.on('click', '.next', pet_detail_next)
+			.on('submit', 'form', pet_detail_submit)
+			.on('click', '.ui-popup-footer button[type=submit]', pet_detail_submit);
 
 		$('#pets_deletesel_popup form').on('submit', function() { return pets_deletes(false); });
 		$('#pets_deleteall_popup form').on('submit', function() { return pets_deletes(true); });
