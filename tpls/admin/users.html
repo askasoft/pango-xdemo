@@ -125,7 +125,7 @@
 
 <div id="users_deletebat_popup" class="ui-popup s-popup-detail" data-spy="popup" tabindex="-1"
 	popup-position="center" popup-mask="true" popup-mouse="false" popup-closer="true"
-	popup-focus="#users_deletebat_popup [name=name]">
+	popup-focus="[name=name]">
 	<div class="ui-popup-header">
 		<h4>{{I "deletebat"}}
 			{{T .Loc "button.deletebat"}}
@@ -213,6 +213,6 @@
 
 <div id="users_detail_popup" class="ui-popup s-popup-detail medium" data-spy="popup" tabindex="-1"
 	popup-position="center" popup-keyboard="false" popup-mouse="false" popup-mask="false" popup-closer="true"
-	popup-loader="true" popup-focus="#users_detail_popup [name=name], #users_detail_popup button"></div>
+	popup-loader="true" popup-focus="[name=name], button.close"></div>
 
 {{template "main_footer" .}}

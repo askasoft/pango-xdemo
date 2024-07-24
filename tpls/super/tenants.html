@@ -38,7 +38,7 @@
 
 <div id="tenants_create_popup" class="ui-popup s-popup-detail" data-spy="popup" tabindex="-1"
 	popup-position="center" popup-mouse="false" popup-closer="true"
-	popup-focus="#tenants_create_popup [name=name]">
+	popup-focus="[name=name]">
 	<div class="ui-popup-header">
 		<h4>{{I "edit"}}
 			{{T .Loc "tenant.create.header"}}
@@ -62,13 +62,13 @@
 	</form>
 	<div class="ui-popup-footer">
 		<button type="submit" class="btn btn-primary">{{I "save"}} {{T .Loc "button.create"}}</button>
-		<button type="button" class="btn btn-secondary" popup-dismiss="true">{{I "close"}} {{T .Loc "button.close"}}</button>
+		<button type="button" class="btn btn-secondary close" popup-dismiss="true">{{I "close"}} {{T .Loc "button.close"}}</button>
 	</div>
 </div>
 
 <div id="tenants_update_popup" class="ui-popup s-popup-detail" data-spy="popup" tabindex="-1"
 	popup-position="center" popup-mouse="false" popup-closer="true"
-	popup-focus="#tenants_update_popup [name=comment]">
+	popup-focus="[name=name]">
 	<div class="ui-popup-header">
 		<h4>{{I "edit"}}
 			{{T .Loc "tenant.update.header"}}
@@ -94,7 +94,7 @@
 	</div>
 	<div class="ui-popup-footer">
 		<button type="submit" class="btn btn-primary">{{I "save"}} {{T .Loc "button.save"}}</button>
-		<button type="button" class="btn btn-secondary" popup-dismiss="true">{{I "close"}} {{T .Loc "button.close"}}</button>
+		<button type="button" class="btn btn-secondary close" popup-dismiss="true">{{I "close"}} {{T .Loc "button.close"}}</button>
 	</div>
 </div>
 
