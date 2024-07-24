@@ -133,7 +133,7 @@ var main = {
 			};
 		}
 
-		err = xhr.responseText || (xhr.status ? xhr.status + ' ' : '') + (err || status || 'Server error!');
+		err = (xhr.status ? xhr.status + ' ' : '') + (err || status || 'error');
 		if (xhr.responseJSON) {
 			err = xhr.responseJSON.error || JSON.stringify(xhr.responseJSON, null, 4) || err;
 		}
@@ -366,7 +366,7 @@ var main = {
 				continue;
 			}
 
-			var $c = $td.children('a, pre'), v = vs[k];
+			var $c = $td.children('a, pre, button'), v = vs[k];
 			if (typeof(v) == 'undefined') {
 				v = '';
 			}
