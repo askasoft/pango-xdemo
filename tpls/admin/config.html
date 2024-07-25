@@ -51,8 +51,10 @@
 									viewer="{{$c.Viewer}}" editor="{{$c.Editor}}">{{T $.Loc (print "config." $c.Name)}}</label>
 								<div class="col-md-10">
 								{{if eq $c.Style "C"}}
+									<input type="checkbox" name="{{$c.Name}}" value="" checked style="display:none">
 									{{Checks "Name=" $c.Name "List=" (MapGet $.Lists $c.Name) "Values=" $c.Values "Disabled=" ($c.Readonly $.AuthUser.Role)}}
 								{{else if eq $c.Style "O"}}
+									<input type="checkbox" name="{{$c.Name}}" value="" checked style="display:none">
 									{{Checks "Name=" $c.Name "List=" (MapGet $.Lists $c.Name) "Values=" $c.Values "Disabled=" ($c.Readonly $.AuthUser.Role) "Ordered=" true "class=" "vertical"}}
 								{{else if eq $c.Style "R"}}
 									{{Radios "Name=" $c.Name "List=" (MapGet $.Lists $c.Name) "Value=" $c.Value "Disabled=" ($c.Readonly $.AuthUser.Role)}}

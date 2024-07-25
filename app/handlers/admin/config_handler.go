@@ -124,6 +124,7 @@ func ConfigSave(c *xin.Context) {
 		case models.StyleChecks, models.StyleOrders:
 			vs, ok = c.GetPostFormArray(cfg.Name)
 			if ok {
+				vs = str.RemoveEmpties(vs)
 				v = str.Join(vs, "\t")
 			}
 		default:
