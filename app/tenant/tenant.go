@@ -3,6 +3,7 @@ package tenant
 import (
 	"errors"
 	"fmt"
+	"sync"
 
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango/cog/linkedhashset"
@@ -34,11 +35,38 @@ func IsMultiTenant() bool {
 	return app.INI.GetBool("app", "tenants")
 }
 
-func ExistsTenant(s string) (bool, error) {
+// TENAS write lock
+var muTENAS sync.Mutex
+
+func FindTenant(tt Tenant) (bool, error) {
 	if !IsMultiTenant() {
 		return true, nil
 	}
 
+	s := tt.Schema()
+
+	if v, ok := app.TENAS.Get(s); ok {
+		return v.(bool), nil
+	}
+
+	muTENAS.Lock()
+	defer muTENAS.Unlock()
+
+	// get again to prevent duplicated load
+	if v, ok := app.TENAS.Get(s); ok {
+		return v.(bool), nil
+	}
+
+	ok, err := ExistsSchema(s)
+	if err != nil {
+		return false, err
+	}
+
+	app.TENAS.Set(s, ok)
+	return ok, nil
+}
+
+func ExistsSchema(s string) (bool, error) {
 	sm := &Schemata{}
 	r := app.GDB.Table(TableSchemata).Where("schema_name = ?", s).Select("schema_name").Take(sm)
 	if r.Error != nil {
@@ -186,10 +214,6 @@ func (tt Tenant) Table(s string) string {
 	return tt.Prefix() + s
 }
 
-func (tt Tenant) TablePets() string {
-	return tt.Table("pets")
-}
-
 func (tt Tenant) TableFiles() string {
 	return tt.Table("files")
 }
@@ -212,6 +236,10 @@ func (tt Tenant) TableConfigs() string {
 
 func (tt Tenant) TableUsers() string {
 	return tt.Table("users")
+}
+
+func (tt Tenant) TablePets() string {
+	return tt.Table("pets")
 }
 
 func (tt Tenant) ResetSequence(table string, starts ...int64) string {

@@ -16,9 +16,9 @@ func SetCtxLogProp(c *xin.Context) {
 
 func CheckTenant(c *xin.Context) {
 	tt := tenant.FromCtx(c)
-	ok, err := tenant.ExistsTenant(tt.Schema())
+	ok, err := tenant.FindTenant(tt)
 	if err != nil {
-		c.Logger.Errorf("Failed to check schema '%s': %v", tt.Schema(), err)
+		c.Logger.Errorf("Failed to find schema '%s': %v", tt.Schema(), err)
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}

@@ -19,7 +19,7 @@ func TenantCreate(c *xin.Context) {
 		return
 	}
 
-	if ok, err := tenant.ExistsTenant(ti.Name); err != nil {
+	if ok, err := tenant.ExistsSchema(ti.Name); err != nil {
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return
@@ -61,7 +61,7 @@ func TenantUpdate(c *xin.Context) {
 		return
 	}
 
-	if ok, err := tenant.ExistsTenant(te.Oname); err != nil {
+	if ok, err := tenant.ExistsSchema(te.Oname); err != nil {
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return
@@ -72,7 +72,7 @@ func TenantUpdate(c *xin.Context) {
 	}
 
 	if te.Oname != te.Name {
-		if ok, err := tenant.ExistsTenant(te.Name); err != nil {
+		if ok, err := tenant.ExistsSchema(te.Name); err != nil {
 			c.AddError(err)
 			c.JSON(http.StatusInternalServerError, handlers.E(c))
 			return
@@ -116,7 +116,7 @@ func TenantDelete(c *xin.Context) {
 		return
 	}
 
-	if ok, err := tenant.ExistsTenant(ti.Name); err != nil {
+	if ok, err := tenant.ExistsSchema(ti.Name); err != nil {
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return

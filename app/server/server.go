@@ -183,6 +183,7 @@ func initConfigs() {
 
 	apc := app.INI.Section("app")
 	app.Locales = str.FieldsAny(apc.GetString("locales"), ",; ")
+	app.TENAS = imc.New(apc.GetDuration("tenaCacheExpires", time.Second*10), time.Minute)
 	app.CONFS = imc.New(apc.GetDuration("confCacheExpires", time.Minute), time.Minute)
 	app.USERS = imc.New(apc.GetDuration("userCacheExpires", time.Second*15), time.Minute)
 	app.AFIPS = imc.New(apc.GetDuration("afipCacheExpires", time.Minute*15), time.Minute)
