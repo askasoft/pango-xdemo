@@ -38,7 +38,7 @@ func initRouter() {
 	app.XAL = xmw.NewAccessLogger(nil)
 	app.XRL = xmw.NewRequestLimiter(0)
 	app.XRC = xmw.DefaultResponseCompressor()
-	app.XHD = xmw.NewHTTPDumper(app.XIN.Logger.GetOutputer("XHD", log.LevelInfo))
+	app.XHD = xmw.NewHTTPDumper(app.XIN.Logger.GetOutputer("XHD", log.LevelTrace))
 	app.XSR = xmw.NewHTTPSRedirector()
 	app.XLL = xmw.NewLocalizer()
 	app.XTP = xmw.NewTokenProtector("")
@@ -142,13 +142,13 @@ func configAccessLogger() {
 		switch alf {
 		case "text":
 			alw := xmw.NewAccessLogWriter(
-				app.XIN.Logger.GetOutputer("XAL", log.LevelInfo),
+				app.XIN.Logger.GetOutputer("XAL", log.LevelTrace),
 				svc.GetString("accessLogTextFormat", xmw.AccessLogTextFormat),
 			)
 			alws = append(alws, alw)
 		case "json":
 			alw := xmw.NewAccessLogWriter(
-				app.XIN.Logger.GetOutputer("XAJ", log.LevelInfo),
+				app.XIN.Logger.GetOutputer("XAJ", log.LevelTrace),
 				svc.GetString("accessLogJSONFormat", xmw.AccessLogJSONFormat),
 			)
 			alws = append(alws, alw)

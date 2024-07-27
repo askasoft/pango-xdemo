@@ -1,7 +1,5 @@
 #!/bin/sh
 
-# go install github.com/josephspurrier/goversioninfo/cmd/goversioninfo@latest
-
 export GO111MODULE=on
 
 EXENAME=xdemo
