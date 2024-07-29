@@ -11,7 +11,7 @@ func SendHTMLMail(to string, subject, message string) error {
 	sec := app.INI.Section("smtp")
 
 	em := &email.Email{}
-	if err := em.SetFrom(sec.GetString("from")); err != nil {
+	if err := em.SetFrom(sec.GetString("fromaddr")); err != nil {
 		return err
 	}
 	if err := em.AddTo(to); err != nil {
