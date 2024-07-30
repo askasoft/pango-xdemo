@@ -6,6 +6,11 @@
 <div class="s-section">
 	<div class="s-section-head">
 		<h2>{{I "demos.pets.list"}}<span>{{T .Loc "menu.demos.pets.list"}}</span></h2>
+		<div class="ms-auto">
+			<button class="btn btn-sm btn-outline-primary" id="pets_export">
+				{{I "csv"}} {{T .Loc "button.csvexp"}}
+			</button>
+		</div>
 	</div>
 	<div class="s-section-body">
 		<div class="s-toolbar">
@@ -19,9 +24,6 @@
 				{{I "deleteall"}} {{T .Loc "button.deleteall"}}
 			</button>
 			<div class="ms-auto"></div>
-			<button class="btn btn-sm btn-outline-primary" id="pets_new">
-				{{I "new"}} {{T .Loc "button.new"}}
-			</button>
 			<button class="btn btn-sm btn-outline-primary" id="pets_editsel" enableby="#pets_list td.check input">
 				{{I "editsel"}} {{T .Loc "button.editsel"}}
 			</button>
@@ -29,8 +31,8 @@
 				{{I "editall"}} {{T .Loc "button.editall"}}
 			</button>
 			<div class="me-auto"></div>
-			<button class="btn btn-sm btn-outline-primary" id="pets_export">
-				{{I "csv"}} {{T .Loc "button.csvexp"}}
+			<button class="btn btn-sm btn-outline-primary" id="pets_new">
+				{{I "new"}} {{T .Loc "button.new"}}
 			</button>
 		</div>
 
