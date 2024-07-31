@@ -17,7 +17,7 @@ const (
 	RoleAdmin   = "A"
 	RoleEditor  = "E"
 	RoleViewer  = "V"
-	RoleApiOnly = "~"
+	RoleApiOnly = "Z"
 
 	UserActive   = "A"
 	UserDisabled = "D"
