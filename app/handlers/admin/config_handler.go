@@ -169,7 +169,7 @@ func ConfigSave(c *xin.Context) {
 		}
 
 		if r.RowsAffected != 1 {
-			msg := tbs.Format(c.Locale, "error.param.invalid", cfg.Name)
+			msg := tbs.Format(c.Locale, "config.error.unsaved", tbs.GetText(c.Locale, "config."+cfg.Name, cfg.Name))
 			c.Logger.Warn(msg)
 			c.AddError(&vadutil.ParamError{Param: cfg.Name, Message: msg})
 		}

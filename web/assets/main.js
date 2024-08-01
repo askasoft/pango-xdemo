@@ -209,7 +209,7 @@ var main = {
 		if ($f && $f.length) {
 			var $i = $f.find('[name="' + err.param + '"]');
 			$i.addClass('is-invalid');
-			$i.closest('div').append($('<div class="verr">').text(err.message));
+			$i.eq(0).closest('div').append($('<div class="verr">').text(err.message));
 		}
 	},
 	form_ajax_error: function($f) {

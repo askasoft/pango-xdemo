@@ -51,10 +51,10 @@
 									viewer="{{$c.Viewer}}" editor="{{$c.Editor}}">{{T $.Loc (print "config." $c.Name)}}</label>
 								<div class="col-md-10">
 								{{if eq $c.Style "C"}}
-									<input type="checkbox" name="{{$c.Name}}" value="" checked style="display:none">
+									<input type="checkbox" name="{{$c.Name}}" value="" checked{{if $c.Readonly $.AuthUser.Role}} disabled{{end}} style="display:none">
 									{{Checks "Name=" $c.Name "List=" (MapGet $.Lists $c.Name) "Values=" $c.Values "Disabled=" ($c.Readonly $.AuthUser.Role)}}
 								{{else if eq $c.Style "O"}}
-									<input type="checkbox" name="{{$c.Name}}" value="" checked style="display:none">
+									<input type="checkbox" name="{{$c.Name}}" value="" checked{{if $c.Readonly $.AuthUser.Role}} disabled{{end}} style="display:none">
 									{{Checks "Name=" $c.Name "List=" (MapGet $.Lists $c.Name) "Values=" $c.Values "Disabled=" ($c.Readonly $.AuthUser.Role) "Ordered=" true "class=" "vertical"}}
 								{{else if eq $c.Style "R"}}
 									{{Radios "Name=" $c.Name "List=" (MapGet $.Lists $c.Name) "Value=" $c.Value "Disabled=" ($c.Readonly $.AuthUser.Role)}}
@@ -102,8 +102,8 @@
 	<div class="ui-popup-body grey">
 		<form class="ui-form lined" autocomplete="off">
 			<div class="row">
-				<label class="col-md-2 col-form-label">{{T .Loc "config.import.file"}}</label>
-				<div class="col-md-10">
+				<label class="col-md-3 col-form-label">{{T .Loc "config.import.file"}}</label>
+				<div class="col-md-9">
 					<input type="file" name="file" accept=".csv" class="form-control">
 				</div>
 			</div>
