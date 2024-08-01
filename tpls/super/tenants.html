@@ -2,6 +2,14 @@
 
 {{template "main_header" .}}
 
+<style>
+#tenants_table th.size, #tenants_table td.size {
+	text-align: right;
+	width: 1%;
+	white-space: nowrap;
+}
+</style>
+
 <div class="s-section">
 	<div class="s-section-head">
 		<h2>{{I "super.tenants"}}<span>{{T .Loc "menu.super.tenants"}}</span></h2>

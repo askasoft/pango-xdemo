@@ -16,7 +16,16 @@ import (
 
 type TenantInfo struct {
 	Name    string `json:"name" form:"name,strip,lower" validate:"required,maxlen=30,regexp=^[a-z][a-z0-9]{00x2C29}$"`
-	Comment string `json:"comment" form:"comment" validate:"omitempty,maxlen=250"`
+	Size    int64  `json:"size,omitempty"`
+	Default bool   `json:"default,omitempty"`
+	Comment string `json:"comment,omitempty" form:"comment" validate:"omitempty,maxlen=250"`
+}
+
+func (ti *TenantInfo) Prefix() string {
+	if ti.Default {
+		return ""
+	}
+	return ti.Name + "."
 }
 
 type TenantQuery struct {
@@ -29,18 +38,18 @@ func (tq *TenantQuery) Normalize(c *xin.Context) {
 	tq.Sorter.Normalize(
 		"name",
 		"comment",
+		"size",
 	)
 
 	tq.Pager.Normalize(tbsutil.GetPagerLimits(c.Locale)...)
 }
 
 func filterTenants(tq *TenantQuery) *gorm.DB {
-	tx := app.GDB.Table(tenant.TableSchemata)
+	tx := app.GDB.Table(tenant.TablePgNamespace)
 
-	tx = tx.Where("schema_name <> ?", app.INI.GetString("database", "schema", "public"))
-	tx = tx.Where("schema_name NOT LIKE ?", sqx.StringLike("_"))
+	tx = tx.Where("nspname NOT LIKE ?", sqx.StringLike("_"))
 	if tq.Name != "" {
-		tx = tx.Where("schema_name LIKE ?", sqx.StringLike(tq.Name))
+		tx = tx.Where("nspname LIKE ?", sqx.StringLike(tq.Name))
 	}
 	return tx
 }
@@ -57,13 +66,23 @@ func countTenants(tq *TenantQuery) (int, error) {
 }
 
 func findTenants(tq *TenantQuery) (tenants []*TenantInfo, err error) {
-	tx := filterTenants(tq).Select("schema_name AS name, obj_description(schema_name::regnamespace, 'pg_namespace') AS comment")
-
+	tx := filterTenants(tq)
+	tx = tx.Select(
+		"nspname AS name",
+		"(SELECT SUM(pg_relation_size(oid)) FROM pg_catalog.pg_class WHERE relnamespace = pg_namespace.oid) AS size",
+		"obj_description(oid, 'pg_namespace') AS comment",
+	)
 	tx = tq.AddOrder(tx, "name")
 	tx = tq.AddPager(tx)
 
-	r := tx.Find(&tenants)
-	err = r.Error
+	if err = tx.Find(&tenants).Error; err == nil {
+		ds := tenant.DefaultSchema()
+		for _, ti := range tenants {
+			if ti.Name == ds {
+				ti.Default = true
+			}
+		}
+	}
 	return
 }
 

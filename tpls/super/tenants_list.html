@@ -13,6 +13,7 @@
 					{{I "new"}} {{T .Loc "button.new"}}
 				</button>
 			</th>
+			<th class="size sortable" data-sort-col="size">{{T .Loc "tenant.size"}}</th>
 			<th class="comment sortable" data-sort-col="comment">{{T .Loc "tenant.comment"}}</th>
 		</tr>
 	</thead>
@@ -22,13 +23,14 @@
 		<tr id="tenant_{{$t.Name}}">
 			<td class="no">{{Add $n $i}}</td>
 			<td class="name">{{$t.Name}}</td>
-			<td class="domain"><a href="//{{$t.Name}}.{{$.Domain}}" target="_blank">{{$t.Name}}.{{$.Domain}}</a></td>
+			<td class="domain"><a href="//{{$t.Prefix}}{{$.Domain}}" target="_blank">{{$t.Prefix}}{{$.Domain}}</a></td>
 			<td class="actions">
-				{{if ne $.Tenant $t.Name}}
+				{{if and (ne $.Tenant $t.Name) (not $t.Default)}}
 				<button class="btn btn-outline-primary edit" title="{{T $.Loc "button.edit"}}">{{I "edit"}}</button>
 				<button class="btn btn-outline-danger delete" title="{{T $.Loc "button.delete"}}">{{I "delete"}}</button>
 				{{end}}
 			</td>
+			<td class="size">{{HumanSize $t.Size}}</td>
 			<td class="comment"><pre>{{$t.Comment}}</pre></td>
 		</tr>
 		{{end}}
@@ -41,6 +43,7 @@
 		<td class="no"></td>
 		<td class="name"></td>
 		<td class="domain"><a href="#" target="_blank"></a></td>
+		<td class="size"></td>
 		<td class="actions">
 			<button class="btn btn-outline-primary edit" title="{{T .Loc "button.edit"}}">{{I "edit"}}</button>
 			<button class="btn btn-outline-danger delete" title="{{T $.Loc "button.delete"}}">{{I "delete"}}</button>

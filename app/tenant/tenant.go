@@ -22,13 +22,17 @@ import (
 )
 
 const (
-	TableSchemata = "information_schema.schemata"
+	TablePgNamespace = "pg_catalog.pg_namespace"
 )
 
 type Tenant string
 
-type Schemata struct {
-	SchemaName string
+type PgNamesapce struct {
+	Nspname string
+}
+
+func DefaultSchema() string {
+	return app.INI.GetString("database", "schema", "public")
 }
 
 func IsMultiTenant() bool {
@@ -67,8 +71,8 @@ func FindTenant(tt Tenant) (bool, error) {
 }
 
 func ExistsSchema(s string) (bool, error) {
-	sm := &Schemata{}
-	r := app.GDB.Table(TableSchemata).Where("schema_name = ?", s).Select("schema_name").Take(sm)
+	sm := &PgNamesapce{}
+	r := app.GDB.Table(TablePgNamespace).Where("nspname = ?", s).Select("nspname").Take(sm)
 	if r.Error != nil {
 		if errors.Is(r.Error, gorm.ErrRecordNotFound) {
 			return false, nil
@@ -83,26 +87,27 @@ func ListTenants() ([]Tenant, error) {
 		return []Tenant{""}, nil
 	}
 
-	tx := app.GDB.Table(TableSchemata).Where("schema_name NOT LIKE ?", sqx.StringLike("_")).Select("schema_name").Order("schema_name asc")
+	tx := app.GDB.Table(TablePgNamespace).Where("nspname NOT LIKE ?", sqx.StringLike("_")).Select("nspname").Order("nspname asc")
 	rows, err := tx.Rows()
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	ds := app.INI.GetString("database", "schema", "public")
+	ds := DefaultSchema()
 
-	ts := linkedhashset.NewLinkedHashSet(Tenant(""))
+	ts := linkedhashset.NewLinkedHashSet[Tenant]()
 
-	sm := &Schemata{}
+	pn := &PgNamesapce{}
 	for rows.Next() {
-		err = tx.ScanRows(rows, sm)
-		if err != nil {
+		if err = tx.ScanRows(rows, pn); err != nil {
 			return nil, err
 		}
 
-		if sm.SchemaName != ds {
-			ts.Add(Tenant(sm.SchemaName))
+		if pn.Nspname == ds {
+			ts.PushHead(Tenant(""))
+		} else {
+			ts.Add(Tenant(pn.Nspname))
 		}
 	}
 
@@ -201,7 +206,7 @@ func (tt Tenant) FQDN() string {
 
 func (tt Tenant) Schema() string {
 	if len(tt) == 0 {
-		return app.INI.GetString("database", "schema", "public")
+		return DefaultSchema()
 	}
 	return string(tt)
 }

@@ -55,7 +55,7 @@ func TenantUpdate(c *xin.Context) {
 	}
 
 	tt := tenant.FromCtx(c)
-	if te.Oname != te.Name && te.Oname == tt.String() {
+	if te.Oname != te.Name && (te.Oname == tt.String() || te.Oname == tenant.DefaultSchema()) {
 		c.AddError(fmt.Errorf(tbs.GetText(c.Locale, "tenant.error.unrename"), te.Oname))
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
@@ -110,8 +110,8 @@ func TenantDelete(c *xin.Context) {
 	}
 
 	tt := tenant.FromCtx(c)
-	if ti.Name == tt.String() {
-		c.AddError(fmt.Errorf(tbs.GetText(c.Locale, "tenant.error.unrename"), ti.Name))
+	if ti.Name == tt.String() || ti.Name == tenant.DefaultSchema() {
+		c.AddError(fmt.Errorf(tbs.GetText(c.Locale, "tenant.error.undelete"), ti.Name))
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}
