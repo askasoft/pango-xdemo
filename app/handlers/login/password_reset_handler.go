@@ -97,7 +97,7 @@ func PasswordResetSend(c *xin.Context) {
 
 	if err := smtputil.SendHTMLMail(email, subject, message); err != nil {
 		c.Logger.Error(err)
-		c.AddError(err)
+		c.AddError(errors.New(tbs.GetText(c.Locale, "pwdrst.error.sendmail")))
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return
 	}
