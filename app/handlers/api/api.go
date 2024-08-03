@@ -6,10 +6,18 @@ import (
 	"github.com/askasoft/pango/xin"
 )
 
-func Get(c *xin.Context) {
-	c.JSON(http.StatusOK, c.Querys())
+func MyIP(c *xin.Context) {
+	c.String(http.StatusOK, c.ClientIP())
 }
 
-func Post(c *xin.Context) {
-	c.JSON(http.StatusOK, c.PostForms())
+func MyHeader(c *xin.Context) {
+	c.IndentedJSON(http.StatusOK, c.Request.Header)
+}
+
+func MyGet(c *xin.Context) {
+	c.IndentedJSON(http.StatusOK, c.Querys())
+}
+
+func MyPost(c *xin.Context) {
+	c.IndentedJSON(http.StatusOK, c.PostForms())
 }

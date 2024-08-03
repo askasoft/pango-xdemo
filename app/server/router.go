@@ -227,13 +227,21 @@ func addAPIHandlers(rg *xin.RouterGroup) {
 	rg.Use(app.XAC.Handler()) // access control
 	rg.OPTIONS("/*path", xin.Next)
 
-	rg = rg.Group("")
-	rg.Use(CheckTenant)       // schema protect
-	rg.Use(app.XBA.Handler()) // Basic auth
-	rg.Use(IPProtect)         // IP protect
+	rg.Use(CheckTenant) // schema protect
 
-	rg.GET("/get", api.Get)
-	rg.POST("/post", api.Post)
+	addMyApiHandlers(rg)
+
+	rgb := rg.Group("/basic")
+	rgb.Use(app.XBA.Handler()) // Basic auth
+	rgb.Use(IPProtect)         // IP protect
+	addMyApiHandlers(rgb)
+}
+
+func addMyApiHandlers(rg *xin.RouterGroup) {
+	rg.GET("/myip", api.MyIP)
+	rg.GET("/myheader", api.MyHeader)
+	rg.GET("/myget", api.MyGet)
+	rg.POST("/mypost", api.MyPost)
 }
 
 func addFilesHandlers(rg *xin.RouterGroup) {
