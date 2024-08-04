@@ -18,12 +18,12 @@
 		<form id="pwdrst_mail" class="ui-form ui-row-py3" autocomplete="off">
 			<div class="row">
 				<label class="col-md-3 col-form-label">{{T .Loc "pwdrst.email"}}</label>
-				<div class="col-md-9">
+				<div class="col-md-8">
 					<input name="email" type="text" class="form-control" maxlength="250" textclear/>
 				</div>
 			</div>
 			<div class="row">
-				<div class="offset-md-3 col-md-9">
+				<div class="offset-md-3 col">
 					<button type="submit" class="btn btn-primary">{{I "sendmail"}} {{T .Loc "button.send"}}</button>
 					<a class="btn btn-secondary" href="/"><i class="fas fa-circle-arrow-right"></i> {{T .Loc "button.home"}}</a>
 				</div>

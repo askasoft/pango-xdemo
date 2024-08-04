@@ -19,23 +19,23 @@
 			<input type="hidden" name="origin" value="{{.origin}}"/>
 			<div class="row">
 				<label class="col-md-3 col-form-label">{{T .Loc "login.username"}}</label>
-				<div class="col-md-9">
+				<div class="col-md-8">
 					<input name="username" type="text" class="form-control" maxlength="250" textclear/>
 				</div>
 			</div>
 			<div class="row">
 				<label class="col-md-3 col-form-label">{{T .Loc "login.password"}}</label>
-				<div class="col-md-9">
+				<div class="col-md-8">
 					<input name="password" type="password" class="form-control" maxlength="50" textclear/>
 				</div>
 			</div>
 			<div class="row">
-				<div class="offset-md-3 col-md-9">
+				<div class="offset-md-3 col">
 					<button type="submit" class="btn btn-primary">{{I "login"}} {{T .Loc "button.login"}}</button>
 				</div>
 			</div>
 			<div class="row py-4">
-				<div class="offset-md-3 col-md-9">
+				<div class="offset-md-3 col">
 					<a href="./pwdrst/">{{T .Loc "login.forgot"}} <i class="fas fa-circle-arrow-right"></i></a>
 				</div>
 			</div>

@@ -23,18 +23,18 @@
 		<form id="pwdrst_exec" class="ui-form ui-row-py3" autocomplete="off">
 			<div class="row">
 				<label class="col-md-3 col-form-label">{{T .Loc "pwdrst.newpwd"}}</label>
-				<div class="col-md-9">
+				<div class="col-md-8">
 					<input name="newpwd" type="password" class="form-control" maxlength="16" textclear/>
 				</div>
 			</div>
 			<div class="row">
 				<label class="col-md-3 col-form-label">{{T .Loc "pwdrst.conpwd"}}</label>
-				<div class="col-md-9">
+				<div class="col-md-8">
 					<input name="conpwd" type="password" class="form-control" maxlength="16" textclear/>
 				</div>
 			</div>
 			<div class="row">
-				<div class="offset-md-3 col-md-9">
+				<div class="offset-md-3 col">
 					<button type="submit" class="btn btn-primary">{{I "rotate"}} {{T .Loc "button.reset"}}</button>
 					<a class="btn btn-secondary" href="/"><i class="fas fa-circle-arrow-right"></i> {{T .Loc "button.home"}}</a>
 				</div>
