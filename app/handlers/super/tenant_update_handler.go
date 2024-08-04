@@ -82,14 +82,14 @@ func TenantUpdate(c *xin.Context) {
 			return
 		}
 
-		if err := tenant.Rename(te.Oname, te.Name); err != nil {
+		if err := tenant.RenameSchema(te.Oname, te.Name); err != nil {
 			c.AddError(err)
 			c.JSON(http.StatusInternalServerError, handlers.E(c))
 			return
 		}
 	}
 
-	if err := tenant.Update(te.Name, te.Comment); err != nil {
+	if err := tenant.CommentSchema(te.Name, te.Comment); err != nil {
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return
@@ -126,7 +126,7 @@ func TenantDelete(c *xin.Context) {
 		return
 	}
 
-	if err := tenant.Delete(ti.Name); err != nil {
+	if err := tenant.DeleteSchema(ti.Name); err != nil {
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return

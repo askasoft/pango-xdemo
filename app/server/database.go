@@ -2,6 +2,7 @@ package server
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"strings"
 	"time"
@@ -15,6 +16,7 @@ import (
 	"github.com/askasoft/pango/sqx"
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/str"
+	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -41,11 +43,22 @@ func openDatabase() error {
 		return nil
 	}
 
+	typ := sec.GetString("type")
+
 	dsn := sec.GetString("dsn")
 
-	log.Infof("Connect Database: %s", dsn)
+	log.Infof("Connect Database (%s): %s", typ, dsn)
 
-	gdd := postgres.Open(dsn)
+	var gdd gorm.Dialector
+
+	switch typ {
+	case "mysql":
+		gdd = mysql.Open(dsn)
+	case "postgres":
+		gdd = postgres.Open(dsn)
+	default:
+		return fmt.Errorf("Invalid database type: %s", typ)
+	}
 
 	gdc := &gorm.Config{
 		Logger: gormlog.NewGormLogger(
@@ -71,7 +84,7 @@ func openDatabase() error {
 
 	app.DBS = dbs
 	app.GDB = gdb
-	app.SDB = sqlx.NewDB(db, "pgx")
+	app.SDB = sqlx.NewDB(db, typ)
 
 	return nil
 }

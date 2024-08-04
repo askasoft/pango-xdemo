@@ -309,9 +309,8 @@ func (uci *UserCsvImportJob) importRecord(rec *csvUserRecord) error {
 			uci.Log.Infof(tbs.GetText(uci.Locale, "user.import.csv.step.created"), uci.Progress(), user.ID, user.Name, user.Email)
 			if uid != 0 {
 				// reset sequence if create with ID
-				r := db.Exec(uci.Tenant.ResetSequence("users", models.UserStartID))
-				if r.Error != nil {
-					return r.Error
+				if err := uci.Tenant.ResetSequence(db, "users", models.UserStartID); err != nil {
+					return err
 				}
 			}
 		} else {

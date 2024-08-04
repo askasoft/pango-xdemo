@@ -341,7 +341,7 @@ func PetDeletes(c *xin.Context) {
 		}
 		cnt = r.RowsAffected
 
-		return db.Exec(tt.ResetSequence("pets")).Error
+		return tt.ResetSequence(db, "pets")
 	})
 	if err != nil {
 		c.AddError(err)
@@ -380,7 +380,7 @@ func PetDeleteBatch(c *xin.Context) {
 		}
 		cnt = r.RowsAffected
 
-		return db.Exec(tt.ResetSequence("pets")).Error
+		return tt.ResetSequence(db, "pets")
 	})
 	if err != nil {
 		c.AddError(err)

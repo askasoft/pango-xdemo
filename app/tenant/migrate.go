@@ -106,9 +106,7 @@ func (tt Tenant) MigrateSuper() error {
 			return r.Error
 		}
 
-		seq := tt.ResetSequence("users", models.UserStartID)
-		r = app.GDB.Exec(seq)
-		return r.Error
+		return tt.ResetSequence(app.GDB, "users", models.UserStartID)
 	}
 
 	user.Role = models.RoleSuper

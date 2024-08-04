@@ -304,7 +304,7 @@ func UserDeletes(c *xin.Context) {
 		}
 		cnt = r.RowsAffected
 
-		return db.Exec(tt.ResetSequence("users", models.UserStartID)).Error
+		return tt.ResetSequence(db, "users", models.UserStartID)
 	})
 	if err != nil {
 		c.AddError(err)
@@ -345,7 +345,7 @@ func UserDeleteBatch(c *xin.Context) {
 		}
 		cnt = r.RowsAffected
 
-		return db.Exec(tt.ResetSequence("users", models.UserStartID)).Error
+		return tt.ResetSequence(db, "users", models.UserStartID)
 	})
 	if err != nil {
 		c.AddError(err)

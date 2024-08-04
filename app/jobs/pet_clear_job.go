@@ -82,7 +82,7 @@ func (pc *PetClearJob) clear() error {
 
 	if pc.arg.ResetSequence {
 		pc.Log.Info("Reset Pets Sequence")
-		err = db.Exec(tt.ResetSequence("pets")).Error
+		err = tt.ResetSequence(db, "pets")
 		if err != nil {
 			return err
 		}

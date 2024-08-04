@@ -1,14 +1,12 @@
 package tenant
 
 import (
-	"errors"
-	"fmt"
 	"sync"
 
 	"github.com/askasoft/pango-xdemo/app"
+	"github.com/askasoft/pango-xdemo/app/utils/pgutil"
 	"github.com/askasoft/pango/cog/linkedhashset"
 	"github.com/askasoft/pango/log"
-	"github.com/askasoft/pango/sqx"
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/xfs"
@@ -21,19 +19,7 @@ import (
 	"gorm.io/gorm"
 )
 
-const (
-	TablePgNamespace = "pg_catalog.pg_namespace"
-)
-
 type Tenant string
-
-type PgNamesapce struct {
-	Nspname string
-}
-
-func DefaultSchema() string {
-	return app.INI.GetString("database", "schema", "public")
-}
 
 func IsMultiTenant() bool {
 	return app.INI.GetBool("app", "tenants")
@@ -70,44 +56,24 @@ func FindTenant(tt Tenant) (bool, error) {
 	return ok, nil
 }
 
-func ExistsSchema(s string) (bool, error) {
-	sm := &PgNamesapce{}
-	r := app.GDB.Table(TablePgNamespace).Where("nspname = ?", s).Select("nspname").Take(sm)
-	if r.Error != nil {
-		if errors.Is(r.Error, gorm.ErrRecordNotFound) {
-			return false, nil
-		}
-		return false, r.Error
-	}
-	return true, nil
-}
-
 func ListTenants() ([]Tenant, error) {
 	if !IsMultiTenant() {
 		return []Tenant{""}, nil
 	}
 
-	tx := app.GDB.Table(TablePgNamespace).Where("nspname NOT LIKE ?", sqx.StringLike("_")).Select("nspname").Order("nspname asc")
-	rows, err := tx.Rows()
+	ss, err := ListSchemas()
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
 
 	ds := DefaultSchema()
 
 	ts := linkedhashset.NewLinkedHashSet[Tenant]()
-
-	pn := &PgNamesapce{}
-	for rows.Next() {
-		if err = tx.ScanRows(rows, pn); err != nil {
-			return nil, err
-		}
-
-		if pn.Nspname == ds {
+	for _, s := range ss {
+		if s == ds {
 			ts.PushHead(Tenant(""))
 		} else {
-			ts.Add(Tenant(pn.Nspname))
+			ts.Add(Tenant(s))
 		}
 	}
 
@@ -131,14 +97,8 @@ func Iterate(it func(tt Tenant) error) error {
 }
 
 func Create(name string, comment string) error {
-	if err := app.GDB.Exec("CREATE SCHEMA " + name).Error; err != nil {
+	if err := CreateSchema(name, comment); err != nil {
 		return err
-	}
-
-	if comment != "" {
-		if err := app.GDB.Exec(fmt.Sprintf("COMMENT ON SCHEMA %s IS '%s'", name, sqx.EscapeString(comment))).Error; err != nil {
-			log.Error(err)
-		}
 	}
 
 	tt := Tenant(name)
@@ -161,18 +121,6 @@ func Create(name string, comment string) error {
 	}
 
 	return nil
-}
-
-func Update(name string, comment string) error {
-	return app.GDB.Exec(fmt.Sprintf("COMMENT ON SCHEMA %s IS '%s'", name, sqx.EscapeString(comment))).Error
-}
-
-func Rename(old string, new string) error {
-	return app.GDB.Exec(fmt.Sprintf("ALTER SCHEMA %s RENAME TO %s", old, new)).Error
-}
-
-func Delete(name string) error {
-	return app.GDB.Exec(fmt.Sprintf("DROP SCHEMA %s CASCADE", name)).Error
 }
 
 func FromCtx(c *xin.Context) (tt Tenant) {
@@ -215,46 +163,15 @@ func (tt Tenant) Prefix() string {
 	return tt.Schema() + "."
 }
 
-func (tt Tenant) Table(s string) string {
-	return tt.Prefix() + s
-}
-
-func (tt Tenant) TableFiles() string {
-	return tt.Table("files")
-}
-
-func (tt Tenant) TableJobs() string {
-	return tt.Table("jobs")
-}
-
-func (tt Tenant) TableJobLogs() string {
-	return tt.Table("job_logs")
-}
-
-func (tt Tenant) TableJobChains() string {
-	return tt.Table("job_chains")
-}
-
-func (tt Tenant) TableConfigs() string {
-	return tt.Table("configs")
-}
-
-func (tt Tenant) TableUsers() string {
-	return tt.Table("users")
-}
-
-func (tt Tenant) TablePets() string {
-	return tt.Table("pets")
-}
-
-func (tt Tenant) ResetSequence(table string, starts ...int64) string {
-	start := int64(1)
-	if len(starts) > 0 {
-		start = starts[0]
-	}
-
+func (tt Tenant) ResetSequence(db *gorm.DB, table string, starts ...int64) error {
 	stn := tt.Table(table)
-	return fmt.Sprintf("SELECT SETVAL('%s_id_seq', GREATEST((SELECT MAX(id)+1 FROM %s), %d), false)", stn, stn, start)
+
+	switch app.DBS["type"] {
+	case "mysql":
+		return nil
+	default:
+		return db.Exec(pgutil.ResetSequence(stn, starts...)).Error
+	}
 }
 
 func (tt Tenant) GJC(db *gorm.DB) xjm.JobChainer {
@@ -301,3 +218,36 @@ func (tt Tenant) FS() xfs.XFS {
 	}
 	return tt.GFS(app.GDB)
 }
+
+func (tt Tenant) Table(s string) string {
+	return tt.Prefix() + s
+}
+
+func (tt Tenant) TableFiles() string {
+	return tt.Table("files")
+}
+
+func (tt Tenant) TableJobs() string {
+	return tt.Table("jobs")
+}
+
+func (tt Tenant) TableJobLogs() string {
+	return tt.Table("job_logs")
+}
+
+func (tt Tenant) TableJobChains() string {
+	return tt.Table("job_chains")
+}
+
+func (tt Tenant) TableConfigs() string {
+	return tt.Table("configs")
+}
+
+func (tt Tenant) TableUsers() string {
+	return tt.Table("users")
+}
+
+func (tt Tenant) TablePets() string {
+	return tt.Table("pets")
+}
+
