@@ -28,7 +28,7 @@ require (
 	github.com/liuzl/da v0.0.0-20180704015230-14771aad5b1d // indirect
 	golang.org/x/crypto v0.25.0 // indirect
 	golang.org/x/sync v0.7.0 // indirect
-	golang.org/x/sys v0.22.0 // indirect
+	golang.org/x/sys v0.23.0 // indirect
 	golang.org/x/text v0.16.0 // indirect
 )
 
