@@ -14,14 +14,14 @@ type PetCatCreateArg struct {
 	ArgChain
 
 	Items int `json:"items,omitempty" form:"items" validate:"min=1,max=1000"`
-	Sleep int `json:"sleep,omitempty" form:"sleep" validate:"min=0,max=1000"`
+	Delay int `json:"delay,omitempty" form:"delay" validate:"min=0,max=1000"`
 }
 
 func NewPetCatCreateArg(locale string) *PetCatCreateArg {
 	pcca := &PetCatCreateArg{}
 	pcca.Locale = locale
 	pcca.Items = 100
-	pcca.Sleep = 200
+	pcca.Delay = 200
 	return pcca
 }
 
@@ -84,8 +84,8 @@ func (pcc *PetCatCreateJob) run() error {
 			return err
 		}
 
-		if pcc.arg.Sleep > 0 {
-			time.Sleep(time.Millisecond * time.Duration(pcc.arg.Sleep))
+		if pcc.arg.Delay > 0 {
+			time.Sleep(time.Millisecond * time.Duration(pcc.arg.Delay))
 		}
 	}
 	return nil

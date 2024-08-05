@@ -68,14 +68,14 @@ type ArgLocale struct {
 
 type ArgStartEnd struct {
 	Start time.Time `json:"start,omitempty" form:"start"`
-	End   time.Time `json:"end,omitempty" form:"end"`
+	End   time.Time `json:"end,omitempty" form:"end" validate:"omitempty,gtefield=Start"`
 }
 
-func (af *ArgStartEnd) Bind(c *xin.Context, a any) error {
+func (ase *ArgStartEnd) Bind(c *xin.Context, a any) error {
 	err := c.Bind(a)
 
-	if !af.End.IsZero() {
-		af.End = af.End.Add(time.Hour*24 - time.Microsecond)
+	if !ase.End.IsZero() {
+		ase.End = ase.End.Add(time.Hour*24 - time.Microsecond)
 	}
 
 	return err

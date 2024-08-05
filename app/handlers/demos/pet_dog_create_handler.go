@@ -35,7 +35,7 @@ func (pdcjc *PetDogCreateJobController) Index(c *xin.Context) {
 func (pdcjc *PetDogCreateJobController) Start(c *xin.Context) {
 	pdca := jobs.NewPetDogCreateArg(c.Locale)
 	if err := pdca.BindParams(c); err != nil {
-		vadutil.AddBindErrors(c, err, "label.")
+		vadutil.AddBindErrors(c, err, "job.param.")
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}
