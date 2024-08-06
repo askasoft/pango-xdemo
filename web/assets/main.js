@@ -230,8 +230,15 @@ var main = {
 	},
 
 	// list
-	list_events: function(name) {
+	list_init: function(name, sskey) {
 		var $l = $('#' + name + '_list'), $f = $('#' + name + '_listform'), tb = '#' + name + '_table';
+
+		if (!location.search) {
+			$f.formValues(main.ssload(sskey), true);
+		}
+		if (main.form_has_inputs($f)) {
+			$('#' + name + '_listfset').fieldset('expand', 'show');
+		}
 
 		$l.on('goto.pager', '.ui-pager', function(evt, pno) {
 			$f.find('input[name="p"]').val(pno).end().submit();

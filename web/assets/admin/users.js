@@ -345,14 +345,7 @@
 	// init
 	//
 	function users_init() {
-		if (!location.search) {
-			$('#users_listform').formValues(main.ssload(sskey), true);
-		}
-		if (main.form_has_inputs($('#users_listform'))) {
-			$('#users_listfset').fieldset('expand', 'show');
-		}
-
-		main.list_events('users');
+		main.list_init('users', sskey);
 
 		$('#users_listform')
 			.on('reset', users_reset)

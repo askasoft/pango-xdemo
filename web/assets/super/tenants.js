@@ -169,14 +169,7 @@
 	// init
 	//
 	function tenants_init() {
-		if (!location.search) {
-			$('#tenants_listform').formValues(main.ssload(sskey), true);
-		}
-		if (main.form_has_inputs($('#tenants_listform'))) {
-			$('#tenants_listfset').fieldset('expand', 'show');
-		}
-	
-		main.list_events('tenants');
+		main.list_init('tenants', sskey);
 	
 		$('#tenants_listform')
 			.on('reset', tenants_reset)

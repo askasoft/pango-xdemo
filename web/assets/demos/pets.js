@@ -361,14 +361,7 @@
 	// init
 	//
 	function pets_init() {
-		if (!location.search) {
-			$('#pets_listform').formValues(main.ssload(sskey), true);
-		}
-		if (main.form_has_inputs($('#pets_listform'))) {
-			$('#pets_listfset').fieldset('expand', 'show');
-		}
-
-		main.list_events('pets');
+		main.list_init('pets', sskey);
 	
 		$('#pets_listform')
 			.on('reset', pets_reset)
