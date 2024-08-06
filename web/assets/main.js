@@ -127,7 +127,7 @@ var main = {
 		}
 
 		var afterHidden;
-		if (xhr.status == 401 || xhr.status == 403) { // unauthorized, forbidden
+		if (xhr.status == 401 || xhr.status == 403) { // unauthorized, restricted
 			afterHidden = function() {
 				window.location.href = main.base + '/login/';
 			};

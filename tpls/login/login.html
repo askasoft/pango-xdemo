@@ -9,11 +9,11 @@
 		<h2>{{I "login"}}<span>{{T .Loc "menu.login"}}</span></h2>
 	</div>
 	<div class="s-section-body">
-		<div class="well text-center">{{T .Loc "login.well"}}</div>
-
 		<div id="login_alert">
 			{{template "alerts" .}}
 		</div>
+
+		<div class="well text-center">{{T .Loc "login.well"}}</div>
 
 		<form id="login_form" class="ui-form ui-row-py3" autocomplete="off">
 			<input type="hidden" name="origin" value="{{.origin}}"/>
