@@ -45,30 +45,33 @@
 						{{end}}
 
 						<form class="cfgform ui-form lined grey padded rounded" method="POST" autocomplete="off">
+							{{$aro := true}}
 							{{range $c := $cg.Items}}
+								{{$ro := ($c.Readonly $.AuthUser.Role)}}
+								{{if not $ro}}{{$aro = false}}{{end}}
 							<div class="row">
 								<label class="col-md-2 col-form-label{{if $c.Required}} required{{end}}"
 									viewer="{{$c.Viewer}}" editor="{{$c.Editor}}">{{T $.Loc (print "config." $c.Name)}}</label>
 								<div class="col-md-10">
 								{{if eq $c.Style "C"}}
-									<input type="checkbox" name="{{$c.Name}}" value="" checked{{if $c.Readonly $.AuthUser.Role}} disabled{{end}} style="display:none">
-									{{Checks "Name=" $c.Name "List=" (MapGet $.Lists $c.Name) "Values=" $c.Values "Disabled=" ($c.Readonly $.AuthUser.Role)}}
+									<input type="checkbox" name="{{$c.Name}}" value="" checked{{if $ro}} disabled{{end}} style="display:none">
+									{{Checks "Name=" $c.Name "List=" (MapGet $.Lists $c.Name) "Values=" $c.Values "Disabled=" $ro}}
 								{{else if eq $c.Style "O"}}
-									<input type="checkbox" name="{{$c.Name}}" value="" checked{{if $c.Readonly $.AuthUser.Role}} disabled{{end}} style="display:none">
-									{{Checks "Name=" $c.Name "List=" (MapGet $.Lists $c.Name) "Values=" $c.Values "Disabled=" ($c.Readonly $.AuthUser.Role) "Ordered=" true "class=" "vertical"}}
+									<input type="checkbox" name="{{$c.Name}}" value="" checked{{if $ro}} disabled{{end}} style="display:none">
+									{{Checks "Name=" $c.Name "List=" (MapGet $.Lists $c.Name) "Values=" $c.Values "Disabled=" $ro "Ordered=" true "class=" "vertical"}}
 								{{else if eq $c.Style "R"}}
-									{{Radios "Name=" $c.Name "List=" (MapGet $.Lists $c.Name) "Value=" $c.Value "Disabled=" ($c.Readonly $.AuthUser.Role)}}
+									{{Radios "Name=" $c.Name "List=" (MapGet $.Lists $c.Name) "Value=" $c.Value "Disabled=" $ro}}
 								{{else if eq $c.Style "S"}}
-									{{Select "Name=" $c.Name "List=" (MapGet $.Lists $c.Name) "Value=" $c.Value "Disabled=" ($c.Readonly $.AuthUser.Role) "data-spy=" "niceSelect" "class=" "wide"}}
+									{{Select "Name=" $c.Name "List=" (MapGet $.Lists $c.Name) "Value=" $c.Value "Disabled=" $ro "data-spy=" "niceSelect" "class=" "wide"}}
 								{{else if eq $c.Style "M"}}
-									{{Select "Name=" $c.Name "List=" (MapGet $.Lists $c.Name) "Multiple=" true "Values=" $c.Values "Disabled=" ($c.Readonly $.AuthUser.Role) "data-spy=" "niceSelect" "class=" "wide"}}
+									{{Select "Name=" $c.Name "List=" (MapGet $.Lists $c.Name) "Multiple=" true "Values=" $c.Values "Disabled=" $ro "data-spy=" "niceSelect" "class=" "wide"}}
 								{{else if eq $c.Style "T"}}
-									<textarea name="{{$c.Name}}" class="form-control" rows="2" textclear enterfire{{if $c.Readonly $.AuthUser.Role}} disabled{{end}}>
+									<textarea name="{{$c.Name}}" class="form-control" rows="2" textclear enterfire{{if $ro}} disabled{{end}}>
 {{$c.DisplayValue}}</textarea>
 								{{else if eq $c.Style "N"}}
-									<input name="{{$c.Name}}" type="number" size="10" class="form-control" textclear value="{{$c.DisplayValue}}"{{if $c.Readonly $.AuthUser.Role}} disabled{{end}}/>
+									<input name="{{$c.Name}}" type="number" size="10" class="form-control" textclear value="{{$c.DisplayValue}}"{{if $ro}} disabled{{end}}/>
 								{{else}}
-									<input name="{{$c.Name}}" type="text" class="form-control" textclear value="{{$c.DisplayValue}}"{{if $c.Readonly $.AuthUser.Role}} disabled{{end}}/>
+									<input name="{{$c.Name}}" type="text" class="form-control" textclear value="{{$c.DisplayValue}}"{{if $ro}} disabled{{end}}/>
 								{{end}}
 								{{$desc := (T $.Loc (print "config.desc." $c.Name))}}
 								{{if $desc}}
@@ -77,11 +80,13 @@
 								</div>
 							</div>
 							{{end}}
+							{{if not $aro}}
 							<div class="row">
 								<div class="offset-md-2 col">
 									<button class="btn btn-primary">{{I "save"}} {{T $.Loc "button.save"}}</button>
 								</div>
 							</div>
+							{{end}}
 						</form>
 					</div>
 					{{end}}
