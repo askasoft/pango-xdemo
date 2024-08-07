@@ -79,8 +79,8 @@
 	//----------------------------------------------------
 	// detail
 	//
-	function user_detail(self, action) {
-		return user_detail_show($(self).closest('tr'), action);
+	function user_detail(action) {
+		return user_detail_show($(this).closest('tr'), action);
 	}
 
 	function user_detail_show($tr, action) {
@@ -354,12 +354,12 @@
 
 		$('#users_new').on('click', user_new);
 		$('#users_export').on('click', users_export);
-		$('#users_editsel').on('click', main.bulkedit_editsel_click('users'));
-		$('#users_editall').on('click', main.bulkedit_editall_click('users'));
+		$('#users_editsel').on('click', main.bulkedit_editsel_popup.callback('users'));
+		$('#users_editall').on('click', main.bulkedit_editall_popup.callback('users'));
 
 		$('#users_list')
-			.on('click', 'button.view', function() { return user_detail(this, "view"); })
-			.on('click', 'button.edit', function() { return user_detail(this, "edit"); });
+			.on('click', 'button.view', user_detail.callback("view"))
+			.on('click', 'button.edit', user_detail.callback("edit"));
 
 		$('#users_detail_popup')
 			.on('loaded.popup', user_detail_popup_loaded)
@@ -370,8 +370,8 @@
 			.on('submit', 'form', user_detail_submit)
 			.on('click', '.ui-popup-footer button[type=submit]', user_detail_submit);
 
-		$('#users_deletesel_popup form').on('submit', function() { return users_deletes(false); });
-		$('#users_deleteall_popup form').on('submit', function() { return users_deletes(true); });
+		$('#users_deletesel_popup form').on('submit', users_deletes.callback(false));
+		$('#users_deleteall_popup form').on('submit', users_deletes.callback(true));
 
 		$('#users_deletebat_popup')
 			.find('form').on('submit', users_deletebat).end()

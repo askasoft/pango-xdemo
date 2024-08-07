@@ -79,8 +79,8 @@
 	//----------------------------------------------------
 	// detail
 	//
-	function pet_detail(self, action) {
-		return pet_detail_show($(self).closest('tr'), action);
+	function pet_detail(action) {
+		return pet_detail_show($(this).closest('tr'), action);
 	}
 
 	function pet_detail_show($tr, action) {
@@ -372,8 +372,8 @@
 		$('#pets_new').on('click', pet_new);
 	
 		$('#pets_list')
-			.on('click', 'button.view', function() { return pet_detail(this, 'view'); })
-			.on('click', 'button.edit', function() { return pet_detail(this, 'edit'); });
+			.on('click', 'button.view', pet_detail.callback('view'))
+			.on('click', 'button.edit', pet_detail.callback('edit'));
 
 		$('#pets_detail_popup')
 			.on('loaded.popup', pets_detail_popup_loaded)
@@ -384,15 +384,15 @@
 			.on('submit', 'form', pet_detail_submit)
 			.on('click', '.ui-popup-footer button[type=submit]', pet_detail_submit);
 
-		$('#pets_deletesel_popup form').on('submit', function() { return pets_deletes(false); });
-		$('#pets_deleteall_popup form').on('submit', function() { return pets_deletes(true); });
+		$('#pets_deletesel_popup form').on('submit', pets_deletes.callback(false));
+		$('#pets_deleteall_popup form').on('submit', pets_deletes.callback(true));
 
 		$('#pets_deletebat_popup')
 			.find('form').on('submit', pets_deletebat).end()
 			.find('.ui-popup-footer button[type=submit]').on('click', pets_deletebat);
 
-			$('#pets_editsel').on('click', main.bulkedit_editsel_click('pets'));
-		$('#pets_editall').on('click', main.bulkedit_editall_click('pets'));
+			$('#pets_editsel').on('click', main.bulkedit_editsel_popup.callback('pets'));
+		$('#pets_editall').on('click', main.bulkedit_editall_popup.callback('pets'));
 
 		$('#pets_bulkedit_popup')
 			.find('.col-form-label > input').on('change', main.bulkedit_label_click).end()
