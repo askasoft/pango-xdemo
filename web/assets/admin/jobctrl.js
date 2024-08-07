@@ -363,7 +363,7 @@
 			url: './list',
 			method: 'GET',
 			dataType: 'json',
-			beforeSend: $jhs.loadmask.delegate($jhs),
+			beforeSend: $jhs.loadmask.bind($jhs),
 			success: function(data) {
 				setTimeout(function() {
 					if (data && data.length && !jid) {
@@ -374,7 +374,7 @@
 				}, 10);
 			},
 			error: main.ajax_error,
-			complete: $jhs.unloadmask.delegate($jhs)
+			complete: $jhs.unloadmask.bind($jhs)
 		});
 
 		return false;

@@ -297,7 +297,7 @@
 			url: './list',
 			method: 'GET',
 			dataType: 'json',
-			beforeSend: $jchs.loadmask.delegate($jchs),
+			beforeSend: $jchs.loadmask.bind($jchs),
 			success: function(data) {
 				setTimeout(function() {
 					if (data && data.length && !cid) {
@@ -308,7 +308,7 @@
 				}, 10);
 			},
 			error: main.ajax_error,
-			complete: $jchs.unloadmask.delegate($jchs)
+			complete: $jchs.unloadmask.bind($jchs)
 		});
 
 		return false;
