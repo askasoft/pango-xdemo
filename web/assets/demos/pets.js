@@ -99,8 +99,8 @@
 		return false;
 	}
 
-	function pet_detail_action_trigger(action) {
-		$('#pets_table > tbody > tr:last-child').find('button.' + action).trigger('click');
+	function pet_detail_action_trigger(selector, action) {
+		$('#pets_table > tbody > tr' + selector).find('button.' + action).trigger('click');
 	}
 
 	function pet_detail_prev() {
@@ -113,7 +113,7 @@
 		if ($pv.length) {
 			pet_detail_show($pv, action);
 		} else {
-			pets_prev_page(pet_detail_action_trigger.callback(action));
+			pets_prev_page(pet_detail_action_trigger.callback(':last-child', action));
 		}
 	}
 
@@ -127,7 +127,7 @@
 		if ($nx.length) {
 			pet_detail_show($nx, action);
 		} else {
-			pets_next_page(pet_detail_action_trigger.callback(action));
+			pets_next_page(pet_detail_action_trigger.callback(':first-child', action));
 		}
 	}
 

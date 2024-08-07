@@ -99,8 +99,8 @@
 		return false;
 	}
 
-	function user_detail_action_trigger(action) {
-		$('#users_table > tbody > tr:last-child').find('button.' + action).trigger('click');
+	function user_detail_action_trigger(selector, action) {
+		$('#users_table > tbody > tr' + selector).find('button.' + action).trigger('click');
 	}
 	
 	function user_detail_prev() {
@@ -113,7 +113,7 @@
 		if ($pv.length) {
 			user_detail_show($pv, action);
 		} else {
-			users_prev_page(user_detail_action_trigger.callback(action));
+			users_prev_page(user_detail_action_trigger.callback(':last-child', action));
 		}
 	}
 
@@ -127,7 +127,7 @@
 		if ($nx.length) {
 			user_detail_show($nx, action);
 		} else {
-			users_next_page(user_detail_action_trigger.callback(action));
+			users_next_page(user_detail_action_trigger.callback(':first-child', action));
 		}
 	}
 
