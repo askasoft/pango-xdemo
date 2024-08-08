@@ -322,6 +322,7 @@ var main = {
 			.find('.editall').hide().end()
 			.find('input[name=id]').val(ids.join(',')).end()
 			.popup('show');
+		return false;
 	},
 	bulkedit_editall_popup: function(name) {
 		$('#' + name + '_bulkedit_popup')
@@ -329,6 +330,7 @@ var main = {
 			.find('.editall').show().end()
 			.find('input[name=id]').val('*').end()
 			.popup('show');
+		return false;
 	},
 	bulkedit_label_click: function() {
 		var $t = $(this), $i = $t.parent().next().find(':input');
@@ -336,6 +338,7 @@ var main = {
 		if ($i.data('spy') == 'niceSelect') {
 			$i.niceSelect('update');
 		}
+		return false;
 	},
 
 	// table
