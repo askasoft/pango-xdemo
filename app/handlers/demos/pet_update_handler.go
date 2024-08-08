@@ -40,7 +40,7 @@ func PetNew(c *xin.Context) {
 	c.HTML(http.StatusOK, "demos/pet_detail_edit", h)
 }
 
-func petDetail(c *xin.Context, edit bool) {
+func petDetail(c *xin.Context, action string) {
 	pid := num.Atol(c.Query("id"))
 	if pid == 0 {
 		c.AddError(vadutil.ErrInvalidID(c))
@@ -67,15 +67,15 @@ func petDetail(c *xin.Context, edit bool) {
 	h["Pet"] = pet
 	petAddMaps(c, h)
 
-	c.HTML(http.StatusOK, str.If(edit, "demos/pet_detail_edit", "demos/pet_detail_view"), h)
+	c.HTML(http.StatusOK, "demos/pet_detail_"+action, h)
 }
 
 func PetView(c *xin.Context) {
-	petDetail(c, false)
+	petDetail(c, "view")
 }
 
 func PetEdit(c *xin.Context) {
-	petDetail(c, true)
+	petDetail(c, "edit")
 }
 
 func petBind(c *xin.Context) *PetWithFile {
