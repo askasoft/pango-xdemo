@@ -233,7 +233,7 @@ func addAPIHandlers(rg *xin.RouterGroup) {
 
 	rgb := rg.Group("/basic")
 	rgb.Use(app.XBA.Handler()) // Basic auth
-	rgb.Use(IPProtect)         // IP protect
+	rgb.Use(api.IPProtect)     // IP protect
 	addMyApiHandlers(rgb)
 }
 
