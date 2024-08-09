@@ -1,9 +1,15 @@
 {{define "alerts"}}
-{{if .Ctx.Errors}}
+{{if or .Ctx.Errors .Error .Errors}}
 <div class="alert alert-danger alert-dismissible">
 	<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
 	<ul class="fa-ul">
 		{{range $e := .Ctx.Errors}}
+		<li><span class="fa-li"><i class="fas fa-fw fa-circle-exclamation"></i></span><span>{{$e}}</span></li>
+		{{end}}
+		{{if .Error}}
+		<li><span class="fa-li"><i class="fas fa-fw fa-circle-exclamation"></i></span><span>{{.Error}}</span></li>
+		{{end}}
+		{{range $e := .Errors}}
 		<li><span class="fa-li"><i class="fas fa-fw fa-circle-exclamation"></i></span><span>{{$e}}</span></li>
 		{{end}}
 	</ul>
@@ -22,19 +28,6 @@
 	</ul>
 </div>
 {{end}}
-{{if or .Message .Messages}}
-<div class="alert alert-primary alert-dismissible">
-	<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-	<ul class="fa-ul">
-		{{if .Message}}
-		<li><span class="fa-li"><i class="fas fa-fw fa-circle-info"></i></span><span>{{.Message}}</span></li>
-		{{end}}
-		{{range $m := .Messages}}
-		<li><span class="fa-li"><i class="fas fa-fw fa-circle-info"></i></span><span>{{$m}}</span></li>
-		{{end}}
-	</ul>
-</div>
-{{end}}
 {{if or .Success .Successes}}
 <div class="alert alert-success alert-dismissible">
 	<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -44,6 +37,19 @@
 		{{end}}
 		{{range $s := .Successes}}
 		<li><span class="fa-li"><i class="fas fa-fw fa-check"></i></span><span>{{$s}}</span></li>
+		{{end}}
+	</ul>
+</div>
+{{end}}
+{{if or .Message .Messages}}
+<div class="alert alert-primary alert-dismissible">
+	<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+	<ul class="fa-ul">
+		{{if .Message}}
+		<li><span class="fa-li"><i class="fas fa-fw fa-circle-info"></i></span><span>{{.Message}}</span></li>
+		{{end}}
+		{{range $m := .Messages}}
+		<li><span class="fa-li"><i class="fas fa-fw fa-circle-info"></i></span><span>{{$m}}</span></li>
 		{{end}}
 	</ul>
 </div>
