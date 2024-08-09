@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/askasoft/pango-xdemo/app"
+	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/xin"
 )
 
@@ -12,12 +13,21 @@ func Index(c *xin.Context) {
 }
 
 func NotFound(c *xin.Context) {
+	if str.EqualFold(c.GetHeader("X-Requested-With"), "XMLHttpRequest") {
+		c.AbortWithStatus(http.StatusNotFound)
+		return
+	}
+
 	c.HTML(http.StatusNotFound, "404", H(c))
 	c.Abort()
 }
 
 func Forbidden(c *xin.Context) {
-	c.HTML(http.StatusForbidden, "403", H(c))
+	if str.EqualFold(c.GetHeader("X-Requested-With"), "XMLHttpRequest") {
+		c.JSON(http.StatusForbidden, E(c))
+	} else {
+		c.HTML(http.StatusForbidden, "403", H(c))
+	}
 	c.Abort()
 }
 

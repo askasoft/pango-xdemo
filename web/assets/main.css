@@ -318,6 +318,9 @@ body {
 }
 
 /** alert **/
+.alert.alert-dismissible {
+	padding-right: 3em;
+}
 .alert > ul:last-child {
 	margin-bottom: 0;
 }

@@ -34,6 +34,7 @@ func IPProtect(c *xin.Context) {
 	au := tenant.AuthUser(c)
 
 	if !tenant.CheckClientIP(c, au) {
+		c.AddError(handlers.ErrRestrictedIP)
 		handlers.Forbidden(c)
 		return
 	}
@@ -48,6 +49,7 @@ func RoleProtect(c *xin.Context, role string) {
 	au := tenant.AuthUser(c)
 
 	if !au.HasRole(role) {
+		c.AddError(handlers.ErrRestrictedFunction)
 		handlers.Forbidden(c)
 		return
 	}
