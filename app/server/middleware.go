@@ -75,3 +75,11 @@ func RoleEditorProtect(c *xin.Context) {
 func RoleViewerProtect(c *xin.Context) {
 	RoleProtect(c, models.RoleViewer)
 }
+
+func RoleCustomProtector(s string) xin.HandlerFunc {
+	return func(c *xin.Context) {
+		tt := tenant.FromCtx(c)
+		role := tt.GetConfigValue(s)
+		RoleProtect(c, role)
+	}
+}

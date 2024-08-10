@@ -9,6 +9,7 @@ import (
 	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
 	"github.com/askasoft/pango/doc/csvx"
 	"github.com/askasoft/pango/log"
+	"github.com/askasoft/pango/str"
 	"gorm.io/gorm"
 )
 
@@ -69,7 +70,16 @@ func (tt Tenant) loadConfigMap(db *gorm.DB) (map[string]string, error) {
 	return cm, nil
 }
 
+func (tt Tenant) GetConfigValue(k string) string {
+	return tt.GetConfigMap()[k]
+}
+
+func (tt Tenant) GetConfigValues(k string) []string {
+	val := tt.GetConfigValue(k)
+	return str.FieldsByte(val, '\t')
+}
+
 func (tt Tenant) GetCIDRs() []*net.IPNet {
-	dcm := tt.GetConfigMap()
-	return vadutil.ParseCIDRs(dcm["secure_cidr"])
+	val := tt.GetConfigValue("secure_cidr")
+	return vadutil.ParseCIDRs(val)
 }
