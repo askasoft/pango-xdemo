@@ -15,7 +15,7 @@ func Hash(s string) string {
 }
 
 func Encrypt(secret, s string) (string, error) {
-	cryptor := cpt.NewAes128CBC(secret)
+	cryptor := cpt.NewAes128CBCEncryptor(secret)
 	return cryptor.EncryptString(s)
 }
 
@@ -28,7 +28,7 @@ func MustEncrypt(secret, s string) string {
 }
 
 func Decrypt(secret, s string) (string, error) {
-	cryptor := cpt.NewAes128CBC(secret)
+	cryptor := cpt.NewAes128CBCDecryptor(secret)
 	return cryptor.DecryptString(s)
 }
 
