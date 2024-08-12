@@ -115,11 +115,16 @@ func (jc *JobController) logs(c *xin.Context, tjm xjm.JobManager) (logs []*xjm.J
 			limit = maxlogs
 		}
 
-		lvls := []string{
-			log.LevelFatal.Prefix(),
-			log.LevelError.Prefix(),
-			log.LevelWarn.Prefix(),
-			log.LevelInfo.Prefix(),
+		var lvls []string
+
+		au := tenant.GetAuthUser(c)
+		if au == nil || !au.IsSuper() {
+			lvls = []string{
+				log.LevelFatal.Prefix(),
+				log.LevelError.Prefix(),
+				log.LevelWarn.Prefix(),
+				log.LevelInfo.Prefix(),
+			}
 		}
 
 		logs, err = tjm.GetJobLogs(jid, min, max, asc, limit, lvls...)

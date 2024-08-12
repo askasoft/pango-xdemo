@@ -126,9 +126,7 @@ fieldset > form {
 }
 #job_list tr.D td {
 	color: #333;
-	display: none;
 }
 #job_list tr.T td {
 	color: #888;
-	display: none;
 }
