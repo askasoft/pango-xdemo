@@ -47,7 +47,7 @@
 						<form class="cfgform ui-form lined grey padded rounded" method="POST" autocomplete="off">
 							{{$aro := true}}
 							{{range $c := $cg.Items}}
-								{{$ro := ($c.Readonly $.AuthUser.Role)}}
+								{{$ro := ($c.Readonly $.AU.Role)}}
 								{{if not $ro}}{{$aro = false}}{{end}}
 							<div class="row">
 								<label class="col-md-2 col-form-label{{if $c.Required}} required{{end}}"

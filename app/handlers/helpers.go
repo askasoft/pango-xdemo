@@ -21,23 +21,23 @@ func H(c *xin.Context) xin.H {
 	au := tenant.GetAuthUser(c)
 
 	h := xin.H{
-		"CFG":      app.CFG,
-		"INI":      app.INI,
-		"VER":      app.Version,
-		"REV":      app.Revision,
-		"Host":     c.Request.Host,
-		"Base":     app.Base,
-		"Now":      time.Now(),
-		"Ctx":      c,
-		"Loc":      c.Locale,
-		"Token":    app.XTP.RefreshToken(c),
-		"Domain":   app.Domain,
-		"Tenant":   tt,
-		"AuthUser": au,
+		"CFG":    app.CFG,
+		"INI":    app.INI,
+		"VER":    app.Version,
+		"REV":    app.Revision,
+		"Host":   c.Request.Host,
+		"Base":   app.Base,
+		"Now":    time.Now(),
+		"Ctx":    c,
+		"Loc":    c.Locale,
+		"Token":  app.XTP.RefreshToken(c),
+		"Domain": app.Domain,
+		"TT":     tt,
+		"AU":     au,
 	}
 
 	if au != nil {
-		h["DCM"] = tt.GetConfigMap()
+		h["DCM"] = tt.ConfigMap()
 	}
 	return h
 }

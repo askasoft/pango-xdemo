@@ -31,7 +31,7 @@
 			</div>
 		</div>
 
-		{{if and .AuthUser .AuthUser.IsSuper}}
+		{{if and .AU .AU.IsSuper}}
 		<div id="navi_super" class="card">
 			<div class="card-header">
 				{{I "super"}}<span>{{T .Loc "menu.super"}}</span>
@@ -47,7 +47,7 @@
 		{{end}}
 	</div>
 
-	{{if and .AuthUser .AuthUser.IsAdmin}}
+	{{if and .AU .AU.IsAdmin}}
 	<div class="footnavi ui-sidenavi minimal">
 		<div id="navi_admin" class="card">
 			<div class="card-header">

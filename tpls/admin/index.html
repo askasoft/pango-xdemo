@@ -5,13 +5,13 @@
 		<div class="well">{{T .Loc "admin.well"}}</div>
 
 		<div class="s-menu">
-		{{if and .AuthUser .AuthUser.IsAdmin}}
+		{{if and .AU .AU.IsAdmin}}
 			<hr>
 			<a class="s-menu-item" href="{{.Base}}/a/config/">{{I "admin.config" "fa-4x"}}<div>{{T .Loc "menu.admin.config"}}</div></a>
 			<a class="s-menu-item" href="{{.Base}}/a/users/">{{I "admin.users" "fa-4x"}}<div>{{T .Loc "menu.admin.users"}}</div></a>
 		{{end}}
 
-		{{if and .AuthUser .AuthUser.IsSuper}}
+		{{if and .AU .AU.IsSuper}}
 			<hr/>
 			{{if eq .CFG.app.tenants "true"}}
 			<a class="s-menu-item" href="{{.Base}}/s/tenants/">{{I "super.tenants" "fa-4x"}}<div>{{T .Loc "menu.super.tenants"}}</div></a>

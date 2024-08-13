@@ -33,7 +33,7 @@ func (tt Tenant) PurgeConfigMap() {
 	muCONFS.Unlock()
 }
 
-func (tt Tenant) GetConfigMap() map[string]string {
+func (tt Tenant) ConfigMap() map[string]string {
 	if dcm, ok := app.CONFS.Get(string(tt)); ok {
 		return dcm.(map[string]string)
 	}
@@ -70,16 +70,16 @@ func (tt Tenant) loadConfigMap(db *gorm.DB) (map[string]string, error) {
 	return cm, nil
 }
 
-func (tt Tenant) GetConfigValue(k string) string {
-	return tt.GetConfigMap()[k]
+func (tt Tenant) ConfigValue(k string) string {
+	return tt.ConfigMap()[k]
 }
 
-func (tt Tenant) GetConfigValues(k string) []string {
-	val := tt.GetConfigValue(k)
+func (tt Tenant) ConfigValues(k string) []string {
+	val := tt.ConfigValue(k)
 	return str.FieldsByte(val, '\t')
 }
 
 func (tt Tenant) GetCIDRs() []*net.IPNet {
-	val := tt.GetConfigValue("secure_cidr")
+	val := tt.ConfigValue("secure_cidr")
 	return vadutil.ParseCIDRs(val)
 }

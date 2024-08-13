@@ -25,7 +25,7 @@
 			<td class="name">{{$t.Name}}</td>
 			<td class="domain"><a href="//{{$t.Prefix}}{{$.Domain}}" target="_blank">{{$t.Prefix}}{{$.Domain}}</a></td>
 			<td class="actions">
-				{{if and (ne $.Tenant $t.Name) (not $t.Default)}}
+				{{if and (ne $.TT $t.Name) (not $t.Default)}}
 				<button class="btn btn-outline-primary edit" title="{{T $.Loc "button.edit"}}">{{I "edit"}}</button>
 				<button class="btn btn-outline-danger delete" title="{{T $.Loc "button.delete"}}">{{I "delete"}}</button>
 				{{end}}
