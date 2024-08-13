@@ -31,12 +31,12 @@ type ConfigCategory struct {
 	Groups []*ConfigGroup `json:"groups"`
 }
 
-func configList(c *xin.Context) []*ConfigCategory {
+func configList(c *xin.Context, role string) []*ConfigCategory {
 	tt := tenant.FromCtx(c)
 	au := tenant.AuthUser(c)
 
 	tx := app.GDB.Table(tt.TableConfigs())
-	tx = tx.Where("viewer >= ?", au.Role)
+	tx = tx.Where(role+" >= ?", au.Role)
 	tx = tx.Order(gormutil.GormOrderBy("order"))
 
 	configs := []*models.Config{}
@@ -77,7 +77,7 @@ func configList(c *xin.Context) []*ConfigCategory {
 }
 
 func ConfigIndex(c *xin.Context) {
-	configs := configList(c)
+	configs := configList(c, "viewer")
 
 	lists := map[string]any{}
 	for _, cc := range configs {
@@ -193,7 +193,7 @@ func ConfigSave(c *xin.Context) {
 }
 
 func ConfigExport(c *xin.Context) {
-	configs := configList(c)
+	configs := configList(c, "editor")
 
 	c.SetAttachmentHeader("configs.csv")
 
