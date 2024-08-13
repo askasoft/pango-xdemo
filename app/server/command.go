@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/askasoft/pango-xdemo/app"
+	"github.com/askasoft/pango-xdemo/app/tasks"
 	"github.com/askasoft/pango-xdemo/app/utils/cptutil"
 	"github.com/askasoft/pango-xdemo/tpls"
 	"github.com/askasoft/pango-xdemo/txts"
@@ -35,6 +36,7 @@ func (s *service) PrintCommand(out io.Writer) {
 	fmt.Fprintln(out, "      kind=super        migrate tenant super user.")
 	fmt.Fprintln(out, "      schema=...        specify schemas to migrate.")
 	fmt.Fprintln(out, "    execsql <file>      execute sql file.")
+	fmt.Fprintln(out, "    tmpclean            clean outdated temporary files.")
 	fmt.Fprintln(out, "    encrypt [key] <str> encrypt string.")
 	fmt.Fprintln(out, "    decrypt [key] <str> decrypt string.")
 	fmt.Fprintln(out, "    assets  [dir]       export assets to directory.")
@@ -45,80 +47,110 @@ func (s *service) PrintCommand(out io.Writer) {
 // Basic: 'help' 'usage' 'version'
 // Windows only: 'install' 'remove' 'start' 'stop' 'debug'
 func (s *service) Exec(cmd string) {
+	log.SetLevel(log.LevelDebug)
+	log.SetFormat("%t [%p] - %m%n%T")
+
 	switch cmd {
 	case "migrate":
-		initConfigs()
-
-		if err := openDatabase(); err != nil {
-			log.Fatal(err) //nolint: all
-			app.Exit(app.ExitErrDB)
-		}
-
-		sub := ""
-		args := flag.Args()[1:]
-		if len(args) > 0 {
-			sub = args[0]
-			args = args[1:]
-		}
-
-		switch sub {
-		case "schema":
-			if err := dbMigrateSchemas(args...); err != nil {
-				log.Fatal(err) //nolint: all
-				app.Exit(app.ExitErrDB)
-			}
-		case "config":
-			if err := dbMigrateConfigs(args...); err != nil {
-				log.Fatal(err) //nolint: all
-				app.Exit(app.ExitErrDB)
-			}
-		case "super":
-			if err := dbMigrateSupers(args...); err != nil {
-				log.Fatal(err) //nolint: all
-				app.Exit(app.ExitErrDB)
-			}
-		}
-
-		log.Info("DONE.")
-		app.Exit(0)
+		doMigrate()
 	case "execsql":
-		initConfigs()
-
-		if err := openDatabase(); err != nil {
-			log.Fatal(err) //nolint: all
-			app.Exit(app.ExitErrDB)
-		}
-		if err := dbExecSQL(flag.Arg(1)); err != nil {
-			log.Fatal(err) //nolint: all
-			app.Exit(app.ExitErrDB)
-		}
-
-		log.Info("DONE.")
-		app.Exit(0)
+		doExecSQL()
+	case "tmpclean":
+		doTmpClean()
 	case "encrypt":
-		k, v := cryptFlags()
-		if es, err := cptutil.Encrypt(k, v); err != nil {
-			fmt.Println(err)
-		} else {
-			fmt.Println(es)
-		}
-		fmt.Println()
-		app.Exit(0)
+		doEncrypt()
 	case "decrypt":
-		k, v := cryptFlags()
-		if ds, err := cptutil.Decrypt(k, v); err != nil {
-			fmt.Println(err)
-		} else {
-			fmt.Println(ds)
-		}
-		app.Exit(0)
+		doDecrypt()
 	case "assets":
-		exportAssets(flag.Arg(1))
-		app.Exit(0)
+		doExportAssets()
 	default:
 		flag.CommandLine.SetOutput(os.Stdout)
 		fmt.Fprintf(os.Stderr, "Invalid command %q\n\n", cmd)
 		s.Usage()
+	}
+}
+
+func doMigrate() {
+	initConfigs()
+
+	if err := openDatabase(); err != nil {
+		log.Fatal(err) //nolint: all
+		app.Exit(app.ExitErrDB)
+	}
+
+	sub := ""
+	args := flag.Args()[1:]
+	if len(args) > 0 {
+		sub = args[0]
+		args = args[1:]
+	}
+
+	switch sub {
+	case "schema":
+		if err := dbMigrateSchemas(args...); err != nil {
+			log.Fatal(err) //nolint: all
+			app.Exit(app.ExitErrDB)
+		}
+	case "config":
+		if err := dbMigrateConfigs(args...); err != nil {
+			log.Fatal(err) //nolint: all
+			app.Exit(app.ExitErrDB)
+		}
+	case "super":
+		if err := dbMigrateSupers(args...); err != nil {
+			log.Fatal(err) //nolint: all
+			app.Exit(app.ExitErrDB)
+		}
+	}
+
+	log.Info("DONE.")
+}
+
+func doExecSQL() {
+	initConfigs()
+
+	if err := openDatabase(); err != nil {
+		log.Fatal(err) //nolint: all
+		app.Exit(app.ExitErrDB)
+	}
+
+	if err := dbExecSQL(flag.Arg(1)); err != nil {
+		log.Fatal(err) //nolint: all
+		app.Exit(app.ExitErrDB)
+	}
+
+	log.Info("DONE.")
+}
+
+func doTmpClean() {
+	initConfigs()
+
+	if err := openDatabase(); err != nil {
+		log.Fatal(err) //nolint: all
+		app.Exit(app.ExitErrDB)
+	}
+
+	tasks.CleanTemporaryFiles()
+
+	log.Info("DONE.")
+}
+
+func doEncrypt() {
+	k, v := cryptFlags()
+	if es, err := cptutil.Encrypt(k, v); err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Println(es)
+	}
+	fmt.Println()
+}
+
+func doDecrypt() {
+	k, v := cryptFlags()
+	if ds, err := cptutil.Decrypt(k, v); err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Println(ds)
 	}
 }
 
@@ -133,11 +165,8 @@ func cryptFlags() (k, v string) {
 	return
 }
 
-//-------------------------------------------
-// assets
-
-func exportAssets(dir string) {
-	dir = str.IfEmpty(dir, ".")
+func doExportAssets() {
+	dir := str.IfEmpty(flag.Arg(1), ".")
 	mt := app.BuildTime
 
 	if err := saveFS(txts.FS, filepath.Join(dir, "txts"), mt); err != nil {
@@ -160,6 +189,7 @@ func exportAssets(dir string) {
 			return
 		}
 	}
+	log.Info("DONE.")
 }
 
 func saveFS(fsys fs.FS, dir string, mt time.Time) error {
