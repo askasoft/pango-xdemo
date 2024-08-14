@@ -264,17 +264,22 @@ body {
 .s-section-head > * {
 	margin: 0 5px 5px 0;
 }
-.s-section-head > h2 {
-	font-size: 1.5rem;
-	line-height: 1.5rem;
+.s-section-head > h2, .s-section-head > h3 {
+	display: flex;
+	align-items: center;
 	margin: 0;
 	padding: 0;
 }
-.s-section-head > h2 > * {
-	vertical-align: middle;
+.s-section-head > h2 {
+	font-size: 1.5rem;
+	line-height: 1.5rem;
 }
-.s-section-head > h2 > i {
-	font-size: 125%;
+.s-section-head > h3 {
+	font-size: 1.25rem;
+	line-height: 1.25rem;
+}
+.s-section-head > h2 > i, .s-section-head > h3 > i {
+	font-size: 1.25em;
 }
 .s-section-head > h2 > i + * {
 	margin-left: 0.5rem;
