@@ -1,4 +1,4 @@
-package demos
+package pets
 
 import (
 	"encoding/csv"

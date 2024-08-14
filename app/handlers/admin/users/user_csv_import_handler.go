@@ -1,4 +1,4 @@
-package admin
+package users
 
 import (
 	"encoding/csv"
@@ -23,7 +23,7 @@ func newUserCsvImportJobController() handlers.JobCtrl {
 	jc := &UserCsvImportJobController{
 		JobController: handlers.JobController{
 			Name:     jobs.JobNameUserCsvImport,
-			Template: "admin/user_csv_import_job",
+			Template: "admin/users/user_csv_import_job",
 		},
 	}
 	return jc

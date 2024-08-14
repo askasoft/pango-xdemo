@@ -8,8 +8,10 @@ import (
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/handlers"
 	"github.com/askasoft/pango-xdemo/app/handlers/admin"
+	"github.com/askasoft/pango-xdemo/app/handlers/admin/users"
 	"github.com/askasoft/pango-xdemo/app/handlers/api"
 	"github.com/askasoft/pango-xdemo/app/handlers/demos"
+	"github.com/askasoft/pango-xdemo/app/handlers/demos/pets"
 	"github.com/askasoft/pango-xdemo/app/handlers/files"
 	"github.com/askasoft/pango-xdemo/app/handlers/login"
 	"github.com/askasoft/pango-xdemo/app/handlers/super"
@@ -291,26 +293,26 @@ func addDemosHandlers(rg *xin.RouterGroup) {
 }
 
 func addDemosPetsHandlers(rg *xin.RouterGroup) {
-	rg.GET("/", demos.PetIndex)
-	rg.POST("/list", demos.PetList)
-	rg.GET("/new", demos.PetNew)
-	rg.GET("/view", demos.PetView)
-	rg.GET("/edit", demos.PetEdit)
-	rg.POST("/create", demos.PetCreate)
-	rg.POST("/update", demos.PetUpdate)
-	rg.POST("/updates", demos.PetUpdates)
-	rg.POST("/deletes", demos.PetDeletes)
-	rg.POST("/deleteb", demos.PetDeleteBatch)
-	rg.POST("/export/csv", demos.PetCsvExport)
+	rg.GET("/", pets.PetIndex)
+	rg.POST("/list", pets.PetList)
+	rg.GET("/new", pets.PetNew)
+	rg.GET("/view", pets.PetView)
+	rg.GET("/edit", pets.PetEdit)
+	rg.POST("/create", pets.PetCreate)
+	rg.POST("/update", pets.PetUpdate)
+	rg.POST("/updates", pets.PetUpdates)
+	rg.POST("/deletes", pets.PetDeletes)
+	rg.POST("/deleteb", pets.PetDeleteBatch)
+	rg.POST("/export/csv", pets.PetCsvExport)
 
 	addDemosPetJobsHandlers(rg.Group("/jobs"))
 }
 
 func addDemosPetJobsHandlers(rg *xin.RouterGroup) {
-	demos.PetClearJobHandler.Router(rg.Group("/clear"))
-	demos.PetCatCreateJobHandler.Router(rg.Group("/catcreate"))
-	demos.PetDogCreateJobHandler.Router(rg.Group("/dogcreate"))
-	demos.PetResetJobChainHandler.Router(rg.Group("/reset"))
+	pets.PetClearJobHandler.Router(rg.Group("/clear"))
+	pets.PetCatCreateJobHandler.Router(rg.Group("/catcreate"))
+	pets.PetDogCreateJobHandler.Router(rg.Group("/dogcreate"))
+	pets.PetResetJobChainHandler.Router(rg.Group("/reset"))
 }
 
 func addDemosChineseHandlers(rg *xin.RouterGroup) {
@@ -354,17 +356,17 @@ func addAdminConfigHandlers(rg *xin.RouterGroup) {
 }
 
 func addAdminUserHandlers(rg *xin.RouterGroup) {
-	rg.GET("/", admin.UserIndex)
-	rg.POST("/list", admin.UserList)
-	rg.GET("/new", admin.UserNew)
-	rg.GET("/view", admin.UserView)
-	rg.GET("/edit", admin.UserEdit)
-	rg.POST("/create", admin.UserCreate)
-	rg.POST("/update", admin.UserUpdate)
-	rg.POST("/updates", admin.UserUpdates)
-	rg.POST("/deletes", admin.UserDeletes)
-	rg.POST("/deleteb", admin.UserDeleteBatch)
-	rg.POST("/export/csv", admin.UserCsvExport)
+	rg.GET("/", users.UserIndex)
+	rg.POST("/list", users.UserList)
+	rg.GET("/new", users.UserNew)
+	rg.GET("/view", users.UserView)
+	rg.GET("/edit", users.UserEdit)
+	rg.POST("/create", users.UserCreate)
+	rg.POST("/update", users.UserUpdate)
+	rg.POST("/updates", users.UserUpdates)
+	rg.POST("/deletes", users.UserDeletes)
+	rg.POST("/deleteb", users.UserDeleteBatch)
+	rg.POST("/export/csv", users.UserCsvExport)
 
 	addAdminUserImportHandlers(rg.Group("/import"))
 }
@@ -376,8 +378,8 @@ func addAdminUserImportHandlers(rg *xin.RouterGroup) {
 }
 
 func addAdminUserCsvImportHandlers(rg *xin.RouterGroup) {
-	admin.UserCsvImportJobHandler.Router(rg)
-	rg.GET("/sample", admin.UserCsvImportSample)
+	users.UserCsvImportJobHandler.Router(rg)
+	rg.GET("/sample", users.UserCsvImportSample)
 }
 
 func addSuperHandlers(rg *xin.RouterGroup) {

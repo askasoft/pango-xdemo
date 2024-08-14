@@ -1,4 +1,4 @@
-package demos
+package pets
 
 import (
 	"net/http"
@@ -15,7 +15,7 @@ func newPetResetJobChainController() handlers.JobChainCtrl {
 	jc := &PetResetJobChainController{
 		JobChainController: handlers.JobChainController{
 			ChainName: jobs.JobChainPetReset,
-			Template:  "demos/pet_reset_jobchain",
+			Template:  "demos/pets/pet_reset_jobchain",
 		},
 	}
 	return jc
@@ -29,8 +29,8 @@ func (prjcc *PetResetJobChainController) Index(c *xin.Context) {
 	h := handlers.H(c)
 	h["Arg"] = jobs.NewPetClearArg(c.Locale)
 	h["PetResetSequenceMap"] = tbsutil.GetBoolMap(c.Locale)
-	h["PetResetJobnamesMap"] = tbsutil.GetPetResetJobnamesMap(c.Locale)
-	h["PetResetJslabelsMap"] = tbsutil.GetPetResetJslabelsMap(c.Locale)
+	h["JobchainJobnamesMap"] = tbsutil.GetPetResetJobnamesMap(c.Locale)
+	h["JobchainJslabelsMap"] = tbsutil.GetPetResetJslabelsMap(c.Locale)
 
 	c.HTML(http.StatusOK, prjcc.Template, h)
 }

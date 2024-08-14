@@ -1,4 +1,4 @@
-package admin
+package users
 
 import (
 	"net/http"
@@ -125,7 +125,7 @@ func UserIndex(c *xin.Context) {
 
 	userAddMaps(c, h)
 
-	c.HTML(http.StatusOK, "admin/users", h)
+	c.HTML(http.StatusOK, "admin/users/users", h)
 }
 
 func UserList(c *xin.Context) {
@@ -163,5 +163,5 @@ func UserList(c *xin.Context) {
 
 	userAddMaps(c, h)
 
-	c.HTML(http.StatusOK, "admin/users_list", h)
+	c.HTML(http.StatusOK, "admin/users/users_list", h)
 }

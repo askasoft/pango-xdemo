@@ -1,4 +1,4 @@
-package demos
+package pets
 
 import (
 	"errors"
@@ -37,7 +37,7 @@ func PetNew(c *xin.Context) {
 	h["Pet"] = pet
 	petAddMaps(c, h)
 
-	c.HTML(http.StatusOK, "demos/pet_detail_edit", h)
+	c.HTML(http.StatusOK, "demos/pets/pet_detail_edit", h)
 }
 
 func petDetail(c *xin.Context, action string) {
@@ -67,7 +67,7 @@ func petDetail(c *xin.Context, action string) {
 	h["Pet"] = pet
 	petAddMaps(c, h)
 
-	c.HTML(http.StatusOK, "demos/pet_detail_"+action, h)
+	c.HTML(http.StatusOK, "demos/pets/pet_detail_"+action, h)
 }
 
 func PetView(c *xin.Context) {

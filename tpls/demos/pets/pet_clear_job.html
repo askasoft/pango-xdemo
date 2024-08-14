@@ -1,0 +1,35 @@
+{{MapSet .Ctx.Attrs "styles" (Array "admin/jobctrl.css")}}
+{{MapSet .Ctx.Attrs "scripts" (Array "admin/jobctrl.js")}}
+
+{{template "main_header" .}}
+
+<div class="s-section">
+	<div class="s-section-head">
+		<h2>{{I "demos.pets.clear"}}<span>{{T .Loc "menu.demos.pets.clear"}}</span></h2>
+	</div>
+	<div class="s-section-body">
+		<div class="well">{{T .Loc "pet.clear.well"}}</div>
+
+		<form id="job_form" class="ui-form grey padded" data-form="{{T .Loc "job.label.parameter"}}" data-copy="{{T .Loc "button.copy"}}">
+			<div class="row">
+				<label class="col-md-2 col-form-label">{{T .Loc "pet.clear.reset_sequence"}}</label>
+				<div class="col-md-10">
+					{{Radios "Name=" "reset_sequence" "List=" .PetResetSequenceMap "Value=" .Arg.ResetSequence}}
+				</div>
+			</div>
+		</form>
+
+		<div class="container">
+			<div class="row">
+				<div class="offset-md-2 col">
+					<button id="job_start" class="btn btn-success" disabled data-processing="{{T .Loc "button.processing"}}">{{I "start"}} <span>{{T .Loc "button.start"}}</span></button>
+					<button id="job_abort" class="btn btn-danger" disabled>{{I "stop"}} {{T .Loc "button.stop"}}</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+{{template "job_list" .}}
+
+{{template "main_footer" .}}

@@ -39,13 +39,6 @@
 	</div>
 </div>
 
-<fieldset id="job_history" class="ui-fieldset collapsed" data-spy="fieldset">
-	<legend>{{T .Loc "job.label.history"}}</legend>
-	<div id="job_tabs">
-		<ul class="nav nav-pills"></ul>
-	</div>
-</fieldset>
-
-<div id="job_list" class="tab-content"></div>
+{{template "job_list" .}}
 
 {{template "main_footer" .}}

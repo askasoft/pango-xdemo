@@ -1,35 +1,4 @@
-{{MapSet .Ctx.Attrs "styles" (Array "admin/jobchain.css")}}
-{{MapSet .Ctx.Attrs "scripts" (Array "admin/jobchain.js")}}
-
-{{template "main_header" .}}
-
-<div class="s-section">
-	<div class="s-section-head">
-		<h2>{{I "demos.pets.reset"}}<span>{{T .Loc "menu.demos.pets.reset"}}</span></h2>
-	</div>
-	<div class="s-section-body">
-		<div class="well">{{T .Loc "pet.reset.well"}}</div>
-
-		<form id="jobchain_form" class="ui-form grey padded">
-			<div class="row">
-				<label class="col-md-2 col-form-label">{{T .Loc "pet.clear.reset_sequence"}}</label>
-				<div class="col-md-10">
-					{{Radios "Name=" "reset_sequence" "List=" .PetResetSequenceMap "Value=" .Arg.ResetSequence}}
-				</div>
-			</div>
-		</form>
-
-		<div class="container">
-			<div class="row">
-				<div class="offset-md-2 col">
-					<button id="jobchain_start" class="btn btn-success" disabled data-processing="{{T .Loc "button.processing"}}">{{I "start"}} <span>{{T .Loc "button.start"}}</span></button>
-					<button id="jobchain_abort" class="btn btn-danger" disabled>{{I "stop"}} {{T .Loc "button.stop"}}</button>
-				</div>
-			</div>
-		</div>
-	</div>
-</div>
-
+{{define "jobchain_list"}}
 <fieldset id="jobchain_history" class="ui-fieldset" data-spy="fieldset">
 	<legend>{{T .Loc "job.label.history"}}</legend>
 	<div id="jobchain_tabs">
@@ -61,11 +30,6 @@
 	</div>
 </div>
 
-<div id="jobchain_maps"
-	data-jobnames="{{JSON .PetResetJobnamesMap}}"
-	data-jslabels="{{JSON .PetResetJslabelsMap}}"
-></div>
-
 <div id="jobchain_error_popup" class="ui-popup s-popup-error" data-spy="popup" tabindex="-1">
 	<h4 class="ui-popup-header">{{T .Loc "job.label.error"}}</h4>
 	<div class="ui-popup-body"></div>
@@ -74,4 +38,8 @@
 	</div>
 </div>
 
-{{template "main_footer" .}}
+<div id="jobchain_maps"
+	data-jobnames="{{JSON .JobchainJobnamesMap}}"
+	data-jslabels="{{JSON .JobchainJslabelsMap}}"
+></div>
+{{end}}

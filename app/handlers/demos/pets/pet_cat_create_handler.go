@@ -1,4 +1,4 @@
-package demos
+package pets
 
 import (
 	"net/http"
@@ -15,7 +15,7 @@ func newPetCatCreateJobController() handlers.JobCtrl {
 	jc := &PetCatCreateJobController{
 		JobController: handlers.JobController{
 			Name:     jobs.JobNamePetCatCreate,
-			Template: "demos/pet_cat_create_job",
+			Template: "demos/pets/pet_cat_create_job",
 		},
 	}
 	return jc

@@ -1,4 +1,4 @@
-package demos
+package pets
 
 import (
 	"net/http"
@@ -155,7 +155,7 @@ func PetIndex(c *xin.Context) {
 
 	petAddMaps(c, h)
 
-	c.HTML(http.StatusOK, "demos/pets", h)
+	c.HTML(http.StatusOK, "demos/pets/pets", h)
 }
 
 func PetList(c *xin.Context) {
@@ -195,5 +195,5 @@ func PetList(c *xin.Context) {
 
 	petAddMaps(c, h)
 
-	c.HTML(http.StatusOK, "demos/pets_list", h)
+	c.HTML(http.StatusOK, "demos/pets/pets_list", h)
 }

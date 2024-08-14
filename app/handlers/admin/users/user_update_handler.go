@@ -1,4 +1,4 @@
-package admin
+package users
 
 import (
 	"errors"
@@ -30,7 +30,7 @@ func UserNew(c *xin.Context) {
 	h["User"] = user
 	userAddMaps(c, h)
 
-	c.HTML(http.StatusOK, "admin/user_detail_edit", h)
+	c.HTML(http.StatusOK, "admin/users/user_detail_edit", h)
 }
 
 func userDetail(c *xin.Context, action string) {
@@ -61,7 +61,7 @@ func userDetail(c *xin.Context, action string) {
 
 	userAddMaps(c, h)
 
-	c.HTML(http.StatusOK, "admin/user_detail_"+action, h)
+	c.HTML(http.StatusOK, "admin/users/user_detail_"+action, h)
 }
 
 func UserView(c *xin.Context) {
