@@ -11,10 +11,10 @@ import (
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango-xdemo/app/utils/argutil"
 	"github.com/askasoft/pango-xdemo/app/utils/pgutil"
+	"github.com/askasoft/pango-xdemo/app/utils/pwdutil"
 	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
 	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
 	"github.com/askasoft/pango/num"
-	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/tbs"
 	"github.com/askasoft/pango/xin"
 	"gorm.io/gorm"
@@ -99,7 +99,6 @@ func userBind(c *xin.Context) *models.User {
 
 	userValidateRole(c, user.Role)
 	userValidateStatus(c, user.Status)
-
 	return user
 }
 
@@ -110,15 +109,16 @@ func UserCreate(c *xin.Context) {
 		return
 	}
 
+	tt := tenant.FromCtx(c)
+
 	user.ID = 0
 	if user.Password == "" {
-		user.Password = str.RandLetterNumbers(16)
+		user.Password = pwdutil.RandomPassword()
 	}
 	user.SetPassword(user.Password)
 	user.CreatedAt = time.Now()
 	user.UpdatedAt = user.CreatedAt
 
-	tt := tenant.FromCtx(c)
 	if err := app.GDB.Table(tt.TableUsers()).Create(user).Error; err != nil {
 		if pgutil.IsUniqueViolation(err) {
 			err = &vadutil.ParamError{

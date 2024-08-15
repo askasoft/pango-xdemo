@@ -14,6 +14,7 @@ import (
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango-xdemo/app/utils/csvutil"
 	"github.com/askasoft/pango-xdemo/app/utils/pgutil"
+	"github.com/askasoft/pango-xdemo/app/utils/pwdutil"
 	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
 	"github.com/askasoft/pango/cog/linkedhashmap"
 	"github.com/askasoft/pango/iox"
@@ -297,7 +298,7 @@ func (uci *UserCsvImportJob) importRecord(rec *csvUserRecord) error {
 		uid := user.ID
 		pwd := rec.Password
 		if pwd == "" {
-			pwd = str.RandLetterNumbers(16)
+			pwd = pwdutil.RandomPassword()
 		}
 		user.SetPassword(pwd)
 
