@@ -1,23 +1,29 @@
-package jobs
+package pets
 
 import (
 	"time"
 
 	"github.com/askasoft/pango-xdemo/app"
+	"github.com/askasoft/pango-xdemo/app/jobs"
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pango/xjm"
 )
 
+func init() {
+	jobs.RegisterJobRun(jobs.JobNamePetCatCreate, NewPetCatCreateJob)
+	jobs.RegisterJobArg(jobs.JobNamePetCatCreate, NewPetCatCreateArg)
+}
+
 type PetCatCreateArg struct {
-	ArgLocale
-	ArgChain
+	jobs.ArgLocale
+	jobs.ArgChain
 
 	Items int `json:"items,omitempty" form:"items" validate:"min=1,max=1000"`
 	Delay int `json:"delay,omitempty" form:"delay" validate:"min=0,max=1000"`
 }
 
-func NewPetCatCreateArg(locale string) *PetCatCreateArg {
+func NewPetCatCreateArg(tt tenant.Tenant, locale string) jobs.IArg {
 	pcca := &PetCatCreateArg{}
 	pcca.Locale = locale
 	pcca.Items = 100
@@ -25,23 +31,23 @@ func NewPetCatCreateArg(locale string) *PetCatCreateArg {
 	return pcca
 }
 
-func (pcca *PetCatCreateArg) BindParams(c *xin.Context) error {
+func (pcca *PetCatCreateArg) Bind(c *xin.Context) error {
 	return c.Bind(pcca)
 }
 
 type PetCatCreateJob struct {
-	*JobRunner
+	*jobs.JobRunner
 
-	JobState
+	jobs.JobState
 
 	arg PetCatCreateArg
 	gen *PetGenerator
 }
 
-func NewPetCatCreateJob(tt tenant.Tenant, job *xjm.Job) iRunner {
+func NewPetCatCreateJob(tt tenant.Tenant, job *xjm.Job) jobs.IRun {
 	pcc := &PetCatCreateJob{}
 
-	pcc.JobRunner = newJobRunner(tt, job.Name, job.ID)
+	pcc.JobRunner = jobs.NewJobRunner(tt, job.Name, job.ID)
 
 	xjm.MustDecode(job.Param, &pcc.arg)
 

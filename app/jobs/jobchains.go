@@ -255,14 +255,10 @@ func JobChainAppendJob(tt tenant.Tenant, cid int64, name string, locale string) 
 	tjm := tt.JM()
 
 	var arg any
-	switch name {
-	case JobNamePetClear:
-		arg = NewPetClearArg(locale)
-	case JobNamePetDogCreate:
-		arg = NewPetDogCreateArg(locale)
-	case JobNamePetCatCreate:
-		arg = NewPetCatCreateArg(locale)
-	default:
+
+	if jac, ok := jobArgCreators[name]; ok {
+		arg = jac(tt, locale)
+	} else {
 		return fmt.Errorf("Invalid chain job %q", name)
 	}
 

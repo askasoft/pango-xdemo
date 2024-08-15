@@ -1,4 +1,4 @@
-package jobs
+package users
 
 import (
 	"bytes"
@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/askasoft/pango-xdemo/app"
+	"github.com/askasoft/pango-xdemo/app/jobs"
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango-xdemo/app/utils/csvutil"
@@ -23,8 +24,12 @@ import (
 	"gorm.io/gorm"
 )
 
+func init() {
+	jobs.RegisterJobRun(jobs.JobNameUserCsvImport, NewUserCsvImportJob)
+}
+
 type UserCsvImportArg struct {
-	ArgLocale
+	jobs.ArgLocale
 
 	Role string `json:"role,omitempty"`
 }
@@ -37,9 +42,9 @@ func NewUserCsvImportArg(locale, role string) *UserCsvImportArg {
 }
 
 type UserCsvImportJob struct {
-	*JobRunner
+	*jobs.JobRunner
 
-	JobState
+	jobs.JobState
 
 	arg UserCsvImportArg
 
@@ -54,10 +59,10 @@ type UserCsvImportJob struct {
 	statusRevMap map[string]string
 }
 
-func NewUserCsvImportJob(tt tenant.Tenant, job *xjm.Job) iRunner {
+func NewUserCsvImportJob(tt tenant.Tenant, job *xjm.Job) jobs.IRun {
 	uci := &UserCsvImportJob{}
 
-	uci.JobRunner = newJobRunner(tt, job.Name, job.ID)
+	uci.JobRunner = jobs.NewJobRunner(tt, job.Name, job.ID)
 
 	xjm.MustDecode(job.Param, &uci.arg)
 
@@ -90,7 +95,7 @@ func (uci *UserCsvImportJob) Run() {
 
 	total, err := uci.doCheckCsv()
 	if err != nil {
-		err = NewClientError(err)
+		err = jobs.NewClientError(err)
 		uci.Done(err)
 		return
 	}
@@ -172,7 +177,7 @@ func (uci *UserCsvImportJob) doReadCsv(callback func(rec *csvUserRecord) error) 
 		rec.Line = i
 
 		err = callback(rec)
-		if err != nil && !errors.Is(err, ErrItemSkip) {
+		if err != nil && !errors.Is(err, jobs.ErrItemSkip) {
 			return err
 		}
 	}
@@ -271,7 +276,7 @@ func (uci *UserCsvImportJob) importRecord(rec *csvUserRecord) error {
 				if r.Error != nil {
 					if pgutil.IsUniqueViolation(r.Error) {
 						uci.Log.Warnf(tbs.GetText(uci.Locale, "user.import.csv.step.duplicated"), uci.Progress(), user.ID, user.Name, user.Email)
-						return ErrItemSkip
+						return jobs.ErrItemSkip
 					}
 					return r.Error
 				}
@@ -300,7 +305,7 @@ func (uci *UserCsvImportJob) importRecord(rec *csvUserRecord) error {
 		if r.Error != nil {
 			if pgutil.IsUniqueViolation(r.Error) {
 				uci.Log.Warnf(tbs.GetText(uci.Locale, "user.import.csv.step.duplicated"), uci.Progress(), user.ID, user.Name, user.Email)
-				return ErrItemSkip
+				return jobs.ErrItemSkip
 			}
 			return r.Error
 		}

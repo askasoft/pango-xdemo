@@ -5,6 +5,8 @@ import (
 
 	"github.com/askasoft/pango-xdemo/app/handlers"
 	"github.com/askasoft/pango-xdemo/app/jobs"
+	"github.com/askasoft/pango-xdemo/app/jobs/pets"
+	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
 	"github.com/askasoft/pango/xin"
 )
@@ -26,8 +28,10 @@ type PetResetJobChainController struct {
 }
 
 func (prjcc *PetResetJobChainController) Index(c *xin.Context) {
+	tt := tenant.FromCtx(c)
+
 	h := handlers.H(c)
-	h["Arg"] = jobs.NewPetClearArg(c.Locale)
+	h["Arg"] = pets.NewPetClearArg(tt, c.Locale)
 	h["PetResetSequenceMap"] = tbsutil.GetBoolMap(c.Locale)
 	h["JobchainJobnamesMap"] = tbsutil.GetPetResetJobnamesMap(c.Locale)
 	h["JobchainJslabelsMap"] = tbsutil.GetPetResetJslabelsMap(c.Locale)
@@ -36,10 +40,12 @@ func (prjcc *PetResetJobChainController) Index(c *xin.Context) {
 }
 
 func (prjcc *PetResetJobChainController) Start(c *xin.Context) {
+	tt := tenant.FromCtx(c)
+
 	prjcc.JobName = jobs.JobNamePetClear
-	pca := jobs.NewPetClearArg(c.Locale)
-	pca.BindParams(c)
-	prjcc.JobParam = pca
-	prjcc.ChainStates = jobs.PetResetCreateStates()
+	pca := pets.NewPetClearArg(tt, c.Locale)
+	pca.Bind(c)
+	prjcc.JobParam = pca.(jobs.ISetChainID)
+	prjcc.ChainStates = pets.PetResetCreateStates()
 	prjcc.JobChainController.Start(c)
 }

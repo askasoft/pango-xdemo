@@ -1,4 +1,4 @@
-package jobs
+package pets
 
 import (
 	"fmt"
@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/askasoft/pango-xdemo/app/jobs"
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
@@ -51,7 +52,7 @@ func NewPetGenerator(tt tenant.Tenant, cat string) *PetGenerator {
 	return pg
 }
 
-func (pg *PetGenerator) Create(logger log.Logger, db *gorm.DB, js *JobState) error {
+func (pg *PetGenerator) Create(logger log.Logger, db *gorm.DB, js *jobs.JobState) error {
 	gfs := pg.tt.GFS(db)
 
 	bd, _ := time.Parse(time.RFC3339, "2000-01-01T10:04:05+09:00")

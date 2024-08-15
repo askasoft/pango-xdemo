@@ -8,6 +8,7 @@ import (
 
 	"github.com/askasoft/pango-xdemo/app/handlers"
 	"github.com/askasoft/pango-xdemo/app/jobs"
+	"github.com/askasoft/pango-xdemo/app/jobs/users"
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
@@ -51,7 +52,7 @@ func (ucijc *UserCsvImportJobController) Start(c *xin.Context) {
 	}
 
 	au := tenant.AuthUser(c)
-	ucia := jobs.NewUserCsvImportArg(c.Locale, au.Role)
+	ucia := users.NewUserCsvImportArg(c.Locale, au.Role)
 	ucijc.SetParam(ucia)
 	ucijc.JobController.Start(c)
 }

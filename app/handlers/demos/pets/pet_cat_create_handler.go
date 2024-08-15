@@ -5,6 +5,8 @@ import (
 
 	"github.com/askasoft/pango-xdemo/app/handlers"
 	"github.com/askasoft/pango-xdemo/app/jobs"
+	"github.com/askasoft/pango-xdemo/app/jobs/pets"
+	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
 	"github.com/askasoft/pango/xin"
 )
@@ -26,15 +28,19 @@ type PetCatCreateJobController struct {
 }
 
 func (pccjc *PetCatCreateJobController) Index(c *xin.Context) {
+	tt := tenant.FromCtx(c)
+
 	h := handlers.H(c)
-	h["Arg"] = jobs.NewPetCatCreateArg(c.Locale)
+	h["Arg"] = pets.NewPetCatCreateArg(tt, c.Locale)
 
 	c.HTML(http.StatusOK, pccjc.Template, h)
 }
 
 func (pccjc *PetCatCreateJobController) Start(c *xin.Context) {
-	pcca := jobs.NewPetCatCreateArg(c.Locale)
-	if err := pcca.BindParams(c); err != nil {
+	tt := tenant.FromCtx(c)
+
+	pcca := pets.NewPetCatCreateArg(tt, c.Locale)
+	if err := pcca.Bind(c); err != nil {
 		vadutil.AddBindErrors(c, err, "job.param.")
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return

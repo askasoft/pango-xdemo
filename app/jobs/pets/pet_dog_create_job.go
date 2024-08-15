@@ -1,23 +1,29 @@
-package jobs
+package pets
 
 import (
 	"time"
 
 	"github.com/askasoft/pango-xdemo/app"
+	"github.com/askasoft/pango-xdemo/app/jobs"
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pango/xjm"
 )
 
+func init() {
+	jobs.RegisterJobRun(jobs.JobNamePetDogCreate, NewPetDogCreateJob)
+	jobs.RegisterJobArg(jobs.JobNamePetDogCreate, NewPetDogCreateArg)
+}
+
 type PetDogCreateArg struct {
-	ArgLocale
-	ArgChain
+	jobs.ArgLocale
+	jobs.ArgChain
 
 	Items int `json:"items,omitempty" form:"items" validate:"min=1,max=1000"`
 	Delay int `json:"delay,omitempty" form:"delay" validate:"min=0,max=1000"`
 }
 
-func NewPetDogCreateArg(locale string) *PetDogCreateArg {
+func NewPetDogCreateArg(tt tenant.Tenant, locale string) jobs.IArg {
 	pdca := &PetDogCreateArg{}
 	pdca.Locale = locale
 	pdca.Items = 100
@@ -25,23 +31,23 @@ func NewPetDogCreateArg(locale string) *PetDogCreateArg {
 	return pdca
 }
 
-func (pdca *PetDogCreateArg) BindParams(c *xin.Context) error {
+func (pdca *PetDogCreateArg) Bind(c *xin.Context) error {
 	return c.Bind(pdca)
 }
 
 type PetDogCreateJob struct {
-	*JobRunner
+	*jobs.JobRunner
 
-	JobState
+	jobs.JobState
 
 	arg PetDogCreateArg
 	gen *PetGenerator
 }
 
-func NewPetDogCreateJob(tt tenant.Tenant, job *xjm.Job) iRunner {
+func NewPetDogCreateJob(tt tenant.Tenant, job *xjm.Job) jobs.IRun {
 	pdc := &PetDogCreateJob{}
 
-	pdc.JobRunner = newJobRunner(tt, job.Name, job.ID)
+	pdc.JobRunner = jobs.NewJobRunner(tt, job.Name, job.ID)
 
 	xjm.MustDecode(job.Param, &pdc.arg)
 

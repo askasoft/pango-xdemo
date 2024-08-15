@@ -37,17 +37,28 @@ var hasFileJobs = []string{
 	JobNameUserCsvImport,
 }
 
-type iRunner interface {
+type IRun interface {
 	Run()
 }
 
-type JobRunnerCreator func(tenant.Tenant, *xjm.Job) iRunner
+type JobRunCreator func(tenant.Tenant, *xjm.Job) IRun
 
-var creators = map[string]JobRunnerCreator{
-	JobNameUserCsvImport: NewUserCsvImportJob,
-	JobNamePetClear:      NewPetClearJob,
-	JobNamePetCatCreate:  NewPetCatCreateJob,
-	JobNamePetDogCreate:  NewPetDogCreateJob,
+var jobRunCreators = map[string]JobRunCreator{}
+
+func RegisterJobRun(name string, jrc JobRunCreator) {
+	jobRunCreators[name] = jrc
+}
+
+type IArg interface {
+	Bind(c *xin.Context) error
+}
+
+type JobArgCreater func(tenant.Tenant, string) IArg
+
+var jobArgCreators = map[string]JobArgCreater{}
+
+func RegisterJobArg(name string, jac JobArgCreater) {
+	jobArgCreators[name] = jac
 }
 
 type ISetChainID interface {
@@ -182,7 +193,7 @@ type JobRunner struct {
 	ChainID int64
 }
 
-func newJobRunner(tt tenant.Tenant, jnm string, jid int64) *JobRunner {
+func NewJobRunner(tt tenant.Tenant, jnm string, jid int64) *JobRunner {
 	rid := time.Now().UnixMilli()
 	rsx := app.INI.GetString("job", "ridSuffix")
 	if rsx != "" {
@@ -449,7 +460,7 @@ func startJob(tt tenant.Tenant, job *xjm.Job) {
 		}
 	}()
 
-	if jrc, ok := creators[job.Name]; ok {
+	if jrc, ok := jobRunCreators[job.Name]; ok {
 		logger.Debugf("Start job %s#%d", job.Name, job.ID)
 
 		run := jrc(tt, job)

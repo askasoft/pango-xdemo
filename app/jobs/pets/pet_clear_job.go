@@ -1,43 +1,49 @@
-package jobs
+package pets
 
 import (
 	"github.com/askasoft/pango-xdemo/app"
+	"github.com/askasoft/pango-xdemo/app/jobs"
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pango/xjm"
 )
 
+func init() {
+	jobs.RegisterJobRun(jobs.JobNamePetClear, NewPetClearJob)
+	jobs.RegisterJobArg(jobs.JobNamePetClear, NewPetClearArg)
+}
+
 type PetClearArg struct {
-	ArgLocale
-	ArgChain
+	jobs.ArgLocale
+	jobs.ArgChain
 
 	ResetSequence bool `json:"reset_sequence" form:"reset_sequence"`
 }
 
-func NewPetClearArg(locale string) *PetClearArg {
+func NewPetClearArg(tt tenant.Tenant, locale string) jobs.IArg {
 	pca := &PetClearArg{}
 	pca.Locale = locale
 	pca.ResetSequence = true
 	return pca
 }
 
-func (pca *PetClearArg) BindParams(c *xin.Context) {
-	_ = c.Bind(pca)
+func (pca *PetClearArg) Bind(c *xin.Context) error {
+	return c.Bind(pca)
 }
 
 type PetClearJob struct {
-	*JobRunner
+	*jobs.JobRunner
 
-	JobState
+	jobs.JobState
 
 	arg PetClearArg
 }
 
-func NewPetClearJob(tt tenant.Tenant, job *xjm.Job) iRunner {
+func NewPetClearJob(tt tenant.Tenant, job *xjm.Job) jobs.IRun {
 	pc := &PetClearJob{}
 
-	pc.JobRunner = newJobRunner(tt, job.Name, job.ID)
+	pc.JobRunner = jobs.NewJobRunner(tt, job.Name, job.ID)
 
 	xjm.MustDecode(job.Param, &pc.arg)
 
