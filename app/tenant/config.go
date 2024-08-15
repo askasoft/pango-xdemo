@@ -80,6 +80,6 @@ func (tt Tenant) ConfigValues(k string) []string {
 }
 
 func (tt Tenant) GetCIDRs() []*net.IPNet {
-	val := tt.ConfigValue("secure_cidr")
+	val := tt.ConfigValue("secure_client_cidr")
 	return vadutil.ParseCIDRs(val)
 }
