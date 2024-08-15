@@ -16,6 +16,8 @@ import (
 )
 
 func (tt Tenant) MigrateSchema() error {
+	log.Infof("Migrate schema %q", tt.Schema())
+
 	dbc := &gorm.Config{
 		NamingStrategy: schema.NamingStrategy{TablePrefix: tt.Prefix()},
 		Logger: gormlog.NewGormLogger(
@@ -50,6 +52,8 @@ func (tt Tenant) MigrateSchema() error {
 }
 
 func (tt Tenant) MigrateConfig(configs []*models.Config) error {
+	log.Infof("Migrate config %q", tt.Schema())
+
 	tn := tt.TableConfigs()
 
 	for _, cfg := range configs {
@@ -85,6 +89,8 @@ func (tt Tenant) MigrateSuper() error {
 	if superEmail == "" {
 		return errors.New("missing [super] email settings")
 	}
+
+	log.Infof("Migrate super %q: %s", tt, superEmail)
 
 	user := &models.User{}
 	r := app.GDB.Table(tt.TableUsers()).Where("email = ?", superEmail).Take(user)

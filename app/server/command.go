@@ -16,6 +16,7 @@ import (
 	"github.com/askasoft/pango-xdemo/txts"
 	"github.com/askasoft/pango-xdemo/web"
 	"github.com/askasoft/pango/fsu"
+	"github.com/askasoft/pango/gog"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/srv"
 	"github.com/askasoft/pango/str"
@@ -26,6 +27,7 @@ import (
 
 // Flag process optional command flag
 func (s *service) Flag() {
+	flag.BoolVar(&s.debug, "debug", false, "print debug log.")
 }
 
 // PrintCommand print custom command
@@ -47,8 +49,8 @@ func (s *service) PrintCommand(out io.Writer) {
 // Basic: 'help' 'usage' 'version'
 // Windows only: 'install' 'remove' 'start' 'stop' 'debug'
 func (s *service) Exec(cmd string) {
-	log.SetLevel(log.LevelDebug)
 	log.SetFormat("%t [%p] - %m%n%T")
+	log.SetLevel(gog.If(s.debug, log.LevelDebug, log.LevelInfo))
 
 	switch cmd {
 	case "migrate":

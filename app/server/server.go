@@ -29,7 +29,9 @@ import (
 var SRV = &service{}
 
 // service srv.App, srv.Cmd implement
-type service struct{}
+type service struct {
+	debug bool
+}
 
 // -----------------------------------
 // srv.App implement
