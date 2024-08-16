@@ -338,7 +338,7 @@ var main = {
 		if ($i.data('spy') == 'niceSelect') {
 			$i.niceSelect('update');
 		}
-		return false;
+		// NOTE: do not 'return false', otherwise 'update' button can not be enabled.
 	},
 
 	// table
