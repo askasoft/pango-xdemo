@@ -91,6 +91,21 @@ func userValidateStatus(c *xin.Context, status string) {
 	}
 }
 
+func userValidatePassword(c *xin.Context, password string) {
+	if password != "" {
+		tt := tenant.FromCtx(c)
+
+		if vs := tt.ValidatePassword(c.Locale, password); len(vs) > 0 {
+			for _, v := range vs {
+				c.AddError(&vadutil.ParamError{
+					Param:   "password",
+					Message: v,
+				})
+			}
+		}
+	}
+}
+
 func userBind(c *xin.Context) *models.User {
 	user := &models.User{}
 	if err := c.Bind(user); err != nil {
@@ -99,6 +114,7 @@ func userBind(c *xin.Context) *models.User {
 
 	userValidateRole(c, user.Role)
 	userValidateStatus(c, user.Status)
+	userValidatePassword(c, user.Password)
 	return user
 }
 

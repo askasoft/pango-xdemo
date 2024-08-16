@@ -21,8 +21,23 @@ func PasswordChangeIndex(c *xin.Context) {
 
 type PwdChgArg struct {
 	Oldpwd string `form:"oldpwd" validate:"required"`
-	Newpwd string `form:"newpwd" validate:"required,btwlen=8 ~ 16,printascii"`
+	Newpwd string `form:"newpwd" validate:"required,printascii"`
 	Conpwd string `form:"conpwd" validate:"required,eqfield=Newpwd"`
+}
+
+func pwdchgValidatePassword(c *xin.Context, password string) {
+	if password != "" {
+		tt := tenant.FromCtx(c)
+
+		if vs := tt.ValidatePassword(c.Locale, password); len(vs) > 0 {
+			for _, v := range vs {
+				c.AddError(&vadutil.ParamError{
+					Param:   "newpwd",
+					Message: v,
+				})
+			}
+		}
+	}
 }
 
 func PasswordChangeChange(c *xin.Context) {
@@ -30,6 +45,11 @@ func PasswordChangeChange(c *xin.Context) {
 
 	if err := c.Bind(pca); err != nil {
 		vadutil.AddBindErrors(c, err, "pwdchg.")
+	}
+
+	pwdchgValidatePassword(c, pca.Newpwd)
+
+	if len(c.Errors) > 0 {
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}

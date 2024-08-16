@@ -7,11 +7,16 @@ import (
 )
 
 const (
-	StyleChecks   = "C"
-	StyleOrders   = "O"
-	StyleRadios   = "R"
-	StyleTextarea = "T"
-	StyleNumber   = "N"
+	StyleChecks         = "C"
+	StyleVerticalChecks = "L"
+	StyleOrders         = "O"
+	StyleRadios         = "R"
+	StyleVerticalRadios = "V"
+	StyleSingleSelect   = "S"
+	StyleMultiSelect    = "M"
+	StyleTextarea       = "T"
+	StyleNumeric        = "N"
+	StyleDecimal        = "D"
 )
 
 type Config struct {

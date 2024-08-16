@@ -56,11 +56,16 @@
 								{{if eq $c.Style "C"}}
 									<input type="checkbox" name="{{$c.Name}}" value="" checked{{if $ro}} disabled{{end}} style="display:none">
 									{{Checks "Name=" $c.Name "List=" (MapGet $.Lists $c.Name) "Values=" $c.Values "Disabled=" $ro}}
+								{{else if eq $c.Style "L"}}
+									<input type="checkbox" name="{{$c.Name}}" value="" checked{{if $ro}} disabled{{end}} style="display:none">
+									{{Checks "Name=" $c.Name "List=" (MapGet $.Lists $c.Name) "Values=" $c.Values "Disabled=" $ro "class=" "vertical"}}
 								{{else if eq $c.Style "O"}}
 									<input type="checkbox" name="{{$c.Name}}" value="" checked{{if $ro}} disabled{{end}} style="display:none">
 									{{Checks "Name=" $c.Name "List=" (MapGet $.Lists $c.Name) "Values=" $c.Values "Disabled=" $ro "Ordered=" true "class=" "vertical"}}
 								{{else if eq $c.Style "R"}}
 									{{Radios "Name=" $c.Name "List=" (MapGet $.Lists $c.Name) "Value=" $c.Value "Disabled=" $ro}}
+								{{else if eq $c.Style "V"}}
+									{{Radios "Name=" $c.Name "List=" (MapGet $.Lists $c.Name) "Value=" $c.Value "Disabled=" $ro "class=" "vertical"}}
 								{{else if eq $c.Style "S"}}
 									{{Select "Name=" $c.Name "List=" (MapGet $.Lists $c.Name) "Value=" $c.Value "Disabled=" $ro "data-spy=" "niceSelect" "class=" "wide"}}
 								{{else if eq $c.Style "M"}}
@@ -69,6 +74,8 @@
 									<textarea name="{{$c.Name}}" class="form-control" rows="2" textclear enterfire{{if $ro}} disabled{{end}}>
 {{$c.DisplayValue}}</textarea>
 								{{else if eq $c.Style "N"}}
+									<input name="{{$c.Name}}" type="number" size="10" class="form-control" textclear value="{{$c.DisplayValue}}"{{if $ro}} disabled{{end}}/>
+								{{else if eq $c.Style "D"}}
 									<input name="{{$c.Name}}" type="number" size="10" class="form-control" textclear value="{{$c.DisplayValue}}"{{if $ro}} disabled{{end}}/>
 								{{else}}
 									<input name="{{$c.Name}}" type="text" class="form-control" textclear value="{{$c.DisplayValue}}"{{if $ro}} disabled{{end}}/>

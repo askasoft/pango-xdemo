@@ -37,7 +37,7 @@ func (pts *PwdRstToken) String() string {
 }
 
 type PwdRstArg struct {
-	Newpwd string `form:"newpwd" validate:"required,btwlen=8 ~ 16,printascii"`
+	Newpwd string `form:"newpwd" validate:"required,printascii"`
 	Conpwd string `form:"conpwd" validate:"required,eqfield=Newpwd"`
 }
 
@@ -160,14 +160,28 @@ func PasswordResetExecute(c *xin.Context) {
 		return
 	}
 
+	tt := tenant.FromCtx(c)
+
 	pra := &PwdRstArg{}
 	if err := c.Bind(pra); err != nil {
 		vadutil.AddBindErrors(c, err, "pwdrst.")
+	}
+
+	if pra.Newpwd != "" {
+		if vs := tt.ValidatePassword(c.Locale, pra.Newpwd); len(vs) > 0 {
+			for _, v := range vs {
+				c.AddError(&vadutil.ParamError{
+					Param:   "newpwd",
+					Message: v,
+				})
+			}
+		}
+	}
+
+	if len(c.Errors) > 0 {
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}
-
-	tt := tenant.FromCtx(c)
 
 	mu := user.(*models.User)
 	mu.SetPassword(pra.Newpwd)

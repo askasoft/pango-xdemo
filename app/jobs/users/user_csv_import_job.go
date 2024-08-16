@@ -58,6 +58,8 @@ type UserCsvImportJob struct {
 
 	roleRevMap   map[string]string
 	statusRevMap map[string]string
+
+	pwdPolicy *tenant.PasswordPolicy
 }
 
 func NewUserCsvImportJob(tt tenant.Tenant, job *xjm.Job) jobs.IRun {
@@ -93,6 +95,7 @@ func (uci *UserCsvImportJob) Run() {
 	uci.statusMap = tbsutil.GetUserStatusMap(uci.Locale)
 	uci.roleRevMap = tbsutil.GetUserRoleReverseMap()
 	uci.statusRevMap = tbsutil.GetUserStatusReverseMap()
+	uci.pwdPolicy = uci.Tenant.GetPasswordPolicy(uci.Locale)
 
 	total, err := uci.doCheckCsv()
 	if err != nil {
@@ -228,6 +231,11 @@ func (uci *UserCsvImportJob) checkRecord(rec *csvUserRecord) error {
 	}
 	if !uci.statusMap.Contain(rec.Status) {
 		errs = append(errs, tbs.GetText(uci.Locale, "user.status"))
+	}
+	if rec.Password != "" {
+		if vs := uci.pwdPolicy.ValidatePassword(rec.Password); len(vs) > 0 {
+			errs = append(errs, tbs.GetText(uci.Locale, "user.password")+":["+str.Join(vs, ",")+"]")
+		}
 	}
 
 	if len(errs) > 0 {

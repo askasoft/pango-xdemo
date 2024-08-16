@@ -16,6 +16,7 @@ import (
 	"github.com/askasoft/pango/cog/linkedhashmap"
 	"github.com/askasoft/pango/doc/csvx"
 	"github.com/askasoft/pango/iox"
+	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/tbs"
 	"github.com/askasoft/pango/xin"
@@ -121,11 +122,33 @@ func ConfigSave(c *xin.Context) {
 	db := app.GDB.Begin()
 	for _, cfg := range configs {
 		switch cfg.Style {
-		case models.StyleChecks, models.StyleOrders:
+		case models.StyleChecks, models.StyleVerticalChecks, models.StyleOrders, models.StyleMultiSelect:
 			vs, ok = c.GetPostFormArray(cfg.Name)
 			if ok {
 				vs = str.RemoveEmpties(vs)
 				v = str.Join(vs, "\t")
+			}
+		case models.StyleNumeric:
+			v, ok = c.GetPostForm(cfg.Name)
+			if ok {
+				if !str.IsNumeric(v) {
+					c.AddError(&vadutil.ParamError{
+						Param:   cfg.Name,
+						Message: tbs.Format(c.Locale, "error.param.numeric", tbs.GetText(c.Locale, "config."+cfg.Name)),
+					})
+					continue
+				}
+			}
+		case models.StyleDecimal:
+			v, ok = c.GetPostForm(cfg.Name)
+			if ok {
+				if !str.IsDecimal(v) {
+					c.AddError(&vadutil.ParamError{
+						Param:   cfg.Name,
+						Message: tbs.Format(c.Locale, "error.param.decimal", tbs.GetText(c.Locale, "config."+cfg.Name)),
+					})
+					continue
+				}
 			}
 		default:
 			v, ok = c.GetPostForm(cfg.Name)
@@ -148,7 +171,17 @@ func ConfigSave(c *xin.Context) {
 			validation += str.If(validation == "", "", ",") + "omitempty," + cfg.Validation
 		}
 		if validation != "" {
-			if err := app.VAD.Var(v, validation); err != nil {
+			var vv any
+			switch cfg.Style {
+			case models.StyleNumeric:
+				vv = num.Atol(v)
+			case models.StyleDecimal:
+				vv = num.Atof(v)
+			default:
+				vv = v
+			}
+
+			if err := app.VAD.Var(vv, validation); err != nil {
 				vadutil.AddBindErrors(c, err, "config.", cfg.Name)
 				continue
 			}
@@ -187,7 +220,7 @@ func ConfigSave(c *xin.Context) {
 		return
 	}
 
-	tt.PurgeConfigMap()
+	tt.PurgeConfig()
 
 	c.JSON(http.StatusOK, xin.H{"success": tbs.GetText(c.Locale, "success.saved")})
 }
@@ -296,7 +329,7 @@ func ConfigImport(c *xin.Context) {
 		return
 	}
 
-	tt.PurgeConfigMap()
+	tt.PurgeConfig()
 
 	c.JSON(http.StatusOK, xin.H{"success": tbs.GetText(c.Locale, "success.imported")})
 }
