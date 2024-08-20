@@ -13,6 +13,8 @@
 .btn-primary {
 	--bs-btn-bg: var(--bs-primary);
 	--bs-btn-border-color: var(--bs-primary);
+	--bs-btn-disabled-bg: var(--bs-primary);
+	--bs-btn-disabled-border-color: var(--bs-primary);
 }
 .btn-outline-primary {
 	--bs-btn-color: var(--bs-primary);
@@ -56,6 +58,47 @@
 	--bs-btn-disabled-border-color:#ac8edb;
 }
 **/
+
+/** bootstrap5 customize **/
+/* button */
+.btn-xs {
+	--bs-btn-padding-y: 0.15rem;
+	--bs-btn-padding-x: 0.25rem;
+	--bs-btn-font-size: 0.75rem;
+	--bs-btn-border-radius: var(--bs-border-radius-sm);
+}
+
+/* well */
+.well {
+	margin-bottom: 20px;
+	white-space: pre-wrap;
+}
+
+/* dropdown menu (copy from bootstrap3) */
+.dropdown-menu .divider {
+	height: 1px;
+	margin: 9px 0;
+	overflow: hidden;
+	background-color: #e5e5e5;
+}
+.dropdown-menu > li > a > i {
+	margin-right: 8px;
+}
+
+/* alert */
+.alert.alert-dismissible {
+	padding-right: 3em;
+}
+.alert > ul:last-child {
+	margin-bottom: 0;
+}
+.alert .fa-ul li {
+	padding: 0.25em 0;
+}
+.alert .fa-ul .fa-li {
+	font-size: 1.5em;
+	top: -0.1em;
+}
 
 
 /** layout **/
@@ -290,24 +333,6 @@ body {
 	padding: 25px;
 }
 
-/** well **/
-.well {
-	margin-bottom: 20px;
-	white-space: pre-wrap;
-}
-
-/** dropdown menu **/
-/* copy from bootstrap3 */
-.dropdown-menu .divider {
-	height: 1px;
-	margin: 9px 0;
-	overflow: hidden;
-	background-color: #e5e5e5;
-}
-.dropdown-menu > li > a > i {
-	margin-right: 8px;
-}
-
 /** nav-popup **/
 .nav.nav-popup {
 	margin: 5px;
@@ -320,21 +345,6 @@ body {
 }
 .nav.nav-popup > li > hr {
 	margin: 5px 0;
-}
-
-/** alert **/
-.alert.alert-dismissible {
-	padding-right: 3em;
-}
-.alert > ul:last-child {
-	margin-bottom: 0;
-}
-.alert .fa-ul li {
-	padding: 0.25em 0;
-}
-.alert .fa-ul .fa-li {
-	font-size: 1.5em;
-	top: -0.1em;
 }
 
 /** form **/
