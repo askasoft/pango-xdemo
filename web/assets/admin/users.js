@@ -294,6 +294,7 @@
 	//
 	function users_updates() {
 		var $p = $('#users_bulkedit_popup').popup({ keyboard: false });
+		var ids = $p.find('[name=id]').val();
 
 		$.ajax({
 			url: './updates',
@@ -309,28 +310,20 @@
 					text: data.success
 				});
 
-				if ($p.find('[name=id]').val() == '*') {
-					users_search();
-					return;
-				}
+				var $trs = (ids == '*' ? $('#users_table > tbody > tr') : main.get_table_trs('#user_', ids.split(',')));
 
 				var us = data.updates;
-				if (us) {
-					var ids = main.get_table_checked_ids($('#users_table'));
-					var $trs = main.get_table_trs('#user_', ids);
-
-					if (us.status) {
-						$trs.attr('class', '').addClass(us.status);
-						$trs.find('td.status').text(USM[us.status]);
-					}
-					if (us.role) {
-						$trs.find('td.role').text(URM[us.role]);
-					}
-					if ('cidr' in us) {
-						$trs.find('td.cidr > pre').text(us.cidr);
-					}
-					main.blink($trs);
+				if (us.status) {
+					$trs.attr('class', '').addClass(us.status);
+					$trs.find('td.status').text(USM[us.status]);
 				}
+				if (us.role) {
+					$trs.find('td.role').text(URM[us.role]);
+				}
+				if ('cidr' in us) {
+					$trs.find('td.cidr > pre').text(us.cidr);
+				}
+				main.blink($trs);
 			},
 			error: main.form_ajax_error($p),
 			complete: function() {

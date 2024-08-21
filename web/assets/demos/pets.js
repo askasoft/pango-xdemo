@@ -301,6 +301,7 @@
 	//
 	function pets_updates() {
 		var $p = $('#pets_bulkedit_popup').popup('update', { keyboard: false });
+		var ids = $p.find('[name=id]').val();
 
 		$.ajax({
 			url: './updates',
@@ -316,37 +317,29 @@
 					text: data.success
 				});
 
-				if ($p.find('[name=id]').val() == '*') {
-					pets_search();
-					return;
-				}
+				var $trs = (ids == '*' ? $('#pets_table > tbody > tr') : main.get_table_trs('#pet_', ids.split(',')));
 
 				var us = data.updates;
-				if (us) {
-					var ids = main.get_table_checked_ids($('#pets_table'));
-					var $trs = main.get_table_trs('#pet_', ids);
-
-					if (us.gender) {
-						$trs.find('td.gender').text(PGM[us.gender]);
-					}
-					if (us.born_at) {
-						$trs.find('td.born_at').text(main.format_date(us.born_at));
-					}
-					if (us.origin) {
-						$trs.find('td.origin').text(POM[us.origin]);
-					}
-					if (us.temper) {
-						$trs.find('td.temper').text(PTM[us.temper]);
-					}
-					if (us.habits) {
-						var hs = [];
-						$.each(us.habits, function(i, h) {
-							hs.push($('<b>').text(PHM[h]));
-						})
-						$trs.find('td.habits').empty().append(hs);
-					}
-					main.blink($trs);
+				if (us.gender) {
+					$trs.find('td.gender').text(PGM[us.gender]);
 				}
+				if (us.born_at) {
+					$trs.find('td.born_at').text(main.format_date(us.born_at));
+				}
+				if (us.origin) {
+					$trs.find('td.origin').text(POM[us.origin]);
+				}
+				if (us.temper) {
+					$trs.find('td.temper').text(PTM[us.temper]);
+				}
+				if (us.habits) {
+					var hs = [];
+					$.each(us.habits, function(i, h) {
+						hs.push($('<b>').text(PHM[h]));
+					})
+					$trs.find('td.habits').empty().append(hs);
+				}
+				main.blink($trs);
 			},
 			error: main.form_ajax_error($p),
 			complete:  function() {
