@@ -20,8 +20,5 @@ func PetResetJobChainStart(tt tenant.Tenant) error {
 }
 
 func PetResetCreateStates() []*jobs.JobRunState {
-	jns := []string{jobs.JobNamePetClear, jobs.JobNamePetCatCreate, jobs.JobNamePetDogCreate}
-
-	states := jobs.JobChainInitStates(jns)
-	return states
+	return jobs.JobChainInitStates(jobs.JobNamePetClear, jobs.JobNamePetCatCreate, jobs.JobNamePetDogCreate)
 }
