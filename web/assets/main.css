@@ -390,12 +390,10 @@ form div.verr {
 	margin-bottom: 1.5rem;
 }
 .s-toolbar > * {
-	margin: 0 5px 5px 0;
+	margin: 0 0.5em 0.5em 0;
 }
-.s-toolbar-rt {
-	position: absolute;
-	right: 50px;
-	text-align: right;
+.s-toolbar > *:last-child {
+	margin-right: 0;
 }
 
 /** menu **/
