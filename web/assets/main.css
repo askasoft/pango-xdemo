@@ -26,13 +26,6 @@
 	--bs-btn-disabled-color: var(--bs-primary);
 	--bs-btn-disabled-border-color: var(--bs-primary);
 }
-.pagination {
-	--bs-pagination-active-bg: var(--bs-primary);
-	--bs-pagination-active-border-color: var(--bs-primary);
-}
-.nav-pills {
-	--bs-nav-pills-link-active-bg: var(--bs-primary);
-}
 
 /** bootswatch5 (cosmo)
 [data-bs-theme=dark] .btn-outline-secondary {
@@ -60,31 +53,6 @@
 **/
 
 /** bootstrap5 customize **/
-/* button */
-.btn-xs {
-	--bs-btn-padding-y: 0.15rem;
-	--bs-btn-padding-x: 0.25rem;
-	--bs-btn-font-size: 0.75rem;
-	--bs-btn-border-radius: var(--bs-border-radius-sm);
-}
-
-/* well */
-.well {
-	margin-bottom: 20px;
-	white-space: pre-wrap;
-}
-
-/* dropdown menu (copy from bootstrap3) */
-.dropdown-menu .divider {
-	height: 1px;
-	margin: 9px 0;
-	overflow: hidden;
-	background-color: #e5e5e5;
-}
-.dropdown-menu > li > a > i {
-	margin-right: 8px;
-}
-
 /* alert */
 .alert.alert-dismissible {
 	padding-right: 3em;
@@ -98,6 +66,45 @@
 .alert .fa-ul .fa-li {
 	font-size: 1.5em;
 	top: -0.1em;
+}
+
+/* button */
+.btn-xs {
+	--bs-btn-padding-y: 0.15rem;
+	--bs-btn-padding-x: 0.25rem;
+	--bs-btn-font-size: 0.75rem;
+	--bs-btn-border-radius: var(--bs-border-radius-sm);
+}
+
+/* dropdown menu (copy from bootstrap3) */
+.dropdown-menu .divider {
+	height: 1px;
+	margin: 9px 0;
+	overflow: hidden;
+	background-color: #e5e5e5;
+}
+.dropdown-menu > li > a > i {
+	margin-right: 8px;
+}
+
+/* nav */
+.nav-pills {
+	--bs-nav-pills-link-active-bg: var(--bs-primary);
+}
+
+/* pagination */
+.pagination {
+	--bs-pagination-active-bg: var(--bs-primary);
+	--bs-pagination-active-border-color: var(--bs-primary);
+	font-family: var(--bs-font-monospace);
+	margin: 0 1em;
+	padding: 0;
+}
+
+/* well */
+.well {
+	margin-bottom: 20px;
+	white-space: pre-wrap;
 }
 
 
