@@ -6,23 +6,10 @@ import (
 	"github.com/askasoft/pango/str"
 )
 
-const (
-	StyleChecks         = "C"
-	StyleVerticalChecks = "L"
-	StyleOrders         = "O"
-	StyleRadios         = "R"
-	StyleVerticalRadios = "V"
-	StyleSingleSelect   = "S"
-	StyleMultiSelect    = "M"
-	StyleTextarea       = "T"
-	StyleNumeric        = "N"
-	StyleDecimal        = "D"
-)
-
 type Config struct {
 	Name       string    `gorm:"size:64;not null;primaryKey"`
 	Value      string    `gorm:"not null"`
-	Style      string    `gorm:"size:1;not null"`
+	Style      string    `gorm:"size:2;not null"`
 	Order      int       `gorm:"not null"`
 	Required   bool      `gorm:"not null"`
 	Secret     bool      `gorm:"not null"`

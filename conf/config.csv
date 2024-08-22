@@ -1,4 +1,4 @@
 ﻿Name,Value,Style,Order,Required,Secret,Viewer,Editor,Validation
 secure_client_cidr,,T,11,FALSE,FALSE,A,A,cidrs
 password_policy_minlen,8,N,12,FALSE,FALSE,A,A,btw=8 ~ 64
-password_policy_strength,,L,13,FALSE,FALSE,A,A,
+password_policy_strength,,VC,13,FALSE,FALSE,A,A,

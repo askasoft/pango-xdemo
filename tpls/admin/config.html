@@ -56,19 +56,19 @@
 								{{if eq $c.Style "C"}}
 									<input type="checkbox" name="{{$c.Name}}" value="" checked{{if $ro}} disabled{{end}} style="display:none">
 									{{Checks "Name=" $c.Name "List=" (MapGet $.Lists $c.Name) "Values=" $c.Values "Disabled=" $ro}}
-								{{else if eq $c.Style "L"}}
+								{{else if eq $c.Style "VC"}}
 									<input type="checkbox" name="{{$c.Name}}" value="" checked{{if $ro}} disabled{{end}} style="display:none">
 									{{Checks "Name=" $c.Name "List=" (MapGet $.Lists $c.Name) "Values=" $c.Values "Disabled=" $ro "class=" "vertical"}}
-								{{else if eq $c.Style "O"}}
+								{{else if eq $c.Style "OC"}}
 									<input type="checkbox" name="{{$c.Name}}" value="" checked{{if $ro}} disabled{{end}} style="display:none">
 									{{Checks "Name=" $c.Name "List=" (MapGet $.Lists $c.Name) "Values=" $c.Values "Disabled=" $ro "Ordered=" true "class=" "vertical"}}
 								{{else if eq $c.Style "R"}}
 									{{Radios "Name=" $c.Name "List=" (MapGet $.Lists $c.Name) "Value=" $c.Value "Disabled=" $ro}}
-								{{else if eq $c.Style "V"}}
+								{{else if eq $c.Style "VR"}}
 									{{Radios "Name=" $c.Name "List=" (MapGet $.Lists $c.Name) "Value=" $c.Value "Disabled=" $ro "class=" "vertical"}}
 								{{else if eq $c.Style "S"}}
 									{{Select "Name=" $c.Name "List=" (MapGet $.Lists $c.Name) "Value=" $c.Value "Disabled=" $ro "data-spy=" "niceSelect" "class=" "wide"}}
-								{{else if eq $c.Style "M"}}
+								{{else if eq $c.Style "MS"}}
 									{{Select "Name=" $c.Name "List=" (MapGet $.Lists $c.Name) "Multiple=" true "Values=" $c.Values "Disabled=" $ro "data-spy=" "niceSelect" "class=" "wide"}}
 								{{else if eq $c.Style "T"}}
 									<textarea name="{{$c.Name}}" class="form-control" rows="2" textclear enterfire{{if $ro}} disabled{{end}}>

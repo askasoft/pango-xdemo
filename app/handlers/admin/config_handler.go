@@ -22,6 +22,19 @@ import (
 	"github.com/askasoft/pango/xin"
 )
 
+const (
+	StyleChecks         = "C"
+	StyleVerticalChecks = "VC"
+	StyleOrderedChecks  = "OC"
+	StyleRadios         = "R"
+	StyleVerticalRadios = "VR"
+	StyleSelect         = "S"
+	StyleMultiSelect    = "MS"
+	StyleTextarea       = "T"
+	StyleNumeric        = "N"
+	StyleDecimal        = "D"
+)
+
 type ConfigGroup struct {
 	Name  string           `json:"name"`
 	Items []*models.Config `json:"items"`
@@ -122,13 +135,13 @@ func ConfigSave(c *xin.Context) {
 	db := app.GDB.Begin()
 	for _, cfg := range configs {
 		switch cfg.Style {
-		case models.StyleChecks, models.StyleVerticalChecks, models.StyleOrders, models.StyleMultiSelect:
+		case StyleChecks, StyleVerticalChecks, StyleOrderedChecks, StyleMultiSelect:
 			vs, ok = c.GetPostFormArray(cfg.Name)
 			if ok {
 				vs = str.RemoveEmpties(vs)
 				v = str.Join(vs, "\t")
 			}
-		case models.StyleNumeric:
+		case StyleNumeric:
 			v, ok = c.GetPostForm(cfg.Name)
 			if ok {
 				if !str.IsNumeric(v) {
@@ -139,7 +152,7 @@ func ConfigSave(c *xin.Context) {
 					continue
 				}
 			}
-		case models.StyleDecimal:
+		case StyleDecimal:
 			v, ok = c.GetPostForm(cfg.Name)
 			if ok {
 				if !str.IsDecimal(v) {
@@ -173,9 +186,9 @@ func ConfigSave(c *xin.Context) {
 		if validation != "" {
 			var vv any
 			switch cfg.Style {
-			case models.StyleNumeric:
+			case StyleNumeric:
 				vv = num.Atol(v)
-			case models.StyleDecimal:
+			case StyleDecimal:
 				vv = num.Atof(v)
 			default:
 				vv = v
