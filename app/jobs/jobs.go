@@ -77,16 +77,31 @@ type ArgLocale struct {
 	Locale string `json:"locale,omitempty"`
 }
 
-type ArgStartEnd struct {
+type ArgItems struct {
+	Items int `json:"items,omitempty" form:"items"`
+}
+
+type IPeriod interface {
+	Period() *ArgPeriod
+}
+
+type ArgPeriod struct {
 	Start time.Time `json:"start,omitempty" form:"start"`
 	End   time.Time `json:"end,omitempty" form:"end" validate:"omitempty,gtefield=Start"`
 }
 
-func (ase *ArgStartEnd) Bind(c *xin.Context, a any) error {
+func (ap *ArgPeriod) Period() *ArgPeriod {
+	return ap
+}
+
+func ArgBind(c *xin.Context, a any) error {
 	err := c.Bind(a)
 
-	if !ase.End.IsZero() {
-		ase.End = ase.End.Add(time.Hour*24 - time.Microsecond)
+	if ip, ok := a.(IPeriod); ok {
+		ap := ip.Period()
+		if !ap.End.IsZero() {
+			ap.End = ap.End.Add(time.Hour*24 - time.Microsecond)
+		}
 	}
 
 	return err
@@ -122,17 +137,7 @@ func (js *JobState) Progress() string {
 }
 
 func (js *JobState) String() string {
-	s := js.Progress()
-	if js.Skipped > 0 {
-		s += fmt.Sprintf(" -%d", js.Skipped)
-	}
-	if js.Success > 0 {
-		s += fmt.Sprintf(" +%d", js.Success)
-	}
-	if js.Failure > 0 {
-		s += fmt.Sprintf(" !%d", js.Failure)
-	}
-	return s
+	return fmt.Sprintf("[%d/%d/%d] (-%d|+%d|!%d)", js.Step, js.Limit, js.Total, js.Skipped, js.Success, js.Failure)
 }
 
 func (js *JobState) State() JobState {
