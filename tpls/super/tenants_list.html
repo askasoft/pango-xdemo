@@ -20,13 +20,13 @@
 	<tbody>
 		{{$n := .Q.Begin}}
 		{{range $i, $t := .Tenants}}
-		<tr id="tenant_{{$t.Name}}">
+		<tr id="tenant_{{$t.Name}}" data-default="{{$t.Default}}" data-current="{{$t.Current}}">
 			<td class="no">{{Add $n $i}}</td>
 			<td class="name">{{$t.Name}}</td>
 			<td class="domain"><a href="//{{$t.Prefix}}{{$.Domain}}" target="_blank">{{$t.Prefix}}{{$.Domain}}</a></td>
 			<td class="actions">
-				{{if and (ne $.TT $t.Name) (not $t.Default)}}
 				<button class="btn btn-outline-primary edit" title="{{T $.Loc "button.edit"}}">{{I "edit"}}</button>
+				{{if and (not $t.Current) (not $t.Default)}}
 				<button class="btn btn-outline-danger delete" title="{{T $.Loc "button.delete"}}">{{I "delete"}}</button>
 				{{end}}
 			</td>
@@ -43,11 +43,11 @@
 		<td class="no"></td>
 		<td class="name"></td>
 		<td class="domain"><a href="#" target="_blank"></a></td>
-		<td class="size"></td>
 		<td class="actions">
 			<button class="btn btn-outline-primary edit" title="{{T .Loc "button.edit"}}">{{I "edit"}}</button>
 			<button class="btn btn-outline-danger delete" title="{{T $.Loc "button.delete"}}">{{I "delete"}}</button>
 		</td>
+		<td class="size"></td>
 		<td class="comment"><pre></pre></td>
 	</tr>
 </table>

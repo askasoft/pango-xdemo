@@ -12,6 +12,7 @@ import (
 
 type TenantInfo struct {
 	gormutil.SchemaInfo
+	Current bool `json:"current,omitempty"`
 	Default bool `json:"default,omitempty"`
 }
 
@@ -24,27 +25,6 @@ func (ti *TenantInfo) Prefix() string {
 
 type TenantQuery struct {
 	gormutil.SchemaQuery
-}
-
-func findTenants(tq *TenantQuery) (tenants []*TenantInfo, err error) {
-	var schemas []*gormutil.SchemaInfo
-
-	schemas, err = tenant.FindSchemas(&tq.SchemaQuery)
-	if err != nil || len(schemas) == 0 {
-		return
-	}
-
-	ds := tenant.DefaultSchema()
-
-	tenants = make([]*TenantInfo, len(schemas))
-	for i, si := range schemas {
-		ti := &TenantInfo{SchemaInfo: *si}
-		if ti.Name == ds {
-			ti.Default = true
-		}
-		tenants[i] = ti
-	}
-	return
 }
 
 func tenantListArgs(c *xin.Context) (tq *TenantQuery, err error) {
@@ -85,11 +65,26 @@ func TenantList(c *xin.Context) {
 	h := handlers.H(c)
 
 	if tq.Total > 0 {
-		tenants, err := findTenants(tq)
+		schemas, err := tenant.FindSchemas(&tq.SchemaQuery)
 		if err != nil {
 			c.AddError(err)
 			c.JSON(http.StatusBadRequest, handlers.E(c))
 			return
+		}
+
+		tt := tenant.FromCtx(c)
+		ds := tenant.DefaultSchema()
+
+		tenants := make([]*TenantInfo, len(schemas))
+		for i, si := range schemas {
+			ti := &TenantInfo{SchemaInfo: *si}
+			if ti.Name == tt.Schema() {
+				ti.Current = true
+			}
+			if ti.Name == ds {
+				ti.Default = true
+			}
+			tenants[i] = ti
 		}
 
 		h["Tenants"] = tenants

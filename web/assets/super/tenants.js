@@ -87,6 +87,7 @@
 		var $tr = $(this).closest('tr'), $p = $('#tenants_update_popup');
 		$p.find('[name=oname], [name=name]').val($tr.find('.name').text());
 		$p.find('[name=comment]').val($tr.find('.comment > pre').text());
+		$p.find('[name=name]').prop('readonly', $tr.data('current') || $tr.data('default') || false);
 		$p.popup('show');
 		return false;
 	}
