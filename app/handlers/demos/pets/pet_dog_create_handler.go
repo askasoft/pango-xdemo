@@ -41,7 +41,7 @@ func (pdcjc *PetDogCreateJobController) Start(c *xin.Context) {
 
 	pdca := pets.NewPetDogCreateArg(tt, c.Locale)
 	if err := pdca.Bind(c); err != nil {
-		vadutil.AddBindErrors(c, err, "job.param.")
+		vadutil.AddBindErrors(c, err, "pet.create.")
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}

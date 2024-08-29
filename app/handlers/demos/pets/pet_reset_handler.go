@@ -8,6 +8,7 @@ import (
 	"github.com/askasoft/pango-xdemo/app/jobs/pets"
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
+	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
 	"github.com/askasoft/pango/xin"
 )
 
@@ -42,9 +43,14 @@ func (prjcc *PetResetJobChainController) Index(c *xin.Context) {
 func (prjcc *PetResetJobChainController) Start(c *xin.Context) {
 	tt := tenant.FromCtx(c)
 
-	prjcc.JobName = jobs.JobNamePetClear
 	pca := pets.NewPetClearArg(tt, c.Locale)
-	pca.Bind(c)
+	if err := pca.Bind(c); err != nil {
+		vadutil.AddBindErrors(c, err, "pet.clear.")
+		c.JSON(http.StatusBadRequest, handlers.E(c))
+		return
+	}
+
+	prjcc.JobName = jobs.JobNamePetClear
 	prjcc.JobParam = pca.(jobs.ISetChainID)
 	prjcc.ChainStates = pets.PetResetCreateStates()
 	prjcc.JobChainController.Start(c)
