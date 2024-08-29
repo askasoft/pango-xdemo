@@ -1,6 +1,6 @@
 (function($) {
 	function login() {
-		var $f = $('#login_form');
+		var $f = $('#login_form'), $la = $('#login_alert').empty();
 		
 		$.ajax({
 			url: './login',
@@ -9,15 +9,23 @@
 			dataType: 'json',
 			beforeSend: main.form_ajax_start($f),
 			success: function(data) {
-				$.toast({
-					icon: 'success',
-					text: data.success
-				});
+				if (data.mfa) {
+					main.show_alert($la, 'primary', data.message);
+					$f.find('input[name=passcode]').closest('.row').removeClass('hidden');
+					return;
+				}
 
-				setTimeout(function() {
-					var origin = $f.find('input[name=origin]').val() || main.base || '/';
-					location.href = origin;
-				}, 500);
+				if (data.success) {
+					$.toast({
+						icon: 'success',
+						text: data.success
+					});
+	
+					setTimeout(function() {
+						var origin = $f.find('input[name=origin]').val() || main.base || '/';
+						location.href = origin;
+					}, 500);
+				}
 			},
 			error: main.form_ajax_error($f),
 			complete: main.form_ajax_end($f)

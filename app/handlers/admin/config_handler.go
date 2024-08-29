@@ -143,25 +143,21 @@ func ConfigSave(c *xin.Context) {
 			}
 		case StyleNumeric:
 			v, ok = c.GetPostForm(cfg.Name)
-			if ok {
-				if !str.IsNumeric(v) {
-					c.AddError(&vadutil.ParamError{
-						Param:   cfg.Name,
-						Message: tbs.Format(c.Locale, "error.param.numeric", tbs.GetText(c.Locale, "config."+cfg.Name)),
-					})
-					continue
-				}
+			if ok && v != "" && !str.IsNumeric(v) {
+				c.AddError(&vadutil.ParamError{
+					Param:   cfg.Name,
+					Message: tbs.Format(c.Locale, "error.param.numeric", tbs.GetText(c.Locale, "config."+cfg.Name)),
+				})
+				continue
 			}
 		case StyleDecimal:
 			v, ok = c.GetPostForm(cfg.Name)
-			if ok {
-				if !str.IsDecimal(v) {
-					c.AddError(&vadutil.ParamError{
-						Param:   cfg.Name,
-						Message: tbs.Format(c.Locale, "error.param.decimal", tbs.GetText(c.Locale, "config."+cfg.Name)),
-					})
-					continue
-				}
+			if ok && v != "" && !str.IsDecimal(v) {
+				c.AddError(&vadutil.ParamError{
+					Param:   cfg.Name,
+					Message: tbs.Format(c.Locale, "error.param.decimal", tbs.GetText(c.Locale, "config."+cfg.Name)),
+				})
+				continue
 			}
 		default:
 			v, ok = c.GetPostForm(cfg.Name)

@@ -229,6 +229,32 @@ var main = {
 		};
 	},
 
+	// show alert
+	show_alert: function($c, type, msgs) {
+		var icons = {
+			'danger': 'fa-circle-exclamation',
+			'warning': 'fa-triangle-exclamation',
+			'success': 'fa-check',
+			'primary': 'fa-circle-info'
+		};
+
+		var $a = $('<div class="alert alert-primary alert-dismissible"></div>').appendTo($c);
+		$('<button type="button" class="btn-close" data-bs-dismiss="alert"></button>').appendTo($a);
+
+		var $ul = $('<ul class="fa-ul"></ul>').appendTo($a);
+		var add = function(i, msg) {
+			var $li = $('<li><span class="fa-li"><i class="fas fa-fw ' + icons[type] + '"></i></span></li>');
+			var $sp = $('<span></span>').text(msg);
+			$li.append($sp).appendTo($ul);
+		};
+
+		if ($.isArray(msgs)) {
+			$.each(msgs, add);
+		} else {
+			add(0, msgs);
+		}
+	},
+
 	// list
 	list_init: function(name, sskey) {
 		var $l = $('#' + name + '_list'), $f = $('#' + name + '_listform'), tb = '#' + name + '_table';

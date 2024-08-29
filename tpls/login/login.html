@@ -29,6 +29,12 @@
 					<input name="password" type="password" class="form-control" maxlength="250" textclear/>
 				</div>
 			</div>
+			<div class="row hidden">
+				<label class="col-md-3 col-form-label">{{T .Loc "login.passcode"}}</label>
+				<div class="col-md-8">
+					<input name="passcode" type="text" class="form-control" maxlength="250" textclear/>
+				</div>
+			</div>
 			<div class="row">
 				<div class="offset-md-3 col">
 					<button type="submit" class="btn btn-primary">{{I "login"}} {{T .Loc "button.login"}}</button>

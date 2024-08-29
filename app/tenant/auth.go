@@ -126,12 +126,11 @@ func CheckClientIP(c *xin.Context, u *models.User) bool {
 }
 
 //----------------------------------------------------
-// handlers
+// AFIP
 
 func AuthPassed(c *xin.Context) {
 	cip := c.ClientIP()
 	app.AFIPS.Delete(cip)
-	c.Next()
 }
 
 func AuthFailed(c *xin.Context) {
@@ -143,12 +142,15 @@ func AuthFailed(c *xin.Context) {
 	}
 }
 
+//----------------------------------------------------
+// middleware
+
+func BasicAuthPassed(c *xin.Context) {
+	AuthPassed(c)
+	app.XBA.Authorized(c)
+}
+
 func BasicAuthFailed(c *xin.Context) {
 	AuthFailed(c)
 	app.XBA.Unauthorized(c)
-}
-
-func CookieAuthFailed(c *xin.Context) {
-	AuthFailed(c)
-	app.XCA.Unauthorized(c)
 }
