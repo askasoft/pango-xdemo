@@ -52,7 +52,7 @@ func JobChainStart(tt tenant.Tenant, chainName string, states []*JobRunState, jo
 			return err
 		}
 
-		jobParam.SetChain(cid, chainData)
+		jobParam.SetChain(cid, 0, chainData)
 		jParam := xjm.MustEncode(jobParam)
 
 		gjm := tt.GJM(db)
@@ -246,12 +246,12 @@ func (jr *JobRunner) jobChainContinue() error {
 		return err
 	}
 	if next != nil && status == xjm.JobChainRunning {
-		return JobChainAppendJob(next.Name, jr.Tenant, jr.Locale, jr.ChainID, jr.ChainData)
+		return JobChainAppendJob(next.Name, jr.Tenant, jr.Locale, jr.ChainID, jr.ChainSeq+1, jr.ChainData)
 	}
 	return nil
 }
 
-func JobChainAppendJob(name string, tt tenant.Tenant, locale string, cid int64, cdt bool) error {
+func JobChainAppendJob(name string, tt tenant.Tenant, locale string, cid int64, csq int, cdt bool) error {
 	tjm := tt.JM()
 
 	var arg any
@@ -263,7 +263,7 @@ func JobChainAppendJob(name string, tt tenant.Tenant, locale string, cid int64, 
 	}
 
 	if isc, ok := arg.(ISetChain); ok {
-		isc.SetChain(cid, cdt)
+		isc.SetChain(cid, csq, cdt)
 	} else {
 		return fmt.Errorf("Invalid chain job %q", name)
 	}

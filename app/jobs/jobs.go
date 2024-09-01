@@ -62,17 +62,23 @@ func RegisterJobArg(name string, jac JobArgCreater) {
 }
 
 type ISetChain interface {
-	SetChain(chainID int64, chainData bool)
+	SetChain(chainID int64, chainSeq int, chainData bool)
 }
 
 type ArgChain struct {
 	ChainID   int64 `json:"chain_id,omitempty"`
+	ChainSeq  int   `json:"chain_seq,omitempty"`
 	ChainData bool  `json:"chain_data,omitempty" form:"chain_data"`
 }
 
-func (ac *ArgChain) SetChain(cid int64, cdt bool) {
+func (ac *ArgChain) SetChain(cid int64, csq int, cdt bool) {
 	ac.ChainID = cid
+	ac.ChainSeq = csq
 	ac.ChainData = cdt
+}
+
+func (ac *ArgChain) ShouldChainData() bool {
+	return ac.ChainData && ac.ChainSeq > 0
 }
 
 type ArgLocale struct {
