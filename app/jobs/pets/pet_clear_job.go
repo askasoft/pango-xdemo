@@ -48,7 +48,7 @@ func NewPetClearJob(tt tenant.Tenant, job *xjm.Job) jobs.IRun {
 	xjm.MustDecode(job.Param, &pc.arg)
 
 	pc.Locale = pc.arg.Locale
-	pc.ChainID = pc.arg.ChainID
+	pc.ArgChain = pc.arg.ArgChain
 
 	return pc
 }

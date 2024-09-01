@@ -52,7 +52,7 @@ func NewPetDogCreateJob(tt tenant.Tenant, job *xjm.Job) jobs.IRun {
 	xjm.MustDecode(job.Param, &pdc.arg)
 
 	pdc.Locale = pdc.arg.Locale
-	pdc.ChainID = pdc.arg.ChainID
+	pdc.ArgChain = pdc.arg.ArgChain
 
 	return pdc
 }

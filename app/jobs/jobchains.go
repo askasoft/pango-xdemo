@@ -42,7 +42,7 @@ func JobChainInitStates(jns ...string) []*JobRunState {
 	return states
 }
 
-func JobChainStart(tt tenant.Tenant, chainName string, states []*JobRunState, jobName string, jobFile string, jobParam ISetChainID) (cid int64, err error) {
+func JobChainStart(tt tenant.Tenant, chainName string, states []*JobRunState, jobName string, jobFile string, jobParam ISetChain, chainData bool) (cid int64, err error) {
 	state := JobChainEncodeStates(states)
 
 	err = app.GDB.Transaction(func(db *gorm.DB) error {
@@ -52,7 +52,7 @@ func JobChainStart(tt tenant.Tenant, chainName string, states []*JobRunState, jo
 			return err
 		}
 
-		jobParam.SetChainID(cid)
+		jobParam.SetChain(cid, chainData)
 		jParam := xjm.MustEncode(jobParam)
 
 		gjm := tt.GJM(db)
@@ -246,12 +246,12 @@ func (jr *JobRunner) jobChainContinue() error {
 		return err
 	}
 	if next != nil && status == xjm.JobChainRunning {
-		return JobChainAppendJob(jr.Tenant, jr.ChainID, next.Name, jr.Locale)
+		return JobChainAppendJob(next.Name, jr.Tenant, jr.Locale, jr.ChainID, jr.ChainData)
 	}
 	return nil
 }
 
-func JobChainAppendJob(tt tenant.Tenant, cid int64, name string, locale string) error {
+func JobChainAppendJob(name string, tt tenant.Tenant, locale string, cid int64, cdt bool) error {
 	tjm := tt.JM()
 
 	var arg any
@@ -262,8 +262,8 @@ func JobChainAppendJob(tt tenant.Tenant, cid int64, name string, locale string) 
 		return fmt.Errorf("Invalid chain job %q", name)
 	}
 
-	if isc, ok := arg.(ISetChainID); ok {
-		isc.SetChainID(cid)
+	if isc, ok := arg.(ISetChain); ok {
+		isc.SetChain(cid, cdt)
 	} else {
 		return fmt.Errorf("Invalid chain job %q", name)
 	}

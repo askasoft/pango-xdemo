@@ -9,7 +9,7 @@ func PetResetJobChainStart(tt tenant.Tenant) error {
 	pca := NewPetClearArg(tt, "")
 
 	states := PetResetCreateStates()
-	cid, err := jobs.JobChainStart(tt, jobs.JobChainPetReset, states, jobs.JobNamePetClear, "", pca.(jobs.ISetChainID))
+	cid, err := jobs.JobChainStart(tt, jobs.JobChainPetReset, states, jobs.JobNamePetClear, "", pca.(jobs.ISetChain), false)
 	if err != nil {
 		tt.Logger("PET").Errorf("Failed to start PetReset JobChain: %v", err)
 		return err

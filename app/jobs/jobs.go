@@ -61,16 +61,18 @@ func RegisterJobArg(name string, jac JobArgCreater) {
 	jobArgCreators[name] = jac
 }
 
-type ISetChainID interface {
-	SetChainID(int64)
+type ISetChain interface {
+	SetChain(chainID int64, chainData bool)
 }
 
 type ArgChain struct {
-	ChainID int64 `json:"chain_id,omitempty"`
+	ChainID   int64 `json:"chain_id,omitempty"`
+	ChainData bool  `json:"chain_data,omitempty" form:"chain_data"`
 }
 
-func (ac *ArgChain) SetChainID(cid int64) {
+func (ac *ArgChain) SetChain(cid int64, cdt bool) {
 	ac.ChainID = cid
+	ac.ChainData = cdt
 }
 
 type ArgLocale struct {
@@ -105,6 +107,11 @@ func ArgBind(c *xin.Context, a any) error {
 	}
 
 	return err
+}
+
+type ArgIDRange struct {
+	IdFrom int64 `json:"id_from,omitempty" form:"id_from"`
+	IdTo   int64 `json:"id_to,omitempty" form:"id_to" validate:"omitempty,gtefield=IdFrom"`
 }
 
 type iState interface {
@@ -192,10 +199,10 @@ func (ce *ClientError) Unwrap() error {
 
 type JobRunner struct {
 	*xjm.JobRunner
+	ArgChain
 
-	Tenant  tenant.Tenant
-	Locale  string
-	ChainID int64
+	Tenant tenant.Tenant
+	Locale string
 }
 
 func NewJobRunner(tt tenant.Tenant, jnm string, jid int64) *JobRunner {
