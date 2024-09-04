@@ -1,61 +1,62 @@
+{{$p := .Pet}}
 <div class="ui-popup-header">
 	<h4>{{I "demos.pets.detail"}}
 		{{T .Loc "pet.detail.header"}}
-		#{{.Pet.ID}}
+		#{{$p.ID}}
 	</h4>
 </div>
 <div class="ui-popup-body grey">
 	<div class="ui-view lined label-bold">
-		<input type="hidden" id="pet_detail_id" name="id" value="{{.Pet.ID}}"/>
+		<input type="hidden" id="pet_detail_id" name="id" value="{{$p.ID}}"/>
 		<div class="row">
 			<label class="col-md-2 ui-label">{{T .Loc "pet.name"}}</label>
-			<div class="col-md-10 ui-value">{{.Pet.Name}}</div>
+			<div class="col-md-10 ui-value">{{$p.Name}}</div>
 		</div>
 		<div class="row">
 			<label class="col-md-2 ui-label">{{T .Loc "pet.photo"}}</label>
-			<div class="col-md-10 ui-value"><img src="{{.Base}}/files{{.Pet.PhotoURI}}"></div>
+			<div class="col-md-10 ui-value"><img src="{{.Base}}/files{{$p.PhotoURI}}"></div>
 		</div>
 		<div class="row">
 			<label class="col-2 ui-label">{{T .Loc "pet.gender"}}</label>
-			<div class="col-4 ui-value">{{.PetGenderMap.MustGet .Pet.Gender .Pet.Gender}}</div>
+			<div class="col-4 ui-value">{{.PetGenderMap.MustGet $p.Gender $p.Gender}}</div>
 			<label class="col-2 ui-label">{{T .Loc "pet.born_at"}}</label>
-			<div class="col-4 ui-value">{{DATE .Pet.BornAt}}</div>
+			<div class="col-4 ui-value">{{DATE $p.BornAt}}</div>
 		</div>
 		<div class="row">
 			<label class="col-2 ui-label">{{T .Loc "pet.origin"}}</label>
-			<div class="col-10 ui-value">{{.PetOriginMap.MustGet .Pet.Origin .Pet.Origin}}</div>
+			<div class="col-10 ui-value">{{.PetOriginMap.MustGet $p.Origin $p.Origin}}</div>
 		</div>
 		<div class="row">
 			<label class="col-2 ui-label">{{T .Loc "pet.temper"}}</label>
-			<div class="col-4 ui-value">{{.PetTemperMap.MustGet .Pet.Temper .Pet.Temper}}</div>
+			<div class="col-4 ui-value">{{.PetTemperMap.MustGet $p.Temper $p.Temper}}</div>
 			<label class="col-2 ui-label">{{T .Loc "pet.habits"}}</label>
-			<div class="col-4 ui-value">{{range $h := .Pet.Habits}}<b>{{$.PetHabitsMap.MustGet $h $h}}</b>{{end}}</div>
+			<div class="col-4 ui-value">{{range $h := $p.Habits}}<b>{{$.PetHabitsMap.MustGet $h $h}}</b>{{end}}</div>
 		</div>
 		<div class="row">
 			<label class="col-2 ui-label">{{T .Loc "pet.amount"}}</label>
-			<div class="col-4 ui-value">{{.Pet.Amount}}</div>
+			<div class="col-4 ui-value">{{$p.Amount}}</div>
 			<label class="col-2 ui-label">{{T .Loc "pet.price"}}</label>
-			<div class="col-4 ui-value">{{.Pet.Price}}</div>
+			<div class="col-4 ui-value">{{$p.Price}}</div>
 		</div>
 		<div class="row">
 			<label class="col-md-2 ui-label">{{T .Loc "pet.shop_name"}}</label>
-			<div class="col-md-10 ui-value">{{.Pet.ShopName}}</div>
+			<div class="col-md-10 ui-value">{{$p.ShopName}}</div>
 		</div>
 		<div class="row">
 			<label class="col-md-2 ui-label">{{T .Loc "pet.shop_address"}}</label>
-			<div class="col-md-10 ui-value">{{.Pet.ShopAddress}}</div>
+			<div class="col-md-10 ui-value">{{$p.ShopAddress}}</div>
 		</div>
 		<div class="row">
 			<label class="col-md-2 ui-label">{{T .Loc "pet.shop_telephone"}}</label>
-			<div class="col-md-10 ui-value">{{.Pet.ShopTelephone}}</div>
+			<div class="col-md-10 ui-value">{{$p.ShopTelephone}}</div>
 		</div>
 		<div class="row">
 			<label class="col-md-2 ui-label">{{T .Loc "pet.shop_link"}}</label>
-			<div class="col-md-10 ui-value">{{if .Pet.ShopLink}}<a href="{{.Pet.ShopLink}}" taret="_blank">{{.Pet.ShopLink}}</a>{{end}}</div>
+			<div class="col-md-10 ui-value">{{if $p.ShopLink}}<a href="{{$p.ShopLink}}" taret="_blank">{{$p.ShopLink}}</a>{{end}}</div>
 		</div>
 		<div class="row">
 			<label class="col-md-2 ui-label">{{T .Loc "pet.description"}}</label>
-			<div class="col-md-10 ui-value"><pre>{{.Pet.Description}}</pre></div>
+			<div class="col-md-10 ui-value"><pre>{{$p.Description}}</pre></div>
 		</div>
 	</div>
 </div>

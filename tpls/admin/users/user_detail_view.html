@@ -1,32 +1,33 @@
+{{$u := .User}}
 <div class="ui-popup-header">
 	<h4>{{I "user.detail"}}
 		{{T .Loc "user.detail.header"}}
-		#{{.User.ID}}
+		#{{$u.ID}}
 	</h4>
 </div>
 <div class="ui-popup-body grey">
 	<div class="ui-view lined label-bold">
-		<input type="hidden" id="user_detail_id" name="id" value="{{.User.ID}}"/>
+		<input type="hidden" id="user_detail_id" name="id" value="{{$u.ID}}"/>
 		<div class="row">
 			<label class="col-md-2 ui-label">{{T .Loc "user.name"}}</label>
-			<div class="col-md-10 ui-value">{{.User.Name}}</div>
+			<div class="col-md-10 ui-value">{{$u.Name}}</div>
 		</div>
 		<div class="row">
 			<label class="col-md-2 ui-label">{{T .Loc "user.email"}}</label>
-			<div class="col-md-10 ui-value">{{.User.Email}}</div>
+			<div class="col-md-10 ui-value">{{$u.Email}}</div>
 		</div>
 		<div class="row">
 			<label class="col-md-2 ui-label">{{T .Loc "user.role"}}</label>
-			<div class="col-md-10 ui-value">{{.UserRoleMap.MustGet .User.Role .User.Role}}</div>
+			<div class="col-md-10 ui-value">{{.UserRoleMap.MustGet $u.Role $u.Role}}</div>
 		</div>
 		<div class="row">
 			<label class="col-md-2 ui-label">{{T .Loc "user.status"}}</label>
-			<div class="col-md-10 ui-value">{{.UserStatusMap.MustGet .User.Status .User.Status}}
+			<div class="col-md-10 ui-value">{{.UserStatusMap.MustGet $u.Status $u.Status}}
 			</div>
 		</div>
 		<div class="row">
 			<label class="col-md-2 ui-label">{{T .Loc "user.cidr"}}</label>
-			<div class="col-md-10 ui-value"><pre>{{.User.CIDR}}</pre></div>
+			<div class="col-md-10 ui-value"><pre>{{$u.CIDR}}</pre></div>
 		</div>
 	</div>
 </div>
