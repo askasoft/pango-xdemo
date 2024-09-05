@@ -389,8 +389,6 @@ func addSuperHandlers(rg *xin.RouterGroup) {
 	rg.Use(RoleRootProtect)   // role protect
 	rg.Use(app.XTP.Handler()) // token protect
 
-	// rg.GET("/", super.Index)
-
 	addSuperTenantHandlers(rg.Group("/tenants"))
 	addSuperJobHandlers(rg.Group("/job"))
 	addSuperShellHandlers(rg.Group("/shell"))

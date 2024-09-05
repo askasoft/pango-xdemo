@@ -23,7 +23,7 @@
 		<tr id="tenant_{{$t.Name}}" data-default="{{$t.Default}}" data-current="{{$t.Current}}">
 			<td class="no">{{Add $n $i}}</td>
 			<td class="name">{{$t.Name}}</td>
-			<td class="domain"><a href="//{{$t.Prefix}}{{$.Domain}}" target="_blank">{{$t.Prefix}}{{$.Domain}}</a></td>
+			<td class="domain"><a href="//{{$t.Name}}.{{$.Domain}}" target="_blank">{{$t.Name}}.{{$.Domain}}</a></td>
 			<td class="actions">
 				<button class="btn btn-outline-primary edit" title="{{T $.Loc "button.edit"}}">{{I "edit"}}</button>
 				{{if and (not $t.Current) (not $t.Default)}}

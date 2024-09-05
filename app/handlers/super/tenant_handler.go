@@ -16,13 +16,6 @@ type TenantInfo struct {
 	Default bool `json:"default,omitempty"`
 }
 
-func (ti *TenantInfo) Prefix() string {
-	if ti.Default {
-		return ""
-	}
-	return ti.Name + "."
-}
-
 type TenantQuery struct {
 	gormutil.SchemaQuery
 }
