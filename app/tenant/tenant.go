@@ -22,7 +22,7 @@ import (
 type Tenant string
 
 func IsMultiTenant() bool {
-	return app.INI.GetBool("app", "tenants")
+	return app.INI.GetBool("tenant", "multiple")
 }
 
 // TENAS write lock
@@ -152,8 +152,12 @@ func (tt Tenant) FQDN() string {
 	return string(tt) + "." + app.Domain
 }
 
+func (tt Tenant) IsDefault() bool {
+	return tt == "" || string(tt) == DefaultSchema()
+}
+
 func (tt Tenant) Schema() string {
-	if len(tt) == 0 {
+	if tt == "" {
 		return DefaultSchema()
 	}
 	return string(tt)
@@ -250,4 +254,3 @@ func (tt Tenant) TableUsers() string {
 func (tt Tenant) TablePets() string {
 	return tt.Table("pets")
 }
-

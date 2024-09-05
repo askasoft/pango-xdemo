@@ -13,7 +13,7 @@
 
 		{{if and .AU .AU.IsSuper}}
 			<hr/>
-			{{if eq .CFG.app.tenants "true"}}
+			{{if and .TT.IsDefault (eq .CFG.tenant.multiple "true")}}
 			<a class="s-menu-item" href="{{.Base}}/s/tenants/">{{I "super.tenants" "fa-4x"}}<div>{{T .Loc "menu.super.tenants"}}</div></a>
 			{{end}}
 			<a class="s-menu-item" href="{{.Base}}/s/job/">{{I "super.job" "fa-4x"}}<div>{{T .Loc "menu.super.job"}}</div></a>

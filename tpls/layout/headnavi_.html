@@ -30,14 +30,14 @@
 			{{.AU.Initials}}
 		</button>
 		<ul class="dropdown-menu dropdown-menu-end">
-			{{if .AU.IsSuper}}
+			{{if and .TT.IsDefault .AU.IsSuper}}
+			{{if eq .CFG.tenant.multiple "true"}}
+			<li><a class="dropdown-item" href="{{.Base}}/s/tenants/">{{I "super.tenants"}}<span>{{T .Loc "menu.super.tenants"}}</span></a></li>
+			{{end}}
 			<li><a class="dropdown-item" href="{{.Base}}/s/job/">{{I "super.job"}}<span>{{T .Loc "menu.super.job"}}</span></a></li>
 			<li><a class="dropdown-item" href="{{.Base}}/s/shell/">{{I "super.shell"}}<span>{{T .Loc "menu.super.shell"}}</span></a></li>
 			<li><a class="dropdown-item" href="{{.Base}}/s/sql/">{{I "super.sql"}}<span>{{T .Loc "menu.super.sql"}}</span></a></li>
 			<li class="divider"></li>
-			{{end}}
-			{{if and .AU.IsSuper (eq .CFG.app.tenants "true")}}
-			<li><a class="dropdown-item" href="{{.Base}}/s/tenants/">{{I "super.tenants"}}<span>{{T .Loc "menu.super.tenants"}}</span></a></li>
 			{{end}}
 			{{if .AU.IsAdmin}}
 			<li><a class="dropdown-item" href="{{.Base}}/a/users/">{{I "admin.users"}}<span>{{T .Loc "menu.admin.users"}}</span></a></li>

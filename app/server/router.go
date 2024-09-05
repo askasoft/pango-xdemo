@@ -386,7 +386,7 @@ func addSuperHandlers(rg *xin.RouterGroup) {
 	rg.Use(CheckTenant)       // schema protect
 	rg.Use(app.XCA.Handler()) // cookie auth
 	rg.Use(IPProtect)         // IP protect
-	rg.Use(RoleSuperProtect)  // role protect
+	rg.Use(RoleRootProtect)   // role protect
 	rg.Use(app.XTP.Handler()) // token protect
 
 	// rg.GET("/", super.Index)

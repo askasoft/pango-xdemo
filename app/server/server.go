@@ -94,6 +94,8 @@ func Init() {
 
 	initConfigs()
 
+	initCaches()
+
 	initMessages()
 
 	initTemplates()
@@ -181,18 +183,26 @@ func initConfigs() {
 	}
 
 	app.INI = ini
-	app.CFG = ini.StringMap()
+	initAppCfg()
+}
+
+func initAppCfg() {
+	app.CFG = app.INI.StringMap()
 
 	apc := app.INI.Section("app")
 	app.Locales = str.FieldsAny(apc.GetString("locales"), ",; ")
-	app.TENAS = imc.New(apc.GetDuration("tenaCacheExpires", time.Second*10), time.Minute)
-	app.CONFS = imc.New(apc.GetDuration("confCacheExpires", time.Minute), time.Minute)
-	app.USERS = imc.New(apc.GetDuration("userCacheExpires", time.Second*15), time.Minute)
-	app.AFIPS = imc.New(apc.GetDuration("afipCacheExpires", time.Minute*15), time.Minute)
 
 	svc := app.INI.Section("server")
 	app.Domain = svc.GetString("domain")
 	app.Base = svc.GetString("prefix")
+}
+
+func initCaches() {
+	cac := app.INI.Section("cache")
+	app.TENAS = imc.New(cac.GetDuration("tenaCacheExpires", time.Second*10), time.Minute)
+	app.CONFS = imc.New(cac.GetDuration("confCacheExpires", time.Minute), time.Minute)
+	app.USERS = imc.New(cac.GetDuration("userCacheExpires", time.Second*15), time.Minute)
+	app.AFIPS = imc.New(cac.GetDuration("afipCacheExpires", time.Minute*15), time.Minute)
 }
 
 func loadConfigs() (*ini.Ini, error) {
@@ -270,15 +280,11 @@ func reloadConfigs(path string, op fsw.Op) {
 	}
 
 	app.INI = ini
-	app.CFG = ini.StringMap()
 
-	apc := app.INI.Section("app")
-	app.Locales = str.FieldsAny(apc.GetString("locales"), ",; ")
+	initAppCfg()
+	initCaches()
 
 	svc := app.INI.Section("server")
-	app.Domain = svc.GetString("domain")
-	app.Base = svc.GetString("prefix")
-
 	app.TCP.Disable(!svc.GetBool("tcpDump"))
 
 	if err := openDatabase(); err != nil {

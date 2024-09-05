@@ -47,13 +47,31 @@ func IPProtect(c *xin.Context) {
 
 func RoleProtect(c *xin.Context, role string) {
 	au := tenant.AuthUser(c)
-
 	if !au.HasRole(role) {
 		c.AddError(handlers.ErrRestrictedFunction)
 		handlers.Forbidden(c)
 		return
 	}
+
 	c.Next()
+}
+
+func RoleRootProtect(c *xin.Context) {
+	if tenant.IsMultiTenant() {
+		tt := tenant.FromCtx(c)
+		au := tenant.AuthUser(c)
+
+		if !tt.IsDefault() || !au.IsSuper() {
+			c.AddError(handlers.ErrRestrictedFunction)
+			handlers.Forbidden(c)
+			return
+		}
+
+		c.Next()
+		return
+	}
+
+	RoleSuperProtect(c)
 }
 
 func RoleSuperProtect(c *xin.Context) {
