@@ -1,0 +1,12 @@
+{{template "main_header" .}}
+
+<div class="s-section">
+	<div class="s-section-head text-danger">
+		<h2>{{I "error"}}<span>{{T .Loc "error.server.internal"}}</span></h2>
+	</div>
+	<div class="s-section-body">
+		<div>{{template "alerts" .}}</div>
+	</div>
+</div>
+
+{{template "main_footer" .}}

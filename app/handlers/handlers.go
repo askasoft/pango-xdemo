@@ -31,6 +31,15 @@ func Forbidden(c *xin.Context) {
 	c.Abort()
 }
 
+func InternalServerError(c *xin.Context) {
+	if str.EqualFold(c.GetHeader("X-Requested-With"), "XMLHttpRequest") {
+		c.JSON(http.StatusInternalServerError, E(c))
+	} else {
+		c.HTML(http.StatusInternalServerError, "500", H(c))
+	}
+	c.Abort()
+}
+
 func HealthCheck(c *xin.Context) {
 	if err := app.SDB.Ping(); err != nil {
 		c.Logger.Errorf("Healthcheck: %v", err)

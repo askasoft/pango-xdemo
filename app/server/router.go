@@ -192,6 +192,7 @@ func configHandlers() {
 	rg.GET("/", app.XCN.Handler(), handlers.Index)
 	rg.GET("/403", app.XCN.Handler(), handlers.Forbidden)
 	rg.GET("/404", app.XCN.Handler(), handlers.NotFound)
+	rg.GET("/500", app.XCN.Handler(), handlers.InternalServerError)
 	rg.GET("/panic", handlers.Panic)
 
 	addStaticHandlers(rg)
