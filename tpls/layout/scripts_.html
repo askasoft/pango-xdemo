@@ -12,7 +12,10 @@
 <script src="{{.Base}}/static/plugins/js/plugins.min.js?r={{.REV}}" type="text/javascript"></script>
 <script src="{{.Base}}/assets/main.js?r={{.REV}}" type="text/javascript"></script>
 {{end}}
-{{range $s := .Ctx.Attrs.scripts}}
+{{range $s := .Ctx.Attrs.sscripts}}
+<script src="{{$.Base}}/static/{{$s}}?r={{$.REV}}" type="text/javascript"></script>
+{{end}}
+{{range $s := .Ctx.Attrs.ascripts}}
 <script src="{{$.Base}}/assets/{{$s}}?r={{$.REV}}" type="text/javascript"></script>
 {{end}}
 {{end}}

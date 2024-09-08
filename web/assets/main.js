@@ -303,6 +303,7 @@ var main = {
 		$d.find('[textclear]').textclear();
 		$d.find('textarea[autosize]').autosize();
 		$d.find('textarea[enterfire]').enterfire();
+		main.summernote($d.find('textarea[summernote]'));
 		$(window).trigger('resize');
 	},
 	detail_popup_shown2: function($d) {
@@ -412,7 +413,20 @@ var main = {
 		setTimeout(function() { $e.removeClass('ui-blink-1s2'); }, 2000);
 	},
 
+	summernote: function($el) {
+		if ($el.length) {
+			var sno = {};
+			if ($('html').attr('lang') == 'ja') {
+				sno = { lang: 'ja-JP' };
+			}
+			$el.removeAttr('summernote').summernote(sno);
+		}
+	},
+
 	init: function() {
+		// summernote
+		main.summernote($('textarea[summernote]'));
+
 		// sidenavi
 		$('#sidenavi i').each(function() {
 			$(this).attr('title', $(this).next('span').text());

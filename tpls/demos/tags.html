@@ -1,3 +1,6 @@
+{{MapSet .Ctx.Attrs "sstyles" (Array "summernote/summernote-bs5.min.css")}}
+{{MapSet .Ctx.Attrs "sscripts" (Array "summernote/summernote-bs5.min.js")}}
+
 {{template "main_header" .}}
 
 <div class="s-section">
@@ -71,6 +74,12 @@
 				<label class="col-md-2 col-form-label">Textarea</label>
 				<div class="col-md-10">
 					<textarea name="textarea" class="form-control" rows="8" autosize textclear enterfire="true">{{.Arg.Textarea}}</textarea>
+				</div>
+			</div>
+			<div class="row">
+				<label class="col-md-2 col-form-label">Htmledit</label>
+				<div class="col-md-10">
+					<textarea name="htmledit" summernote>{{.Arg.Htmledit}}</textarea>
 				</div>
 			</div>
 			<div class="row">

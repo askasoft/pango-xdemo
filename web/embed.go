@@ -11,6 +11,7 @@ import (
 	"github.com/askasoft/pango-assets/html/fontawesome6"
 	"github.com/askasoft/pango-assets/html/jquery"
 	"github.com/askasoft/pango-assets/html/plugins"
+	"github.com/askasoft/pango-assets/html/summernote"
 )
 
 // Static embed static folder
@@ -23,6 +24,7 @@ var Statics = map[string]embed.FS{
 	"corejs":             corejs.FS,
 	"jquery":             jquery.FS,
 	"plugins":            plugins.FS,
+	"summernote":         summernote.FS,
 }
 
 //go:embed assets favicon.ico

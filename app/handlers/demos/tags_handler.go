@@ -22,6 +22,7 @@ type tagsArg struct {
 	Nselect  string   `form:"nselect"`
 	Mselect  []string `form:"mselect"`
 	Textarea string   `form:"textarea"`
+	Htmledit string   `form:"htmledit"`
 }
 
 func TagsIndex(c *xin.Context) {

@@ -1,8 +1,8 @@
 {{define "head"}}
 <head>
 <title>{{T .Loc "title"}}</title>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src * 'unsafe-inline'; font-src *; img-src * data:; media-src *"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src * 'unsafe-inline'; font-src *; img-src * data:; media-src *"/>
 <meta property="xdemo:base" content="{{.Base}}"/>
 <meta property="xdemo:domain" content="{{.Domain}}"/>
 <meta property="xdemo:token" content="{{.Token}}"/>
@@ -14,7 +14,10 @@
 <link href="{{.Base}}/static/fontawesome6/css/all.min.css?r={{.REV}}" rel="stylesheet" type="text/css"/>
 <link href="{{.Base}}/static/plugins/css/plugins.min.css?r={{.REV}}" rel="stylesheet" type="text/css"/>
 <link href="{{.Base}}/assets/main.css?r={{.REV}}" rel="stylesheet" type="text/css"/>
-{{range $s := .Ctx.Attrs.styles}}
+{{range $s := .Ctx.Attrs.sstyles}}
+<link href="{{$.Base}}/static/{{$s}}?r={{$.REV}}" rel="stylesheet" type="text/css"/>
+{{end}}
+{{range $s := .Ctx.Attrs.astyles}}
 <link href="{{$.Base}}/assets/{{$s}}?r={{$.REV}}" rel="stylesheet" type="text/css"/>
 {{end}}
 </head>

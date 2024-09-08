@@ -52,7 +52,6 @@
 }
 **/
 
-/** bootstrap5 customize **/
 /* alert */
 .alert.alert-dismissible {
 	padding-right: 3em;
@@ -118,6 +117,10 @@ body {
 	flex-direction: column;
 	min-height: 100vh;
 	padding-top: 50px; /* for #header.fixed-top */
+}
+pre {
+	font-size: 1em;
+	white-space: pre-wrap;
 }
 
 #header {
