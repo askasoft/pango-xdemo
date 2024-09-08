@@ -277,10 +277,8 @@ body {
 	}
 }
 .nosidenavi #content {
-	margin: 0px;
-	padding: 20px;
-	display: flex;
-	justify-content: center;
+	margin: 0;
+	padding: 1.5rem;
 }
 .nosidenavi #footer {
 	margin-left: 0;
@@ -338,6 +336,16 @@ body {
 	background-color: var(--bs-body-bg);
 	border-radius: 12px;
 	padding: 25px;
+}
+
+/** login **/
+.s-login {
+	display: flex;
+	justify-content: center;
+}
+.s-login > .s-section {
+	max-width: 720px;
+	width: 90vw;
 }
 
 /** nav-popup **/

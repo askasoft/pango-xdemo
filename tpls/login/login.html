@@ -1,9 +1,8 @@
-{{MapSet .Ctx.Attrs "styles" (Array "login/login.css")}}
 {{MapSet .Ctx.Attrs "scripts" (Array "login/login.js")}}
 {{MapSet .Ctx.Attrs "nosidenavi" true}}
 
 {{template "main_header" .}}
-
+<div class="s-login">
 <div class="s-section">
 	<div class="s-section-head">
 		<h2>{{I "login"}}<span>{{T .Loc "menu.login"}}</span></h2>
@@ -47,6 +46,7 @@
 			</div>
 		</form>
 	</div>
+</div>
 </div>
 
 {{template "main_footer" .}}
