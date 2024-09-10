@@ -81,7 +81,7 @@ func (pcc *PetCatCreateJob) run() error {
 		}
 
 		pcc.Step++
-		if err := pcc.gen.Create(pcc.Log, app.GDB, &pcc.JobState); err != nil {
+		if err := pcc.gen.Create(pcc.Log, app.SDB, &pcc.JobState); err != nil {
 			return err
 		}
 

@@ -11,7 +11,6 @@ import (
 	"github.com/askasoft/pango-xdemo/app/handlers"
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/tenant"
-	"github.com/askasoft/pango-xdemo/app/utils/gormutil"
 	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
 	"github.com/askasoft/pango/cog/linkedhashmap"
 	"github.com/askasoft/pango/doc/csvx"
@@ -49,12 +48,14 @@ func configList(c *xin.Context, role string) []*ConfigCategory {
 	tt := tenant.FromCtx(c)
 	au := tenant.AuthUser(c)
 
-	tx := app.GDB.Table(tt.TableConfigs())
-	tx = tx.Where(role+" >= ?", au.Role)
-	tx = tx.Order(gormutil.GormOrderBy("order"))
+	sqb := app.SDB.Builder()
+	sqb.Select().From(tt.TableConfigs())
+	sqb.Where(role+" >= ?", au.Role)
+	sqb.Order(app.SDB.Quote("order"))
+	sql, args := sqb.Build()
 
 	configs := []*models.Config{}
-	if err := tx.Find(&configs).Error; err != nil {
+	if err := app.SDB.Select(&configs, sql, args...); err != nil {
 		panic(err)
 	}
 
@@ -121,8 +122,13 @@ func ConfigSave(c *xin.Context) {
 	tt := tenant.FromCtx(c)
 	au := tenant.AuthUser(c)
 
+	sqb := app.SDB.Builder()
+	sqb.Select().From(tt.TableConfigs())
+	sqb.Order("name")
+	sql, args := sqb.Build()
+
 	configs := []*models.Config{}
-	if err := app.GDB.Order("name ASC").Find(&configs).Error; err != nil {
+	if err := app.SDB.Select(&configs, sql, args...); err != nil {
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return
@@ -132,7 +138,13 @@ func ConfigSave(c *xin.Context) {
 	var v string
 	var ok bool
 
-	db := app.GDB.Begin()
+	tx, err := app.SDB.Beginx()
+	if err != nil {
+		c.AddError(err)
+		c.JSON(http.StatusInternalServerError, handlers.E(c))
+		return
+	}
+
 	for _, cfg := range configs {
 		switch cfg.Style {
 		case StyleChecks, StyleVerticalChecks, StyleOrderedChecks, StyleMultiSelect:
@@ -199,18 +211,25 @@ func ConfigSave(c *xin.Context) {
 		cfg.Value = v
 		cfg.UpdatedAt = time.Now()
 
-		tx := db.Table(tt.TableConfigs())
-		tx = tx.Where("editor >= ?", au.Role)
-		r := tx.Select("value", "updated_at").Updates(cfg)
-		if r.Error != nil {
-			c.Logger.Error(r.Error)
-			c.Errors = []error{r.Error}
+		sqb.Reset()
+		sqb.Update(tt.TableConfigs())
+		sqb.Setc("value", cfg.Value)
+		sqb.Setc("updated_at", cfg.UpdatedAt)
+		sqb.Where("name = ?", cfg.Name)
+		sqb.Where("editor >= ?", au.Role)
+		sql, args = sqb.Build()
+
+		r, err := tx.Exec(sql, args...)
+		if err != nil {
+			c.Logger.Error(err)
+			c.Errors = []error{err}
 			c.JSON(http.StatusInternalServerError, handlers.E(c))
-			db.Rollback()
+			_ = tx.Rollback()
 			return
 		}
 
-		if r.RowsAffected != 1 {
+		cnt, _ := r.RowsAffected()
+		if cnt != 1 {
 			msg := tbs.Format(c.Locale, "config.error.unsaved", tbs.GetText(c.Locale, "config."+cfg.Name, cfg.Name))
 			c.Logger.Warn(msg)
 			c.AddError(&vadutil.ParamError{Param: cfg.Name, Message: msg})
@@ -218,12 +237,12 @@ func ConfigSave(c *xin.Context) {
 	}
 
 	if len(c.Errors) > 0 {
-		db.Rollback()
+		_ = tx.Rollback()
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}
 
-	if err := db.Commit().Error; err != nil {
+	if err := tx.Commit(); err != nil {
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return
@@ -300,7 +319,14 @@ func ConfigImport(c *xin.Context) {
 	tt := tenant.FromCtx(c)
 	au := tenant.AuthUser(c)
 
-	db := app.GDB.Begin()
+	tx, err := app.SDB.Beginx()
+	if err != nil {
+		c.AddError(err)
+		c.JSON(http.StatusBadRequest, handlers.E(c))
+		return
+	}
+
+	sqb := app.SDB.Builder()
 	for _, cfg := range cfgs {
 		uc := &models.Config{
 			Name:      cfg.Name,
@@ -308,18 +334,24 @@ func ConfigImport(c *xin.Context) {
 			UpdatedAt: time.Now(),
 		}
 
-		tx := db.Table(tt.TableConfigs())
-		tx = tx.Where("editor >= ?", au.Role)
-		r := tx.Select("value", "updated_at").Updates(uc)
-		if r.Error != nil {
-			c.Logger.Error(r.Error)
-			c.AddError(r.Error)
+		sqb.Reset()
+		sqb.Update(tt.TableConfigs())
+		sqb.Setc("value", uc.Value)
+		sqb.Setc("updated_at", uc.UpdatedAt)
+		sqb.Where("editor >= ?", au.Role)
+		sql, args := sqb.Build()
+
+		r, err := tx.Exec(sql, args...)
+		if err != nil {
+			c.Logger.Error(err)
+			c.Errors = []error{err}
 			c.JSON(http.StatusInternalServerError, handlers.E(c))
-			db.Rollback()
+			_ = tx.Rollback()
 			return
 		}
 
-		if r.RowsAffected != 1 {
+		cnt, _ := r.RowsAffected()
+		if cnt != 1 {
 			msg := tbs.Format(c.Locale, "config.import.invalid", cfg.Name)
 			c.Logger.Warn(msg)
 			c.AddError(errors.New(msg))
@@ -327,12 +359,12 @@ func ConfigImport(c *xin.Context) {
 	}
 
 	if len(c.Errors) > 0 {
-		db.Rollback()
+		_ = tx.Rollback()
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}
 
-	if err := db.Commit().Error; err != nil {
+	if err := tx.Commit(); err != nil {
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return

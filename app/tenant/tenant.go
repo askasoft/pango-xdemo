@@ -167,14 +167,15 @@ func (tt Tenant) Prefix() string {
 	return tt.Schema() + "."
 }
 
-func (tt Tenant) ResetSequence(db *gorm.DB, table string, starts ...int64) error {
+func (tt Tenant) ResetSequence(db sqlx.Sqlx, table string, starts ...int64) error {
 	stn := tt.Table(table)
 
 	switch app.DBS["type"] {
 	case "mysql":
 		return nil
 	default:
-		return db.Exec(pgutil.ResetSequence(stn, starts...)).Error
+		_, err := db.Exec(pgutil.ResetSequence(stn, starts...))
+		return err
 	}
 }
 
@@ -190,15 +191,15 @@ func (tt Tenant) GFS(db *gorm.DB) xfs.XFS {
 	return gormfs.FS(db, tt.TableFiles())
 }
 
-func (tt Tenant) SJC(db *sqlx.DB) xjm.JobChainer {
+func (tt Tenant) SJC(db sqlx.Sqlx) xjm.JobChainer {
 	return sqlxjm.JC(db, tt.TableJobChains())
 }
 
-func (tt Tenant) SJM(db *sqlx.DB) xjm.JobManager {
+func (tt Tenant) SJM(db sqlx.Sqlx) xjm.JobManager {
 	return sqlxjm.JM(db, tt.TableJobs(), tt.TableJobLogs())
 }
 
-func (tt Tenant) SFS(db *sqlx.DB) xfs.XFS {
+func (tt Tenant) SFS(db sqlx.Sqlx) xfs.XFS {
 	return sqlxfs.FS(db, tt.TableFiles())
 }
 

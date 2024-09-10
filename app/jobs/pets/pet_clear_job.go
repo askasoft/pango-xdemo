@@ -63,25 +63,27 @@ func (pc *PetClearJob) Run() {
 
 func (pc *PetClearJob) clear() error {
 	tt := pc.Tenant
-	db := app.GDB
+	db := app.SDB
 
 	pc.Log.Infof("Delete Pet Files: /%s ...", models.PrefixPetFile)
 
-	gfs := tt.GFS(db)
-	cnt, err := gfs.DeletePrefix("/" + models.PrefixPetFile + "/")
+	sfs := tt.SFS(db)
+	cnt, err := sfs.DeletePrefix("/" + models.PrefixPetFile + "/")
 	if err != nil {
 		return err
 	}
 	pc.Log.Infof("%d Pet Files Deleted.", cnt)
 
 	pc.Log.Info("Delete Pets ...")
-	r := db.Exec("DELETE FROM " + tt.TablePets())
-	if r.Error != nil {
-		return r.Error
+	r, err := db.Exec("DELETE FROM " + tt.TablePets())
+	if err != nil {
+		return err
 	}
-	pc.Log.Infof("%d Pets Deleted.", r.RowsAffected)
 
-	pc.Success = int(r.RowsAffected)
+	cnt, _ = r.RowsAffected()
+	pc.Log.Infof("%d Pets Deleted.", cnt)
+
+	pc.Success = int(cnt)
 	if err = pc.Running(&pc.JobState); err != nil {
 		return err
 	}

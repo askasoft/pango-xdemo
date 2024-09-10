@@ -15,11 +15,10 @@ import (
 	"github.com/askasoft/pango/cog/treemap"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/num"
+	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/str"
-	"github.com/askasoft/pango/xfs"
 	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pango/xjm"
-	"gorm.io/gorm"
 )
 
 var (
@@ -513,27 +512,36 @@ func CleanOutdatedJobs() {
 	before := time.Now().Add(-1 * app.INI.GetDuration("job", "outdatedBefore", time.Hour*24*10))
 
 	_ = tenant.Iterate(func(tt tenant.Tenant) error {
-		return app.GDB.Transaction(func(db *gorm.DB) error {
+		return app.SDB.Transaction(func(tx *sqlx.Tx) error {
 			logger := tt.Logger("JOB")
 
 			if len(hasFileJobs) > 0 {
-				where := "id IN (SELECT file FROM " + tt.TableJobs() + " WHERE name IN ? AND status IN ? AND updated_at < ?)"
+				sqa := tx.Builder()
+				sqa.Select("file").From(tt.TableJobs())
+				sqa.Where("updated_at < ?", before)
+				sqa.In("name", hasFileJobs)
+				sqa.In("status", xjm.JobAbortedCompleted)
+				sql, args := sqa.Build()
 
-				tx := db.Table(tt.TableFiles())
-				tx = tx.Where(where, hasFileJobs, xjm.JobAbortedCompleted, before)
+				sqb := tx.Builder()
+				sqb.Delete(tt.TableFiles())
+				sqb.Where("id IN ("+sql+")", args...)
+				sql, args = sqb.Build()
 
-				r := tx.Delete(&xfs.File{})
-				if r.Error != nil {
-					logger.Errorf("Failed to delete outdated job files: %v", r.Error)
-					return r.Error
+				r, err := tx.Exec(sql, args...)
+				if err != nil {
+					logger.Errorf("Failed to delete outdated job files: %v", err)
+					return err
 				}
-				if r.RowsAffected > 0 {
-					logger.Infof("Delete outdated job files: %d", r.RowsAffected)
+
+				cnt, _ := r.RowsAffected()
+				if cnt > 0 {
+					logger.Infof("Delete outdated job files: %d", cnt)
 				}
 			}
 
-			gjm := tt.GJM(db)
-			_, _, err := gjm.CleanOutdatedJobs(before)
+			sjm := tt.SJM(tx)
+			_, _, err := sjm.CleanOutdatedJobs(before)
 			if err != nil {
 				logger.Errorf("Failed to CleanOutdatedJobs('%s', '%s')", string(tt), before.Format(time.RFC3339))
 			}

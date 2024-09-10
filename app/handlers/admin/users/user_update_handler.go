@@ -15,9 +15,9 @@ import (
 	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
 	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
 	"github.com/askasoft/pango/num"
+	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/tbs"
 	"github.com/askasoft/pango/xin"
-	"gorm.io/gorm"
 )
 
 func UserNew(c *xin.Context) {
@@ -43,9 +43,13 @@ func userDetail(c *xin.Context, action string) {
 
 	tt := tenant.FromCtx(c)
 
+	sqb := app.SDB.Builder()
+	sqb.Select().From(tt.TableUsers()).Where("id = ?", aid)
+	sql, args := sqb.Build()
+
 	user := &models.User{}
-	err := app.GDB.Table(tt.TableUsers()).Where("id = ?", aid).Take(user).Error
-	if errors.Is(err, gorm.ErrRecordNotFound) {
+	err := app.SDB.Get(user, sql, args...)
+	if errors.Is(err, sqlx.ErrNoRows) {
 		c.AddError(err)
 		c.JSON(http.StatusNotFound, handlers.E(c))
 		return
@@ -167,22 +171,22 @@ func UserUpdate(c *xin.Context) {
 	tt := tenant.FromCtx(c)
 	au := tenant.AuthUser(c)
 
+	sqb := app.SDB.Builder()
+
 	if user.Password == "" {
+		sqb.Select("password").From(tt.TableUsers())
+		sqb.Where("id = ?", user.ID)
+		sql, args := sqb.Build()
+
 		eu := &models.User{}
-		err := app.GDB.Table(tt.TableUsers()).Where("id = ?", user.ID).Take(eu).Error
+		err := app.SDB.Get(eu, sql, args...)
 		if err != nil {
-			if pgutil.IsUniqueViolation(err) {
-				err = &vadutil.ParamError{
-					Param:   "email",
-					Message: tbs.Format(c.Locale, "user.error.duplicated", tbs.GetText(c.Locale, "user.email", "email"), user.Email),
-				}
-			}
 			c.AddError(err)
 			c.JSON(http.StatusInternalServerError, handlers.E(c))
 			return
 		}
 
-		// NOTE: we need reencrypt password, because password is encrypted by email
+		// NOTE: we need re-encrypt password, because password is encrypted by email
 		user.SetPassword(eu.GetPassword())
 	} else {
 		user.SetPassword(user.Password)
@@ -190,30 +194,33 @@ func UserUpdate(c *xin.Context) {
 
 	user.UpdatedAt = time.Now()
 
-	tx := app.GDB.Table(tt.TableUsers())
-	tx = tx.Where("id = ?", user.ID)
-	tx = tx.Where("role >= ?", au.Role)
-	tx = tx.Select(
-		"name",
-		"email",
-		"password",
-		"role",
-		"status",
-		"cidr",
-		"updated_at",
-	)
+	sqb.Reset()
+	sqb.Update(tt.TableUsers())
+	sqb.Setc("name", user.Name)
+	sqb.Setc("email", user.Email)
+	sqb.Setc("password", user.Password)
+	sqb.Setc("role", user.Role)
+	sqb.Setc("status", user.Status)
+	sqb.Setc("cidr", user.CIDR)
+	sqb.Setc("updated_at", user.UpdatedAt)
+	sqb.Where("id = ?", user.ID)
+	sqb.Where("role >= ?", au.Role)
+	sql, args := sqb.Build()
 
-	r := tx.Updates(user)
-	if r.Error != nil {
-		c.AddError(r.Error)
+	r, err := app.SDB.Exec(sql, args...)
+	if err != nil {
+		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return
 	}
 
 	user.Password = ""
+
+	cnt, _ := r.RowsAffected()
+
 	c.JSON(http.StatusOK, xin.H{
 		"user":    user,
-		"success": tbs.Format(c.Locale, "user.success.updates", r.RowsAffected),
+		"success": tbs.Format(c.Locale, "user.success.updates", cnt),
 	})
 }
 
@@ -254,43 +261,39 @@ func UserUpdates(c *xin.Context) {
 	au := tenant.AuthUser(c)
 	tt := tenant.FromCtx(c)
 
-	tx := app.GDB.Table(tt.TableUsers())
-
-	tx = tx.Where("id <> ?", au.ID)
-	tx = tx.Where("role >= ?", au.Role)
-
-	if len(ids) > 0 {
-		tx = tx.Where("id IN ?", ids)
-	}
-
-	user := &models.User{}
-	user.UpdatedAt = time.Now()
-
-	cols := make([]string, 0, 4)
-	cols = append(cols, "updated_at")
+	sqb := app.SDB.Builder()
+	sqb.Update(tt.TableUsers())
 
 	if uua.Role != "" {
-		user.Role = uua.Role
-		cols = append(cols, "role")
+		sqb.Setc("role", uua.Role)
 	}
 	if uua.Status != "" {
-		user.Status = uua.Status
-		cols = append(cols, "status")
+		sqb.Setc("status", uua.Status)
 	}
 	if uua.CIDR != nil {
-		user.CIDR = *uua.CIDR
-		cols = append(cols, "cidr")
+		sqb.Setc("cidr", *uua.CIDR)
+	}
+	sqb.Setc("updated_at", time.Now())
+
+	sqb.Where("id <> ?", au.ID)
+	sqb.Where("role >= ?", au.Role)
+	if len(ids) > 0 {
+		sqb.In("id", ids)
 	}
 
-	r := tx.Select(cols).Updates(user)
-	if r.Error != nil {
-		c.AddError(r.Error)
+	sql, args := sqb.Build()
+
+	r, err := app.SDB.Exec(sql, args...)
+	if err != nil {
+		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return
 	}
 
+	cnt, _ := r.RowsAffected()
+
 	c.JSON(http.StatusOK, xin.H{
-		"success": tbs.Format(c.Locale, "user.success.updates", r.RowsAffected),
+		"success": tbs.Format(c.Locale, "user.success.updates", cnt),
 		"updates": uua,
 	})
 }
@@ -307,20 +310,24 @@ func UserDeletes(c *xin.Context) {
 	tt := tenant.FromCtx(c)
 
 	var cnt int64
-	err := app.GDB.Transaction(func(db *gorm.DB) error {
-		tx := db.Table(tt.TableUsers())
-		tx = tx.Where("id <> ?", au.ID)
-		tx = tx.Where("role >= ?", au.Role)
+	err := app.SDB.Transaction(func(tx *sqlx.Tx) error {
+		sqb := tx.Builder()
+		sqb.Delete(tt.TableUsers())
+		sqb.Where("id <> ?", au.ID)
+		sqb.Where("role >= ?", au.Role)
 		if len(ids) > 0 {
-			tx = tx.Where("id IN ?", ids)
+			sqb.In("id", ids)
 		}
-		r := tx.Delete(&models.User{})
-		if r.Error != nil {
-			return r.Error
-		}
-		cnt = r.RowsAffected
+		sql, args := sqb.Build()
 
-		return tt.ResetSequence(db, "users", models.UserStartID)
+		r, err := tx.Exec(sql, args...)
+		if err != nil {
+			return err
+		}
+
+		cnt, _ = r.RowsAffected()
+
+		return tt.ResetSequence(tx, "users", models.UserStartID)
 	})
 	if err != nil {
 		c.AddError(err)
@@ -351,17 +358,20 @@ func UserDeleteBatch(c *xin.Context) {
 	au := tenant.AuthUser(c)
 
 	var cnt int64
-	err = app.GDB.Transaction(func(db *gorm.DB) (err error) {
-		tx := db.Table(tt.TableUsers())
-		tx = tx.Where("id <> ?", au.ID)
-		tx = uq.AddWhere(c, tx)
-		r := tx.Delete(&models.User{})
-		if err = r.Error; err != nil {
-			return
-		}
-		cnt = r.RowsAffected
+	err = app.SDB.Transaction(func(tx *sqlx.Tx) error {
+		sqb := tx.Builder()
+		sqb.Delete(tt.TableUsers())
+		sqb.Where("id <> ?", au.ID)
+		uq.AddWhere(c, sqb)
+		sql, args := sqb.Build()
 
-		return tt.ResetSequence(db, "users", models.UserStartID)
+		r, err := tx.Exec(sql, args...)
+		if err != nil {
+			return err
+		}
+
+		cnt, _ = r.RowsAffected()
+		return tt.ResetSequence(tx, "users", models.UserStartID)
 	})
 	if err != nil {
 		c.AddError(err)

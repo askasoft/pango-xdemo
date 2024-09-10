@@ -7,16 +7,16 @@ import (
 	"github.com/askasoft/pango-xdemo/app/handlers"
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/tenant"
-	"github.com/askasoft/pango-xdemo/app/utils/gormutil"
+	"github.com/askasoft/pango-xdemo/app/utils/sqlxutil"
 	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
 	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
 	"github.com/askasoft/pango/sqx"
+	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/xin"
-	"gorm.io/gorm"
 )
 
 type UserQuery struct {
-	gormutil.BaseQuery
+	sqlxutil.BaseQuery
 
 	ID     int64    `json:"id" form:"id,strip"`
 	Name   string   `json:"name" form:"name,strip"`
@@ -49,55 +49,54 @@ func (uq *UserQuery) HasFilter() bool {
 		uq.CIDR != ""
 }
 
-func (uq *UserQuery) AddWhere(c *xin.Context, tx *gorm.DB) *gorm.DB {
+func (uq *UserQuery) AddWhere(c *xin.Context, sqb *sqlx.Builder) {
 	au := tenant.AuthUser(c)
-	tx = tx.Where("role >= ?", au.Role)
+	sqb.Where("role >= ?", au.Role)
 
 	if uq.ID != 0 {
-		tx = tx.Where("id = ?", uq.ID)
+		sqb.Where("id = ?", uq.ID)
 	}
 	if uq.Name != "" {
-		tx = tx.Where("name LIKE ?", sqx.StringLike(uq.Name))
+		sqb.Where("name LIKE ?", sqx.StringLike(uq.Name))
 	}
 	if uq.Email != "" {
-		tx = tx.Where("email LIKE ?", sqx.StringLike(uq.Email))
+		sqb.Where("email LIKE ?", sqx.StringLike(uq.Email))
 	}
 	if uq.CIDR != "" {
-		tx = tx.Where("cidr LIKE ?", sqx.StringLike(uq.CIDR))
+		sqb.Where("cidr LIKE ?", sqx.StringLike(uq.CIDR))
 	}
 	if len(uq.Role) > 0 {
-		tx = tx.Where("role IN ?", uq.Role)
+		sqb.In("role", uq.Role)
 	}
 	if len(uq.Status) > 0 {
-		tx = tx.Where("status IN ?", uq.Status)
+		sqb.In("status", uq.Status)
 	}
-	return tx
 }
 
-func filterUsers(c *xin.Context, uq *UserQuery) *gorm.DB {
+func filterUsers(c *xin.Context, uq *UserQuery) *sqlx.Builder {
 	tt := tenant.FromCtx(c)
-	tx := uq.AddWhere(c, app.GDB.Table(tt.TableUsers()))
-	return tx
+
+	sqb := app.SDB.Builder()
+	sqb.From(tt.TableUsers())
+	uq.AddWhere(c, sqb)
+	return sqb
 }
 
-func countUsers(c *xin.Context, uq *UserQuery) (int, error) {
-	var total int64
+func countUsers(c *xin.Context, uq *UserQuery) (total int, err error) {
+	sqb := filterUsers(c, uq).Count()
+	sql, args := sqb.Build()
 
-	tx := filterUsers(c, uq)
-	if err := tx.Count(&total).Error; err != nil {
-		return 0, err
-	}
-
-	return int(total), nil
+	err = app.SDB.Get(total, sql, args)
+	return
 }
 
 func findUsers(c *xin.Context, uq *UserQuery) (usrs []*models.User, err error) {
-	tx := filterUsers(c, uq)
+	sqb := filterUsers(c, uq).Select()
+	uq.AddOrder(sqb, "id")
+	uq.AddPager(sqb)
+	sql, args := sqb.Build()
 
-	tx = uq.AddOrder(tx, "id")
-	tx = uq.AddPager(tx)
-
-	err = tx.Find(&usrs).Error
+	err = app.SDB.Select(&usrs, sql, args...)
 	return
 }
 

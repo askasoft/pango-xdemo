@@ -15,6 +15,7 @@ import (
 	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/sqx/pqx"
+	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/tbs"
 	"github.com/askasoft/pango/xin"
@@ -50,9 +51,14 @@ func petDetail(c *xin.Context, action string) {
 
 	tt := tenant.FromCtx(c)
 
+	sqb := app.SDB.Builder()
+	sqb.Select().From(tt.TablePets())
+	sqb.Where("id = ?", pid)
+	sql, args := sqb.Build()
+
 	pet := &models.Pet{}
-	err := app.GDB.Table(tt.TablePets()).Where("id = ?", pid).Take(pet).Error
-	if errors.Is(err, gorm.ErrRecordNotFound) {
+	err := app.SDB.Get(pet, sql, args...)
+	if errors.Is(err, sqlx.ErrNoRows) {
 		c.AddError(err)
 		c.JSON(http.StatusNotFound, handlers.E(c))
 		return
@@ -171,14 +177,16 @@ func PetUpdate(c *xin.Context) {
 	tt := tenant.FromCtx(c)
 
 	var cnt int64
-	err := app.GDB.Transaction(func(db *gorm.DB) error {
-		tx := db.Table(tt.TablePets()).Select(
+	err := app.SDB.Transaction(func(tx *sqlx.Tx) error {
+		sqb := tx.Builder()
+		sqb.Update(tt.TablePets())
+		sqb.Names(
 			"name",
 			"gender",
 			"born_at",
 			"origin",
 			"temper",
-			"habbits",
+			"habits",
 			"amount",
 			"price",
 			"shop_name",
@@ -188,20 +196,23 @@ func PetUpdate(c *xin.Context) {
 			"description",
 			"updated_at",
 		)
-		r := tx.Updates(&pet.Pet)
-		if r.Error != nil {
-			return r.Error
+		sqb.Where("id = ?", pet.ID)
+		sql := sqb.SQL()
+
+		r, err := tx.NamedExec(sql, pet)
+		if err != nil {
+			return err
 		}
 
-		cnt = r.RowsAffected
+		cnt, _ = r.RowsAffected()
 
 		if pet.File != "" {
 			fid := pet.PhotoPath()
-			gfs := tt.GFS(db)
-			if err := gfs.DeleteFile(fid); err != nil {
+			sfs := tt.SFS(tx)
+			if err := sfs.DeleteFile(fid); err != nil {
 				return err
 			}
-			return gfs.MoveFile(pet.File, fid)
+			return sfs.MoveFile(pet.File, fid)
 		}
 		return nil
 	})
@@ -259,49 +270,43 @@ func PetUpdates(c *xin.Context) {
 
 	tt := tenant.FromCtx(c)
 
-	db := app.GDB.Session(&gorm.Session{AllowGlobalUpdate: true})
-	tx := db.Table(tt.TablePets())
-
-	if len(ids) > 0 {
-		tx = tx.Where("id IN ?", ids)
-	}
-
-	pet := &models.Pet{}
-	pet.UpdatedAt = time.Now()
-
-	cols := make([]string, 0, 8)
-	cols = append(cols, "updated_at")
+	sqb := app.SDB.Builder()
+	sqb.Update(tt.TablePets())
 
 	if pua.Gender != "" {
-		pet.Gender = pua.Gender
-		cols = append(cols, "gender")
+		sqb.Setc("gender", pua.Gender)
 	}
 	if pua.BornAt != nil {
-		pet.BornAt = *pua.BornAt
-		cols = append(cols, "born_at")
+		sqb.Setc("born_at", *pua.BornAt)
 	}
 	if pua.Origin != "" {
-		pet.Origin = pua.Origin
-		cols = append(cols, "origin")
+		sqb.Setc("origin", pua.Origin)
 	}
 	if pua.Temper != "" {
-		pet.Temper = pua.Temper
-		cols = append(cols, "temper")
+		sqb.Setc("temper", pua.Temper)
 	}
 	if pua.Habits != nil {
-		pet.Habits = str.Strips(*pua.Habits)
-		cols = append(cols, "habits")
+		sqb.Setc("habits", str.Strips(*pua.Habits))
+	}
+	sqb.Setc("updated_at", time.Now())
+
+	if len(ids) > 0 {
+		sqb.In("id", ids)
 	}
 
-	r := tx.Select(cols).Updates(pet)
-	if r.Error != nil {
-		c.AddError(r.Error)
+	sql, args := sqb.Build()
+
+	r, err := app.SDB.Exec(sql, args...)
+	if err != nil {
+		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return
 	}
 
+	cnt, _ := r.RowsAffected()
+
 	c.JSON(http.StatusOK, xin.H{
-		"success": tbs.Format(c.Locale, "pet.success.updates", r.RowsAffected),
+		"success": tbs.Format(c.Locale, "pet.success.updates", cnt),
 		"updates": pua,
 	})
 }
@@ -317,31 +322,35 @@ func PetDeletes(c *xin.Context) {
 	tt := tenant.FromCtx(c)
 
 	var cnt int64
-	err := app.GDB.Session(&gorm.Session{AllowGlobalUpdate: true}).Transaction(func(db *gorm.DB) error {
-		gfs := tt.GFS(db)
+	err := app.SDB.Transaction(func(tx *sqlx.Tx) error {
+		sfs := tt.SFS(tx)
 		if len(ids) > 0 {
 			for _, id := range ids {
-				if _, err := gfs.DeletePrefix(fmt.Sprintf("/%s/%d/", models.PrefixPetFile, id)); err != nil {
+				if _, err := sfs.DeletePrefix(fmt.Sprintf("/%s/%d/", models.PrefixPetFile, id)); err != nil {
 					return err
 				}
 			}
 		} else {
-			if _, err := gfs.DeletePrefix("/" + models.PrefixPetFile + "/"); err != nil {
+			if _, err := sfs.DeletePrefix("/" + models.PrefixPetFile + "/"); err != nil {
 				return err
 			}
 		}
 
-		tx := db.Table(tt.TablePets())
+		sqb := tx.Builder()
+		sqb.Delete(tt.TablePets())
 		if len(ids) > 0 {
-			tx = tx.Where("id IN ?", ids)
+			sqb.In("id", ids)
 		}
-		r := tx.Delete(&models.Pet{})
-		if r.Error != nil {
-			return r.Error
-		}
-		cnt = r.RowsAffected
+		sql, args := sqb.Build()
 
-		return tt.ResetSequence(db, "pets")
+		r, err := tx.Exec(sql, args...)
+		if err != nil {
+			return err
+		}
+
+		cnt, _ = r.RowsAffected()
+
+		return tt.ResetSequence(tx, "pets")
 	})
 	if err != nil {
 		c.AddError(err)
@@ -371,16 +380,20 @@ func PetDeleteBatch(c *xin.Context) {
 	tt := tenant.FromCtx(c)
 
 	var cnt int64
-	err = app.GDB.Transaction(func(db *gorm.DB) (err error) {
-		tx := db.Table(tt.TablePets())
-		tx = pq.AddWhere(tx)
-		r := tx.Delete(&models.Pet{})
-		if err = r.Error; err != nil {
+	err = app.SDB.Transaction(func(tx *sqlx.Tx) (err error) {
+		sqb := tx.Builder()
+		sqb.Delete(tt.TablePets())
+		pq.AddWhere(sqb)
+		sql, args := sqb.Build()
+
+		r, err := tx.Exec(sql, args...)
+		if err != nil {
 			return
 		}
-		cnt = r.RowsAffected
 
-		return tt.ResetSequence(db, "pets")
+		cnt, _ = r.RowsAffected()
+
+		return tt.ResetSequence(tx, "pets")
 	})
 	if err != nil {
 		c.AddError(err)

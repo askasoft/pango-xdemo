@@ -166,7 +166,7 @@ func dbExecSQL(sqlfile string) error {
 
 		sr := sqx.NewSqlReader(strings.NewReader(tsql))
 
-		err := app.GDB.Transaction(func(db *gorm.DB) error {
+		err := app.SDB.Transaction(func(tx *sqlx.Tx) error {
 			for i := 1; ; i++ {
 				sql, err := sr.ReadSql()
 				if errors.Is(err, io.EOF) {
@@ -177,11 +177,13 @@ func dbExecSQL(sqlfile string) error {
 				}
 
 				log.Infof("[%d] %s", i, sql)
-				r := db.Exec(sql)
-				if r.Error != nil {
-					return r.Error
+				r, err := tx.Exec(sql)
+				if err != nil {
+					return err
 				}
-				log.Infof("[%d] = %d", i+1, r.RowsAffected)
+
+				cnt, _ := r.RowsAffected()
+				log.Infof("[%d] = %d", i+1, cnt)
 			}
 		})
 

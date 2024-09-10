@@ -4,6 +4,7 @@ import (
 	"encoding/csv"
 	"net/http"
 
+	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/handlers"
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/tenant"
@@ -30,9 +31,10 @@ func UserCsvExport(c *xin.Context) {
 	cw := csv.NewWriter(c.Writer)
 	cw.UseCRLF = true
 
-	tx := filterUsers(c, uq).Order("id ASC")
+	sqb := filterUsers(c, uq).Select().Order("id")
+	sql, args := sqb.Build()
 
-	rows, err := tx.Rows()
+	rows, err := app.SDB.Queryx(sql, args...)
 	if err != nil {
 		c.Logger.Error(err)
 		_ = cw.Write([]string{err.Error()})
@@ -62,8 +64,9 @@ func UserCsvExport(c *xin.Context) {
 	rm := tbsutil.GetUserRoleMap(c.Locale, au.Role)
 	for rows.Next() {
 		var user models.User
-		err = tx.ScanRows(rows, &user)
+		err = rows.StructScan(&user)
 		if err != nil {
+			c.Logger.Error(err)
 			_ = cw.Write([]string{err.Error()})
 			cw.Flush()
 			return

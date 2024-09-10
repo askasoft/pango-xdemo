@@ -81,7 +81,7 @@ func (pdc *PetDogCreateJob) run() error {
 		}
 
 		pdc.Step++
-		if err := pdc.gen.Create(pdc.Log, app.GDB, &pdc.JobState); err != nil {
+		if err := pdc.gen.Create(pdc.Log, app.SDB, &pdc.JobState); err != nil {
 			return err
 		}
 

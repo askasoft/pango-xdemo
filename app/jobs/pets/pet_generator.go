@@ -15,9 +15,9 @@ import (
 	"github.com/askasoft/pango/fsu"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/num"
+	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/xfs"
-	"gorm.io/gorm"
 )
 
 type PetGenerator struct {
@@ -52,8 +52,8 @@ func NewPetGenerator(tt tenant.Tenant, cat string) *PetGenerator {
 	return pg
 }
 
-func (pg *PetGenerator) Create(logger log.Logger, db *gorm.DB, js *jobs.JobState) error {
-	gfs := pg.tt.GFS(db)
+func (pg *PetGenerator) Create(logger log.Logger, db *sqlx.DB, js *jobs.JobState) error {
+	sfs := pg.tt.SFS(db)
 
 	bd, _ := time.Parse(time.RFC3339, "2000-01-01T10:04:05+09:00")
 	pet := &models.Pet{
@@ -72,14 +72,24 @@ func (pg *PetGenerator) Create(logger log.Logger, db *gorm.DB, js *jobs.JobState
 	}
 
 	logger.Infof("%s Create Pet: %s", js.Progress(), pet.Name)
-	if err := db.Table(pg.tt.TablePets()).Create(pet).Error; err != nil {
+
+	sqb := db.Builder()
+	sqb.Insert(pg.tt.TablePets())
+	sqb.Names("name", "gender", "born_at", "origin", "temper", "habits", "amount", "price", "shop_name", "description", "created_at", "updated_at")
+	if !db.SupportLastInsertID() {
+		sqb.Returns("id")
+	}
+	sql := sqb.SQL()
+
+	pid, err := db.Create(sql, pet)
+	if err != nil {
 		return err
 	}
-	logger.Infof("%s Pet #%d Created: %s", js.Progress(), pet.ID, pet.Name)
+	logger.Infof("%s Pet #%d Created: %s", js.Progress(), pid, pet.Name)
 
 	if len(pg.imgs) > 0 {
 		img := pg.imgs[rand.Intn(len(pg.imgs))] //nolint: gosec
-		if _, err := xfs.SaveLocalFile(gfs, pet.PhotoPath(), img); err != nil {
+		if _, err := xfs.SaveLocalFile(sfs, pet.PhotoPath(), img); err != nil {
 			return err
 		}
 	}

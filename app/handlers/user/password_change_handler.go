@@ -68,13 +68,22 @@ func PasswordChangeChange(c *xin.Context) {
 	nu.SetPassword(pca.Newpwd)
 
 	tt := tenant.FromCtx(c)
-	r := app.GDB.Table(tt.TableUsers()).Where("id = ?", au.ID).Update("password", nu.Password)
-	if r.Error != nil {
-		c.AddError(r.Error)
+
+	sqb := app.SDB.Builder()
+	sqb.Update(tt.TableUsers())
+	sqb.Setc("password", nu.Password)
+	sqb.Where("id = ?", au.ID)
+	sql, args := sqb.Build()
+
+	r, err := app.SDB.Exec(sql, args...)
+	if err != nil {
+		c.AddError(err)
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}
-	if r.RowsAffected != 1 {
+
+	cnt, _ := r.RowsAffected()
+	if cnt != 1 {
 		c.AddError(errors.New(tbs.GetText(c.Locale, "error.update.notfound")))
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return

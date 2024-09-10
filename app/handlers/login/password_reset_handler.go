@@ -186,7 +186,13 @@ func PasswordResetExecute(c *xin.Context) {
 	mu := user.(*models.User)
 	mu.SetPassword(pra.Newpwd)
 
-	if err := app.GDB.Table(tt.TableUsers()).Where("id = ?", mu.ID).Update("password", mu.Password).Error; err != nil {
+	sqb := app.SDB.Builder()
+	sqb.Update(tt.TableUsers())
+	sqb.Setc("password", mu.Password)
+	sqb.Where("id = ?", mu.ID)
+	sql, args := sqb.Build()
+
+	if _, err := app.SDB.Exec(sql, args...); err != nil {
 		c.Logger.Error(err)
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))

@@ -8,9 +8,9 @@ import (
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango/log"
+	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pango/xmw"
-	"gorm.io/gorm"
 )
 
 // empty user
@@ -44,14 +44,19 @@ func FindUser(c *xin.Context, username string) (xmw.AuthUser, error) {
 		return u, nil
 	}
 
+	sqb := app.SDB.Builder()
+	sqb.Select().From(tt.TableUsers())
+	sqb.Where("email = ? AND status = ?", username, models.UserActive)
+	sql, args := sqb.Build()
+
 	u := &models.User{}
-	r := app.GDB.Table(tt.TableUsers()).Where("email = ? AND status = ?", username, models.UserActive).Take(u)
-	if r.Error != nil {
-		if errors.Is(r.Error, gorm.ErrRecordNotFound) {
+	err := app.SDB.Get(u, sql, args...)
+	if err != nil {
+		if errors.Is(err, sqlx.ErrNoRows) {
 			app.USERS.Set(k, noUser)
 			return nil, nil
 		}
-		return nil, r.Error
+		return nil, err
 	}
 
 	app.USERS.Set(k, u)

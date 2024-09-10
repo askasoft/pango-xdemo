@@ -13,9 +13,9 @@ import (
 	"github.com/askasoft/pango/doc/csvx"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/num"
+	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/tbs"
-	"gorm.io/gorm"
 )
 
 func ReadConfigFile() ([]*models.Config, error) {
@@ -51,7 +51,7 @@ func (tt Tenant) ConfigMap() map[string]string {
 		return dcm.(map[string]string)
 	}
 
-	dcm, err := tt.loadConfigMap(app.GDB)
+	dcm, err := tt.loadConfigMap(app.SDB)
 	if err != nil {
 		panic(err)
 	}
@@ -60,10 +60,13 @@ func (tt Tenant) ConfigMap() map[string]string {
 	return dcm
 }
 
-func (tt Tenant) loadConfigMap(db *gorm.DB) (map[string]string, error) {
-	configs := []*models.Config{}
+func (tt Tenant) loadConfigMap(db *sqlx.DB) (map[string]string, error) {
+	sqb := db.Builder()
+	sqb.Select().From(tt.TableConfigs())
+	sql, args := sqb.Build()
 
-	if err := db.Table(tt.TableConfigs()).Find(&configs).Error; err != nil {
+	configs := []*models.Config{}
+	if err := db.Select(&configs, sql, args...); err != nil {
 		return nil, err
 	}
 

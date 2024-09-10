@@ -4,6 +4,7 @@ import (
 	"encoding/csv"
 	"net/http"
 
+	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/handlers"
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/tenant"
@@ -33,9 +34,10 @@ func PetCsvExport(c *xin.Context) {
 
 	tt := tenant.FromCtx(c)
 
-	tx := filterPets(tt, pq).Order("id ASC")
+	sqb := filterPets(tt, pq).Select().Order("id")
+	sql, args := sqb.Build()
 
-	rows, err := tx.Rows()
+	rows, err := app.SDB.Queryx(sql, args...)
 	if err != nil {
 		c.Logger.Error(err)
 		_ = cw.Write([]string{err.Error()})
@@ -74,7 +76,7 @@ func PetCsvExport(c *xin.Context) {
 
 	for rows.Next() {
 		var pet models.Pet
-		err = tx.ScanRows(rows, &pet)
+		err = rows.StructScan(&pet)
 		if err != nil {
 			_ = cw.Write([]string{err.Error()})
 			cw.Flush()

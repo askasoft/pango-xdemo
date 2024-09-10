@@ -19,10 +19,10 @@ import (
 	"github.com/askasoft/pango/cog/linkedhashmap"
 	"github.com/askasoft/pango/iox"
 	"github.com/askasoft/pango/num"
+	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/tbs"
 	"github.com/askasoft/pango/xjm"
-	"gorm.io/gorm"
 )
 
 func init() {
@@ -269,28 +269,45 @@ func (uci *UserCsvImportJob) importRecord(rec *csvUserRecord) error {
 		UpdatedAt: time.Now(),
 	}
 
-	err := app.GDB.Transaction(func(db *gorm.DB) error {
+	err := app.SDB.Transaction(func(tx *sqlx.Tx) error {
+		sqb := tx.Builder()
+
 		if user.ID != 0 {
+			sqb.Select().From(uci.Tenant.TableUsers()).Where("id = ?", user.ID)
+			sql, args := sqb.Build()
+
 			eu := &models.User{}
-			r := db.Table(uci.Tenant.TableUsers()).Where("id = ?", user.ID).Take(eu)
-			if r.Error == nil {
+			err := tx.Get(eu, sql, args...)
+			if err == nil {
 				if rec.Password == "" {
-					// NOTE: we need reencrypt password, because password is encrypted by email
+					// NOTE: we need re-encrypt password, because password is encrypted by email
 					user.SetPassword(eu.GetPassword())
 				} else {
 					user.SetPassword(rec.Password)
 				}
 
-				r = db.Table(uci.Tenant.TableUsers()).Updates(user)
-				if r.Error != nil {
-					if pgutil.IsUniqueViolation(r.Error) {
+				sqb.Reset()
+				sqb.Update(uci.Tenant.TableUsers())
+				sqb.Setc("name", user.Name)
+				sqb.Setc("email", user.Email)
+				sqb.Setc("password", user.Password)
+				sqb.Setc("role", user.Role)
+				sqb.Setc("status", user.Status)
+				sqb.Setc("cidr", user.CIDR)
+				sqb.Setc("updated_at", user.UpdatedAt)
+				sqb.Where("id = ?", user.ID)
+				sql, args = sqb.Build()
+
+				r, err := tx.Exec(sql, args...)
+				if err != nil {
+					if pgutil.IsUniqueViolation(err) {
 						uci.Log.Warnf(tbs.GetText(uci.Locale, "user.import.csv.step.duplicated"), uci.Progress(), user.ID, user.Name, user.Email)
 						return jobs.ErrItemSkip
 					}
-					return r.Error
+					return err
 				}
 
-				if r.RowsAffected > 0 {
+				if cnt, _ := r.RowsAffected(); cnt > 0 {
 					uci.Log.Infof(tbs.GetText(uci.Locale, "user.import.csv.step.updated"), uci.Progress(), user.ID, user.Name, user.Email)
 				} else {
 					uci.Log.Warnf(tbs.GetText(uci.Locale, "user.import.csv.step.ufailed"), uci.Progress(), user.ID, user.Name, user.Email)
@@ -298,37 +315,51 @@ func (uci *UserCsvImportJob) importRecord(rec *csvUserRecord) error {
 				return nil
 			}
 
-			if !errors.Is(r.Error, gorm.ErrRecordNotFound) {
-				return r.Error
+			if !errors.Is(err, sqlx.ErrNoRows) {
+				return err
 			}
 		}
 
-		uid := user.ID
 		pwd := rec.Password
 		if pwd == "" {
 			pwd = pwdutil.RandomPassword()
 		}
 		user.SetPassword(pwd)
 
-		r := db.Table(uci.Tenant.TableUsers()).Create(user)
-		if r.Error != nil {
-			if pgutil.IsUniqueViolation(r.Error) {
+		sqb.Reset()
+		sqb.Insert(uci.Tenant.TableUsers())
+		if user.ID == 0 {
+			if !tx.SupportLastInsertID() {
+				sqb.Returns("id")
+			}
+		} else {
+			sqb.Setc("id", user.ID)
+		}
+		sqb.Setc("name", user.Name)
+		sqb.Setc("email", user.Email)
+		sqb.Setc("password", user.Password)
+		sqb.Setc("role", user.Role)
+		sqb.Setc("status", user.Status)
+		sqb.Setc("cidr", user.CIDR)
+		sqb.Setc("created_at", user.UpdatedAt)
+		sqb.Setc("updated_at", user.UpdatedAt)
+		sql, args := sqb.Build()
+
+		uid, err := tx.Create(sql, args...)
+		if err != nil {
+			if pgutil.IsUniqueViolation(err) {
 				uci.Log.Warnf(tbs.GetText(uci.Locale, "user.import.csv.step.duplicated"), uci.Progress(), user.ID, user.Name, user.Email)
 				return jobs.ErrItemSkip
 			}
-			return r.Error
+			return err
 		}
 
-		if r.RowsAffected > 0 {
-			uci.Log.Infof(tbs.GetText(uci.Locale, "user.import.csv.step.created"), uci.Progress(), user.ID, user.Name, user.Email)
-			if uid != 0 {
-				// reset sequence if create with ID
-				if err := uci.Tenant.ResetSequence(db, "users", models.UserStartID); err != nil {
-					return err
-				}
+		uci.Log.Infof(tbs.GetText(uci.Locale, "user.import.csv.step.created"), uci.Progress(), uid, user.Name, user.Email)
+		if user.ID != 0 {
+			// reset sequence if create with ID
+			if err := uci.Tenant.ResetSequence(tx, "users", models.UserStartID); err != nil {
+				return err
 			}
-		} else {
-			uci.Log.Warnf(tbs.GetText(uci.Locale, "user.import.csv.step.cfailed"), uci.Progress(), user.ID, user.Name, user.Email)
 		}
 		return nil
 	})

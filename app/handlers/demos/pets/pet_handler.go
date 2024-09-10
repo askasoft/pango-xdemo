@@ -8,18 +8,18 @@ import (
 	"github.com/askasoft/pango-xdemo/app/handlers"
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/tenant"
-	"github.com/askasoft/pango-xdemo/app/utils/gormutil"
+	"github.com/askasoft/pango-xdemo/app/utils/sqlxutil"
 	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
 	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/sqx"
 	"github.com/askasoft/pango/sqx/pqx"
+	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/xin"
-	"gorm.io/gorm"
 )
 
 type PetQuery struct {
-	gormutil.BaseQuery
+	sqlxutil.BaseQuery
 
 	ID        int64     `form:"id,strip" json:"id"`
 	Name      string    `form:"name,strip" json:"name"`
@@ -36,21 +36,23 @@ type PetQuery struct {
 	ShopName  string    `form:"shop_name,strip" json:"shop_name"`
 }
 
+var petListColumns = []string{
+	"id",
+	"name",
+	"gender",
+	"born_at",
+	"origin",
+	"temper",
+	"habits",
+	"amount",
+	"price",
+	"shop_name",
+	"created_at",
+	"updated_at",
+}
+
 func (pq *PetQuery) Normalize(c *xin.Context) {
-	pq.Sorter.Normalize(
-		"id",
-		"name",
-		"gender",
-		"born_at",
-		"origin",
-		"temper",
-		"habbits",
-		"amount",
-		"price",
-		"shop_name",
-		"created_at",
-		"updated_at",
-	)
+	pq.Sorter.Normalize(petListColumns...)
 
 	pq.Pager.Normalize(tbsutil.GetPagerLimits(c.Locale)...)
 }
@@ -69,65 +71,65 @@ func (pq *PetQuery) HasFilter() bool {
 		pq.ShopName != ""
 }
 
-func (pq *PetQuery) AddWhere(tx *gorm.DB) *gorm.DB {
+func (pq *PetQuery) AddWhere(sqb *sqlx.Builder) {
 	if pq.ID != 0 {
-		tx = tx.Where("id = ?", pq.ID)
+		sqb.Where("id = ?", pq.ID)
 	}
 	if pq.Name != "" {
-		tx = tx.Where("name LIKE ?", sqx.StringLike(pq.Name))
+		sqb.Where("name LIKE ?", sqx.StringLike(pq.Name))
 	}
 	if len(pq.Gender) > 0 {
-		tx = tx.Where("gender IN ?", pq.Gender)
+		sqb.In("gender", pq.Gender)
 	}
 	if len(pq.Origin) > 0 {
-		tx = tx.Where("origin IN ?", pq.Origin)
+		sqb.In("origin", pq.Origin)
 	}
 	if len(pq.Temper) > 0 {
-		tx = tx.Where("temper IN ?", pq.Temper)
+		sqb.In("temper", pq.Temper)
 	}
 	if len(pq.Habits) > 0 {
-		tx = tx.Where("habits @> ?", pqx.StringArray(pq.Habits))
+		sqb.Where("habits @> ?", pqx.StringArray(pq.Habits))
 	}
 	if pq.AmountMin != "" {
-		tx = tx.Where("amount >= ?", num.Atoi(pq.AmountMin))
+		sqb.Where("amount >= ?", num.Atoi(pq.AmountMin))
 	}
 	if pq.AmountMax != "" {
-		tx = tx.Where("amount <= ?", num.Atoi(pq.AmountMax))
+		sqb.Where("amount <= ?", num.Atoi(pq.AmountMax))
 	}
 	if pq.PriceMin != "" {
-		tx = tx.Where("price >= ?", num.Atof(pq.PriceMin))
+		sqb.Where("price >= ?", num.Atof(pq.PriceMin))
 	}
 	if pq.PriceMax != "" {
-		tx = tx.Where("price <= ?", num.Atof(pq.PriceMax))
+		sqb.Where("price <= ?", num.Atof(pq.PriceMax))
 	}
 	if pq.ShopName != "" {
-		tx = tx.Where("shop_name LIKE ?", sqx.StringLike(pq.ShopName))
+		sqb.Where("shop_name LIKE ?", sqx.StringLike(pq.ShopName))
 	}
-	return tx
 }
 
-func filterPets(tt tenant.Tenant, pq *PetQuery) *gorm.DB {
-	return pq.AddWhere(app.GDB.Table(tt.TablePets()))
+func filterPets(tt tenant.Tenant, pq *PetQuery) *sqlx.Builder {
+	sqb := app.SDB.Builder()
+	sqb.From(tt.TablePets())
+	pq.AddWhere(sqb)
+	return sqb
 }
 
-func countPets(tt tenant.Tenant, pq *PetQuery) (int, error) {
-	var total int64
+func countPets(tt tenant.Tenant, pq *PetQuery) (total int, err error) {
+	sqb := filterPets(tt, pq).Count()
+	sql, args := sqb.Build()
 
-	tx := filterPets(tt, pq)
-	if err := tx.Count(&total).Error; err != nil {
-		return 0, err
-	}
-
-	return int(total), nil
+	err = app.SDB.Get(&total, sql, args...)
+	return
 }
 
-func findPets(tt tenant.Tenant, pq *PetQuery) (arts []*models.Pet, err error) {
-	tx := filterPets(tt, pq)
+func findPets(tt tenant.Tenant, pq *PetQuery) (pets []*models.Pet, err error) {
+	sqb := filterPets(tt, pq)
+	pq.AddOrder(sqb, "id")
+	pq.AddPager(sqb)
+	sqb.Select(petListColumns...)
+	sql, args := sqb.Build()
 
-	tx = pq.AddOrder(tx, "id")
-	tx = pq.AddPager(tx)
-
-	err = tx.Omit("shop_address", "shop_link", "description").Find(&arts).Error
+	err = app.SDB.Select(&pets, sql, args...)
 	return
 }
 

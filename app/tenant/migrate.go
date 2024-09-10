@@ -9,6 +9,7 @@ import (
 	"github.com/askasoft/pango-xdemo/app/utils/cptutil"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/log/gormlog"
+	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/xfs"
 	"github.com/askasoft/pango/xjm"
 	"gorm.io/gorm"
@@ -56,22 +57,41 @@ func (tt Tenant) MigrateConfig(configs []*models.Config) error {
 
 	tn := tt.TableConfigs()
 
+	sqbu := app.SDB.Builder()
+	sqbu.Update(tn)
+	sqbu.Names("style", "order", "required", "secret", "viewer", "editor", "validation", "updated_at")
+	sqbu.Where("name = :name")
+	sqlu := sqbu.SQL()
+
+	stmtu, err := app.SDB.PrepareNamed(sqlu)
+	if err != nil {
+		return err
+	}
+	defer stmtu.Close()
+
+	sqbc := app.SDB.Builder()
+	sqbc.Insert(tn)
+	sqbc.Names("name", "style", "order", "required", "secret", "viewer", "editor", "validation", "created_at", "updated_at")
+	sqlc := sqbc.SQL()
+	stmtc, err := app.SDB.PrepareNamed(sqlc)
+	if err != nil {
+		return err
+	}
+	defer stmtc.Close()
+
 	for _, cfg := range configs {
-		tx := app.GDB.Table(tn)
-		tx = tx.Select("style", "order", "required", "secret", "viewer", "editor", "validation")
-		r := tx.Updates(cfg)
-		if r.Error != nil {
-			return r.Error
+		r, err := stmtu.Exec(cfg)
+		if err != nil {
+			return err
 		}
 
-		if r.RowsAffected == 0 {
+		if cnt, _ := r.RowsAffected(); cnt == 0 {
 			cfg.CreatedAt = time.Now()
 			cfg.UpdatedAt = cfg.CreatedAt
 
 			log.Infof("INSERT INTO %s: %v", tn, cfg)
-			r = app.GDB.Table(tn).Create(cfg)
-			if r.Error != nil {
-				return r.Error
+			if _, err := stmtc.Exec(cfg); err != nil {
+				return err
 			}
 		}
 	}
@@ -92,31 +112,40 @@ func (tt Tenant) MigrateSuper() error {
 
 	log.Infof("Migrate super %q: %s", tt, superEmail)
 
+	sqb := app.SDB.Builder()
+	sqb.Select().From(tt.TableUsers()).Where("email = ?", superEmail)
+	sql, args := sqb.Build()
+
 	user := &models.User{}
-	r := app.GDB.Table(tt.TableUsers()).Where("email = ?", superEmail).Take(user)
-	if r.Error != nil {
-		if !errors.Is(r.Error, gorm.ErrRecordNotFound) {
-			return r.Error
+	err := app.SDB.Get(user, sql, args...)
+	if err != nil {
+		if !errors.Is(err, sqlx.ErrNoRows) {
+			return err
 		}
 
-		user.ID = suc.GetInt64("id", 1)
-		user.Email = superEmail
-		user.Name = suc.GetString("name", "SUPER") + "@" + tt.String()
-		user.Password = cptutil.MustEncrypt(superEmail, suc.GetString("password", "changeme"))
-		user.Role = models.RoleSuper
-		user.Status = models.UserActive
-		user.CIDR = "0.0.0.0/0\n::/0"
+		sqb.Reset()
+		sqb.Insert(tt.TableUsers())
+		sqb.Setc("id", suc.GetInt64("id", 1))
+		sqb.Setc("email", superEmail)
+		sqb.Setc("name", suc.GetString("name", "SUPER")+"@"+tt.String())
+		sqb.Setc("password", cptutil.MustEncrypt(superEmail, suc.GetString("password", "changeme")))
+		sqb.Setc("role", models.RoleSuper)
+		sqb.Setc("status", models.UserActive)
+		sqb.Setc("cidr", "0.0.0.0/0\n::/0")
 
-		r = app.GDB.Table(tt.TableUsers()).Create(user)
-		if r.Error != nil {
-			return r.Error
+		_, err = app.SDB.Exec(sql, args...)
+		if err != nil {
+			return err
 		}
 
-		return tt.ResetSequence(app.GDB, "users", models.UserStartID)
+		return tt.ResetSequence(app.SDB, "users", models.UserStartID)
 	}
 
-	user.Role = models.RoleSuper
-	user.Status = models.UserActive
-	r = app.GDB.Table(tt.TableUsers()).Select("role", "status").Updates(user)
-	return r.Error
+	sqb.Reset()
+	sqb.Update(tt.TableUsers())
+	sqb.Setc("role", models.RoleSuper)
+	sqb.Setc("status", models.UserActive)
+	sql, args = sqb.Build()
+	_, err = app.SDB.Exec(sql, args...)
+	return err
 }

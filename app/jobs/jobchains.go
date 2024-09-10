@@ -7,9 +7,9 @@ import (
 
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/tenant"
+	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/xjm"
-	"gorm.io/gorm"
 )
 
 const (
@@ -45,9 +45,9 @@ func JobChainInitStates(jns ...string) []*JobRunState {
 func JobChainStart(tt tenant.Tenant, chainName string, states []*JobRunState, jobName string, jobFile string, jobParam ISetChain, chainData bool) (cid int64, err error) {
 	state := JobChainEncodeStates(states)
 
-	err = app.GDB.Transaction(func(db *gorm.DB) error {
-		gjc := tt.GJC(db)
-		cid, err = gjc.CreateJobChain(chainName, state)
+	err = app.SDB.Transaction(func(tx *sqlx.Tx) error {
+		sjc := tt.SJC(tx)
+		cid, err = sjc.CreateJobChain(chainName, state)
 		if err != nil {
 			return err
 		}
@@ -55,8 +55,8 @@ func JobChainStart(tt tenant.Tenant, chainName string, states []*JobRunState, jo
 		jobParam.SetChain(cid, 0, chainData)
 		jParam := xjm.MustEncode(jobParam)
 
-		gjm := tt.GJM(db)
-		_, err = gjm.AppendJob(jobName, jobFile, jParam)
+		sjm := tt.SJM(tx)
+		_, err = sjm.AppendJob(jobName, jobFile, jParam)
 
 		return err
 	})
