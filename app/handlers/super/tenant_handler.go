@@ -5,19 +5,20 @@ import (
 
 	"github.com/askasoft/pango-xdemo/app/handlers"
 	"github.com/askasoft/pango-xdemo/app/tenant"
-	"github.com/askasoft/pango-xdemo/app/utils/gormutil"
+	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
 	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
 	"github.com/askasoft/pango/xin"
+	"github.com/askasoft/pango/xsm"
 )
 
 type TenantInfo struct {
-	gormutil.SchemaInfo
+	xsm.SchemaInfo
 	Current bool `json:"current,omitempty"`
 	Default bool `json:"default,omitempty"`
 }
 
 type TenantQuery struct {
-	gormutil.SchemaQuery
+	xsm.SchemaQuery
 }
 
 func tenantListArgs(c *xin.Context) (tq *TenantQuery, err error) {
@@ -32,7 +33,7 @@ func TenantIndex(c *xin.Context) {
 	h := handlers.H(c)
 
 	tq, _ := tenantListArgs(c)
-	tq.Normalize(c)
+	tq.Normalize(tbsutil.GetPagerLimits(c.Locale))
 
 	h["Q"] = tq
 	c.HTML(http.StatusOK, "super/tenants", h)
@@ -47,7 +48,7 @@ func TenantList(c *xin.Context) {
 	}
 
 	tq.Total, err = tenant.CountSchemas(&tq.SchemaQuery)
-	tq.Normalize(c)
+	tq.Normalize(tbsutil.GetPagerLimits(c.Locale))
 
 	if err != nil {
 		c.AddError(err)

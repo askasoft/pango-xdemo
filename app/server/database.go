@@ -12,6 +12,7 @@ import (
 	"github.com/askasoft/pango/fsu"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/log/gormlog"
+	"github.com/askasoft/pango/log/sqlxlog"
 	"github.com/askasoft/pango/mag"
 	"github.com/askasoft/pango/sqx"
 	"github.com/askasoft/pango/sqx/sqlx"
@@ -84,7 +85,10 @@ func openDatabase() error {
 
 	app.DBS = dbs
 	app.GDB = gdb
-	app.SDB = sqlx.NewDB(db, typ)
+	app.SDB = sqlx.NewDB(db, typ, sqlxlog.NewSqlxLogger(
+		log.GetLogger("SQL"),
+		sec.GetDuration("slowSql", time.Second),
+	).Trace)
 
 	return nil
 }

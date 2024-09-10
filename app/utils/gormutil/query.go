@@ -25,18 +25,22 @@ func (bq *BaseQuery) AddPager(tx *gorm.DB) *gorm.DB {
 }
 
 func (bq *BaseQuery) AddOrder(tx *gorm.DB, defcol string) *gorm.DB {
-	cols := str.FieldsByte(bq.Sorter.Col, ',')
+	return GormAddOrder(tx, &bq.Sorter, defcol)
+}
+
+func GormAddOrder(tx *gorm.DB, st *args.Sorter, defcol string) *gorm.DB {
+	cols := str.FieldsByte(st.Col, ',')
 
 	defs := false
 	for _, col := range cols {
-		tx = tx.Order(GormOrderBy(col, bq.Sorter.IsDesc()))
+		tx = tx.Order(GormOrderBy(col, st.IsDesc()))
 		if col == defcol {
 			defs = true
 		}
 	}
 
 	if !defs {
-		tx = tx.Order(GormOrderBy(defcol, bq.Sorter.IsDesc()))
+		tx = tx.Order(GormOrderBy(defcol, st.IsDesc()))
 	}
 	return tx
 }
