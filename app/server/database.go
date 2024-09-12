@@ -176,14 +176,14 @@ func dbExecSQL(sqlfile string) error {
 					return err
 				}
 
-				log.Infof("[%d] %s", i, sql)
 				r, err := tx.Exec(sql)
 				if err != nil {
+					log.Errorf("#%d = %s", i, sql)
 					return err
 				}
 
 				cnt, _ := r.RowsAffected()
-				log.Infof("[%d] = %d", i+1, cnt)
+				log.Infof("#%d [%d] = %s", i, cnt, sql)
 			}
 		})
 

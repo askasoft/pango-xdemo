@@ -34,7 +34,11 @@ func PetCsvExport(c *xin.Context) {
 
 	tt := tenant.FromCtx(c)
 
-	sqb := filterPets(tt, pq).Select().Order("id")
+	sqb := app.SDB.Builder()
+	sqb.Select()
+	sqb.From(tt.TablePets())
+	pq.AddWhere(sqb)
+	sqb.Order("id")
 	sql, args := sqb.Build()
 
 	rows, err := app.SDB.Queryx(sql, args...)

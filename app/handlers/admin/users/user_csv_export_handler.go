@@ -31,7 +31,13 @@ func UserCsvExport(c *xin.Context) {
 	cw := csv.NewWriter(c.Writer)
 	cw.UseCRLF = true
 
-	sqb := filterUsers(c, uq).Select().Order("id")
+	tt := tenant.FromCtx(c)
+
+	sqb := app.SDB.Builder()
+	sqb.Select()
+	sqb.From(tt.TableUsers())
+	uq.AddWhere(c, sqb)
+	sqb.Order("id")
 	sql, args := sqb.Build()
 
 	rows, err := app.SDB.Queryx(sql, args...)

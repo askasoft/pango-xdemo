@@ -107,15 +107,11 @@ func (pq *PetQuery) AddWhere(sqb *sqlx.Builder) {
 	}
 }
 
-func filterPets(tt tenant.Tenant, pq *PetQuery) *sqlx.Builder {
+func countPets(tt tenant.Tenant, pq *PetQuery) (total int, err error) {
 	sqb := app.SDB.Builder()
+	sqb.Count()
 	sqb.From(tt.TablePets())
 	pq.AddWhere(sqb)
-	return sqb
-}
-
-func countPets(tt tenant.Tenant, pq *PetQuery) (total int, err error) {
-	sqb := filterPets(tt, pq).Count()
 	sql, args := sqb.Build()
 
 	err = app.SDB.Get(&total, sql, args...)
@@ -123,10 +119,12 @@ func countPets(tt tenant.Tenant, pq *PetQuery) (total int, err error) {
 }
 
 func findPets(tt tenant.Tenant, pq *PetQuery) (pets []*models.Pet, err error) {
-	sqb := filterPets(tt, pq)
+	sqb := app.SDB.Builder()
+	sqb.Select(petListColumns...)
+	sqb.From(tt.TablePets())
+	pq.AddWhere(sqb)
 	pq.AddOrder(sqb, "id")
 	pq.AddPager(sqb)
-	sqb.Select(petListColumns...)
 	sql, args := sqb.Build()
 
 	err = app.SDB.Select(&pets, sql, args...)

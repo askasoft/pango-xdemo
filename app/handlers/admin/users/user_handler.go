@@ -73,25 +73,27 @@ func (uq *UserQuery) AddWhere(c *xin.Context, sqb *sqlx.Builder) {
 	}
 }
 
-func filterUsers(c *xin.Context, uq *UserQuery) *sqlx.Builder {
+func countUsers(c *xin.Context, uq *UserQuery) (total int, err error) {
 	tt := tenant.FromCtx(c)
 
 	sqb := app.SDB.Builder()
+	sqb.Count()
 	sqb.From(tt.TableUsers())
 	uq.AddWhere(c, sqb)
-	return sqb
-}
 
-func countUsers(c *xin.Context, uq *UserQuery) (total int, err error) {
-	sqb := filterUsers(c, uq).Count()
 	sql, args := sqb.Build()
 
-	err = app.SDB.Get(total, sql, args)
+	err = app.SDB.Get(total, sql, args...)
 	return
 }
 
 func findUsers(c *xin.Context, uq *UserQuery) (usrs []*models.User, err error) {
-	sqb := filterUsers(c, uq).Select()
+	tt := tenant.FromCtx(c)
+
+	sqb := app.SDB.Builder()
+	sqb.Select()
+	sqb.From(tt.TableUsers())
+	uq.AddWhere(c, sqb)
 	uq.AddOrder(sqb, "id")
 	uq.AddPager(sqb)
 	sql, args := sqb.Build()
