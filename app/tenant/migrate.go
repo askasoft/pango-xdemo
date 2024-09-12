@@ -8,7 +8,7 @@ import (
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/utils/cptutil"
 	"github.com/askasoft/pango/log"
-	"github.com/askasoft/pango/log/gormlog"
+	"github.com/askasoft/pango/log/sqlog/gormlog"
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/xfs"
 	"github.com/askasoft/pango/xjm"
