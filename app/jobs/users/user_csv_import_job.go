@@ -300,7 +300,7 @@ func (uci *UserCsvImportJob) importRecord(rec *csvUserRecord) error {
 
 				r, err := tx.Exec(sql, args...)
 				if err != nil {
-					if pgutil.IsUniqueViolation(err) {
+					if pgutil.IsUniqueViolationError(err) {
 						uci.Log.Warnf(tbs.GetText(uci.Locale, "user.import.csv.step.duplicated"), uci.Progress(), user.ID, user.Name, user.Email)
 						return jobs.ErrItemSkip
 					}
@@ -347,7 +347,7 @@ func (uci *UserCsvImportJob) importRecord(rec *csvUserRecord) error {
 
 		uid, err := tx.Create(sql, args...)
 		if err != nil {
-			if pgutil.IsUniqueViolation(err) {
+			if pgutil.IsUniqueViolationError(err) {
 				uci.Log.Warnf(tbs.GetText(uci.Locale, "user.import.csv.step.duplicated"), uci.Progress(), user.ID, user.Name, user.Email)
 				return jobs.ErrItemSkip
 			}

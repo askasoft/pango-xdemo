@@ -140,7 +140,7 @@ func UserCreate(c *xin.Context) {
 	user.UpdatedAt = user.CreatedAt
 
 	if err := app.GDB.Table(tt.TableUsers()).Create(user).Error; err != nil {
-		if pgutil.IsUniqueViolation(err) {
+		if pgutil.IsUniqueViolationError(err) {
 			err = &vadutil.ParamError{
 				Param:   "email",
 				Message: tbs.Format(c.Locale, "user.error.duplicated", tbs.GetText(c.Locale, "user.email", "email"), user.Email),

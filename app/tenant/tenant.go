@@ -174,7 +174,7 @@ func (tt Tenant) ResetSequence(db sqlx.Sqlx, table string, starts ...int64) erro
 	case "mysql":
 		return nil
 	default:
-		_, err := db.Exec(pgutil.ResetSequence(stn, starts...))
+		_, err := db.Exec(pgutil.ResetSequenceSQL(stn, starts...))
 		return err
 	}
 }
