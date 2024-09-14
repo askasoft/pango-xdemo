@@ -180,23 +180,8 @@ func PetUpdate(c *xin.Context) {
 	err := app.SDB.Transaction(func(tx *sqlx.Tx) error {
 		sqb := tx.Builder()
 		sqb.Update(tt.TablePets())
-		sqb.Names(
-			"name",
-			"gender",
-			"born_at",
-			"origin",
-			"temper",
-			"habits",
-			"amount",
-			"price",
-			"shop_name",
-			"shop_link",
-			"shop_address",
-			"shop_telephone",
-			"description",
-			"updated_at",
-		)
-		sqb.Where("id = ?", pet.ID)
+		sqb.StructNames(&pet.Pet, "id", "created_at")
+		sqb.Where("id = :id")
 		sql := sqb.SQL()
 
 		r, err := tx.NamedExec(sql, pet)

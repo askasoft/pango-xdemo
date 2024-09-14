@@ -75,13 +75,13 @@ func (pg *PetGenerator) Create(logger log.Logger, db *sqlx.DB, js *jobs.JobState
 
 	sqb := db.Builder()
 	sqb.Insert(pg.tt.TablePets())
-	sqb.Names("name", "gender", "born_at", "origin", "temper", "habits", "amount", "price", "shop_name", "description", "created_at", "updated_at")
+	sqb.StructNames(pet, "id")
 	if !db.SupportLastInsertID() {
 		sqb.Returns("id")
 	}
 	sql := sqb.SQL()
 
-	pid, err := db.Create(sql, pet)
+	pid, err := db.NamedCreate(sql, pet)
 	if err != nil {
 		return err
 	}

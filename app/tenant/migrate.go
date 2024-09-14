@@ -53,13 +53,13 @@ func (tt Tenant) MigrateSchema() error {
 }
 
 func (tt Tenant) MigrateConfig(configs []*models.Config) error {
-	log.Infof("Migrate config %q", tt.Schema())
+	tb := tt.TableConfigs()
 
-	tn := tt.TableConfigs()
+	log.Infof("Migrate %q", tb)
 
 	sqbu := app.SDB.Builder()
-	sqbu.Update(tn)
-	sqbu.Names("style", "order", "required", "secret", "viewer", "editor", "validation", "updated_at")
+	sqbu.Update(tb)
+	sqbu.Names("style", "order", "required", "secret", "viewer", "editor", "validation")
 	sqbu.Where("name = :name")
 	sqlu := sqbu.SQL()
 
@@ -70,8 +70,8 @@ func (tt Tenant) MigrateConfig(configs []*models.Config) error {
 	defer stmtu.Close()
 
 	sqbc := app.SDB.Builder()
-	sqbc.Insert(tn)
-	sqbc.Names("name", "style", "order", "required", "secret", "viewer", "editor", "validation", "created_at", "updated_at")
+	sqbc.Insert(tb)
+	sqbc.StructNames(&models.Config{})
 	sqlc := sqbc.SQL()
 	stmtc, err := app.SDB.PrepareNamed(sqlc)
 	if err != nil {
@@ -80,16 +80,16 @@ func (tt Tenant) MigrateConfig(configs []*models.Config) error {
 	defer stmtc.Close()
 
 	for _, cfg := range configs {
+		cfg.UpdatedAt = time.Now()
 		r, err := stmtu.Exec(cfg)
 		if err != nil {
 			return err
 		}
 
 		if cnt, _ := r.RowsAffected(); cnt == 0 {
-			cfg.CreatedAt = time.Now()
-			cfg.UpdatedAt = cfg.CreatedAt
+			cfg.CreatedAt = cfg.UpdatedAt
 
-			log.Infof("INSERT INTO %s: %v", tn, cfg)
+			log.Infof("INSERT INTO %s: %v", tb, cfg)
 			if _, err := stmtc.Exec(cfg); err != nil {
 				return err
 			}
