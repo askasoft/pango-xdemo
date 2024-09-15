@@ -179,7 +179,7 @@ func ConfigSave(c *xin.Context) {
 			continue
 		}
 
-		if cfg.Secret && str.CountByte(v, '*') == len(v) {
+		if cfg.Secret && v != "" && str.CountByte(v, '*') == len(v) {
 			// skip unmodified secret value
 			continue
 		}
@@ -328,16 +328,10 @@ func ConfigImport(c *xin.Context) {
 
 	sqb := app.SDB.Builder()
 	for _, cfg := range cfgs {
-		uc := &models.Config{
-			Name:      cfg.Name,
-			Value:     cfg.Value,
-			UpdatedAt: time.Now(),
-		}
-
 		sqb.Reset()
 		sqb.Update(tt.TableConfigs())
-		sqb.Setc("value", uc.Value)
-		sqb.Setc("updated_at", uc.UpdatedAt)
+		sqb.Setc("value", cfg.Value)
+		sqb.Setc("updated_at", time.Now())
 		sqb.Where("editor >= ?", au.Role)
 		sql, args := sqb.Build()
 
