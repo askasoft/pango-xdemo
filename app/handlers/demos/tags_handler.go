@@ -29,7 +29,8 @@ func TagsIndex(c *xin.Context) {
 	h := handlers.H(c)
 
 	a := &tagsArg{
-		Ochecks: []string{"c2"},
+		Ochecks:  []string{"c2"},
+		Htmledit: "<pre>HTML本文</pre>",
 	}
 	_ = c.Bind(a)
 

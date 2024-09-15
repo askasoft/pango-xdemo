@@ -415,11 +415,26 @@ var main = {
 
 	summernote: function($el) {
 		if ($el.length) {
-			var sno = {};
+			var sno = {
+				toolbar: [
+					[ 'style', [ 'style', 'fontname', 'fontsize', 'color' ] ],
+					[ 'text', [ 'bold', 'italic', 'underline', 'strikethrough', 'superscript', 'subscript' ] ],
+					[ 'para', [ /*'height', */'paragraph', 'ol', 'ul' ] ],
+					[ 'insert', [ 'hr', 'table', 'link' ] ],
+					[ 'media', [ 'picture', 'video' ] ],
+					[ 'edit', [ 'undo', 'redo', 'clear' ] ]
+					// [ 'misc', [ 'codeview', 'fullscreen', 'help' ] ],
+				]
+			};
 			if ($('html').attr('lang') == 'ja') {
-				sno = { lang: 'ja-JP' };
+				sno.lang = 'ja-JP';
 			}
 			$el.removeAttr('summernote').summernote(sno);
+
+			// summernote bs5 bug fix
+			$('.note-toolbar').find('[data-toggle]').each(function() {
+				$(this).attr('data-bs-toggle', $(this).attr('data-toggle')).removeAttr('data-toggle');
+			});
 		}
 	},
 
