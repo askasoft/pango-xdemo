@@ -176,6 +176,7 @@ func configHandlers() {
 
 	r.HTMLTemplates = app.XHT
 
+	r.Use(SetCtxLogProp) // Set TENANT logger prop
 	r.Use(app.XAL.Handler())
 	r.Use(app.XRL.Handler())
 	r.Use(app.XRC.Handler())

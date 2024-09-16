@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/askasoft/pango-xdemo/app"
-	"github.com/askasoft/pango-xdemo/app/tasks"
 	"github.com/askasoft/pango-xdemo/app/utils/cptutil"
 	"github.com/askasoft/pango-xdemo/tpls"
 	"github.com/askasoft/pango-xdemo/txts"
@@ -38,7 +37,7 @@ func (s *service) PrintCommand(out io.Writer) {
 	fmt.Fprintln(out, "      kind=super        migrate tenant super user.")
 	fmt.Fprintln(out, "      schema=...        specify schemas to migrate.")
 	fmt.Fprintln(out, "    execsql <file>      execute sql file.")
-	fmt.Fprintln(out, "    tmpclean            clean outdated temporary files.")
+	fmt.Fprintln(out, "    exectask <task>     execute task [ "+str.Join(schedules.Keys(), ", ")+" ]")
 	fmt.Fprintln(out, "    encrypt [key] <str> encrypt string.")
 	fmt.Fprintln(out, "    decrypt [key] <str> decrypt string.")
 	fmt.Fprintln(out, "    assets  [dir]       export assets to directory.")
@@ -49,7 +48,7 @@ func (s *service) PrintCommand(out io.Writer) {
 // Basic: 'help' 'usage' 'version'
 // Windows only: 'install' 'remove' 'start' 'stop' 'debug'
 func (s *service) Exec(cmd string) {
-	log.SetFormat("%t [%p] - %m%n%T")
+	log.SetFormat("%t [%p] (%x{TENANT}) - %m%n%T")
 	log.SetLevel(gog.If(s.debug, log.LevelDebug, log.LevelInfo))
 
 	switch cmd {
@@ -57,8 +56,8 @@ func (s *service) Exec(cmd string) {
 		doMigrate()
 	case "execsql":
 		doExecSQL()
-	case "tmpclean":
-		doTmpClean()
+	case "exectask":
+		doExecTask()
 	case "encrypt":
 		doEncrypt()
 	case "decrypt":
@@ -76,7 +75,7 @@ func doMigrate() {
 	initConfigs()
 
 	if err := openDatabase(); err != nil {
-		log.Fatal(err) //nolint: all
+		log.Error(err)
 		app.Exit(app.ExitErrDB)
 	}
 
@@ -90,17 +89,17 @@ func doMigrate() {
 	switch sub {
 	case "schema":
 		if err := dbMigrateSchemas(args...); err != nil {
-			log.Fatal(err) //nolint: all
+			log.Error(err)
 			app.Exit(app.ExitErrDB)
 		}
 	case "config":
 		if err := dbMigrateConfigs(args...); err != nil {
-			log.Fatal(err) //nolint: all
+			log.Error(err)
 			app.Exit(app.ExitErrDB)
 		}
 	case "super":
 		if err := dbMigrateSupers(args...); err != nil {
-			log.Fatal(err) //nolint: all
+			log.Error(err)
 			app.Exit(app.ExitErrDB)
 		}
 	}
@@ -112,27 +111,34 @@ func doExecSQL() {
 	initConfigs()
 
 	if err := openDatabase(); err != nil {
-		log.Fatal(err) //nolint: all
+		log.Error(err)
 		app.Exit(app.ExitErrDB)
 	}
 
 	if err := dbExecSQL(flag.Arg(1)); err != nil {
-		log.Fatal(err) //nolint: all
+		log.Error(err)
 		app.Exit(app.ExitErrDB)
 	}
 
 	log.Info("DONE.")
 }
 
-func doTmpClean() {
+func doExecTask() {
 	initConfigs()
 
 	if err := openDatabase(); err != nil {
-		log.Fatal(err) //nolint: all
+		log.Error(err)
 		app.Exit(app.ExitErrDB)
 	}
 
-	tasks.CleanTemporaryFiles()
+	tn := flag.Arg(1)
+	tf, ok := schedules.Get(tn)
+	if !ok {
+		log.Errorf("Invalid Task %q", tn)
+		app.Exit(app.ExitErrSCH)
+	}
+
+	tf()
 
 	log.Info("DONE.")
 }
