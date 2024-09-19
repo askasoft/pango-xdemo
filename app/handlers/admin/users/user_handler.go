@@ -83,7 +83,7 @@ func countUsers(c *xin.Context, uq *UserQuery) (total int, err error) {
 
 	sql, args := sqb.Build()
 
-	err = app.SDB.Get(total, sql, args...)
+	err = app.SDB.Get(&total, sql, args...)
 	return
 }
 

@@ -21,9 +21,7 @@ import (
 	"github.com/askasoft/pango-xdemo/web"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/net/httpx"
-	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/str"
-	"github.com/askasoft/pango/tbs"
 	"github.com/askasoft/pango/vad"
 	"github.com/askasoft/pango/xfs"
 	"github.com/askasoft/pango/xin"
@@ -62,17 +60,12 @@ func initRouter() {
 	configHandlers()
 }
 
-func bodyTooLarge(c *xin.Context, limit int64) {
-	c.String(http.StatusBadRequest, tbs.Format(c.Locale, "error.request.toolarge", num.HumanSize(float64(limit))))
-	c.Abort()
-}
-
 func configMiddleware() {
 	svc := app.INI.Section("server")
 
 	app.XRL.DrainBody = svc.GetBool("httpDrainRequestBody", false)
 	app.XRL.MaxBodySize = svc.GetSize("httpMaxRequestBodySize", 8<<20)
-	app.XRL.BodyTooLarge = bodyTooLarge
+	app.XRL.BodyTooLarge = handlers.BodyTooLarge
 
 	app.XRC.Disable(!svc.GetBool("httpGzip"))
 	app.XHD.Disable(!svc.GetBool("httpDump"))
@@ -176,13 +169,13 @@ func configHandlers() {
 
 	r.HTMLTemplates = app.XHT
 
+	r.Use(xin.Recovery())
 	r.Use(SetCtxLogProp) // Set TENANT logger prop
 	r.Use(app.XAL.Handler())
+	r.Use(app.XLL.Handler())
 	r.Use(app.XRL.Handler())
 	r.Use(app.XRC.Handler())
 	r.Use(app.XHD.Handler())
-	r.Use(xin.Recovery())
-	r.Use(app.XLL.Handler())
 	r.Use(app.XRH.Handler())
 
 	rg := r.Group(app.Base)

@@ -4,16 +4,22 @@ import (
 	"net/http"
 
 	"github.com/askasoft/pango-xdemo/app"
+	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/str"
+	"github.com/askasoft/pango/tbs"
 	"github.com/askasoft/pango/xin"
 )
+
+func IsAjax(c *xin.Context) bool {
+	return str.EqualFold(c.GetHeader("X-Requested-With"), "XMLHttpRequest")
+}
 
 func Index(c *xin.Context) {
 	c.HTML(http.StatusOK, "index", H(c))
 }
 
 func NotFound(c *xin.Context) {
-	if str.EqualFold(c.GetHeader("X-Requested-With"), "XMLHttpRequest") {
+	if IsAjax(c) {
 		c.AbortWithStatus(http.StatusNotFound)
 		return
 	}
@@ -23,7 +29,7 @@ func NotFound(c *xin.Context) {
 }
 
 func Forbidden(c *xin.Context) {
-	if str.EqualFold(c.GetHeader("X-Requested-With"), "XMLHttpRequest") {
+	if IsAjax(c) {
 		c.JSON(http.StatusForbidden, E(c))
 	} else {
 		c.HTML(http.StatusForbidden, "403", H(c))
@@ -31,8 +37,19 @@ func Forbidden(c *xin.Context) {
 	c.Abort()
 }
 
+func BodyTooLarge(c *xin.Context) {
+	err := tbs.Format(c.Locale, "error.request.toolarge", num.HumanSize(float64(app.XRL.MaxBodySize)))
+
+	if IsAjax(c) {
+		c.JSON(http.StatusRequestEntityTooLarge, xin.H{"error": err})
+	} else {
+		c.String(http.StatusRequestEntityTooLarge, err)
+	}
+	c.Abort()
+}
+
 func InternalServerError(c *xin.Context) {
-	if str.EqualFold(c.GetHeader("X-Requested-With"), "XMLHttpRequest") {
+	if IsAjax(c) {
 		c.JSON(http.StatusInternalServerError, E(c))
 	} else {
 		c.HTML(http.StatusInternalServerError, "500", H(c))
