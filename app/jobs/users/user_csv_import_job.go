@@ -210,10 +210,9 @@ func (uci *UserCsvImportJob) doCheckCsv() (total int, err error) {
 
 func (uci *UserCsvImportJob) checkRecord(rec *csvUserRecord) error {
 	var errs []string
-	if rec.ID != "" {
-		if num.Atol(rec.ID) < models.UserStartID {
-			errs = append(errs, tbs.Format(uci.Locale, "error.param.gte", tbs.GetText(uci.Locale, "user.id", "ID"), num.Ltoa(models.UserStartID)))
-		}
+
+	if rec.ID != "" && num.Atol(rec.ID) < models.UserStartID {
+		errs = append(errs, tbs.Format(uci.Locale, "error.param.gte", tbs.GetText(uci.Locale, "user.id", "ID"), num.Ltoa(models.UserStartID)))
 	}
 	if rec.Name == "" {
 		errs = append(errs, tbs.GetText(uci.Locale, "user.name"))

@@ -41,7 +41,6 @@ func (ch *CsvHeader) ParseHead(row []string) {
 	ch.Others = make(map[string]int)
 
 	for i, s := range row {
-		s = str.TrimSuffix(s, "ー")
 		s = str.Strip(s)
 		if s == "" {
 			continue
