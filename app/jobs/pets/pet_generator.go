@@ -85,7 +85,9 @@ func (pg *PetGenerator) Create(logger log.Logger, db *sqlx.DB, js *jobs.JobState
 	if err != nil {
 		return err
 	}
-	logger.Infof("%s Pet #%d Created: %s", js.Progress(), pid, pet.Name)
+
+	pet.ID = pid
+	logger.Infof("%s Pet #%d Created: %s", js.Progress(), pet.ID, pet.Name)
 
 	if len(pg.imgs) > 0 {
 		img := pg.imgs[rand.Intn(len(pg.imgs))] //nolint: gosec
