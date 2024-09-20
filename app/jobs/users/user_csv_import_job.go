@@ -16,7 +16,7 @@ import (
 	"github.com/askasoft/pango-xdemo/app/utils/pgutil"
 	"github.com/askasoft/pango-xdemo/app/utils/pwdutil"
 	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
-	"github.com/askasoft/pango/cog/linkedhashmap"
+	"github.com/askasoft/pango/cog/hashmap"
 	"github.com/askasoft/pango/iox"
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/sqx/sqlx"
@@ -53,11 +53,8 @@ type UserCsvImportJob struct {
 	data []byte
 	head csvUserHeader
 
-	roleMap   *linkedhashmap.LinkedHashMap[string, string]
-	statusMap *linkedhashmap.LinkedHashMap[string, string]
-
-	roleRevMap   map[string]string
-	statusRevMap map[string]string
+	roleRevMap   *hashmap.HashMap[string, string]
+	statusRevMap *hashmap.HashMap[string, string]
 
 	pwdPolicy *tenant.PasswordPolicy
 }
@@ -91,8 +88,6 @@ func (uci *UserCsvImportJob) Run() {
 		return
 	}
 
-	uci.roleMap = tbsutil.GetUserRoleMap(uci.Locale, uci.arg.Role)
-	uci.statusMap = tbsutil.GetUserStatusMap(uci.Locale)
 	uci.roleRevMap = tbsutil.GetUserRoleReverseMap()
 	uci.statusRevMap = tbsutil.GetUserStatusReverseMap()
 	uci.pwdPolicy = uci.Tenant.GetPasswordPolicy(uci.Locale)
@@ -226,10 +221,10 @@ func (uci *UserCsvImportJob) checkRecord(rec *csvUserRecord) error {
 	if rec.Email == "" {
 		errs = append(errs, tbs.GetText(uci.Locale, "user.email"))
 	}
-	if !uci.roleMap.Contain(rec.Role) {
+	if rec.Role != "" && !uci.roleRevMap.Contain(rec.Role) {
 		errs = append(errs, tbs.GetText(uci.Locale, "user.role"))
 	}
-	if !uci.statusMap.Contain(rec.Status) {
+	if rec.Status != "" && !uci.statusRevMap.Contain(rec.Status) {
 		errs = append(errs, tbs.GetText(uci.Locale, "user.status"))
 	}
 	if rec.Password != "" {
@@ -263,8 +258,8 @@ func (uci *UserCsvImportJob) importRecord(rec *csvUserRecord) error {
 		ID:        num.Atol(rec.ID),
 		Name:      rec.Name,
 		Email:     rec.Email,
-		Role:      rec.Role,
-		Status:    rec.Status,
+		Role:      uci.roleRevMap.MustGet(rec.Role, models.RoleViewer),
+		Status:    uci.statusRevMap.MustGet(rec.Status, models.UserActive),
 		CIDR:      rec.CIDR,
 		UpdatedAt: time.Now(),
 	}
@@ -385,29 +380,9 @@ func (uci *UserCsvImportJob) parseData(row []string) *csvUserRecord {
 	rec.Name = csvutil.GetString(row, h.IdxName)
 	rec.Email = csvutil.GetColumn(row, h.IdxEmail)
 	rec.Password = csvutil.GetString(row, h.IdxPassword)
+	rec.Status = csvutil.GetString(row, h.IdxStatus)
+	rec.Role = csvutil.GetString(row, h.IdxRole)
 	rec.CIDR = csvutil.GetColumn(row, h.IdxCIDR)
-
-	rec.Role = models.RoleViewer
-	if h.IdxRole > 0 {
-		rv := csvutil.GetString(row, h.IdxRole)
-		if rv != "" {
-			rec.Role = rv
-			if role, ok := uci.roleRevMap[rv]; ok {
-				rec.Role = role
-			}
-		}
-	}
-
-	rec.Status = models.UserActive
-	if h.IdxStatus > 0 {
-		sv := csvutil.GetString(row, h.IdxStatus)
-		if sv != "" {
-			rec.Status = sv
-			if status, ok := uci.statusRevMap[sv]; ok {
-				rec.Status = status
-			}
-		}
-	}
 
 	rec.Others = make(map[string]string)
 	for k, i := range h.Others {

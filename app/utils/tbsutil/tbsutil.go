@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 
 	"github.com/askasoft/pango-xdemo/app"
+	"github.com/askasoft/pango/cog/hashmap"
 	"github.com/askasoft/pango/cog/linkedhashmap"
-	"github.com/askasoft/pango/mag"
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/tbs"
@@ -24,23 +24,26 @@ func GetLinkedHashMap(locale, name string) *linkedhashmap.LinkedHashMap[string, 
 	return m
 }
 
-func GetReverseMap(locale, name string) map[string]string {
+func GetReverseMap(locale, name string) *hashmap.HashMap[string, string] {
 	m := make(map[string]string)
 	err := json.Unmarshal(str.UnsafeBytes(tbs.GetText(locale, name)), &m)
 	if err != nil {
 		panic(err)
 	}
-	return mag.Reverse(m)
+
+	rm := hashmap.NewHashMap[string, string]()
+	for k, v := range m {
+		rm.Set(v, k)
+	}
+	return rm
 }
 
-func GetAllReverseMap(name string) map[string]string {
-	am := make(map[string]string)
-
+func GetAllReverseMap(name string) *hashmap.HashMap[string, string] {
+	am := hashmap.NewHashMap[string, string]()
 	for _, lang := range app.Locales {
 		rm := GetReverseMap(lang, name)
-		mag.Copy(am, rm)
+		am.Copy(rm)
 	}
-
 	return am
 }
 
@@ -61,7 +64,7 @@ func GetUserStatusMap(locale string) *linkedhashmap.LinkedHashMap[string, string
 	return GetLinkedHashMap(locale, "user.map.status")
 }
 
-func GetUserStatusReverseMap() map[string]string {
+func GetUserStatusReverseMap() *hashmap.HashMap[string, string] {
 	return GetAllReverseMap("user.map.status")
 }
 
@@ -75,7 +78,7 @@ func GetUserRoleMap(locale string, role string) *linkedhashmap.LinkedHashMap[str
 	return urm
 }
 
-func GetUserRoleReverseMap() map[string]string {
+func GetUserRoleReverseMap() *hashmap.HashMap[string, string] {
 	return GetAllReverseMap("user.map.role")
 }
 
@@ -102,4 +105,3 @@ func GetPetResetJobnamesMap(locale string) *linkedhashmap.LinkedHashMap[string, 
 func GetPetResetJslabelsMap(locale string) *linkedhashmap.LinkedHashMap[string, string] {
 	return GetLinkedHashMap(locale, "pet.reset.jslabels")
 }
-
