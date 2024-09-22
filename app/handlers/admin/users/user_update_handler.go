@@ -139,7 +139,28 @@ func UserCreate(c *xin.Context) {
 	user.CreatedAt = time.Now()
 	user.UpdatedAt = user.CreatedAt
 
-	if err := app.GDB.Table(tt.TableUsers()).Create(user).Error; err != nil {
+	db := app.SDB
+	sqb := db.Builder()
+	sqb.Insert(tt.TableUsers())
+	if user.ID == 0 {
+		if !db.SupportLastInsertID() {
+			sqb.Returns("id")
+		}
+	} else {
+		sqb.Setc("id", user.ID)
+	}
+	sqb.Setc("name", user.Name)
+	sqb.Setc("email", user.Email)
+	sqb.Setc("password", user.Password)
+	sqb.Setc("role", user.Role)
+	sqb.Setc("status", user.Status)
+	sqb.Setc("cidr", user.CIDR)
+	sqb.Setc("created_at", user.UpdatedAt)
+	sqb.Setc("updated_at", user.UpdatedAt)
+	sql, args := sqb.Build()
+
+	uid, err := db.Create(sql, args...)
+	if err != nil {
 		if pgutil.IsUniqueViolationError(err) {
 			err = &vadutil.ParamError{
 				Param:   "email",
@@ -151,6 +172,7 @@ func UserCreate(c *xin.Context) {
 		return
 	}
 
+	user.ID = uid
 	user.Password = ""
 	c.JSON(http.StatusOK, xin.H{
 		"user":    user,

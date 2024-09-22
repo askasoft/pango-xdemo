@@ -19,12 +19,11 @@ import (
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/tbs"
 	"github.com/askasoft/pango/xin"
-	"gorm.io/gorm"
 )
 
 type PetWithFile struct {
 	models.Pet
-	File string `json:"file" form:"file,strip"`
+	File string `db:"-" json:"file" form:"file,strip"`
 }
 
 func PetNew(c *xin.Context) {
@@ -136,17 +135,29 @@ func PetCreate(c *xin.Context) {
 	pet.UpdatedAt = pet.CreatedAt
 
 	tt := tenant.FromCtx(c)
-	err := app.GDB.Transaction(func(db *gorm.DB) error {
-		if err := db.Table(tt.TablePets()).Create(&pet.Pet).Error; err != nil {
+
+	err := app.SDB.Transaction(func(tx *sqlx.Tx) error {
+		sqb := tx.Builder()
+		sqb.Insert(tt.TablePets())
+		sqb.StructNames(&pet.Pet, "id")
+		if !tx.SupportLastInsertID() {
+			sqb.Returns("id")
+		}
+		sql := sqb.SQL()
+
+		pid, err := tx.NamedCreate(sql, pet)
+		if err != nil {
 			return err
 		}
+
+		pet.ID = pid
 		if pet.File != "" {
 			fid := pet.PhotoPath()
-			gfs := tt.GFS(db)
-			if err := gfs.DeleteFile(fid); err != nil {
+			sfs := tt.SFS(tx)
+			if err := sfs.DeleteFile(fid); err != nil {
 				return err
 			}
-			return gfs.MoveFile(pet.File, fid)
+			return sfs.MoveFile(pet.File, fid)
 		}
 		return nil
 	})
