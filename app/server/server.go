@@ -53,7 +53,7 @@ func (s *service) Description() string {
 
 // Version app version
 func (s *service) Version() string {
-	return fmt.Sprintf("%s.%s (%s) [%s %s/%s]", app.Version, app.Revision, app.BuildTime.Local(), runtime.Version(), runtime.GOOS, runtime.GOARCH)
+	return app.Versions()
 }
 
 // Usage print command line usage

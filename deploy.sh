@@ -55,7 +55,7 @@ if ! [ -z "${LOG_OPENSEARCH_ACCESS}" ]; then
 		${APPHOME}/conf/log.ini
 fi
 
-cp -a ${APPNAME} ${APPHOME}/
-#cp -a tpls       ${APPHOME}/
-#cp -a txts       ${APPHOME}/
-#cp -a web        ${APPHOME}/
+cp -a ${APPNAME}* ${APPHOME}/
+#cp -a tpls        ${APPHOME}/
+#cp -a txts        ${APPHOME}/
+#cp -a web         ${APPHOME}/

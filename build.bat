@@ -4,19 +4,19 @@ SET GOARCH=amd64
 SET GOOS=windows
 SET GO111MODULE=on
 
+IF [%EXE%] == [] SET EXE=xdemo.exe
+SET PKG=github.com/askasoft/pango-xdemo/app
 SET COMPANY=Askasoft LLC.
 SET PRODUCT=Pango Xdemo
-SET EXENAME=xdemo.exe
-SET PKG=github.com/askasoft/pango-xdemo/app
+SET VER_MAJOR=1
+SET VER_MINOR=0
+SET VER_PATCH=0
 
 FOR /F "tokens=* USEBACKQ" %%i IN (`powershell -Command "Get-Date -date (Get-Date).ToUniversalTime()-uformat %%Y-%%m-%%dT%%H:%%M:%%SZ"`) DO (
 	SET BUILD_TIME=%%i
 )
 
 SET YEAR=%BUILD_TIME:~0,4%
-SET VER_MAJOR=1
-SET VER_MINOR=0
-SET VER_PATCH=0
 SET VERSION=%VER_MAJOR%.%VER_MINOR%.%VER_PATCH%
 FOR /F "tokens=* USEBACKQ" %%i IN (`git rev-parse --short HEAD`) DO (
 	SET REVISION=%%i
@@ -48,7 +48,7 @@ echo 		"FileVersion": "",
 echo 		"InternalName": "",
 echo 		"LegalCopyright": "Copyright (c) %YEAR% %COMPANY%, All Rights Reserved",
 echo 		"LegalTrademarks": "",
-echo 		"OriginalFilename": "%EXENAME%",
+echo 		"OriginalFilename": "%EXE%",
 echo 		"PrivateBuild": "",
 echo 		"ProductName": "%PRODUCT%",
 echo 		"ProductVersion": "%VERSION%.%REVISION%",
@@ -66,4 +66,4 @@ echo }
 ) > versioninfo.json
 
 go generate
-go build -ldflags "-X %PKG%.Version=%VERSION% -X %PKG%.Revision=%REVISION% -X %PKG%.buildTime=%BUILD_TIME%" -o %EXENAME%
+go build -ldflags "-X %PKG%.Version=%VERSION% -X %PKG%.Revision=%REVISION% -X %PKG%.buildTime=%BUILD_TIME%" -o %EXE%
