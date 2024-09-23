@@ -19,6 +19,7 @@ powershell -command "(gc conf\app.ini -Encoding utf8) | %% { $_ -replace 'prefix
 powershell -command "(gc conf\log.ini -Encoding utf8).Replace('DEBUG', '%LOG_LEVEL%').Replace('HOSTNAME', '%COMPUTERNAME%') | Out-File %APPHOME%\conf\log.ini -Encoding utf8"
 
 copy /Y conf\config.csv %APPHOME%\conf\
+copy /Y conf\schema.sql %APPHOME%\conf\
 
 if not "%LOG_SLACK_WEBHOOK%." == "." (
 	set LOG_WRITERS=%LOG_WRITERS%, slack

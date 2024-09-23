@@ -32,7 +32,6 @@ func (s *service) Flag() {
 // PrintCommand print custom command
 func (s *service) PrintCommand(out io.Writer) {
 	fmt.Fprintln(out, "    migrate <kind> [schema]...")
-	fmt.Fprintln(out, "      kind=schema       migrate database schemas.")
 	fmt.Fprintln(out, "      kind=config       migrate tenant configurations.")
 	fmt.Fprintln(out, "      kind=super        migrate tenant super user.")
 	fmt.Fprintln(out, "      schema=...        specify schemas to migrate.")
@@ -48,7 +47,7 @@ func (s *service) PrintCommand(out io.Writer) {
 // Basic: 'help' 'usage' 'version'
 // Windows only: 'install' 'remove' 'start' 'stop' 'debug'
 func (s *service) Exec(cmd string) {
-	log.SetFormat("%t [%p] (%x{TENANT}) - %m%n%T")
+	log.SetFormat("%t [%p] - %m%n%T")
 	log.SetLevel(gog.If(s.debug, log.LevelDebug, log.LevelInfo))
 
 	switch cmd {
@@ -74,10 +73,7 @@ func (s *service) Exec(cmd string) {
 func doMigrate() {
 	initConfigs()
 
-	if err := openDatabase(); err != nil {
-		log.Error(err)
-		app.Exit(app.ExitErrDB)
-	}
+	initDatabase()
 
 	sub := ""
 	args := flag.Args()[1:]
@@ -87,11 +83,6 @@ func doMigrate() {
 	}
 
 	switch sub {
-	case "schema":
-		if err := dbMigrateSchemas(args...); err != nil {
-			log.Error(err)
-			app.Exit(app.ExitErrDB)
-		}
 	case "config":
 		if err := dbMigrateConfigs(args...); err != nil {
 			log.Error(err)

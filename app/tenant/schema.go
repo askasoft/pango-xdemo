@@ -4,17 +4,11 @@ import (
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/xsm"
-	"github.com/askasoft/pango/xsm/pgsm/pggormsm"
 	"github.com/askasoft/pango/xsm/pgsm/pgsqlxsm"
-	"gorm.io/gorm"
 )
 
 func DefaultSchema() string {
 	return app.INI.GetString("database", "schema", "public")
-}
-
-func GSM(db *gorm.DB) xsm.SchemaManager {
-	return pggormsm.SM(db)
 }
 
 func SSM(db *sqlx.DB) xsm.SchemaManager {
@@ -22,10 +16,7 @@ func SSM(db *sqlx.DB) xsm.SchemaManager {
 }
 
 func SM() xsm.SchemaManager {
-	if app.INI.GetString("internal", "xsm") == "sqlxsm" {
-		return SSM(app.SDB)
-	}
-	return GSM(app.GDB)
+	return SSM(app.SDB)
 }
 
 func ExistsSchema(s string) (bool, error) {

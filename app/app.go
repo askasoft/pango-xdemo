@@ -14,7 +14,6 @@ import (
 	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pango/xin/render"
 	"github.com/askasoft/pango/xmw"
-	"gorm.io/gorm"
 )
 
 const (
@@ -23,6 +22,9 @@ const (
 
 	// Database Config table init file
 	DBConfigFile = "conf/config.csv"
+
+	// Schema DDL sql file
+	SQLSchemaFile = "conf/schema.sql"
 )
 
 const (
@@ -130,9 +132,6 @@ var (
 
 	// HTTP global http server
 	HTTP *http.Server
-
-	// GDB gorm database instance
-	GDB *gorm.DB
 
 	// SDB sqx database instance
 	SDB *sqlx.DB

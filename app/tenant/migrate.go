@@ -2,54 +2,51 @@ package tenant
 
 import (
 	"errors"
+	"io"
+	"strings"
 	"time"
 
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/models"
-	"github.com/askasoft/pango-xdemo/app/utils/cptutil"
+	"github.com/askasoft/pango/fsu"
 	"github.com/askasoft/pango/log"
-	"github.com/askasoft/pango/log/sqlog/gormlog"
+	"github.com/askasoft/pango/sqx"
 	"github.com/askasoft/pango/sqx/sqlx"
-	"github.com/askasoft/pango/xfs"
-	"github.com/askasoft/pango/xjm"
-	"gorm.io/gorm"
-	"gorm.io/gorm/schema"
+	"github.com/askasoft/pango/str"
 )
 
-func (tt Tenant) MigrateSchema() error {
-	log.Infof("Migrate schema %q", tt.Schema())
-
-	dbc := &gorm.Config{
-		NamingStrategy: schema.NamingStrategy{TablePrefix: tt.Prefix()},
-		Logger: gormlog.NewGormLogger(
-			tt.Logger("SQL"),
-			app.INI.GetDuration("database", "slowSql", time.Second),
-		),
+func (tt Tenant) InitSchema() error {
+	if err := tt.MigrateSchema(); err != nil {
+		return err
 	}
 
-	gdd := app.GDB.Dialector
+	if err := tt.MigrateSuper(); err != nil {
+		return err
+	}
 
-	gdb, err := gorm.Open(gdd, dbc)
+	configs, err := ReadConfigFile()
 	if err != nil {
 		return err
 	}
 
-	migrates := []any{
-		&xfs.File{},
-		&xjm.Job{},
-		&xjm.JobLog{},
-		&xjm.JobChain{},
-		&models.Config{},
-		&models.User{},
-		&models.Pet{},
+	if err := tt.MigrateConfig(configs); err != nil {
+		return err
 	}
 
-	err = gdb.AutoMigrate(migrates...)
+	return nil
+}
 
-	if db, err := gdb.DB(); err == nil {
-		db.Close()
+func (tt Tenant) MigrateSchema() error {
+	log.Infof("Migrate schema %q", tt.Schema())
+
+	log.Infof("Read SQL file '%s'", app.SQLSchemaFile)
+
+	sql, err := fsu.ReadString(app.SQLSchemaFile)
+	if err != nil {
+		return err
 	}
-	return err
+
+	return tt.ExecSQL(sql)
 }
 
 func (tt Tenant) MigrateConfig(configs []*models.Config) error {
@@ -123,17 +120,22 @@ func (tt Tenant) MigrateSuper() error {
 			return err
 		}
 
+		user.ID = suc.GetInt64("id", 1)
+		user.Email = superEmail
+		user.Name = suc.GetString("name", "SUPER") + "@" + tt.String()
+		user.SetPassword(suc.GetString("password", "changeme"))
+		user.Role = models.RoleSuper
+		user.Status = models.UserActive
+		user.CIDR = suc.GetString("cidr", "0.0.0.0/0\n::/0")
+		user.CreatedAt = time.Now()
+		user.UpdatedAt = user.CreatedAt
+
 		sqb.Reset()
 		sqb.Insert(tt.TableUsers())
-		sqb.Setc("id", suc.GetInt64("id", 1))
-		sqb.Setc("email", superEmail)
-		sqb.Setc("name", suc.GetString("name", "SUPER")+"@"+tt.String())
-		sqb.Setc("password", cptutil.MustEncrypt(superEmail, suc.GetString("password", "changeme")))
-		sqb.Setc("role", models.RoleSuper)
-		sqb.Setc("status", models.UserActive)
-		sqb.Setc("cidr", "0.0.0.0/0\n::/0")
+		sqb.StructNames(user)
+		sql := sqb.SQL()
 
-		_, err = app.SDB.Exec(sql, args...)
+		_, err = app.SDB.NamedExec(sql, user)
 		if err != nil {
 			return err
 		}
@@ -147,5 +149,36 @@ func (tt Tenant) MigrateSuper() error {
 	sqb.Setc("status", models.UserActive)
 	sql, args = sqb.Build()
 	_, err = app.SDB.Exec(sql, args...)
+	return err
+}
+
+func (tt Tenant) ExecSQL(sql string) error {
+	log.Info(str.PadCenter(" "+tt.Schema()+" ", 78, "="))
+
+	tsql := str.ReplaceAll(sql, `"SCHEMA"`, tt.Schema())
+
+	sr := sqx.NewSqlReader(strings.NewReader(tsql))
+
+	err := app.SDB.Transaction(func(tx *sqlx.Tx) error {
+		for i := 1; ; i++ {
+			sql, err := sr.ReadSql()
+			if errors.Is(err, io.EOF) {
+				return nil
+			}
+			if err != nil {
+				return err
+			}
+
+			r, err := tx.Exec(sql)
+			if err != nil {
+				log.Errorf("#%d = %s", i, sql)
+				return err
+			}
+
+			cnt, _ := r.RowsAffected()
+			log.Infof("#%d [%d] = %s", i, cnt, sql)
+		}
+	})
+
 	return err
 }

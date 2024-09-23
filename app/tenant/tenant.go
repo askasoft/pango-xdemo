@@ -10,13 +10,10 @@ import (
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/xfs"
-	"github.com/askasoft/pango/xfs/gormfs"
 	"github.com/askasoft/pango/xfs/sqlxfs"
 	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pango/xjm"
-	"github.com/askasoft/pango/xjm/gormjm"
 	"github.com/askasoft/pango/xjm/sqlxjm"
-	"gorm.io/gorm"
 )
 
 type Tenant string
@@ -101,22 +98,8 @@ func Create(name string, comment string) error {
 		return err
 	}
 
-	tt := Tenant(name)
-
-	if err := tt.MigrateSchema(); err != nil {
-		return err
-	}
-
-	if err := tt.MigrateSuper(); err != nil {
-		return err
-	}
-
-	configs, err := ReadConfigFile()
-	if err != nil {
-		return err
-	}
-
-	if err := tt.MigrateConfig(configs); err != nil {
+	if err := Tenant(name).InitSchema(); err != nil {
+		_ = DeleteSchema(name)
 		return err
 	}
 
@@ -179,18 +162,6 @@ func (tt Tenant) ResetSequence(db sqlx.Sqlx, table string, starts ...int64) erro
 	}
 }
 
-func (tt Tenant) GJC(db *gorm.DB) xjm.JobChainer {
-	return gormjm.JC(db, tt.TableJobChains())
-}
-
-func (tt Tenant) GJM(db *gorm.DB) xjm.JobManager {
-	return gormjm.JM(db, tt.TableJobs(), tt.TableJobLogs())
-}
-
-func (tt Tenant) GFS(db *gorm.DB) xfs.XFS {
-	return gormfs.FS(db, tt.TableFiles())
-}
-
 func (tt Tenant) SJC(db sqlx.Sqlx) xjm.JobChainer {
 	return sqlxjm.JC(db, tt.TableJobChains())
 }
@@ -204,24 +175,15 @@ func (tt Tenant) SFS(db sqlx.Sqlx) xfs.XFS {
 }
 
 func (tt Tenant) JC() xjm.JobChainer {
-	if app.INI.GetString("internal", "xjc") == "sqlxjc" {
-		return tt.SJC(app.SDB)
-	}
-	return tt.GJC(app.GDB)
+	return tt.SJC(app.SDB)
 }
 
 func (tt Tenant) JM() xjm.JobManager {
-	if app.INI.GetString("internal", "xjm") == "sqlxjm" {
-		return tt.SJM(app.SDB)
-	}
-	return tt.GJM(app.GDB)
+	return tt.SJM(app.SDB)
 }
 
 func (tt Tenant) FS() xfs.XFS {
-	if app.INI.GetString("internal", "xfs") == "sqlxfs" {
-		return tt.SFS(app.SDB)
-	}
-	return tt.GFS(app.GDB)
+	return tt.SFS(app.SDB)
 }
 
 func (tt Tenant) Table(s string) string {
