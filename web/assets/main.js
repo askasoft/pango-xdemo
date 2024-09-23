@@ -421,6 +421,7 @@ var main = {
 	summernote: function($el) {
 		if ($el.length) {
 			var sno = {
+				fontSizes: ['8', '9', '10', '11', '12', '14', '16', '18', '20', '24', '36'],
 				toolbar: [
 					[ 'style', [ 'style', 'fontname', 'fontsize', 'color' ] ],
 					[ 'text', [ 'bold', 'italic', 'underline', 'strikethrough', 'superscript', 'subscript' ] ],
