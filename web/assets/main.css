@@ -122,6 +122,9 @@ pre {
 	font-size: 1em;
 	white-space: pre-wrap;
 }
+a > s {
+	text-decoration: none;
+}
 
 #header {
 	background-color: var(--bs-body-bg);
@@ -309,6 +312,7 @@ pre {
 .s-section-head {
 	display: flex;
 	flex-wrap: wrap;
+	align-items: center;
 	margin-bottom: 10px;
 	padding: 10px;
 }

@@ -397,7 +397,12 @@ var main = {
 			if (v && k.endsWith("_at")) {
 				v = main[$td.hasClass('date') ? 'format_date' : 'format_time'](v);
 			}
-			($c.length ? $c : $td).text(v);
+			if ($c.length) {
+				var $s = $c.children('s');
+				($s.length ? $s : $c).text(v);
+			} else {
+				$td.text(v);
+			}
 		}
 	},
 
