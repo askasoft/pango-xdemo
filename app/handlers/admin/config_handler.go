@@ -21,19 +21,6 @@ import (
 	"github.com/askasoft/pango/xin"
 )
 
-const (
-	StyleChecks         = "C"
-	StyleVerticalChecks = "VC"
-	StyleOrderedChecks  = "OC"
-	StyleRadios         = "R"
-	StyleVerticalRadios = "VR"
-	StyleSelect         = "S"
-	StyleMultiSelect    = "MS"
-	StyleTextarea       = "T"
-	StyleNumeric        = "N"
-	StyleDecimal        = "D"
-)
-
 type ConfigGroup struct {
 	Name  string           `json:"name"`
 	Items []*models.Config `json:"items"`
@@ -147,29 +134,35 @@ func ConfigSave(c *xin.Context) {
 
 	for _, cfg := range configs {
 		switch cfg.Style {
-		case StyleChecks, StyleVerticalChecks, StyleOrderedChecks, StyleMultiSelect:
+		case models.ConfigStyleChecks, models.ConfigStyleVerticalChecks, models.ConfigStyleOrderedChecks, models.ConfigStyleMultiSelect:
 			vs, ok = c.GetPostFormArray(cfg.Name)
 			if ok {
 				vs = str.RemoveEmpties(vs)
 				v = str.Join(vs, "\t")
 			}
-		case StyleNumeric:
+		case models.ConfigStyleNumeric:
 			v, ok = c.GetPostForm(cfg.Name)
-			if ok && v != "" && !str.IsNumeric(v) {
-				c.AddError(&vadutil.ParamError{
-					Param:   cfg.Name,
-					Message: tbs.Format(c.Locale, "error.param.numeric", tbs.GetText(c.Locale, "config."+cfg.Name)),
-				})
-				continue
+			if ok && v != "" {
+				v = str.RemoveByte(v, ',')
+				if !str.IsNumeric(v) {
+					c.AddError(&vadutil.ParamError{
+						Param:   cfg.Name,
+						Message: tbs.Format(c.Locale, "error.param.numeric", tbs.GetText(c.Locale, "config."+cfg.Name)),
+					})
+					continue
+				}
 			}
-		case StyleDecimal:
+		case models.ConfigStyleDecimal:
 			v, ok = c.GetPostForm(cfg.Name)
-			if ok && v != "" && !str.IsDecimal(v) {
-				c.AddError(&vadutil.ParamError{
-					Param:   cfg.Name,
-					Message: tbs.Format(c.Locale, "error.param.decimal", tbs.GetText(c.Locale, "config."+cfg.Name)),
-				})
-				continue
+			if ok && v != "" {
+				v = str.RemoveByte(v, ',')
+				if !str.IsDecimal(v) {
+					c.AddError(&vadutil.ParamError{
+						Param:   cfg.Name,
+						Message: tbs.Format(c.Locale, "error.param.decimal", tbs.GetText(c.Locale, "config."+cfg.Name)),
+					})
+					continue
+				}
 			}
 		default:
 			v, ok = c.GetPostForm(cfg.Name)
@@ -194,9 +187,9 @@ func ConfigSave(c *xin.Context) {
 		if validation != "" {
 			var vv any
 			switch cfg.Style {
-			case StyleNumeric:
+			case models.ConfigStyleNumeric:
 				vv = num.Atol(v)
-			case StyleDecimal:
+			case models.ConfigStyleDecimal:
 				vv = num.Atof(v)
 			default:
 				vv = v

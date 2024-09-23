@@ -3,7 +3,21 @@ package models
 import (
 	"time"
 
+	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/str"
+)
+
+const (
+	ConfigStyleChecks         = "C"
+	ConfigStyleVerticalChecks = "VC"
+	ConfigStyleOrderedChecks  = "OC"
+	ConfigStyleRadios         = "R"
+	ConfigStyleVerticalRadios = "VR"
+	ConfigStyleSelect         = "S"
+	ConfigStyleMultiSelect    = "MS"
+	ConfigStyleTextarea       = "T"
+	ConfigStyleNumeric        = "N"
+	ConfigStyleDecimal        = "D"
 )
 
 type Config struct {
@@ -29,8 +43,17 @@ func (c *Config) Readonly(role string) bool {
 }
 
 func (c *Config) DisplayValue() string {
-	if c.Value != "" && c.Secret {
-		return str.Repeat("*", len(c.Value))
+	if c.Value != "" {
+		if c.Secret {
+			return str.Repeat("*", len(c.Value))
+		}
+
+		switch c.Style {
+		case ConfigStyleNumeric:
+			return num.Comma(num.Atol(c.Value))
+		case ConfigStyleDecimal:
+			return num.CommaFloat(num.Atof(c.Value))
+		}
 	}
 	return c.Value
 }

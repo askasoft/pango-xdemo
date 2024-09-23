@@ -74,9 +74,9 @@
 									<textarea name="{{$c.Name}}" class="form-control" rows="2" textclear enterfire{{if $ro}} disabled{{end}}>
 {{$c.DisplayValue}}</textarea>
 								{{else if eq $c.Style "N"}}
-									<input name="{{$c.Name}}" type="number" size="10" class="form-control" textclear value="{{$c.DisplayValue}}"{{if $ro}} disabled{{end}}/>
+									<input name="{{$c.Name}}" type="text" size="20" class="form-control" textclear value="{{$c.DisplayValue}}"{{if $ro}} disabled{{end}}/>
 								{{else if eq $c.Style "D"}}
-									<input name="{{$c.Name}}" type="number" step="0.001" size="10" class="form-control" textclear value="{{$c.DisplayValue}}"{{if $ro}} disabled{{end}}/>
+									<input name="{{$c.Name}}" type="text" size="20" class="form-control" textclear value="{{$c.DisplayValue}}"{{if $ro}} disabled{{end}}/>
 								{{else}}
 									<input name="{{$c.Name}}" type="text" class="form-control" textclear value="{{$c.DisplayValue}}"{{if $ro}} disabled{{end}}/>
 								{{end}}
