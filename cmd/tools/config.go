@@ -30,7 +30,6 @@ func loadConfigs() (*ini.Ini, error) {
 
 		log.Infof("Loading config: %q", f)
 		if err := c.LoadFile(f); err != nil {
-			log.Errorf("Failed to load ini config file %q: %v", f, err)
 			return nil, err
 		}
 	}

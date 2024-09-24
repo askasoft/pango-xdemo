@@ -1,4 +1,4 @@
-# XDemo
+# Xdemo
 
 ## Linux
 
@@ -79,20 +79,25 @@ SET LOG_SLACK_WEBHOOK=https://hooks.slack.com/services/...
 deploy.bat
 ```
 
-### init mysql database (not supported yet)
+### create mysql database (not supported yet)
 ```sql
 CREATE USER 'xdemo'@'%' IDENTIFIED BY 'xdemo';
 CREATE DATABASE xdemo CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 GRANT ALL PRIVILEGES ON xdemo.* TO 'xdemo'@'%';
 ```
 
-### init postgresql database
+### create postgresql database
 ```sql
 CREATE USER xdemo PASSWORD 'xdemo';
 CREATE DATABASE xdemo WITH OWNER=xdemo ENCODING='UTF-8';
 GRANT ALL ON DATABASE xdemo TO xdemo;
 ```
 
+### init database
+```sh
+cd /app/xdemo
+./xdemo execsql conf/schema.sql
+```
 
 ### install as windows service
 Run As Administrator

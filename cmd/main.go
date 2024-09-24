@@ -19,9 +19,9 @@ func usage() {
 			"    version             print the version information.\n"+
 			"    help | usage        print the usage information.\n"+
 			"    generate [output]   generate database schema DDL.\n"+
-			"      output            specify the output DDL file.\n"+
+			"      [output]          specify the output DDL file.\n"+
 			"    migrate [schema]... migrate database schemas.\n"+
-			"      schema=...        specify schemas to migrate.\n"+
+			"      [schema]...       specify schemas to migrate.\n"+
 			"  <options>:\n",
 		filepath.Base(os.Args[0]))
 
@@ -48,12 +48,12 @@ func main() {
 		fmt.Println(app.Versions())
 	case "generate":
 		if err := tools.GenerateSchema(flag.Arg(1)); err != nil {
-			log.Error(err)
+			fmt.Fprintln(os.Stderr, err)
 			app.Exit(app.ExitErrCMD)
 		}
 	case "migrate":
 		if err := tools.MigrateSchemas(flag.Args()[1:]...); err != nil {
-			log.Error(err)
+			fmt.Fprintln(os.Stderr, err)
 			app.Exit(app.ExitErrCMD)
 		}
 	default:

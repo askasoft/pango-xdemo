@@ -34,8 +34,10 @@ func (s *service) PrintCommand(out io.Writer) {
 	fmt.Fprintln(out, "    migrate <kind> [schema]...")
 	fmt.Fprintln(out, "      kind=config       migrate tenant configurations.")
 	fmt.Fprintln(out, "      kind=super        migrate tenant super user.")
-	fmt.Fprintln(out, "      schema=...        specify schemas to migrate.")
-	fmt.Fprintln(out, "    execsql <file>      execute sql file.")
+	fmt.Fprintln(out, "      [schema]...       specify schemas to migrate.")
+	fmt.Fprintln(out, "    execsql <file> [schema]...")
+	fmt.Fprintln(out, "      <file>            execute sql file.")
+	fmt.Fprintln(out, "      [schema]...       specify schemas to execute sql.")
 	fmt.Fprintln(out, "    exectask <task>     execute task [ "+str.Join(schedules.Keys(), ", ")+" ]")
 	fmt.Fprintln(out, "    encrypt [key] <str> encrypt string.")
 	fmt.Fprintln(out, "    decrypt [key] <str> decrypt string.")
@@ -71,43 +73,49 @@ func (s *service) Exec(cmd string) {
 }
 
 func doMigrate() {
-	initConfigs()
-
-	initDatabase()
-
-	sub := ""
-	args := flag.Args()[1:]
-	if len(args) > 0 {
-		sub = args[0]
-		args = args[1:]
+	sub := flag.Arg(1)
+	if sub == "" {
+		fmt.Fprintln(os.Stderr, "Missing migrate target.")
+		app.Exit(app.ExitErrCMD)
 	}
+	args := flag.Args()[2:]
 
 	switch sub {
 	case "config":
+		initConfigs()
+		initDatabase()
 		if err := dbMigrateConfigs(args...); err != nil {
-			log.Error(err)
+			fmt.Fprintln(os.Stderr, err)
 			app.Exit(app.ExitErrDB)
 		}
 	case "super":
+		initConfigs()
+		initDatabase()
 		if err := dbMigrateSupers(args...); err != nil {
-			log.Error(err)
+			fmt.Fprintln(os.Stderr, err)
 			app.Exit(app.ExitErrDB)
 		}
+	default:
+		fmt.Fprintf(os.Stderr, "Invalid migrate target %q", sub)
+		app.Exit(app.ExitErrCMD)
 	}
 
 	log.Info("DONE.")
 }
 
 func doExecSQL() {
-	initConfigs()
-
-	if err := openDatabase(); err != nil {
-		log.Error(err)
-		app.Exit(app.ExitErrDB)
+	file := flag.Arg(1)
+	if file == "" {
+		fmt.Fprintln(os.Stderr, "Missing SQL file.")
+		app.Exit(app.ExitErrCMD)
 	}
+	args := flag.Args()[2:]
 
-	if err := dbExecSQL(flag.Arg(1)); err != nil {
-		log.Error(err)
+	initConfigs()
+	initDatabase()
+
+	if err := dbExecSQL(file, args...); err != nil {
+		fmt.Fprintln(os.Stderr, err)
 		app.Exit(app.ExitErrDB)
 	}
 
@@ -115,19 +123,15 @@ func doExecSQL() {
 }
 
 func doExecTask() {
-	initConfigs()
-
-	if err := openDatabase(); err != nil {
-		log.Error(err)
-		app.Exit(app.ExitErrDB)
-	}
-
 	tn := flag.Arg(1)
 	tf, ok := schedules.Get(tn)
 	if !ok {
-		log.Errorf("Invalid Task %q", tn)
+		fmt.Fprintf(os.Stderr, "Invalid Task %q\n", tn)
 		app.Exit(app.ExitErrSCH)
 	}
+
+	initConfigs()
+	initDatabase()
 
 	tf()
 
@@ -137,7 +141,7 @@ func doExecTask() {
 func doEncrypt() {
 	k, v := cryptFlags()
 	if es, err := cptutil.Encrypt(k, v); err != nil {
-		fmt.Println(err)
+		fmt.Fprintln(os.Stderr, err)
 	} else {
 		fmt.Println(es)
 	}
@@ -147,7 +151,7 @@ func doEncrypt() {
 func doDecrypt() {
 	k, v := cryptFlags()
 	if ds, err := cptutil.Decrypt(k, v); err != nil {
-		fmt.Println(err)
+		fmt.Fprintln(os.Stderr, err)
 	} else {
 		fmt.Println(ds)
 	}

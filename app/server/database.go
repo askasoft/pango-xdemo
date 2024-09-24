@@ -87,7 +87,7 @@ func dbMigrateSupers(schemas ...string) error {
 	return nil
 }
 
-func dbExecSQL(sqlfile string) error {
+func dbExecSQL(sqlfile string, schemas ...string) error {
 	log.Infof("Read SQL file '%s'", sqlfile)
 
 	sql, err := fsu.ReadString(sqlfile)
@@ -95,9 +95,16 @@ func dbExecSQL(sqlfile string) error {
 		return err
 	}
 
-	err = tenant.Iterate(func(tt tenant.Tenant) error {
-		return tt.ExecSQL(sql)
-	})
+	if len(schemas) == 0 {
+		return tenant.Iterate(func(tt tenant.Tenant) error {
+			return tt.ExecSQL(sql)
+		})
+	}
 
-	return err
+	for _, s := range schemas {
+		if err := tenant.Tenant(s).ExecSQL(sql); err != nil {
+			return err
+		}
+	}
+	return nil
 }
