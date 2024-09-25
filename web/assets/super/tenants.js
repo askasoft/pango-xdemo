@@ -33,7 +33,7 @@
 
 	function tenant_set_tr_values($tr, tenant) {
 		main.set_table_tr_values($tr, tenant);
-		$tr.find('td.domain > a').attr('href', '//' + tenant.name + '.' + main.domain).text(tenant.name + '.' + main.domain);
+		$tr.find('td.domain > a').attr('href', '//' + tenant.name + '.' + main.domain).find('s').text(tenant.name + '.' + main.domain);
 		main.blink($tr);
 	}
 
