@@ -70,7 +70,7 @@ func (tt Tenant) loadConfigMap(db *sqlx.DB) (map[string]string, error) {
 		return nil, err
 	}
 
-	cm := make(map[string]string)
+	cm := make(map[string]string, len(configs))
 	for _, c := range configs {
 		cm[c.Name] = c.Value
 	}
