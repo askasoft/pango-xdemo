@@ -71,7 +71,8 @@
 			$(t).find('textarea').autosize();
 			history.replaceState(null, null, location.href.split('#')[0] + t);
 		});
-	
+
+		$('.cfgform').find('textarea').autosize();
 		$('.cfgform').on('submit', configs_save);
 
 		$('#configs_export').on('click', configs_export);
