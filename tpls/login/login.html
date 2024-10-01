@@ -14,7 +14,7 @@
 
 		<div class="well text-center">{{T .Loc "login.well"}}</div>
 
-		<form id="login_form" class="ui-form ui-row-py3" autocomplete="off">
+		<form id="login_form" class="ui-form ui-row-py2" autocomplete="off">
 			<input type="hidden" name="origin" value="{{.origin}}"/>
 			<div class="row">
 				<label class="col-md-3 col-form-label">{{T .Loc "login.username"}}</label>
@@ -32,6 +32,7 @@
 				<label class="col-md-3 col-form-label">{{T .Loc "login.passcode"}}</label>
 				<div class="col-md-8">
 					<input name="passcode" type="text" class="form-control" maxlength="250" textclear/>
+					<div class="desc M hidden">{{T .Loc "login.mfa.mobile.desc"}} <button id="login_mfa_mobile" type="button" class="btn btn-sm btn-outline-primary">{{I "mobile"}} {{T .Loc "login.mfa.mobile.enroll"}}</button></div>
 				</div>
 			</div>
 			<div class="row">

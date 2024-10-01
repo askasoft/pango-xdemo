@@ -1,6 +1,7 @@
 package login
 
 import (
+	"encoding/base64"
 	"errors"
 	"html"
 	"net/http"
@@ -19,6 +20,8 @@ import (
 	"github.com/askasoft/pango/tbs"
 	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pango/xmw"
+	"github.com/skip2/go-qrcode"
+	"github.com/xlzd/gotp"
 )
 
 func Index(c *xin.Context) {
@@ -36,65 +39,87 @@ type UserPass struct {
 }
 
 func Login(c *xin.Context) {
+	userpass := loginGetUserPass(c)
+	if userpass == nil {
+		return
+	}
+
+	if loginMFACheck(c, userpass) {
+		loginPassed(c, userpass)
+	}
+}
+
+func loginGetUserPass(c *xin.Context) *UserPass {
 	userpass := &UserPass{}
 	if err := c.Bind(userpass); err != nil {
 		vadutil.AddBindErrors(c, err, "login.")
 		c.JSON(http.StatusBadRequest, handlers.E(c))
-		return
+		return nil
 	}
 
 	if tenant.IsClientBlocked(c) {
 		c.AddError(errors.New(tbs.GetText(c.Locale, "login.failed.blocked")))
 		c.JSON(http.StatusBadRequest, handlers.E(c))
-		return
+		return nil
 	}
 
 	au, err := tenant.FindUser(c, userpass.Username)
 	if err != nil {
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
-		return
+		return nil
 	}
 
-	reason := "login.failed.userpass"
-
-	if au != nil && userpass.Password == au.GetPassword() {
-		user := au.(*models.User)
-		if user.HasRole(models.RoleViewer) {
-			if tenant.CheckClientIP(c, user) {
-				if loginMFACheck(c, userpass) {
-					err := app.XCA.SaveUserPassToCookie(c, userpass.Username, userpass.Password)
-					if err != nil {
-						c.AddError(err)
-						c.JSON(http.StatusInternalServerError, handlers.E(c))
-						return
-					}
-
-					tenant.AuthPassed(c)
-
-					c.JSON(http.StatusOK, xin.H{
-						"success": tbs.GetText(c.Locale, "login.success.loggedin"),
-					})
-				}
-				return
-			}
-			reason = "login.failed.restricted"
-		} else {
-			reason = "login.failed.notallowed"
-		}
+	if au == nil || userpass.Password != au.GetPassword() {
+		loginFailed(c, "login.failed.userpass")
+		return nil
 	}
 
+	user := au.(*models.User)
+	if !user.HasRole(models.RoleViewer) {
+		loginFailed(c, "login.failed.notallowed")
+		return nil
+	}
+
+	if !tenant.CheckClientIP(c, user) {
+		loginFailed(c, "login.failed.restricted")
+		return nil
+	}
+
+	return userpass
+}
+
+func loginFailed(c *xin.Context, reason string) {
 	tenant.AuthFailed(c)
 	c.AddError(errors.New(tbs.GetText(c.Locale, reason)))
 	c.JSON(http.StatusBadRequest, handlers.E(c))
 }
 
+func loginPassed(c *xin.Context, userpass *UserPass) {
+	if err := app.XCA.SaveUserPassToCookie(c, userpass.Username, userpass.Password); err != nil {
+		c.AddError(err)
+		c.JSON(http.StatusInternalServerError, handlers.E(c))
+		return
+	}
+
+	tenant.AuthPassed(c)
+
+	c.JSON(http.StatusOK, xin.H{
+		"success": tbs.GetText(c.Locale, "login.success.loggedin"),
+	})
+}
+
+func loginMFASecret(c *xin.Context, username string) string {
+	return cptutil.MustEncrypt(app.Secret(), c.Request.Host+"/"+username)
+}
+
 func loginMFACheck(c *xin.Context, userpass *UserPass) bool {
 	tt := tenant.FromCtx(c)
 	mfa := tt.ConfigValue("secure_login_mfa")
+
 	switch mfa {
 	case "E":
-		secret := cptutil.Hash(userpass.Username)
+		secret := loginMFASecret(c, userpass.Username)
 		expire := app.INI.GetDuration("login", "emailPasscodeExpires", 10*time.Minute)
 		totp := otputil.NewTOTP(secret, expire)
 		if userpass.Passcode == "" {
@@ -109,8 +134,26 @@ func loginMFACheck(c *xin.Context, userpass *UserPass) bool {
 		c.AddError(errors.New(tbs.GetText(c.Locale, "login.failed.passcode")))
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return false
-	case "A":
-		return true
+	case "M":
+		if userpass.Passcode == "" {
+			c.JSON(http.StatusOK, xin.H{
+				"mfa":     "M",
+				"message": tbs.GetText(c.Locale, "login.mfa.mobile.notice"),
+			})
+			return false
+		}
+
+		secret := loginMFASecret(c, userpass.Username)
+		expire := app.INI.GetDuration("login", "mobilePasscodeExpires", 30*time.Second)
+		totp := otputil.NewTOTP(secret, expire)
+
+		if otputil.TOTPVerify(totp, expire, userpass.Passcode) {
+			return true
+		}
+
+		c.AddError(errors.New(tbs.GetText(c.Locale, "login.failed.passcode")))
+		c.JSON(http.StatusBadRequest, handlers.E(c))
+		return false
 	default:
 		return true
 	}
@@ -139,8 +182,54 @@ func loginSendEmailPasscode(c *xin.Context, email, passcode string, expire time.
 	}
 
 	c.JSON(http.StatusOK, xin.H{
-		"mfa":     true,
-		"message": tbs.Format(c.Locale, "login.mfa.email.sent", email),
+		"mfa":     "E",
+		"message": tbs.Format(c.Locale, "login.mfa.email.notice", email),
+	})
+}
+
+func LoginMFAMobile(c *xin.Context) {
+	userpass := loginGetUserPass(c)
+	if userpass == nil {
+		return
+	}
+
+	secret := loginMFASecret(c, userpass.Username)
+	expire := app.INI.GetDuration("login", "mobilePasscodeExpires", 30*time.Second)
+	totp := otputil.NewTOTP(secret, expire)
+	loginSendEmailQrcode(c, userpass.Username, totp)
+}
+
+func loginSendEmailQrcode(c *xin.Context, email string, totp *gotp.TOTP) {
+	sr := strings.NewReplacer(
+		"{{SITE_NAME}}", tbs.GetText(c.Locale, "title"),
+	)
+	subject := sr.Replace(tbs.GetText(c.Locale, "login.mfa.mobile.subject"))
+
+	purl := totp.ProvisioningUri(email, c.Request.Host)
+	png, err := qrcode.Encode(purl, qrcode.Medium, 256)
+	if err != nil {
+		c.Logger.Error(err)
+		c.AddError(errors.New(tbs.GetText(c.Locale, "login.error.qrcode")))
+		c.JSON(http.StatusInternalServerError, handlers.E(c))
+		return
+	}
+
+	sr = strings.NewReplacer(
+		"{{SITE_NAME}}", html.EscapeString(tbs.GetText(c.Locale, "title")),
+		"{{USER_EMAIL}}", html.EscapeString(email),
+		"{{QRCODE}}", base64.StdEncoding.EncodeToString(png),
+	)
+	message := sr.Replace(tbs.GetText(c.Locale, "login.mfa.mobile.message"))
+
+	if err := smtputil.SendHTMLMail(email, subject, message); err != nil {
+		c.Logger.Error(err)
+		c.AddError(errors.New(tbs.GetText(c.Locale, "login.error.sendmail")))
+		c.JSON(http.StatusInternalServerError, handlers.E(c))
+		return
+	}
+
+	c.JSON(http.StatusOK, xin.H{
+		"success": tbs.Format(c.Locale, "login.mfa.mobile.qrcsent", email),
 	})
 }
 

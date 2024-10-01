@@ -11,6 +11,7 @@ import (
 	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
 	"github.com/askasoft/pango/cog/linkedhashmap"
 	"github.com/askasoft/pango/doc/csvx"
+	"github.com/askasoft/pango/ini"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/sqx/sqlx"
@@ -73,6 +74,27 @@ func (tt Tenant) loadConfigMap(db *sqlx.DB) (map[string]string, error) {
 	cm := make(map[string]string, len(configs))
 	for _, c := range configs {
 		cm[c.Name] = c.Value
+	}
+
+	tv := cm["tenant_vars"]
+	if tv != "" {
+		i := ini.NewIni()
+		if err := i.LoadData(str.NewReader(tv)); err != nil {
+			tt.Logger("CFG").Errorf("Invalid tenant_vars: %s", tv)
+		} else {
+			var kvs []string
+			sec := i.Section("")
+			for _, key := range sec.Keys() {
+				kvs = append(kvs, "{{"+key+"}}", sec.GetString(key))
+			}
+
+			sr := str.NewReplacer(kvs...)
+			for ck, cv := range cm {
+				if ck != "tenant_vars" {
+					cm[ck] = sr.Replace(cv)
+				}
+			}
+		}
 	}
 
 	return cm, nil
