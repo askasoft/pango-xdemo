@@ -82,9 +82,15 @@ func configMiddleware() {
 	app.XCC.CacheControl = svc.GetString("staticCacheControl", "public, max-age=31536000, immutable")
 
 	app.XCA.RedirectURL = app.Base + "/login/"
-	app.XCA.CookieMaxAge = app.INI.GetDuration("login", "cookieMaxAge", time.Minute*30)
 	app.XCA.CookiePath = str.IfEmpty(app.Base, "/")
+	app.XCA.CookieMaxAge = app.INI.GetDuration("login", "cookieMaxAge", time.Minute*30)
 	app.XCA.CookieSecure = app.INI.GetBool("login", "cookieSecure", true)
+	switch app.INI.GetString("login", "cookieSameSite", "strict") {
+	case "lax":
+		app.XCA.CookieSameSite = http.SameSiteLaxMode
+	default:
+		app.XCA.CookieSameSite = http.SameSiteStrictMode
+	}
 
 	app.XCN.CookieMaxAge = app.XCA.CookieMaxAge
 	app.XCN.CookiePath = app.XCA.CookiePath
