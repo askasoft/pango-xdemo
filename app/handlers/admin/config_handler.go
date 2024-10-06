@@ -267,7 +267,7 @@ func ConfigExport(c *xin.Context) {
 			cgn := tbs.GetText(c.Locale, "config.group.label."+cg.Name)
 			for _, cfg := range cg.Items {
 				disp := fmt.Sprintf("%s / %s / %s", ccn, cgn, tbs.GetText(c.Locale, "config."+cfg.Name))
-				if err := cw.Write([]string{cfg.Name, cfg.DisplayValue(), disp}); err != nil {
+				if err := cw.Write([]string{cfg.Name, cfg.Value, disp}); err != nil {
 					c.Logger.Error(err)
 					return
 				}
