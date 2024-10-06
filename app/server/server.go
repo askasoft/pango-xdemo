@@ -241,8 +241,8 @@ func initListener() {
 	app.HTTP = &http.Server{
 		Addr:              addr,
 		Handler:           app.XIN,
-		ReadHeaderTimeout: svc.GetDuration("httpReadHeaderTimeout", 5*time.Second),
-		ReadTimeout:       svc.GetDuration("httpReadTimeout", 30*time.Second),
+		ReadHeaderTimeout: svc.GetDuration("httpReadHeaderTimeout", 10*time.Second),
+		ReadTimeout:       svc.GetDuration("httpReadTimeout", 120*time.Second),
 		WriteTimeout:      svc.GetDuration("httpWriteTimeout", 300*time.Second),
 		IdleTimeout:       svc.GetDuration("httpIdleTimeout", 30*time.Second),
 	}
