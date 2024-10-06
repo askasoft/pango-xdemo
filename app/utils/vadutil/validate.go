@@ -4,7 +4,9 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"regexp"
 
+	"github.com/askasoft/pango/ini"
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/tbs"
 	"github.com/askasoft/pango/vad"
@@ -73,12 +75,15 @@ func AddBindErrors(c *xin.Context, err error, ns string, fks ...string) {
 			fn := ""
 			fm := tbs.GetText(c.Locale, ns+"error."+fk+"."+fe.Tag())
 			if fm == "" {
-				fn = tbs.GetText(c.Locale, ns+fk, fk)
-				fm = tbs.GetText(c.Locale, ns+"error.param."+fe.Tag())
+				fm = tbs.GetText(c.Locale, ns+"error."+fk)
 				if fm == "" {
-					fm = tbs.GetText(c.Locale, "error.param."+fe.Tag())
+					fn = tbs.GetText(c.Locale, ns+fk, fk)
+					fm = tbs.GetText(c.Locale, ns+"error.param."+fe.Tag())
 					if fm == "" {
-						fm = tbs.GetText(c.Locale, "error.param.invalid")
+						fm = tbs.GetText(c.Locale, "error.param."+fe.Tag())
+						if fm == "" {
+							fm = tbs.GetText(c.Locale, "error.param.invalid")
+						}
 					}
 				}
 			}
@@ -118,6 +123,23 @@ func ValidateCIDRs(fl vad.FieldLevel) bool {
 		v = true
 	}
 	return v
+}
+
+func ValidateRegexps(fl vad.FieldLevel) bool {
+	v := false
+	for _, s := range str.Fields(fl.Field().String()) {
+		_, err := regexp.Compile(s)
+		if err != nil {
+			return false
+		}
+		v = true
+	}
+	return v
+}
+
+func ValidateINI(fl vad.FieldLevel) bool {
+	err := ini.NewIni().LoadData(str.NewReader(fl.Field().String()))
+	return err == nil
 }
 
 func ParseCIDRs(cidr string) (cidrs []*net.IPNet) {

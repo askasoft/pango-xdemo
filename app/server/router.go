@@ -31,7 +31,9 @@ import (
 func initRouter() {
 	app.XIN = xin.New()
 	app.VAD = app.XIN.Validator.Engine().(*vad.Validate)
+	app.VAD.RegisterValidation("ini", vadutil.ValidateINI)
 	app.VAD.RegisterValidation("cidrs", vadutil.ValidateCIDRs)
+	app.VAD.RegisterValidation("regexps", vadutil.ValidateRegexps)
 
 	app.XIN.NoRoute(handlers.NotFound)
 
