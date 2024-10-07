@@ -297,9 +297,11 @@
 				var v = params[k];
 				switch (typeof(v)) {
 				case 'string':
-					var d = new Date(v);
-					if (d.getTime() > 0 ) {
-						params[k] = main.format_date(d);
+					if (v.match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/)) {
+						var d = new Date(v);
+						if (d.getTime() > 0 ) {
+							params[k] = main.format_date(d);
+						}
 					}
 					break;
 				case 'boolean':
