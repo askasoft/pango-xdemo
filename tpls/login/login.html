@@ -2,6 +2,7 @@
 {{MapSet .Ctx.Attrs "nosidenavi" true}}
 
 {{template "main_header" .}}
+
 <div class="s-login">
 <div class="s-section">
 	<div class="s-section-head">
@@ -32,7 +33,10 @@
 				<label class="col-md-3 col-form-label">{{T .Loc "login.passcode"}}</label>
 				<div class="col-md-8">
 					<input name="passcode" type="text" class="form-control" maxlength="250" textclear/>
-					<div class="desc M hidden">{{T .Loc "login.mfa.mobile.desc"}} <button id="login_mfa_mobile" type="button" class="btn btn-sm btn-outline-primary">{{I "mobile"}} {{T .Loc "login.mfa.mobile.enroll"}}</button></div>
+					<div class="desc M hidden">{{T .Loc "login.mfa.mobile.desc"}} <button 
+						type="button" class="btn btn-sm btn-outline-primary"
+						id="login_mfa_enroll" popup-target="#login_mfa_enroll_popup"
+						>{{I "mobile"}} {{T .Loc "login.mfa.mobile.enroll"}}</button></div>
 				</div>
 			</div>
 			<div class="row">
@@ -48,6 +52,23 @@
 		</form>
 	</div>
 </div>
+</div>
+
+<div id="login_mfa_enroll_popup" class="ui-popup s-popup-confirm" data-spy="popup" tabindex="-1"
+	popup-mask="true" popup-mouse="false">
+	<form>
+		<div class="ui-popup-header">
+			<h4>{{T .Loc "login.mfa.enroll.header"}}</h4>
+		</div>
+		<div class="ui-popup-body">
+			<i class="icon fas fa-3x fa-fw fa-triangle-exclamation text-warning"></i>
+			<div class="msg">{{T .Loc "login.mfa.enroll.confirm"}}</div>
+		</div>
+		<div class="ui-popup-footer">
+			<button type="submit" class="btn btn-warning">{{I "ok"}} {{T .Loc "button.ok"}}</button>
+			<button type="button" class="btn btn-secondary" popup-dismiss="true">{{I "cancel"}} {{T .Loc "button.cancel"}}</button>
+		</div>
+	</form>
 </div>
 
 {{template "main_footer" .}}

@@ -269,7 +269,7 @@ func addLoginHandlers(rg *xin.RouterGroup) {
 
 	rg.GET("/", login.Index)
 	rg.POST("/login", login.Login)
-	rg.POST("login_mfa_mobile", login.LoginMFAMobile)
+	rg.POST("/mfa_enroll", login.LoginMFAEnroll)
 	rg.GET("/logout", login.Logout)
 
 	addLoginPasswordResetHandlers(rg.Group("/pwdrst"))

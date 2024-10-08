@@ -10,6 +10,7 @@ import (
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango/fsu"
 	"github.com/askasoft/pango/log"
+	"github.com/askasoft/pango/ran"
 	"github.com/askasoft/pango/sqx"
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/str"
@@ -127,6 +128,7 @@ func (tt Tenant) MigrateSuper() error {
 		user.Role = models.RoleSuper
 		user.Status = models.UserActive
 		user.CIDR = suc.GetString("cidr", "0.0.0.0/0\n::/0")
+		user.Secret = ran.RandInt63()
 		user.CreatedAt = time.Now()
 		user.UpdatedAt = user.CreatedAt
 

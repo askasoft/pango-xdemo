@@ -15,6 +15,7 @@ import (
 	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
 	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
 	"github.com/askasoft/pango/num"
+	"github.com/askasoft/pango/ran"
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/tbs"
 	"github.com/askasoft/pango/xin"
@@ -155,6 +156,7 @@ func UserCreate(c *xin.Context) {
 	sqb.Setc("role", user.Role)
 	sqb.Setc("status", user.Status)
 	sqb.Setc("cidr", user.CIDR)
+	sqb.Setc("secret", ran.RandInt63())
 	sqb.Setc("created_at", user.UpdatedAt)
 	sqb.Setc("updated_at", user.UpdatedAt)
 	sql, args := sqb.Build()

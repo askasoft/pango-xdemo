@@ -17,6 +17,7 @@ import (
 	"github.com/askasoft/pango-xdemo/app/utils/smtputil"
 	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
 	"github.com/askasoft/pango/num"
+	"github.com/askasoft/pango/ran"
 	"github.com/askasoft/pango/tbs"
 	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pango/xmw"
@@ -39,54 +40,55 @@ type UserPass struct {
 }
 
 func Login(c *xin.Context) {
-	userpass := loginGetUserPass(c)
-	if userpass == nil {
+	up, au, ok := loginFindUser(c)
+	if !ok {
 		return
 	}
 
-	if loginMFACheck(c, userpass) {
-		loginPassed(c, userpass)
+	if loginMFACheck(c, au, up) {
+		loginPassed(c, up)
 	}
 }
 
-func loginGetUserPass(c *xin.Context) *UserPass {
-	userpass := &UserPass{}
-	if err := c.Bind(userpass); err != nil {
+func loginFindUser(c *xin.Context) (up *UserPass, au *models.User, ok bool) {
+	up = &UserPass{}
+	if err := c.Bind(up); err != nil {
 		vadutil.AddBindErrors(c, err, "login.")
 		c.JSON(http.StatusBadRequest, handlers.E(c))
-		return nil
+		return
 	}
 
 	if tenant.IsClientBlocked(c) {
 		c.AddError(errors.New(tbs.GetText(c.Locale, "login.failed.blocked")))
 		c.JSON(http.StatusBadRequest, handlers.E(c))
-		return nil
+		return
 	}
 
-	au, err := tenant.FindUser(c, userpass.Username)
+	fu, err := tenant.FindUser(c, up.Username)
 	if err != nil {
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
-		return nil
+		return
 	}
 
-	if au == nil || userpass.Password != au.GetPassword() {
+	if fu == nil || up.Password != fu.GetPassword() {
 		loginFailed(c, "login.failed.userpass")
-		return nil
+		return
 	}
 
-	user := au.(*models.User)
-	if !user.HasRole(models.RoleViewer) {
+	au = fu.(*models.User)
+	if !au.HasRole(models.RoleViewer) {
 		loginFailed(c, "login.failed.notallowed")
-		return nil
+		return
 	}
 
-	if !tenant.CheckClientIP(c, user) {
+	if !tenant.CheckClientIP(c, au) {
 		loginFailed(c, "login.failed.restricted")
-		return nil
+		return
 	}
 
-	return userpass
+	ok = true
+	return
 }
 
 func loginFailed(c *xin.Context, reason string) {
@@ -95,8 +97,8 @@ func loginFailed(c *xin.Context, reason string) {
 	c.JSON(http.StatusBadRequest, handlers.E(c))
 }
 
-func loginPassed(c *xin.Context, userpass *UserPass) {
-	if err := app.XCA.SaveUserPassToCookie(c, userpass.Username, userpass.Password); err != nil {
+func loginPassed(c *xin.Context, up *UserPass) {
+	if err := app.XCA.SaveUserPassToCookie(c, up.Username, up.Password); err != nil {
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return
@@ -109,25 +111,25 @@ func loginPassed(c *xin.Context, userpass *UserPass) {
 	})
 }
 
-func loginMFASecret(c *xin.Context, username string) string {
-	return cptutil.MustEncrypt(app.Secret(), c.Request.Host+"/"+username)
+func loginMFASecret(c *xin.Context, au *models.User) string {
+	return cptutil.MustEncrypt(app.Secret(), c.Request.Host+"/"+au.Email+"/"+num.Ltoa(au.Secret))
 }
 
-func loginMFACheck(c *xin.Context, userpass *UserPass) bool {
+func loginMFACheck(c *xin.Context, au *models.User, up *UserPass) bool {
 	tt := tenant.FromCtx(c)
 	mfa := tt.ConfigValue("secure_login_mfa")
 
 	switch mfa {
 	case "E":
-		secret := loginMFASecret(c, userpass.Username)
+		secret := loginMFASecret(c, au)
 		expire := app.INI.GetDuration("login", "emailPasscodeExpires", 10*time.Minute)
 		totp := otputil.NewTOTP(secret, expire)
-		if userpass.Passcode == "" {
-			loginSendEmailPasscode(c, userpass.Username, totp.Now(), expire)
+		if up.Passcode == "" {
+			loginSendEmailPasscode(c, au.Email, totp.Now(), expire)
 			return false
 		}
 
-		if otputil.TOTPVerify(totp, expire, userpass.Passcode) {
+		if otputil.TOTPVerify(totp, expire, up.Passcode) {
 			return true
 		}
 
@@ -135,7 +137,7 @@ func loginMFACheck(c *xin.Context, userpass *UserPass) bool {
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return false
 	case "M":
-		if userpass.Passcode == "" {
+		if up.Passcode == "" {
 			c.JSON(http.StatusOK, xin.H{
 				"mfa":     "M",
 				"message": tbs.GetText(c.Locale, "login.mfa.mobile.notice"),
@@ -143,11 +145,11 @@ func loginMFACheck(c *xin.Context, userpass *UserPass) bool {
 			return false
 		}
 
-		secret := loginMFASecret(c, userpass.Username)
+		secret := loginMFASecret(c, au)
 		expire := app.INI.GetDuration("login", "mobilePasscodeExpires", 30*time.Second)
 		totp := otputil.NewTOTP(secret, expire)
 
-		if otputil.TOTPVerify(totp, expire, userpass.Passcode) {
+		if otputil.TOTPVerify(totp, expire, up.Passcode) {
 			return true
 		}
 
@@ -187,16 +189,34 @@ func loginSendEmailPasscode(c *xin.Context, email, passcode string, expire time.
 	})
 }
 
-func LoginMFAMobile(c *xin.Context) {
-	userpass := loginGetUserPass(c)
-	if userpass == nil {
+func LoginMFAEnroll(c *xin.Context) {
+	_, au, ok := loginFindUser(c)
+	if !ok {
 		return
 	}
 
-	secret := loginMFASecret(c, userpass.Username)
+	au.Secret = ran.RandInt63()
+
+	tt := tenant.FromCtx(c)
+
+	sqb := app.SDB.Builder()
+	sqb.Update(tt.TableUsers())
+	sqb.Setc("secret", au.Secret)
+	sqb.Setc("updated_at", time.Now())
+	sqb.Where("id = ?", au.ID)
+	sql, args := sqb.Build()
+
+	_, err := app.SDB.Exec(sql, args...)
+	if err != nil {
+		c.AddError(err)
+		c.JSON(http.StatusInternalServerError, handlers.E(c))
+		return
+	}
+
+	secret := loginMFASecret(c, au)
 	expire := app.INI.GetDuration("login", "mobilePasscodeExpires", 30*time.Second)
 	totp := otputil.NewTOTP(secret, expire)
-	loginSendEmailQrcode(c, userpass.Username, totp)
+	loginSendEmailQrcode(c, au.Email, totp)
 }
 
 func loginSendEmailQrcode(c *xin.Context, email string, totp *gotp.TOTP) {

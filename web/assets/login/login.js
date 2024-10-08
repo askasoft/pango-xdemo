@@ -34,11 +34,12 @@
 		return false;
 	}
 
-	function login_mfa_mobile() {
+	function login_mfa_enroll() {
+		$('#login_mfa_enroll_popup').popup('hide');
+
 		var $f = $('#login_form');
-		
 		$.ajax({
-			url: './login_mfa_mobile',
+			url: './mfa_enroll',
 			method: 'POST',
 			data: $f.serialize(),
 			dataType: 'json',
@@ -52,7 +53,7 @@
 
 	function init() {
 		$('#login_form').on('submit', login);
-		$('#login_mfa_mobile').on('click', login_mfa_mobile);
+		$('#login_mfa_enroll_popup form').on('submit', login_mfa_enroll);
 	}
 
 	$(window).on('load', init);

@@ -13,7 +13,7 @@ import (
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
 	"github.com/askasoft/pango/iox"
-	"github.com/askasoft/pango/str"
+	"github.com/askasoft/pango/ran"
 	"github.com/askasoft/pango/tbs"
 	"github.com/askasoft/pango/xin"
 )
@@ -84,11 +84,11 @@ func UserCsvImportSample(c *xin.Context) {
 
 	domain := c.Request.Host
 	data := [][]string{
-		{"101", "admin", "admin@" + domain, rm.MustGet(models.RoleAdmin), sm.MustGet(models.UserActive), str.RandString(16), "127.0.0.1/32\n192.168.1.1/32"},
-		{"102", "editor", "editor@" + domain, rm.MustGet(models.RoleEditor), sm.MustGet(models.UserActive), str.RandString(16), "127.0.0.1/32\n192.168.1.1/32"},
-		{"103", "viewer", "viewer@" + domain, rm.MustGet(models.RoleViewer), sm.MustGet(models.UserActive), str.RandString(16), "127.0.0.1/32\n192.168.1.1/32"},
-		{"104", "api", "api@" + domain, rm.MustGet(models.RoleApiOnly), sm.MustGet(models.UserActive), str.RandString(16), "127.0.0.1/32\n192.168.1.1/32"},
-		{"", "disabled", "disabled@" + domain, rm.MustGet(models.RoleViewer), sm.MustGet(models.UserDisabled), str.RandString(16), "127.0.0.1/32\n192.168.1.1/32"},
+		{"101", "admin", "admin@" + domain, rm.MustGet(models.RoleAdmin), sm.MustGet(models.UserActive), ran.RandString(16), "127.0.0.1/32\n192.168.1.1/32"},
+		{"102", "editor", "editor@" + domain, rm.MustGet(models.RoleEditor), sm.MustGet(models.UserActive), ran.RandString(16), "127.0.0.1/32\n192.168.1.1/32"},
+		{"103", "viewer", "viewer@" + domain, rm.MustGet(models.RoleViewer), sm.MustGet(models.UserActive), ran.RandString(16), "127.0.0.1/32\n192.168.1.1/32"},
+		{"104", "api", "api@" + domain, rm.MustGet(models.RoleApiOnly), sm.MustGet(models.UserActive), ran.RandString(16), "127.0.0.1/32\n192.168.1.1/32"},
+		{"", "disabled", "disabled@" + domain, rm.MustGet(models.RoleViewer), sm.MustGet(models.UserDisabled), ran.RandString(16), "127.0.0.1/32\n192.168.1.1/32"},
 	}
 
 	err = cw.WriteAll(data)

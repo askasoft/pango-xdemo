@@ -3,7 +3,7 @@ package pwdutil
 import (
 	"strings"
 
-	"github.com/askasoft/pango/str"
+	"github.com/askasoft/pango/ran"
 )
 
 const (
@@ -15,10 +15,10 @@ const (
 
 func RandomPassword() string {
 	rfs := []func(int) string{
-		str.RandUpperLetters,
-		str.RandLowerLetters,
-		str.RandNumbers,
-		str.RandSymbols,
+		ran.RandUpperLetters,
+		ran.RandLowerLetters,
+		ran.RandNumbers,
+		ran.RandSymbols,
 	}
 
 	var sb strings.Builder

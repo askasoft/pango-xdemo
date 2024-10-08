@@ -19,6 +19,7 @@ import (
 	"github.com/askasoft/pango/cog/hashmap"
 	"github.com/askasoft/pango/iox"
 	"github.com/askasoft/pango/num"
+	"github.com/askasoft/pango/ran"
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/tbs"
@@ -335,6 +336,7 @@ func (uci *UserCsvImportJob) importRecord(rec *csvUserRecord) error {
 		sqb.Setc("role", user.Role)
 		sqb.Setc("status", user.Status)
 		sqb.Setc("cidr", user.CIDR)
+		sqb.Setc("secret", ran.RandInt63())
 		sqb.Setc("created_at", user.UpdatedAt)
 		sqb.Setc("updated_at", user.UpdatedAt)
 		sql, args := sqb.Build()
