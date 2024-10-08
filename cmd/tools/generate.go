@@ -7,14 +7,27 @@ import (
 	"time"
 
 	"github.com/askasoft/pango-xdemo/app"
+	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango/fsu"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/str"
+	"github.com/askasoft/pango/xfs"
+	"github.com/askasoft/pango/xjm"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	gormschema "gorm.io/gorm/schema"
 )
+
+var tables = []any{
+	&xfs.File{},
+	&xjm.Job{},
+	&xjm.JobLog{},
+	&xjm.JobChain{},
+	&models.Config{},
+	&models.User{},
+	&models.Pet{},
+}
 
 func GenerateSchema(outfile string) error {
 	ini, err := loadConfigs()
@@ -46,7 +59,7 @@ func GenerateSchema(outfile string) error {
 	}
 
 	gmi := gdb.Migrator()
-	for _, m := range migrates {
+	for _, m := range tables {
 		gp.Printf("---------------------------------")
 		if err := gmi.CreateTable(m); err != nil {
 			return err

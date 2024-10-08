@@ -80,7 +80,7 @@ func migrateSchema(dsn, schema string) error {
 		return err
 	}
 
-	err = gdb.AutoMigrate(migrates...)
+	err = gdb.AutoMigrate(tables...)
 
 	if db, err := gdb.DB(); err == nil {
 		db.Close()
