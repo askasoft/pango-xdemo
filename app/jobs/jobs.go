@@ -389,14 +389,13 @@ func (tj *TenantJobs) Stats() string {
 	defer tj.mu.Unlock()
 
 	if tj.rs.Len() == 0 {
-		return ""
+		return "JOB RUNNING: 0"
 	}
 
 	var total int
 	var sb strings.Builder
 
 	sb.WriteString("\n" + str.RepeatByte('-', 80))
-
 	for it := tj.rs.Iterator(); it.Next(); {
 		total += len(it.Value())
 
@@ -407,11 +406,9 @@ func (tj *TenantJobs) Stats() string {
 
 		sb.WriteString(fmt.Sprintf("\n%30s: [%d] %s", str.IfEmpty(it.Key(), "_"), len(it.Value()), str.Join(ns, " ")))
 	}
-
 	sb.WriteString("\n" + str.RepeatByte('-', 80))
-	sb.WriteString(fmt.Sprintf("\n%30s: %d", "TOTAL", total))
 
-	return sb.String()
+	return fmt.Sprintf("JOB RUNNING: %d", total) + sb.String()
 }
 
 func Stats() string {
@@ -434,10 +431,7 @@ func Starts() {
 		}
 	}
 
-	st := ttjobs.Stats()
-	if st != "" {
-		log.Info(st)
-	}
+	log.Info(ttjobs.Stats())
 }
 
 // StartJobs start tenant jobs
