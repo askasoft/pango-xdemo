@@ -28,7 +28,11 @@ var main = {
 		}
 		return main.fmt_time.format(d);
 	},
-
+	linkify: function(s) {
+		// URLs starting with http://, https://
+		var re = /(\bhttps?:\/\/[\w!\?/\+\-_~=;\.,\*&@#\$%\(\)'\[\]]+)/gim;
+		return s.replace(re, '<a href="$1" target="_blank">$1</a>');
+	},
 	safe_parse_json: function(s, d) {
 		try {
 			return $.parseJSON(s);
@@ -445,6 +449,11 @@ var main = {
 	},
 
 	init: function() {
+		// linkify
+		$('.linkify').each(function() {
+			$(this).html(main.linkify($(this).html()));
+		});
+
 		// summernote
 		main.summernote($('textarea[summernote]'));
 
