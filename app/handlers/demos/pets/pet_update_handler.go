@@ -225,12 +225,12 @@ func PetUpdate(c *xin.Context) {
 }
 
 type PetUpdatesArg struct {
-	ID     string           `json:"id,omitempty" form:"id,strip"`
-	Gender string           `json:"gender,omitempty" form:"gender,strip"`
-	BornAt *time.Time       `json:"born_at,omitempty" form:"born_at"`
-	Origin string           `json:"origin,omitempty" form:"origin,strip"`
-	Temper string           `json:"temper,omitempty" form:"temper,strip"`
-	Habits *pqx.StringArray `json:"habits,omitempty" form:"habits,strip"`
+	ID     string     `json:"id,omitempty" form:"id,strip"`
+	Gender string     `json:"gender,omitempty" form:"gender,strip"`
+	BornAt *time.Time `json:"born_at,omitempty" form:"born_at"`
+	Origin string     `json:"origin,omitempty" form:"origin,strip"`
+	Temper string     `json:"temper,omitempty" form:"temper,strip"`
+	Habits *[]string  `json:"habits,omitempty" form:"habits,strip"`
 }
 
 func (pua *PetUpdatesArg) IsEmpty() bool {
@@ -282,7 +282,7 @@ func PetUpdates(c *xin.Context) {
 		sqb.Setc("temper", pua.Temper)
 	}
 	if pua.Habits != nil {
-		sqb.Setc("habits", str.Strips(*pua.Habits))
+		sqb.Setc("habits", pqx.StringArray(str.Strips(*pua.Habits)))
 	}
 	sqb.Setc("updated_at", time.Now())
 
