@@ -102,7 +102,7 @@
 
 /* well */
 .well {
-	margin-bottom: 20px;
+	margin-bottom: 1.5rem;
 	white-space: pre-wrap;
 }
 
@@ -307,17 +307,17 @@ a > s {
 
 /** section **/
 .s-section {
-	margin-bottom: 40px;
+	margin-bottom: 2rem;
 }
 .s-section-head {
 	display: flex;
 	flex-wrap: wrap;
 	align-items: center;
-	margin-bottom: 10px;
-	padding: 10px;
+	margin-bottom: 0.5rem;
+	padding: 0.5rem;
 }
 .s-section-head > * {
-	margin: 0 5px 5px 0;
+	margin: 0 0.5rem 0.5rem 0;
 }
 .s-section-head > h2, .s-section-head > h3 {
 	display: flex;
@@ -341,8 +341,8 @@ a > s {
 }
 .s-section-body {
 	background-color: var(--bs-body-bg);
-	border-radius: 12px;
-	padding: 25px;
+	border-radius: 0.75rem;
+	padding: 1.5rem;
 }
 
 /** login **/
