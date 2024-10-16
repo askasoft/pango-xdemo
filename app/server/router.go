@@ -226,6 +226,7 @@ func addStaticHandlers(rg *xin.RouterGroup) {
 
 	xin.StaticFSFunc(rg, "/assets", wfsc, "/assets", xcch)
 	xin.StaticFSFuncFile(rg, "/favicon.ico", wfsc, "favicon.ico", xcch)
+	xin.StaticFSFuncFile(rg, "/robots.txt", wfsc, "robots.txt", xcch)
 }
 
 func addAPIHandlers(rg *xin.RouterGroup) {
