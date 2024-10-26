@@ -1,6 +1,7 @@
 package jobs
 
 import (
+	"cmp"
 	"errors"
 	"fmt"
 	"math"
@@ -11,7 +12,6 @@ import (
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango/asg"
-	"github.com/askasoft/pango/cmp"
 	"github.com/askasoft/pango/cog/treemap"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/num"
@@ -336,7 +336,7 @@ func (jr *JobRunner) Done(err error) {
 var ttjobs = NewTenantJobs()
 
 func NewTenantJobs() *TenantJobs {
-	return &TenantJobs{rs: treemap.NewTreeMap[string, []*xjm.Job](cmp.CompareString)}
+	return &TenantJobs{rs: treemap.NewTreeMap[string, []*xjm.Job](cmp.Compare[string])}
 }
 
 type TenantJobs struct {
