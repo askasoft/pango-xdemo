@@ -28,6 +28,50 @@ var main = {
 		}
 		return main.fmt_time.format(d);
 	},
+	split: function(s) {
+		var ss = s.split(/[\s\u3000]/g), rs = [];
+		for (var i = 0; i < ss.length; i++) {
+			if (ss[i].length) {
+				rs.push(ss[i])
+			}
+		}
+		return rs;
+	},
+	index_any: function(s, ks) {
+		var i = 0;
+		while (s.length > 0) {
+			for (var j = 0; j < ks.length; j++) {
+				if (s.startsWith(ks[j])) {
+					return [i, ks[j]]
+				}
+			}
+			s = s.substring(1);
+			i++;
+		}
+		return [-1, ''];
+	},
+	markup: function($e, ks) {
+		if (!ks || ks.length == 0) {
+			return;
+		}
+
+		var t = $e.text(), ps = main.index_any(t, ks);
+		if (ps[0] < 0) {
+			return;
+		}
+		
+		var p = '';
+		while (true) {
+			p += t.substring(0, ps[0]).escapeHTML() + '<s>' + ps[1].escapeHTML() + '</s>';
+			t = t.substring(ps[0] + ps[1].length);
+			ps = main.index_any(t, ks);
+			if (ps[0] < 0) {
+				p += t.escapeHTML();
+				break;
+			}
+		}
+		$e.html(p);
+	},
 	linkify: function(s) {
 		// URLs starting with http://, https://
 		var re = /(\bhttps?:\/\/[\w!\?/\+\-_~=;\.,\*&@#\$%\(\)'\[\]]+)/gim;
