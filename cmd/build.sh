@@ -1,6 +1,6 @@
 #!/bin/sh -ex
 
-export EXE=xdemoc
+export EXE=xdemodb
 
 ../build.sh
 mv -f $EXE ../
