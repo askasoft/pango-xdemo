@@ -170,7 +170,7 @@ func loginSendEmailPasscode(c *xin.Context, email, passcode string, expire time.
 	sr = strings.NewReplacer(
 		"{{SITE_NAME}}", html.EscapeString(tbs.GetText(c.Locale, "title")),
 		"{{USER_EMAIL}}", html.EscapeString(email),
-		"{{REQUEST_DATE}}", html.EscapeString(models.FormatTime(time.Now())),
+		"{{REQUEST_DATE}}", html.EscapeString(app.FormatTime(time.Now())),
 		"{{PASSCODE}}", html.EscapeString(passcode),
 		"{{EXPIRES}}", num.Itoa(int(expire.Minutes())),
 	)

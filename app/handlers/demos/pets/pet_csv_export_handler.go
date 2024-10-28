@@ -96,7 +96,7 @@ func PetCsvExport(c *xin.Context) {
 			num.Ltoa(pet.ID),
 			pet.Name,
 			pgm.MustGet(pet.Gender, pet.Gender),
-			models.FormatDate(pet.BornAt),
+			app.FormatDate(pet.BornAt),
 			pom.MustGet(pet.Origin, pet.Origin),
 			ptm.MustGet(pet.Temper, pet.Temper),
 			str.Join(habits, "\n"),
@@ -106,8 +106,8 @@ func PetCsvExport(c *xin.Context) {
 			pet.ShopAddress,
 			pet.ShopTelephone,
 			pet.ShopLink,
-			models.FormatTime(pet.CreatedAt),
-			models.FormatTime(pet.UpdatedAt),
+			app.FormatTime(pet.CreatedAt),
+			app.FormatTime(pet.UpdatedAt),
 		})
 		if err != nil {
 			c.Logger.Error(err)

@@ -26,7 +26,7 @@ type JobArg struct {
 }
 
 func (ja *JobArg) SetFile(tt tenant.Tenant, mfh *multipart.FileHeader) error {
-	fid := models.MakeFileID(models.PrefixJobFile, mfh.Filename)
+	fid := app.MakeFileID(models.PrefixJobFile, mfh.Filename)
 	tfs := tt.FS()
 	if _, err := xfs.SaveUploadedFile(tfs, fid, mfh); err != nil {
 		return err

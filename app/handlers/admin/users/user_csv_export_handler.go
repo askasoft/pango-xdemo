@@ -86,8 +86,8 @@ func UserCsvExport(c *xin.Context) {
 			sm.MustGet(user.Status, user.Status),
 			"",
 			user.CIDR,
-			models.FormatTime(user.CreatedAt),
-			models.FormatTime(user.UpdatedAt),
+			app.FormatTime(user.CreatedAt),
+			app.FormatTime(user.UpdatedAt),
 		})
 		if err != nil {
 			c.Logger.Error(err)

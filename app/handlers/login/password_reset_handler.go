@@ -79,7 +79,7 @@ func PasswordResetSend(c *xin.Context) {
 		"{{SITE_NAME}}", tbs.GetText(c.Locale, "title"),
 		"{{USER_NAME}}", user.(*models.User).Name,
 		"{{USER_EMAIL}}", user.(*models.User).Email,
-		"{{REQUEST_DATE}}", models.FormatTime(time.Now()),
+		"{{REQUEST_DATE}}", app.FormatTime(time.Now()),
 		"{{RESET_URL}}", rsurl,
 		"{{EXPIRES}}", tkexp,
 	)
@@ -89,7 +89,7 @@ func PasswordResetSend(c *xin.Context) {
 		"{{SITE_NAME}}", html.EscapeString(tbs.GetText(c.Locale, "title")),
 		"{{USER_NAME}}", html.EscapeString(user.(*models.User).Name),
 		"{{USER_EMAIL}}", html.EscapeString(user.(*models.User).Email),
-		"{{REQUEST_DATE}}", html.EscapeString(models.FormatTime(time.Now())),
+		"{{REQUEST_DATE}}", html.EscapeString(app.FormatTime(time.Now())),
 		"{{RESET_URL}}", rsurl,
 		"{{EXPIRES}}", tkexp,
 	)
@@ -203,7 +203,7 @@ func PasswordResetExecute(c *xin.Context) {
 		"{{SITE_NAME}}", tbs.GetText(c.Locale, "title"),
 		"{{USER_NAME}}", user.(*models.User).Name,
 		"{{USER_EMAIL}}", user.(*models.User).Email,
-		"{{RESET_DATE}}", models.FormatTime(time.Now()),
+		"{{RESET_DATE}}", app.FormatTime(time.Now()),
 	)
 	subject := sr.Replace(tbs.GetText(c.Locale, "pwdrst.email.reset.subject"))
 
@@ -211,7 +211,7 @@ func PasswordResetExecute(c *xin.Context) {
 		"{{SITE_NAME}}", html.EscapeString(tbs.GetText(c.Locale, "title")),
 		"{{USER_NAME}}", html.EscapeString(user.(*models.User).Name),
 		"{{USER_EMAIL}}", html.EscapeString(user.(*models.User).Email),
-		"{{RESET_DATE}}", html.EscapeString(models.FormatTime(time.Now())),
+		"{{RESET_DATE}}", html.EscapeString(app.FormatTime(time.Now())),
 	)
 	message := sr.Replace(tbs.GetText(c.Locale, "pwdrst.email.reset.message"))
 

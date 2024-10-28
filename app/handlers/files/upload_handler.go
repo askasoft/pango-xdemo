@@ -4,6 +4,7 @@ import (
 	"mime/multipart"
 	"net/http"
 
+	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango/xfs"
@@ -11,7 +12,7 @@ import (
 )
 
 func SaveUploadedFile(c *xin.Context, mfh *multipart.FileHeader) (*xfs.File, error) {
-	fid := models.MakeFileID(models.PrefixTmpFile, mfh.Filename)
+	fid := app.MakeFileID(models.PrefixTmpFile, mfh.Filename)
 
 	tt := tenant.FromCtx(c)
 	tfs := tt.FS()
