@@ -24,8 +24,7 @@ func FindUser(c *xin.Context, username string) (xmw.AuthUser, error) {
 
 	k := tt.String() + "\n" + username
 
-	if v, ok := app.USERS.Get(k); ok {
-		u := v.(*models.User)
+	if u, ok := app.USERS.Get(k); ok {
 		if u.ID == 0 {
 			return nil, nil
 		}
@@ -36,8 +35,7 @@ func FindUser(c *xin.Context, username string) (xmw.AuthUser, error) {
 	defer muUSERS.Unlock()
 
 	// get again to prevent duplicated load
-	if v, ok := app.USERS.Get(k); ok {
-		u := v.(*models.User)
+	if u, ok := app.USERS.Get(k); ok {
 		if u.ID == 0 {
 			return nil, nil
 		}
@@ -87,8 +85,7 @@ func DeleteAuthUser(c *xin.Context) {
 func IsClientBlocked(c *xin.Context) bool {
 	cip := c.ClientIP()
 
-	if v, ok := app.AFIPS.Get(cip); ok {
-		cnt := v.(int)
+	if cnt, ok := app.AFIPS.Get(cip); ok {
 		if cnt >= app.INI.GetInt("login", "maxFailure", 5) {
 			return true
 		}

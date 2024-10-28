@@ -41,7 +41,7 @@ func (tt Tenant) PurgeConfig() {
 
 func (tt Tenant) ConfigMap() map[string]string {
 	if dcm, ok := app.CONFS.Get(string(tt)); ok {
-		return dcm.(map[string]string)
+		return dcm
 	}
 
 	muCONFS.Lock()
@@ -49,7 +49,7 @@ func (tt Tenant) ConfigMap() map[string]string {
 
 	// get again to prevent duplicated load
 	if dcm, ok := app.CONFS.Get(string(tt)); ok {
-		return dcm.(map[string]string)
+		return dcm
 	}
 
 	dcm, err := tt.loadConfigMap(app.SDB)

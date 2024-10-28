@@ -32,7 +32,7 @@ func FindTenant(tt Tenant) (bool, error) {
 	s := tt.Schema()
 
 	if v, ok := app.TENAS.Get(s); ok {
-		return v.(bool), nil
+		return v, nil
 	}
 
 	muTENAS.Lock()
@@ -40,7 +40,7 @@ func FindTenant(tt Tenant) (bool, error) {
 
 	// get again to prevent duplicated load
 	if v, ok := app.TENAS.Get(s); ok {
-		return v.(bool), nil
+		return v, nil
 	}
 
 	ok, err := ExistsSchema(s)

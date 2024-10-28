@@ -7,6 +7,7 @@ import (
 	"runtime"
 	"time"
 
+	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango/imc"
 	"github.com/askasoft/pango/ini"
 	"github.com/askasoft/pango/log"
@@ -143,16 +144,16 @@ var (
 	DBS map[string]string
 
 	// TENAS tenants cache
-	TENAS *imc.Cache
+	TENAS *imc.Cache[bool]
 
 	// CONFS tenant config map cache
-	CONFS *imc.Cache
+	CONFS *imc.Cache[map[string]string]
 
 	// USERS tenant user cache
-	USERS *imc.Cache
+	USERS *imc.Cache[*models.User]
 
 	// AFIPS authenticate failure ip cache
-	AFIPS *imc.Cache
+	AFIPS *imc.Cache[int]
 )
 
 func Exit(code int) {
