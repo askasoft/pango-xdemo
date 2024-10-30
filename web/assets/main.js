@@ -28,15 +28,6 @@ var main = {
 		}
 		return main.fmt_time.format(d);
 	},
-	split: function(s) {
-		var ss = s.split(/[\s\u3000]/g), rs = [];
-		for (var i = 0; i < ss.length; i++) {
-			if (ss[i].length) {
-				rs.push(ss[i])
-			}
-		}
-		return rs;
-	},
 	index_any: function(s, ks) {
 		var i = 0;
 		while (s.length > 0) {
