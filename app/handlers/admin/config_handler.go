@@ -168,7 +168,8 @@ func ConfigSave(c *xin.Context) {
 			v, ok = c.GetPostForm(cfg.Name)
 		}
 
-		if !ok {
+		if !ok || v == cfg.Value {
+			// skip unknown or unmodified value
 			continue
 		}
 
