@@ -34,9 +34,9 @@ func Index(c *xin.Context) {
 }
 
 type UserPass struct {
-	Username string `form:"username" validate:"required"`
-	Password string `form:"password" validate:"required"`
-	Passcode string `form:"passcode"`
+	Username string  `form:"username" validate:"required"`
+	Password string  `form:"password" validate:"required"`
+	Passcode *string `form:"passcode"`
 }
 
 func Login(c *xin.Context) {
@@ -124,20 +124,19 @@ func loginMFACheck(c *xin.Context, au *models.User, up *UserPass) bool {
 		secret := loginMFASecret(c, au)
 		expire := app.INI.GetDuration("login", "emailPasscodeExpires", 10*time.Minute)
 		totp := otputil.NewTOTP(secret, expire)
-		if up.Passcode == "" {
+		if up.Passcode == nil {
 			loginSendEmailPasscode(c, au.Email, totp.Now(), expire)
 			return false
 		}
 
-		if otputil.TOTPVerify(totp, expire, up.Passcode) {
+		if otputil.TOTPVerify(totp, expire, *up.Passcode) {
 			return true
 		}
 
-		c.AddError(errors.New(tbs.GetText(c.Locale, "login.failed.passcode")))
-		c.JSON(http.StatusBadRequest, handlers.E(c))
+		loginFailed(c, "login.failed.passcode")
 		return false
 	case "M":
-		if up.Passcode == "" {
+		if up.Passcode == nil {
 			c.JSON(http.StatusOK, xin.H{
 				"mfa":     "M",
 				"message": tbs.GetText(c.Locale, "login.mfa.mobile.notice"),
@@ -149,12 +148,11 @@ func loginMFACheck(c *xin.Context, au *models.User, up *UserPass) bool {
 		expire := app.INI.GetDuration("login", "mobilePasscodeExpires", 30*time.Second)
 		totp := otputil.NewTOTP(secret, expire)
 
-		if otputil.TOTPVerify(totp, expire, up.Passcode) {
+		if otputil.TOTPVerify(totp, expire, *up.Passcode) {
 			return true
 		}
 
-		c.AddError(errors.New(tbs.GetText(c.Locale, "login.failed.passcode")))
-		c.JSON(http.StatusBadRequest, handlers.E(c))
+		loginFailed(c, "login.failed.passcode")
 		return false
 	default:
 		return true

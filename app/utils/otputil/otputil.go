@@ -21,6 +21,10 @@ func NewTOTP(secret string, interval time.Duration) *gotp.TOTP {
 }
 
 func TOTPVerify(totp *gotp.TOTP, interval time.Duration, passcode string) bool {
+	if passcode == "" {
+		return false
+	}
+
 	tm := time.Now()
 	if totp.VerifyTime(passcode, tm) {
 		return true

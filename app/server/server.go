@@ -203,7 +203,7 @@ func initCaches() {
 	app.TENAS = imc.New[bool](cac.GetDuration("tenaCacheExpires", time.Second*10), time.Minute)
 	app.CONFS = imc.New[map[string]string](cac.GetDuration("confCacheExpires", time.Minute), time.Minute)
 	app.USERS = imc.New[*models.User](cac.GetDuration("userCacheExpires", time.Second*15), time.Minute)
-	app.AFIPS = imc.New[int](cac.GetDuration("afipCacheExpires", time.Minute*15), time.Minute)
+	app.AFIPS = imc.New[int](cac.GetDuration("afipCacheExpires", time.Minute*30), time.Minute)
 }
 
 func loadConfigs() (*ini.Ini, error) {

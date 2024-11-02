@@ -11,7 +11,7 @@
 			success: function(data) {
 				if (data.mfa) {
 					main.show_alert($la, 'primary', data.message);
-					$f.find('input[name=passcode]').closest('.row').removeClass('hidden');
+					$f.find('input[name=passcode]').prop('disabled', false).closest('.row').removeClass('hidden');
 					$f.find('.desc.'+data.mfa).removeClass('hidden');
 					return;
 				}
