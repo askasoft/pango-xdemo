@@ -51,7 +51,7 @@ func (prjcc *PetResetJobChainController) Start(c *xin.Context) {
 	}
 
 	prjcc.JobName = jobs.JobNamePetClear
-	prjcc.JobParam = pca.(jobs.ISetChain)
+	prjcc.JobParam = pca.(jobs.IArgChain)
 	prjcc.ChainStates = pets.PetResetCreateStates()
 	prjcc.JobChainController.Start(c)
 }

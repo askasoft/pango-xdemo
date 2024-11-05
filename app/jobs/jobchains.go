@@ -42,7 +42,7 @@ func JobChainInitStates(jns ...string) []*JobRunState {
 	return states
 }
 
-func JobChainStart(tt tenant.Tenant, chainName string, states []*JobRunState, jobName string, jobFile string, jobParam ISetChain, chainData bool) (cid int64, err error) {
+func JobChainStart(tt tenant.Tenant, chainName string, states []*JobRunState, jobName string, jobFile string, jobParam IArgChain) (cid int64, err error) {
 	state := JobChainEncodeStates(states)
 
 	err = app.SDB.Transaction(func(tx *sqlx.Tx) error {
@@ -52,7 +52,8 @@ func JobChainStart(tt tenant.Tenant, chainName string, states []*JobRunState, jo
 			return err
 		}
 
-		jobParam.SetChain(cid, 0, chainData)
+		_, _, cdt := jobParam.GetChain()
+		jobParam.SetChain(cid, 0, cdt)
 		jParam := xjm.MustEncode(jobParam)
 
 		sjm := tt.SJM(tx)
@@ -262,7 +263,7 @@ func JobChainAppendJob(name string, tt tenant.Tenant, locale string, cid int64, 
 		return fmt.Errorf("Invalid chain job %q", name)
 	}
 
-	if isc, ok := arg.(ISetChain); ok {
+	if isc, ok := arg.(IArgChain); ok {
 		isc.SetChain(cid, csq, cdt)
 	} else {
 		return fmt.Errorf("Invalid chain job %q", name)

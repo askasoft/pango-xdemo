@@ -54,11 +54,10 @@ func NewJobChainInfo(locale string, jc *xjm.JobChain) *JobChainInfo {
 // JobChainController job chain controller base struct
 type JobChainController struct {
 	ChainName   string
-	ChainData   bool
 	ChainStates []*jobs.JobRunState
 	JobName     string
 	JobFile     string
-	JobParam    jobs.ISetChain
+	JobParam    jobs.IArgChain
 	Template    string
 }
 
@@ -141,7 +140,7 @@ func (jcc *JobChainController) Start(c *xin.Context) {
 		return
 	}
 
-	cid, err := jobs.JobChainStart(tt, jcc.ChainName, jcc.ChainStates, jcc.JobName, jcc.JobFile, jcc.JobParam, jcc.ChainData)
+	cid, err := jobs.JobChainStart(tt, jcc.ChainName, jcc.ChainStates, jcc.JobName, jcc.JobFile, jcc.JobParam)
 	if err != nil {
 		log.Errorf("Failed to CreateJobChain(%q, %q): %v", jcc.ChainName, jcc.JobName, err)
 		c.AddError(err)

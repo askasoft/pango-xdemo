@@ -60,14 +60,19 @@ func RegisterJobArg(name string, jac JobArgCreater) {
 	jobArgCreators[name] = jac
 }
 
-type ISetChain interface {
+type IArgChain interface {
+	GetChain() (int64, int, bool)
 	SetChain(chainID int64, chainSeq int, chainData bool)
 }
 
 type ArgChain struct {
-	ChainID   int64 `json:"chain_id,omitempty"`
-	ChainSeq  int   `json:"chain_seq,omitempty"`
+	ChainID   int64 `json:"chain_id,omitempty" form:"-"`
+	ChainSeq  int   `json:"chain_seq,omitempty" form:"-"`
 	ChainData bool  `json:"chain_data,omitempty" form:"chain_data"`
+}
+
+func (ac *ArgChain) GetChain() (int64, int, bool) {
+	return ac.ChainID, ac.ChainSeq, ac.ChainData
 }
 
 func (ac *ArgChain) SetChain(cid int64, csq int, cdt bool) {
@@ -81,14 +86,14 @@ func (ac *ArgChain) ShouldChainData() bool {
 }
 
 type ArgLocale struct {
-	Locale string `json:"locale,omitempty"`
+	Locale string `json:"locale,omitempty" form:"-"`
 }
 
 type ArgItems struct {
 	Items int `json:"items,omitempty" form:"items"`
 }
 
-type IPeriod interface {
+type iPeriod interface {
 	Period() *ArgPeriod
 }
 
@@ -104,7 +109,7 @@ func (ap *ArgPeriod) Period() *ArgPeriod {
 func ArgBind(c *xin.Context, a any) error {
 	err := c.Bind(a)
 
-	if ip, ok := a.(IPeriod); ok {
+	if ip, ok := a.(iPeriod); ok {
 		ap := ip.Period()
 		if !ap.End.IsZero() {
 			ap.End = ap.End.Add(time.Hour*24 - time.Microsecond)
