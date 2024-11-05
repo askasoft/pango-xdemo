@@ -57,11 +57,6 @@ func (s *service) Version() string {
 	return app.Versions()
 }
 
-// Usage print command line usage
-func (s *service) Usage() {
-	srv.PrintUsage(s)
-}
-
 // Init initialize the app
 func (s *service) Init() {
 	Init()

@@ -13,39 +13,51 @@ import (
 )
 
 func usage() {
-	fmt.Fprintf(flag.CommandLine.Output(),
-		"Usage: %s <command> [options]\n"+
-			"  <command>:\n"+
-			"    version             print the version information.\n"+
-			"    help | usage        print the usage information.\n"+
-			"    generate [output]   generate database schema DDL.\n"+
-			"      [output]          specify the output DDL file.\n"+
-			"    migrate [schema]... migrate database schemas.\n"+
-			"      [schema]...       specify schemas to migrate.\n"+
-			"  <options>:\n",
-		filepath.Base(os.Args[0]))
-
-	flag.PrintDefaults()
+	help := `
+Usage: %s <command> [options]
+  <command>:
+    version             print the version information.
+    help | usage        print the usage information.
+    generate [output]   generate database schema DDL.
+      [output]          specify the output DDL file.
+    migrate [schema]... migrate database schemas.
+      [schema]...       specify schemas to migrate.
+  <options>:
+    -h | -help          print the help message.
+    -v | -version       print the version message.
+    -dir                set the working directory.
+    -debug              print the debug log.
+`
+	fmt.Printf(help, filepath.Base(os.Args[0]))
 }
 
 func main() {
-	debug := flag.Bool("debug", false, "print debug log.")
-	workdir := flag.String("dir", "", "set the working directory.")
+	var (
+		debug   bool
+		version bool
+		workdir string
+	)
+
+	flag.BoolVar(&version, "v", false, "print version message.")
+	flag.BoolVar(&version, "version", false, "print version message.")
+	flag.BoolVar(&debug, "debug", false, "print debug log.")
+	flag.StringVar(&workdir, "dir", "", "set the working directory.")
+
 	flag.CommandLine.Usage = usage
 	flag.Parse()
 
-	chdir(*workdir)
+	chdir(workdir)
+
+	if version {
+		fmt.Println(app.Versions())
+		os.Exit(0)
+	}
 
 	log.SetFormat("%t [%p] - %m%n%T")
-	log.SetLevel(gog.If(*debug, log.LevelDebug, log.LevelInfo))
+	log.SetLevel(gog.If(debug, log.LevelDebug, log.LevelInfo))
 
 	arg := flag.Arg(0)
 	switch arg {
-	case "", "help", "usage":
-		flag.CommandLine.SetOutput(os.Stdout)
-		usage()
-	case "version":
-		fmt.Println(app.Versions())
 	case "generate":
 		if err := tools.GenerateSchema(flag.Arg(1)); err != nil {
 			fmt.Fprintln(os.Stderr, err)
@@ -57,7 +69,6 @@ func main() {
 			app.Exit(app.ExitErrCMD)
 		}
 	default:
-		flag.CommandLine.SetOutput(os.Stdout)
 		fmt.Fprintf(os.Stderr, "Invalid command %q\n\n", arg)
 		usage()
 	}

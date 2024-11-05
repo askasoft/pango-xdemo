@@ -3,7 +3,6 @@ package server
 import (
 	"flag"
 	"fmt"
-	"io"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -29,20 +28,25 @@ func (s *service) Flag() {
 	flag.BoolVar(&s.debug, "debug", false, "print debug log.")
 }
 
-// PrintCommand print custom command
-func (s *service) PrintCommand(out io.Writer) {
-	fmt.Fprintln(out, "    migrate <kind> [schema]...")
-	fmt.Fprintln(out, "      kind=config       migrate tenant configurations.")
-	fmt.Fprintln(out, "      kind=super        migrate tenant super user.")
-	fmt.Fprintln(out, "      [schema]...       specify schemas to migrate.")
-	fmt.Fprintln(out, "    execsql <file> [schema]...")
-	fmt.Fprintln(out, "      <file>            execute sql file.")
-	fmt.Fprintln(out, "      [schema]...       specify schemas to execute sql.")
-	fmt.Fprintln(out, "    exectask <task>     execute task [ "+str.Join(schedules.Keys(), ", ")+" ]")
-	fmt.Fprintln(out, "    encrypt [key] <str> encrypt string.")
-	fmt.Fprintln(out, "    decrypt [key] <str> decrypt string.")
-	fmt.Fprintln(out, "    assets  [dir]       export assets to directory.")
-	srv.PrintDefaultCommand(out)
+// Usage print command line usage
+func (s *service) Usage() {
+	fmt.Println("Usage: " + s.Name() + ".exe <command> [options]")
+	fmt.Println("  <command>:")
+	srv.PrintDefaultCommand(os.Stdout)
+	fmt.Println("    migrate <kind> [schema]...")
+	fmt.Println("      kind=config       migrate tenant configurations.")
+	fmt.Println("      kind=super        migrate tenant super user.")
+	fmt.Println("      [schema]...       specify schemas to migrate.")
+	fmt.Println("    execsql <file> [schema]...")
+	fmt.Println("      <file>            execute sql file.")
+	fmt.Println("      [schema]...       specify schemas to execute sql.")
+	fmt.Println("    exectask <task>     execute task [ " + str.Join(schedules.Keys(), ", ") + " ]")
+	fmt.Println("    encrypt [key] <str> encrypt string.")
+	fmt.Println("    decrypt [key] <str> decrypt string.")
+	fmt.Println("    assets  [dir]       export assets to directory.")
+	fmt.Println("  <options>:")
+	srv.PrintDefaultOptions(os.Stdout)
+	fmt.Println("    -debug              print the debug log.")
 }
 
 // Exec execute optional command except the internal command
