@@ -152,7 +152,7 @@ func (jc *JobController) Status(c *xin.Context) {
 	}
 
 	if job == nil {
-		c.AddError(errors.New(tbs.GetText(c.Locale, "job.notfound")))
+		c.AddError(errors.New(tbs.GetText(c.Locale, "job.error.notfound")))
 		c.JSON(http.StatusBadRequest, E(c))
 		return
 	}
@@ -178,13 +178,14 @@ func (jc *JobController) Start(c *xin.Context) {
 	if !jc.Multi {
 		job, err := tjm.FindJob(jc.Name, false, xjm.JobStatusPending, xjm.JobStatusRunning)
 		if err != nil {
+			log.Errorf("Failed to find job %s: %v", jc.Name, err)
 			c.AddError(err)
 			c.JSON(http.StatusInternalServerError, E(c))
 			return
 		}
 
 		if job != nil {
-			c.AddError(errors.New(tbs.GetText(c.Locale, "job.existing")))
+			c.AddError(errors.New(tbs.GetText(c.Locale, "job.error.existing")))
 			c.JSON(http.StatusBadRequest, E(c))
 			return
 		}
@@ -200,7 +201,7 @@ func (jc *JobController) Start(c *xin.Context) {
 
 	go jobs.StartJobs(tt) //nolint: errcheck
 
-	c.JSON(http.StatusOK, xin.H{"jid": jid, "success": tbs.GetText(c.Locale, "job.started")})
+	c.JSON(http.StatusOK, xin.H{"jid": jid, "success": tbs.GetText(c.Locale, "job.message.started")})
 }
 
 func (jc *JobController) Abort(c *xin.Context) {
@@ -215,7 +216,7 @@ func (jc *JobController) Abort(c *xin.Context) {
 
 	tjm := tt.JM()
 
-	reason := tbs.GetText(c.Locale, "job.abort.userabort", "User canceled.")
+	reason := tbs.GetText(c.Locale, "job.error.userabort", "User canceled.")
 
 	err := tjm.AbortJob(jid, reason)
 	if err != nil {
@@ -228,11 +229,11 @@ func (jc *JobController) Abort(c *xin.Context) {
 				return
 			}
 			if job.Status == xjm.JobStatusAborted {
-				c.JSON(http.StatusOK, xin.H{"warning": tbs.GetText(c.Locale, "job.aborted")})
+				c.JSON(http.StatusOK, xin.H{"warning": tbs.GetText(c.Locale, "job.message.aborted")})
 				return
 			}
 			if job.Status == xjm.JobStatusCompleted {
-				c.JSON(http.StatusOK, xin.H{"warning": tbs.GetText(c.Locale, "job.abort.completed")})
+				c.JSON(http.StatusOK, xin.H{"warning": tbs.GetText(c.Locale, "job.message.completed")})
 				return
 			}
 		}
@@ -252,5 +253,5 @@ func (jc *JobController) Abort(c *xin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, xin.H{"warning": tbs.GetText(c.Locale, "job.aborted")})
+	c.JSON(http.StatusOK, xin.H{"warning": tbs.GetText(c.Locale, "job.message.aborted")})
 }

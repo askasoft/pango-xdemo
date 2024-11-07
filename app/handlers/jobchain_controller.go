@@ -208,7 +208,7 @@ func (jcc *JobChainController) StartJob(c *xin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, xin.H{"cid": cid, "success": tbs.GetText(c.Locale, "job.started")})
+	c.JSON(http.StatusOK, xin.H{"cid": cid, "success": tbs.GetText(c.Locale, "job.message.started")})
 }
 
 func (jcc *JobChainController) Abort(c *xin.Context) {
@@ -231,15 +231,15 @@ func (jcc *JobChainController) Abort(c *xin.Context) {
 	}
 
 	if jc.Status == xjm.JobChainAborted {
-		c.JSON(http.StatusOK, xin.H{"warning": tbs.GetText(c.Locale, "job.aborted")})
+		c.JSON(http.StatusOK, xin.H{"warning": tbs.GetText(c.Locale, "job.message.aborted")})
 		return
 	}
 	if jc.Status == xjm.JobChainCompleted {
-		c.JSON(http.StatusOK, xin.H{"warning": tbs.GetText(c.Locale, "job.abort.completed")})
+		c.JSON(http.StatusOK, xin.H{"warning": tbs.GetText(c.Locale, "job.message.completed")})
 		return
 	}
 
-	reason := tbs.GetText(c.Locale, "job.abort.userabort", "User canceled.")
+	reason := tbs.GetText(c.Locale, "job.error.userabort", "User canceled.")
 
 	if err := jobs.JobChainAbort(tjc, tjm, jc, reason); err != nil {
 		c.Logger.Errorf("Failed to abort job chain #%d: %v", cid, err)
@@ -248,7 +248,7 @@ func (jcc *JobChainController) Abort(c *xin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, xin.H{"warning": tbs.GetText(c.Locale, "job.aborted")})
+	c.JSON(http.StatusOK, xin.H{"warning": tbs.GetText(c.Locale, "job.message.aborted")})
 }
 
 func (jcc *JobChainController) FirstJobName() string {
