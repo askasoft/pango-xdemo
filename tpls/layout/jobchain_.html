@@ -1,3 +1,13 @@
+{{define "jobchain_jobarg"}}
+	{{if eq .JobName "PetClear"}}
+		{{template "pet_clear_params" .}}
+	{{else if eq .JobName "PetCatCreate"}}
+		{{template "pet_create_params" .}}
+	{{else if eq .JobName "PetDogCreate"}}
+		{{template "pet_create_params" .}}
+	{{end}}
+{{end}}
+
 {{define "jobchain_list"}}
 <fieldset id="jobchain_history" class="ui-fieldset" data-spy="fieldset">
 	<legend>{{T .Loc "job.label.history"}}</legend>

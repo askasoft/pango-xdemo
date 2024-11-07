@@ -11,21 +11,7 @@
 		<div class="well">{{T .Loc "pet.create.well.dog"}}</div>
 
 		<form id="job_form" class="ui-form grey padded" data-form="{{T .Loc "job.label.parameter"}}" data-copy="{{T .Loc "button.copy"}}">
-			<div class="row">
-				<label class="col-md-2 col-form-label">{{T .Loc "pet.create.items"}}</label>
-				<div class="col-md-10">
-					<input type="number" class="form-control" name="items" size="7" min="1" max="1000" value="{{.Arg.Items}}">
-				</div>
-			</div>
-			<div class="row">
-				<label class="col-md-2 col-form-label">{{T .Loc "pet.create.delay"}}</label>
-				<div class="col-md-10">
-					<div class="input-group w-auto">
-						<input type="number" class="form-control" name="delay" size="7" min="0" max="1000" value="{{.Arg.Delay}}">
-						<span class="input-group-text">{{T .Loc "pet.create.millisecond"}}</span>
-					</div>
-				</div>
-			</div>
+			{{template "pet_create_params" .}}
 		</form>
 
 		<div class="container">

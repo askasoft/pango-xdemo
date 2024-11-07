@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -10,10 +11,27 @@ import (
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/num"
+	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/tbs"
 	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pango/xjm"
 )
+
+type JobCtxbinder func(c *xin.Context, h xin.H)
+
+var JobCtxbinders = map[string]JobCtxbinder{}
+
+func RegisterJobCtxbinder(name string, jcr JobCtxbinder) {
+	JobCtxbinders[name] = jcr
+}
+
+type JobArgbinder func(c *xin.Context) (jobs.IArgChain, bool)
+
+var jobArgbinders = map[string]JobArgbinder{}
+
+func RegisterJobArgbinder(name string, jab JobArgbinder) {
+	jobArgbinders[name] = jab
+}
 
 type JobChainInfo struct {
 	ID        int64               `json:"id"`
@@ -53,22 +71,19 @@ func NewJobChainInfo(locale string, jc *xjm.JobChain) *JobChainInfo {
 
 // JobChainController job chain controller base struct
 type JobChainController struct {
-	ChainName   string
-	ChainStates []*jobs.JobRunState
-	JobName     string
-	JobFile     string
-	JobParam    jobs.IArgChain
-	Template    string
-}
-
-func NewJobChainController(name, tpl string) *JobChainController {
-	jcc := &JobChainController{ChainName: name, Template: tpl}
-	return jcc
+	ChainName string
+	ChainJobs []string
+	JobFile   string
+	JobParam  jobs.IArgChain
+	Template  string
 }
 
 func (jcc *JobChainController) Index(c *xin.Context) {
 	h := H(c)
-	c.HTML(http.StatusOK, jcc.Template, h)
+
+	if jcc.BindJobCtx(c, h) {
+		c.HTML(http.StatusOK, jcc.Template, h)
+	}
 }
 
 func (jcc *JobChainController) List(c *xin.Context) {
@@ -123,7 +138,51 @@ func (jcc *JobChainController) Status(c *xin.Context) {
 	c.JSON(http.StatusOK, jci)
 }
 
+func (jcc *JobChainController) InvalidChainJobs(c *xin.Context) {
+	c.AddError(fmt.Errorf(tbs.GetText(c.Locale, "error.config.invalid"), jcc.ChainName))
+	c.JSON(http.StatusInternalServerError, E(c))
+}
+
+func (jcc *JobChainController) BindJobCtx(c *xin.Context, h xin.H) bool {
+	fjn := jcc.FirstJobName()
+	if fjn == "" {
+		jcc.InvalidChainJobs(c)
+		return false
+	}
+
+	h["JobName"] = fjn
+
+	if jcb, ok := JobCtxbinders[fjn]; ok {
+		jcb(c, h)
+	}
+
+	return true
+}
+
+func (jcc *JobChainController) BindJobArg(c *xin.Context, jn string) (jobs.IArgChain, bool) {
+	if jba, ok := jobArgbinders[jn]; ok {
+		return jba(c)
+	}
+	return nil, false
+}
+
 func (jcc *JobChainController) Start(c *xin.Context) {
+	fjn := jcc.FirstJobName()
+	if fjn == "" {
+		jcc.InvalidChainJobs(c)
+		return
+	}
+
+	arg, ok := jcc.BindJobArg(c, fjn)
+	if !ok {
+		return
+	}
+
+	jcc.JobParam = arg
+	jcc.StartJob(c)
+}
+
+func (jcc *JobChainController) StartJob(c *xin.Context) {
 	tt := tenant.FromCtx(c)
 
 	tjc := tt.JC()
@@ -140,9 +199,10 @@ func (jcc *JobChainController) Start(c *xin.Context) {
 		return
 	}
 
-	cid, err := jobs.JobChainStart(tt, jcc.ChainName, jcc.ChainStates, jcc.JobName, jcc.JobFile, jcc.JobParam)
+	css := jobs.JobChainInitStates(jcc.ChainJobs...)
+	cid, err := jobs.JobChainStart(tt, jcc.ChainName, css, jcc.FirstJobName(), jcc.JobFile, jcc.JobParam)
 	if err != nil {
-		log.Errorf("Failed to CreateJobChain(%q, %q): %v", jcc.ChainName, jcc.JobName, err)
+		log.Errorf("Failed to CreateJobChain(%q, %q): %v", jcc.ChainName, str.Join(jcc.ChainJobs, "|"), err)
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, E(c))
 		return
@@ -189,4 +249,15 @@ func (jcc *JobChainController) Abort(c *xin.Context) {
 	}
 
 	c.JSON(http.StatusOK, xin.H{"warning": tbs.GetText(c.Locale, "job.aborted")})
+}
+
+func (jcc *JobChainController) FirstJobName() string {
+	if len(jcc.ChainJobs) == 0 {
+		return ""
+	}
+	return jcc.ChainJobs[0]
+}
+
+func (jcc *JobChainController) InitChainJobs(c *xin.Context, jns ...string) {
+	jcc.ChainJobs = jns
 }

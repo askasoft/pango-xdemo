@@ -12,34 +12,34 @@ type JobChainCtrl interface {
 	Status(*xin.Context)
 }
 
-func NewJobChainHandler(create func() JobChainCtrl) *JobChainHandler {
+func NewJobChainHandler(create func(*xin.Context) JobChainCtrl) *JobChainHandler {
 	jc := &JobChainHandler{create}
 	return jc
 }
 
 // JobChainHandler job handler
 type JobChainHandler struct {
-	create func() JobChainCtrl
+	create func(c *xin.Context) JobChainCtrl
 }
 
 func (jch *JobChainHandler) Index(c *xin.Context) {
-	jch.create().Index(c)
+	jch.create(c).Index(c)
 }
 
 func (jch *JobChainHandler) List(c *xin.Context) {
-	jch.create().List(c)
+	jch.create(c).List(c)
 }
 
 func (jch *JobChainHandler) Start(c *xin.Context) {
-	jch.create().Start(c)
+	jch.create(c).Start(c)
 }
 
 func (jch *JobChainHandler) Abort(c *xin.Context) {
-	jch.create().Abort(c)
+	jch.create(c).Abort(c)
 }
 
 func (jch *JobChainHandler) Status(c *xin.Context) {
-	jch.create().Status(c)
+	jch.create(c).Status(c)
 }
 
 func (jch *JobChainHandler) Router(rg *xin.RouterGroup) {

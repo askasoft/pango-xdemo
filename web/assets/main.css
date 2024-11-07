@@ -376,7 +376,8 @@ blockquote {
 
 /** form **/
 form div.desc, form div.verr {
-	margin: 0.5em 0;
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
 	white-space: pre-wrap;
 }
 form div.verr {

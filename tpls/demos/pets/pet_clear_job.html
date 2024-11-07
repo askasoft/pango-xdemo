@@ -11,12 +11,15 @@
 		<div class="well">{{T .Loc "pet.clear.well"}}</div>
 
 		<form id="job_form" class="ui-form grey padded" data-form="{{T .Loc "job.label.parameter"}}" data-copy="{{T .Loc "button.copy"}}">
+{{define "pet_clear_params"}}
 			<div class="row">
 				<label class="col-md-2 col-form-label">{{T .Loc "pet.clear.reset_sequence"}}</label>
 				<div class="col-md-10">
 					{{Radios "Name=" "reset_sequence" "List=" .PetResetSequenceMap "Value=" .Arg.ResetSequence}}
 				</div>
 			</div>
+{{end}}
+			{{template "pet_clear_params" .}}
 		</form>
 
 		<div class="container">

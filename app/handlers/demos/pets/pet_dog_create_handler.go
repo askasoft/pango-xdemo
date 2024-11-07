@@ -13,6 +13,11 @@ import (
 
 var PetDogCreateJobHandler = handlers.NewJobHandler(newPetDogCreateJobController)
 
+func init() {
+	handlers.RegisterJobCtxbinder(jobs.JobNamePetDogCreate, bindPetDogCreateJobCtx)
+	handlers.RegisterJobArgbinder(jobs.JobNamePetDogCreate, bindPetDogCreateJobArg)
+}
+
 func newPetDogCreateJobController() handlers.JobCtrl {
 	jc := &PetDogCreateJobController{
 		JobController: handlers.JobController{
@@ -27,24 +32,36 @@ type PetDogCreateJobController struct {
 	handlers.JobController
 }
 
-func (pdcjc *PetDogCreateJobController) Index(c *xin.Context) {
+func bindPetDogCreateJobCtx(c *xin.Context, h xin.H) {
 	tt := tenant.FromCtx(c)
 
-	h := handlers.H(c)
 	h["Arg"] = pets.NewPetDogCreateArg(tt, c.Locale)
+}
+
+func (pdcjc *PetDogCreateJobController) Index(c *xin.Context) {
+	h := handlers.H(c)
+
+	bindPetDogCreateJobCtx(c, h)
 
 	c.HTML(http.StatusOK, pdcjc.Template, h)
 }
 
-func (pdcjc *PetDogCreateJobController) Start(c *xin.Context) {
-	tt := tenant.FromCtx(c)
+func bindPetDogCreateJobArg(c *xin.Context) (jobs.IArgChain, bool) {
+	pdca := &pets.PetDogCreateArg{}
+	pdca.Locale = c.Locale
 
-	pdca := pets.NewPetDogCreateArg(tt, c.Locale)
 	if err := pdca.Bind(c); err != nil {
 		vadutil.AddBindErrors(c, err, "pet.create.")
 		c.JSON(http.StatusBadRequest, handlers.E(c))
-		return
+		return nil, false
 	}
-	pdcjc.SetParam(pdca)
-	pdcjc.JobController.Start(c)
+
+	return pdca, true
+}
+
+func (pdcjc *PetDogCreateJobController) Start(c *xin.Context) {
+	if pdca, ok := bindPetDogCreateJobArg(c); ok {
+		pdcjc.SetParam(pdca)
+		pdcjc.JobController.Start(c)
+	}
 }

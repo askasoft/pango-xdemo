@@ -11,6 +11,7 @@
 		<div class="well">{{T .Loc "pet.create.well.cat"}}</div>
 
 		<form id="job_form" class="ui-form grey padded" data-form="{{T .Loc "job.label.parameter"}}" data-copy="{{T .Loc "button.copy"}}">
+{{define "pet_create_params"}}
 			<div class="row">
 				<label class="col-md-2 col-form-label">{{T .Loc "pet.create.items"}}</label>
 				<div class="col-md-10">
@@ -26,6 +27,8 @@
 					</div>
 				</div>
 			</div>
+{{end}}
+			{{template "pet_create_params" .}}
 		</form>
 
 		<div class="container">

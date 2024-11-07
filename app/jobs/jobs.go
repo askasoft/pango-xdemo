@@ -90,7 +90,12 @@ type ArgLocale struct {
 }
 
 type ArgItems struct {
-	Items int `json:"items,omitempty" form:"items"`
+	Items int `json:"items,omitempty" form:"items,strip" validate:"min=0"`
+}
+
+type ArgIDRange struct {
+	IdFrom int64 `json:"id_from,omitempty" form:"id_from,strip" validate:"min=0"`
+	IdTo   int64 `json:"id_to,omitempty" form:"id_to,strip" validate:"omitempty,min=0,gtefield=IdFrom"`
 }
 
 type iPeriod interface {
@@ -117,11 +122,6 @@ func ArgBind(c *xin.Context, a any) error {
 	}
 
 	return err
-}
-
-type ArgIDRange struct {
-	IdFrom int64 `json:"id_from,omitempty" form:"id_from"`
-	IdTo   int64 `json:"id_to,omitempty" form:"id_to" validate:"omitempty,gtefield=IdFrom"`
 }
 
 type iState interface {
@@ -393,27 +393,31 @@ func (tj *TenantJobs) Stats() string {
 	tj.mu.Lock()
 	defer tj.mu.Unlock()
 
+	total, stats, detail := 0, "JOB RUNNING: 0", ""
+
 	if tj.rs.Len() == 0 {
-		return "JOB RUNNING: 0"
-	}
+		var sb strings.Builder
+		for it := tj.rs.Iterator(); it.Next(); {
+			cnt := len(it.Value())
+			if cnt > 0 {
+				total += cnt
 
-	var total int
-	var sb strings.Builder
-
-	sb.WriteString("\n" + str.RepeatByte('-', 80))
-	for it := tj.rs.Iterator(); it.Next(); {
-		total += len(it.Value())
-
-		var ns []string
-		for _, job := range it.Value() {
-			ns = append(ns, fmt.Sprintf("%s#%d", job.Name, job.ID))
+				var ns []string
+				for _, job := range it.Value() {
+					ns = append(ns, fmt.Sprintf("%s#%d", job.Name, job.ID))
+				}
+				sb.WriteString(fmt.Sprintf("%30s: [%d] %s\n", str.IfEmpty(it.Key(), "_"), len(it.Value()), str.Join(ns, " ")))
+			}
 		}
-
-		sb.WriteString(fmt.Sprintf("\n%30s: [%d] %s", str.IfEmpty(it.Key(), "_"), len(it.Value()), str.Join(ns, " ")))
+		detail = sb.String()
 	}
-	sb.WriteString("\n" + str.RepeatByte('-', 80))
 
-	return fmt.Sprintf("JOB RUNNING: %d", total) + sb.String()
+	if total > 0 {
+		sep := str.RepeatByte('-', 80)
+		stats = "JOB RUNNING: " + num.Itoa(total) + "\n" + sep + "\n" + detail + sep
+	}
+
+	return stats
 }
 
 func Stats() string {
@@ -463,32 +467,36 @@ func StartJobs(tt tenant.Tenant) error {
 
 	tjm := tt.JM()
 	return tjm.StartJobs(c, func(job *xjm.Job) {
-		startJob(tt, job)
+		runJob(tt, job)
 	})
 }
 
-func startJob(tt tenant.Tenant, job *xjm.Job) {
+func runJob(tt tenant.Tenant, job *xjm.Job) {
 	logger := tt.Logger("JOB")
+
+	jrc, ok := jobRunCreators[job.Name]
+	if !ok {
+		logger.Errorf("No Job Runner Creator %q", job.Name)
+		return
+	}
 
 	defer func() {
 		if err := recover(); err != nil {
 			logger.Errorf("Job %s#%d panic: %v", job.Name, job.ID, err)
 		}
+
+		log.Info(ttjobs.Stats())
 	}()
 
-	if jrc, ok := jobRunCreators[job.Name]; ok {
-		logger.Debugf("Start job %s#%d", job.Name, job.ID)
+	logger.Debugf("Start job %s#%d", job.Name, job.ID)
 
-		run := jrc(tt, job)
+	run := jrc(tt, job)
 
-		ttjobs.Add(tt, job)
+	ttjobs.Add(tt, job)
 
-		defer ttjobs.Del(tt, job)
+	defer ttjobs.Del(tt, job)
 
-		run.Run()
-	} else {
-		logger.Errorf("No Job Runner Creator %q", job.Name)
-	}
+	run.Run()
 }
 
 // ------------------------------------

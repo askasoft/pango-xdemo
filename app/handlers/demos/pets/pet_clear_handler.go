@@ -14,6 +14,11 @@ import (
 
 var PetClearJobHandler = handlers.NewJobHandler(newPetClearJobController)
 
+func init() {
+	handlers.RegisterJobCtxbinder(jobs.JobNamePetClear, bindPetClearJobCtx)
+	handlers.RegisterJobArgbinder(jobs.JobNamePetClear, bindPetClearJobArg)
+}
+
 func newPetClearJobController() handlers.JobCtrl {
 	jc := &PetClearJobController{
 		JobController: handlers.JobController{
@@ -28,25 +33,37 @@ type PetClearJobController struct {
 	handlers.JobController
 }
 
-func (pcjc *PetClearJobController) Index(c *xin.Context) {
+func bindPetClearJobCtx(c *xin.Context, h xin.H) {
 	tt := tenant.FromCtx(c)
 
-	h := handlers.H(c)
 	h["Arg"] = pets.NewPetClearArg(tt, c.Locale)
 	h["PetResetSequenceMap"] = tbsutil.GetBoolMap(c.Locale)
+}
+
+func (pcjc *PetClearJobController) Index(c *xin.Context) {
+	h := handlers.H(c)
+
+	bindPetClearJobCtx(c, h)
 
 	c.HTML(http.StatusOK, pcjc.Template, h)
 }
 
-func (pcjc *PetClearJobController) Start(c *xin.Context) {
-	tt := tenant.FromCtx(c)
+func bindPetClearJobArg(c *xin.Context) (jobs.IArgChain, bool) {
+	pca := &pets.PetClearArg{}
+	pca.Locale = c.Locale
 
-	pca := pets.NewPetClearArg(tt, c.Locale)
 	if err := pca.Bind(c); err != nil {
 		vadutil.AddBindErrors(c, err, "pet.clear.")
 		c.JSON(http.StatusBadRequest, handlers.E(c))
-		return
+		return nil, false
 	}
-	pcjc.SetParam(pca)
-	pcjc.JobController.Start(c)
+
+	return pca, true
+}
+
+func (pcjc *PetClearJobController) Start(c *xin.Context) {
+	if pca, ok := bindPetClearJobArg(c); ok {
+		pcjc.SetParam(pca)
+		pcjc.JobController.Start(c)
+	}
 }
