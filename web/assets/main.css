@@ -87,6 +87,11 @@
 	margin-right: 8px;
 }
 
+/* form */
+textarea.form-control {
+	min-height: auto;
+}
+
 /* nav */
 .nav-pills {
 	--bs-nav-pills-link-active-bg: var(--bs-primary);
