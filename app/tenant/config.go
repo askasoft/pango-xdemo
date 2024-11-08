@@ -132,19 +132,19 @@ func (pp *PasswordPolicy) ValidatePassword(pwd string) (vs []string) {
 		switch ps {
 		case pwdutil.PASSWORD_NEED_UPPER_LETTER:
 			if !str.ContainsAny(pwd, str.UpperLetters) {
-				vs = append(vs, pp.Strengthm.MustGet(ps, ps))
+				vs = append(vs, pp.Strengthm.SafeGet(ps, ps))
 			}
 		case pwdutil.PASSWORD_NEED_LOWER_LETTER:
 			if !str.ContainsAny(pwd, str.LowerLetters) {
-				vs = append(vs, pp.Strengthm.MustGet(ps, ps))
+				vs = append(vs, pp.Strengthm.SafeGet(ps, ps))
 			}
 		case pwdutil.PASSWORD_NEED_NUMBER:
 			if !str.ContainsAny(pwd, str.Numbers) {
-				vs = append(vs, pp.Strengthm.MustGet(ps, ps))
+				vs = append(vs, pp.Strengthm.SafeGet(ps, ps))
 			}
 		case pwdutil.PASSWORD_NEED_SYMBOL:
 			if !str.ContainsAny(pwd, str.Symbols) {
-				vs = append(vs, pp.Strengthm.MustGet(ps, ps))
+				vs = append(vs, pp.Strengthm.SafeGet(ps, ps))
 			}
 		}
 	}

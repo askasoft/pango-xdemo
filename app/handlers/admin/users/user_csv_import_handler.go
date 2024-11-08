@@ -84,11 +84,11 @@ func UserCsvImportSample(c *xin.Context) {
 
 	domain := c.Request.Host
 	data := [][]string{
-		{"101", "admin", "admin@" + domain, rm.MustGet(models.RoleAdmin), sm.MustGet(models.UserActive), ran.RandString(16), "127.0.0.1/32\n192.168.1.1/32"},
-		{"102", "editor", "editor@" + domain, rm.MustGet(models.RoleEditor), sm.MustGet(models.UserActive), ran.RandString(16), "127.0.0.1/32\n192.168.1.1/32"},
-		{"103", "viewer", "viewer@" + domain, rm.MustGet(models.RoleViewer), sm.MustGet(models.UserActive), ran.RandString(16), "127.0.0.1/32\n192.168.1.1/32"},
-		{"104", "api", "api@" + domain, rm.MustGet(models.RoleApiOnly), sm.MustGet(models.UserActive), ran.RandString(16), "127.0.0.1/32\n192.168.1.1/32"},
-		{"", "disabled", "disabled@" + domain, rm.MustGet(models.RoleViewer), sm.MustGet(models.UserDisabled), ran.RandString(16), "127.0.0.1/32\n192.168.1.1/32"},
+		{"101", "admin", "admin@" + domain, rm.SafeGet(models.RoleAdmin), sm.SafeGet(models.UserActive), ran.RandString(16), "127.0.0.1/32\n192.168.1.1/32"},
+		{"102", "editor", "editor@" + domain, rm.SafeGet(models.RoleEditor), sm.SafeGet(models.UserActive), ran.RandString(16), "127.0.0.1/32\n192.168.1.1/32"},
+		{"103", "viewer", "viewer@" + domain, rm.SafeGet(models.RoleViewer), sm.SafeGet(models.UserActive), ran.RandString(16), "127.0.0.1/32\n192.168.1.1/32"},
+		{"104", "api", "api@" + domain, rm.SafeGet(models.RoleApiOnly), sm.SafeGet(models.UserActive), ran.RandString(16), "127.0.0.1/32\n192.168.1.1/32"},
+		{"", "disabled", "disabled@" + domain, rm.SafeGet(models.RoleViewer), sm.SafeGet(models.UserDisabled), ran.RandString(16), "127.0.0.1/32\n192.168.1.1/32"},
 	}
 
 	err = cw.WriteAll(data)

@@ -18,19 +18,19 @@
 		</div>
 		<div class="row">
 			<label class="col-2 ui-label">{{T .Loc "pet.gender"}}</label>
-			<div class="col-4 ui-value">{{.PetGenderMap.MustGet $p.Gender $p.Gender}}</div>
+			<div class="col-4 ui-value">{{.PetGenderMap.SafeGet $p.Gender $p.Gender}}</div>
 			<label class="col-2 ui-label">{{T .Loc "pet.born_at"}}</label>
 			<div class="col-4 ui-value">{{DATE $p.BornAt}}</div>
 		</div>
 		<div class="row">
 			<label class="col-2 ui-label">{{T .Loc "pet.origin"}}</label>
-			<div class="col-10 ui-value">{{.PetOriginMap.MustGet $p.Origin $p.Origin}}</div>
+			<div class="col-10 ui-value">{{.PetOriginMap.SafeGet $p.Origin $p.Origin}}</div>
 		</div>
 		<div class="row">
 			<label class="col-2 ui-label">{{T .Loc "pet.temper"}}</label>
-			<div class="col-4 ui-value">{{.PetTemperMap.MustGet $p.Temper $p.Temper}}</div>
+			<div class="col-4 ui-value">{{.PetTemperMap.SafeGet $p.Temper $p.Temper}}</div>
 			<label class="col-2 ui-label">{{T .Loc "pet.habits"}}</label>
-			<div class="col-4 ui-value">{{range $h := $p.Habits}}<b>{{$.PetHabitsMap.MustGet $h $h}}</b>{{end}}</div>
+			<div class="col-4 ui-value">{{range $h := $p.Habits}}<b>{{$.PetHabitsMap.SafeGet $h $h}}</b>{{end}}</div>
 		</div>
 		<div class="row">
 			<label class="col-2 ui-label">{{T .Loc "pet.amount"}}</label>

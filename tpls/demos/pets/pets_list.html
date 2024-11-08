@@ -31,11 +31,11 @@
 				<button class="btn btn-outline-primary view" title="{{T $.Loc "button.view"}}">{{I "view"}}</button>
 				<button class="btn btn-outline-primary edit" title="{{T $.Loc "button.edit"}}">{{I "edit"}}</button>
 			</td>
-			<td class="gender">{{$.PetGenderMap.MustGet $p.Gender $p.Gender}}</td>
+			<td class="gender">{{$.PetGenderMap.SafeGet $p.Gender $p.Gender}}</td>
 			<td class="born_at date">{{DATE $p.BornAt}}</td>
-			<td class="origin">{{$.PetOriginMap.MustGet $p.Origin $p.Origin}}</td>
-			<td class="temper">{{$.PetTemperMap.MustGet $p.Temper $p.Temper}}</td>
-			<td class="habits">{{range $h := $p.Habits}}<b>{{$.PetHabitsMap.MustGet $h $h}}</b>{{end}}</td>
+			<td class="origin">{{$.PetOriginMap.SafeGet $p.Origin $p.Origin}}</td>
+			<td class="temper">{{$.PetTemperMap.SafeGet $p.Temper $p.Temper}}</td>
+			<td class="habits">{{range $h := $p.Habits}}<b>{{$.PetHabitsMap.SafeGet $h $h}}</b>{{end}}</td>
 			<td class="amount">{{$p.Amount}}</td>
 			<td class="price">{{$p.Price}}</td>
 			<td class="shop_name">{{$p.ShopName}}</td>

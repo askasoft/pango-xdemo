@@ -18,11 +18,11 @@
 		</div>
 		<div class="row">
 			<label class="col-md-2 ui-label">{{T .Loc "user.role"}}</label>
-			<div class="col-md-10 ui-value">{{.UserRoleMap.MustGet $u.Role $u.Role}}</div>
+			<div class="col-md-10 ui-value">{{.UserRoleMap.SafeGet $u.Role $u.Role}}</div>
 		</div>
 		<div class="row">
 			<label class="col-md-2 ui-label">{{T .Loc "user.status"}}</label>
-			<div class="col-md-10 ui-value">{{.UserStatusMap.MustGet $u.Status $u.Status}}
+			<div class="col-md-10 ui-value">{{.UserStatusMap.SafeGet $u.Status $u.Status}}
 			</div>
 		</div>
 		<div class="row">

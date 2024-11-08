@@ -258,8 +258,8 @@ func (uci *UserCsvImportJob) importRecord(rec *csvUserRecord) error {
 		ID:        num.Atol(rec.ID),
 		Name:      rec.Name,
 		Email:     rec.Email,
-		Role:      uci.roleRevMap.MustGet(rec.Role, models.RoleViewer),
-		Status:    uci.statusRevMap.MustGet(rec.Status, models.UserActive),
+		Role:      uci.roleRevMap.SafeGet(rec.Role, models.RoleViewer),
+		Status:    uci.statusRevMap.SafeGet(rec.Status, models.UserActive),
 		CIDR:      rec.CIDR,
 		UpdatedAt: time.Now(),
 	}

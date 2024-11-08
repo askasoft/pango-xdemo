@@ -27,8 +27,8 @@
 			<td class="actions">
 				<button class="btn btn-outline-primary edit" title="{{T $.Loc "button.edit"}}">{{I "edit"}}</button>
 			</td>
-			<td class="role">{{$.UserRoleMap.MustGet $u.Role $u.Role}}</td>
-			<td class="status">{{$.UserStatusMap.MustGet $u.Status $u.Status}}</td>
+			<td class="role">{{$.UserRoleMap.SafeGet $u.Role $u.Role}}</td>
+			<td class="status">{{$.UserStatusMap.SafeGet $u.Status $u.Status}}</td>
 			<td class="cidr"><pre>{{$u.CIDR}}</pre></td>
 			<td class="created_at ro">{{TIME $u.CreatedAt}}</td>
 			<td class="updated_at">{{TIME $u.UpdatedAt}}</td>

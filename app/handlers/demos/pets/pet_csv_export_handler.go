@@ -89,16 +89,16 @@ func PetCsvExport(c *xin.Context) {
 
 		habits := []string{}
 		for _, h := range pet.Habits {
-			habits = append(habits, phm.MustGet(h, h))
+			habits = append(habits, phm.SafeGet(h, h))
 		}
 
 		err = cw.Write([]string{
 			num.Ltoa(pet.ID),
 			pet.Name,
-			pgm.MustGet(pet.Gender, pet.Gender),
+			pgm.SafeGet(pet.Gender, pet.Gender),
 			app.FormatDate(pet.BornAt),
-			pom.MustGet(pet.Origin, pet.Origin),
-			ptm.MustGet(pet.Temper, pet.Temper),
+			pom.SafeGet(pet.Origin, pet.Origin),
+			ptm.SafeGet(pet.Temper, pet.Temper),
 			str.Join(habits, "\n"),
 			num.Itoa(pet.Amount),
 			num.Ftoa(pet.Price),
