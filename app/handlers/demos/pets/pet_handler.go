@@ -8,7 +8,7 @@ import (
 	"github.com/askasoft/pango-xdemo/app/handlers"
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/tenant"
-	"github.com/askasoft/pango-xdemo/app/utils/sqlxutil"
+	"github.com/askasoft/pango-xdemo/app/utils/argutil"
 	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
 	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
 	"github.com/askasoft/pango/num"
@@ -18,8 +18,8 @@ import (
 	"github.com/askasoft/pango/xin"
 )
 
-type PetQuery struct {
-	sqlxutil.BaseQuery
+type PetQueryArg struct {
+	argutil.QueryArg
 
 	ID        int64     `form:"id,strip" json:"id"`
 	Name      string    `form:"name,strip" json:"name"`
@@ -51,115 +51,115 @@ var petListColumns = []string{
 	"updated_at",
 }
 
-func (pq *PetQuery) Normalize(c *xin.Context) {
-	pq.Sorter.Normalize(petListColumns...)
+func (pqa *PetQueryArg) Normalize(c *xin.Context) {
+	pqa.Sorter.Normalize(petListColumns...)
 
-	pq.Pager.Normalize(tbsutil.GetPagerLimits(c.Locale)...)
+	pqa.Pager.Normalize(tbsutil.GetPagerLimits(c.Locale)...)
 }
 
-func (pq *PetQuery) HasFilter() bool {
-	return pq.ID != 0 ||
-		pq.Name != "" ||
-		len(pq.Gender) > 0 ||
-		len(pq.Origin) > 0 ||
-		len(pq.Temper) > 0 ||
-		len(pq.Habits) > 0 ||
-		pq.AmountMin != "" ||
-		pq.AmountMax != "" ||
-		pq.PriceMin != "" ||
-		pq.PriceMax != "" ||
-		pq.ShopName != ""
+func (pqa *PetQueryArg) HasFilter() bool {
+	return pqa.ID != 0 ||
+		pqa.Name != "" ||
+		len(pqa.Gender) > 0 ||
+		len(pqa.Origin) > 0 ||
+		len(pqa.Temper) > 0 ||
+		len(pqa.Habits) > 0 ||
+		pqa.AmountMin != "" ||
+		pqa.AmountMax != "" ||
+		pqa.PriceMin != "" ||
+		pqa.PriceMax != "" ||
+		pqa.ShopName != ""
 }
 
-func (pq *PetQuery) AddWhere(sqb *sqlx.Builder) {
-	if pq.ID != 0 {
-		sqb.Where("id = ?", pq.ID)
+func (pqa *PetQueryArg) AddWhere(sqb *sqlx.Builder) {
+	if pqa.ID != 0 {
+		sqb.Where("id = ?", pqa.ID)
 	}
-	if pq.Name != "" {
-		sqb.Where("name LIKE ?", sqx.StringLike(pq.Name))
+	if pqa.Name != "" {
+		sqb.Where("name LIKE ?", sqx.StringLike(pqa.Name))
 	}
-	if len(pq.Gender) > 0 {
-		sqb.In("gender", pq.Gender)
+	if len(pqa.Gender) > 0 {
+		sqb.In("gender", pqa.Gender)
 	}
-	if len(pq.Origin) > 0 {
-		sqb.In("origin", pq.Origin)
+	if len(pqa.Origin) > 0 {
+		sqb.In("origin", pqa.Origin)
 	}
-	if len(pq.Temper) > 0 {
-		sqb.In("temper", pq.Temper)
+	if len(pqa.Temper) > 0 {
+		sqb.In("temper", pqa.Temper)
 	}
-	if len(pq.Habits) > 0 {
-		sqb.Where("habits @> ?", pqx.StringArray(pq.Habits))
+	if len(pqa.Habits) > 0 {
+		sqb.Where("habits @> ?", pqx.StringArray(pqa.Habits))
 	}
-	if pq.AmountMin != "" {
-		sqb.Where("amount >= ?", num.Atoi(pq.AmountMin))
+	if pqa.AmountMin != "" {
+		sqb.Where("amount >= ?", num.Atoi(pqa.AmountMin))
 	}
-	if pq.AmountMax != "" {
-		sqb.Where("amount <= ?", num.Atoi(pq.AmountMax))
+	if pqa.AmountMax != "" {
+		sqb.Where("amount <= ?", num.Atoi(pqa.AmountMax))
 	}
-	if pq.PriceMin != "" {
-		sqb.Where("price >= ?", num.Atof(pq.PriceMin))
+	if pqa.PriceMin != "" {
+		sqb.Where("price >= ?", num.Atof(pqa.PriceMin))
 	}
-	if pq.PriceMax != "" {
-		sqb.Where("price <= ?", num.Atof(pq.PriceMax))
+	if pqa.PriceMax != "" {
+		sqb.Where("price <= ?", num.Atof(pqa.PriceMax))
 	}
-	if pq.ShopName != "" {
-		sqb.Where("shop_name LIKE ?", sqx.StringLike(pq.ShopName))
+	if pqa.ShopName != "" {
+		sqb.Where("shop_name LIKE ?", sqx.StringLike(pqa.ShopName))
 	}
 }
 
-func countPets(tt tenant.Tenant, pq *PetQuery) (total int, err error) {
-	sqb := app.SDB.Builder()
-	sqb.Count()
-	sqb.From(tt.TablePets())
-	pq.AddWhere(sqb)
-	sql, args := sqb.Build()
+func bindPetQueryArg(c *xin.Context) (pqa *PetQueryArg, err error) {
+	pqa = &PetQueryArg{}
+	pqa.Col, pqa.Dir = "id", "desc"
 
-	err = app.SDB.Get(&total, sql, args...)
+	err = c.Bind(pqa)
 	return
 }
 
-func findPets(tt tenant.Tenant, pq *PetQuery) (pets []*models.Pet, err error) {
-	sqb := app.SDB.Builder()
-	sqb.Select(petListColumns...)
-	sqb.From(tt.TablePets())
-	pq.AddWhere(sqb)
-	pq.AddOrder(sqb, "id")
-	pq.AddPager(sqb)
-	sql, args := sqb.Build()
-
-	err = app.SDB.Select(&pets, sql, args...)
-	return
-}
-
-func petListArgs(c *xin.Context) (pq *PetQuery, err error) {
-	pq = &PetQuery{}
-	pq.Col, pq.Dir = "id", "desc"
-
-	err = c.Bind(pq)
-	return
-}
-
-func petAddMaps(c *xin.Context, h xin.H) {
+func bindPetMaps(c *xin.Context, h xin.H) {
 	h["PetGenderMap"] = tbsutil.GetPetGenderMap(c.Locale)
 	h["PetOriginMap"] = tbsutil.GetPetOriginMap(c.Locale)
 	h["PetTemperMap"] = tbsutil.GetPetTemperMap(c.Locale)
 	h["PetHabitsMap"] = tbsutil.GetPetHabitsMap(c.Locale)
 }
 
+func countPets(tt tenant.Tenant, pqa *PetQueryArg) (total int, err error) {
+	sqb := app.SDB.Builder()
+	sqb.Count()
+	sqb.From(tt.TablePets())
+	pqa.AddWhere(sqb)
+	sql, args := sqb.Build()
+
+	err = app.SDB.Get(&total, sql, args...)
+	return
+}
+
+func findPets(tt tenant.Tenant, pqa *PetQueryArg) (pets []*models.Pet, err error) {
+	sqb := app.SDB.Builder()
+	sqb.Select(petListColumns...)
+	sqb.From(tt.TablePets())
+	pqa.AddWhere(sqb)
+	pqa.AddOrder(sqb, "id")
+	pqa.AddPager(sqb)
+	sql, args := sqb.Build()
+
+	err = app.SDB.Select(&pets, sql, args...)
+	return
+}
+
 func PetIndex(c *xin.Context) {
 	h := handlers.H(c)
 
-	pq, _ := petListArgs(c)
+	pqa, _ := bindPetQueryArg(c)
 
-	h["Q"] = pq
+	h["Q"] = pqa
 
-	petAddMaps(c, h)
+	bindPetMaps(c, h)
 
 	c.HTML(http.StatusOK, "demos/pets/pets", h)
 }
 
 func PetList(c *xin.Context) {
-	pq, err := petListArgs(c)
+	pqa, err := bindPetQueryArg(c)
 	if err != nil {
 		vadutil.AddBindErrors(c, err, "pet.")
 		c.JSON(http.StatusBadRequest, handlers.E(c))
@@ -168,8 +168,8 @@ func PetList(c *xin.Context) {
 
 	tt := tenant.FromCtx(c)
 
-	pq.Total, err = countPets(tt, pq)
-	pq.Normalize(c)
+	pqa.Total, err = countPets(tt, pqa)
+	pqa.Normalize(c)
 
 	if err != nil {
 		c.AddError(err)
@@ -179,8 +179,8 @@ func PetList(c *xin.Context) {
 
 	h := handlers.H(c)
 
-	if pq.Total > 0 {
-		results, err := findPets(tt, pq)
+	if pqa.Total > 0 {
+		results, err := findPets(tt, pqa)
 		if err != nil {
 			c.AddError(err)
 			c.JSON(http.StatusBadRequest, handlers.E(c))
@@ -188,12 +188,12 @@ func PetList(c *xin.Context) {
 		}
 
 		h["Pets"] = results
-		pq.Count = len(results)
+		pqa.Count = len(results)
 	}
 
-	h["Q"] = pq
+	h["Q"] = pqa
 
-	petAddMaps(c, h)
+	bindPetMaps(c, h)
 
 	c.HTML(http.StatusOK, "demos/pets/pets_list", h)
 }

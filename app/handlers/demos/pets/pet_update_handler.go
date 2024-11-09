@@ -35,7 +35,7 @@ func PetNew(c *xin.Context) {
 
 	h := handlers.H(c)
 	h["Pet"] = pet
-	petAddMaps(c, h)
+	bindPetMaps(c, h)
 
 	c.HTML(http.StatusOK, "demos/pets/pet_detail_edit", h)
 }
@@ -70,7 +70,7 @@ func petDetail(c *xin.Context, action string) {
 
 	h := handlers.H(c)
 	h["Pet"] = pet
-	petAddMaps(c, h)
+	bindPetMaps(c, h)
 
 	c.HTML(http.StatusOK, "demos/pets/pet_detail_"+action, h)
 }
@@ -360,14 +360,14 @@ func PetDeletes(c *xin.Context) {
 }
 
 func PetDeleteBatch(c *xin.Context) {
-	pq, err := petListArgs(c)
+	pqa, err := bindPetQueryArg(c)
 	if err != nil {
 		vadutil.AddBindErrors(c, err, "pet.")
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}
 
-	if !pq.HasFilter() {
+	if !pqa.HasFilter() {
 		c.AddError(errors.New(tbs.GetText(c.Locale, "error.param.nofilter")))
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
@@ -379,7 +379,7 @@ func PetDeleteBatch(c *xin.Context) {
 	err = app.SDB.Transaction(func(tx *sqlx.Tx) (err error) {
 		sqb := tx.Builder()
 		sqb.Delete(tt.TablePets())
-		pq.AddWhere(sqb)
+		pqa.AddWhere(sqb)
 		sql, args := sqb.Build()
 
 		r, err := tx.Exec(sql, args...)

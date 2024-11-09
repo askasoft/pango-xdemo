@@ -29,7 +29,7 @@ func UserNew(c *xin.Context) {
 
 	h := handlers.H(c)
 	h["User"] = user
-	userAddMaps(c, h)
+	bindUserMaps(c, h)
 
 	c.HTML(http.StatusOK, "admin/users/user_detail_edit", h)
 }
@@ -64,7 +64,7 @@ func userDetail(c *xin.Context, action string) {
 	h := handlers.H(c)
 	h["User"] = user
 
-	userAddMaps(c, h)
+	bindUserMaps(c, h)
 
 	c.HTML(http.StatusOK, "admin/users/user_detail_"+action, h)
 }
@@ -365,7 +365,7 @@ func UserDeletes(c *xin.Context) {
 }
 
 func UserDeleteBatch(c *xin.Context) {
-	uq, err := userListArgs(c)
+	uq, err := bindUserQueryArg(c)
 	if err != nil {
 		vadutil.AddBindErrors(c, err, "user.")
 		c.JSON(http.StatusBadRequest, handlers.E(c))

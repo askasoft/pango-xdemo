@@ -17,7 +17,7 @@ import (
 )
 
 func UserCsvExport(c *xin.Context) {
-	uq, err := userListArgs(c)
+	uqa, err := bindUserQueryArg(c)
 	if err != nil {
 		vadutil.AddBindErrors(c, err, "user.")
 		c.JSON(http.StatusBadRequest, handlers.E(c))
@@ -36,7 +36,7 @@ func UserCsvExport(c *xin.Context) {
 	sqb := app.SDB.Builder()
 	sqb.Select()
 	sqb.From(tt.TableUsers())
-	uq.AddWhere(c, sqb)
+	uqa.AddWhere(c, sqb)
 	sqb.Order("id")
 	sql, args := sqb.Build()
 

@@ -7,7 +7,7 @@ import (
 	"github.com/askasoft/pango-xdemo/app/handlers"
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/tenant"
-	"github.com/askasoft/pango-xdemo/app/utils/sqlxutil"
+	"github.com/askasoft/pango-xdemo/app/utils/argutil"
 	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
 	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
 	"github.com/askasoft/pango/sqx"
@@ -15,8 +15,8 @@ import (
 	"github.com/askasoft/pango/xin"
 )
 
-type UserQuery struct {
-	sqlxutil.BaseQuery
+type UserQueryArg struct {
+	argutil.QueryArg
 
 	ID     int64    `json:"id" form:"id,strip"`
 	Name   string   `json:"name" form:"name,strip"`
@@ -26,8 +26,8 @@ type UserQuery struct {
 	CIDR   string   `json:"cidr" form:"cidr,strip"`
 }
 
-func (uq *UserQuery) Normalize(c *xin.Context) {
-	uq.Sorter.Normalize(
+func (uqa *UserQueryArg) Normalize(c *xin.Context) {
+	uqa.Sorter.Normalize(
 		"id",
 		"name",
 		"email",
@@ -37,49 +37,63 @@ func (uq *UserQuery) Normalize(c *xin.Context) {
 		"updated_at",
 	)
 
-	uq.Pager.Normalize(tbsutil.GetPagerLimits(c.Locale)...)
+	uqa.Pager.Normalize(tbsutil.GetPagerLimits(c.Locale)...)
 }
 
-func (uq *UserQuery) HasFilter() bool {
-	return uq.ID != 0 ||
-		uq.Name != "" ||
-		uq.Email != "" ||
-		len(uq.Role) > 0 ||
-		len(uq.Status) > 0 ||
-		uq.CIDR != ""
+func (uqa *UserQueryArg) HasFilter() bool {
+	return uqa.ID != 0 ||
+		uqa.Name != "" ||
+		uqa.Email != "" ||
+		len(uqa.Role) > 0 ||
+		len(uqa.Status) > 0 ||
+		uqa.CIDR != ""
 }
 
-func (uq *UserQuery) AddWhere(c *xin.Context, sqb *sqlx.Builder) {
+func (uqa *UserQueryArg) AddWhere(c *xin.Context, sqb *sqlx.Builder) {
 	au := tenant.AuthUser(c)
 	sqb.Where("role >= ?", au.Role)
 
-	if uq.ID != 0 {
-		sqb.Where("id = ?", uq.ID)
+	if uqa.ID != 0 {
+		sqb.Where("id = ?", uqa.ID)
 	}
-	if uq.Name != "" {
-		sqb.Where("name LIKE ?", sqx.StringLike(uq.Name))
+	if uqa.Name != "" {
+		sqb.Where("name LIKE ?", sqx.StringLike(uqa.Name))
 	}
-	if uq.Email != "" {
-		sqb.Where("email LIKE ?", sqx.StringLike(uq.Email))
+	if uqa.Email != "" {
+		sqb.Where("email LIKE ?", sqx.StringLike(uqa.Email))
 	}
-	if uq.CIDR != "" {
-		sqb.Where("cidr LIKE ?", sqx.StringLike(uq.CIDR))
+	if uqa.CIDR != "" {
+		sqb.Where("cidr LIKE ?", sqx.StringLike(uqa.CIDR))
 	}
-	if len(uq.Role) > 0 {
-		sqb.In("role", uq.Role)
+	if len(uqa.Role) > 0 {
+		sqb.In("role", uqa.Role)
 	}
-	if len(uq.Status) > 0 {
-		sqb.In("status", uq.Status)
+	if len(uqa.Status) > 0 {
+		sqb.In("status", uqa.Status)
 	}
 }
 
-func countUsers(c *xin.Context, uq *UserQuery) (total int, err error) {
+func bindUserQueryArg(c *xin.Context) (uqa *UserQueryArg, err error) {
+	uqa = &UserQueryArg{}
+	uqa.Col, uqa.Dir = "id", "asc"
+
+	err = c.Bind(uqa)
+	return
+}
+
+func bindUserMaps(c *xin.Context, h xin.H) {
+	au := tenant.AuthUser(c)
+	h["UserStatusMap"] = tbsutil.GetUserStatusMap(c.Locale)
+	h["UserRoleMap"] = tbsutil.GetUserRoleMap(c.Locale, au.Role)
+}
+
+func countUsers(c *xin.Context, uqa *UserQueryArg) (total int, err error) {
 	tt := tenant.FromCtx(c)
 
 	sqb := app.SDB.Builder()
 	sqb.Count()
 	sqb.From(tt.TableUsers())
-	uq.AddWhere(c, sqb)
+	uqa.AddWhere(c, sqb)
 
 	sql, args := sqb.Build()
 
@@ -87,58 +101,44 @@ func countUsers(c *xin.Context, uq *UserQuery) (total int, err error) {
 	return
 }
 
-func findUsers(c *xin.Context, uq *UserQuery) (usrs []*models.User, err error) {
+func findUsers(c *xin.Context, uqa *UserQueryArg) (usrs []*models.User, err error) {
 	tt := tenant.FromCtx(c)
 
 	sqb := app.SDB.Builder()
 	sqb.Select()
 	sqb.From(tt.TableUsers())
-	uq.AddWhere(c, sqb)
-	uq.AddOrder(sqb, "id")
-	uq.AddPager(sqb)
+	uqa.AddWhere(c, sqb)
+	uqa.AddOrder(sqb, "id")
+	uqa.AddPager(sqb)
 	sql, args := sqb.Build()
 
 	err = app.SDB.Select(&usrs, sql, args...)
 	return
 }
 
-func userListArgs(c *xin.Context) (uq *UserQuery, err error) {
-	uq = &UserQuery{}
-	uq.Col, uq.Dir = "id", "asc"
-
-	err = c.Bind(uq)
-	return
-}
-
-func userAddMaps(c *xin.Context, h xin.H) {
-	au := tenant.AuthUser(c)
-	h["UserStatusMap"] = tbsutil.GetUserStatusMap(c.Locale)
-	h["UserRoleMap"] = tbsutil.GetUserRoleMap(c.Locale, au.Role)
-}
-
 func UserIndex(c *xin.Context) {
 	h := handlers.H(c)
 
-	uq, _ := userListArgs(c)
-	uq.Normalize(c)
+	uqa, _ := bindUserQueryArg(c)
+	uqa.Normalize(c)
 
-	h["Q"] = uq
+	h["Q"] = uqa
 
-	userAddMaps(c, h)
+	bindUserMaps(c, h)
 
 	c.HTML(http.StatusOK, "admin/users/users", h)
 }
 
 func UserList(c *xin.Context) {
-	uq, err := userListArgs(c)
+	uqa, err := bindUserQueryArg(c)
 	if err != nil {
 		vadutil.AddBindErrors(c, err, "user.")
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}
 
-	uq.Total, err = countUsers(c, uq)
-	uq.Normalize(c)
+	uqa.Total, err = countUsers(c, uqa)
+	uqa.Normalize(c)
 
 	if err != nil {
 		c.AddError(err)
@@ -148,8 +148,8 @@ func UserList(c *xin.Context) {
 
 	h := handlers.H(c)
 
-	if uq.Total > 0 {
-		results, err := findUsers(c, uq)
+	if uqa.Total > 0 {
+		results, err := findUsers(c, uqa)
 		if err != nil {
 			c.AddError(err)
 			c.JSON(http.StatusBadRequest, handlers.E(c))
@@ -157,12 +157,12 @@ func UserList(c *xin.Context) {
 		}
 
 		h["Users"] = results
-		uq.Count = len(results)
+		uqa.Count = len(results)
 	}
 
-	h["Q"] = uq
+	h["Q"] = uqa
 
-	userAddMaps(c, h)
+	bindUserMaps(c, h)
 
 	c.HTML(http.StatusOK, "admin/users/users_list", h)
 }

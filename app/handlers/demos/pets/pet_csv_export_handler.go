@@ -18,7 +18,7 @@ import (
 )
 
 func PetCsvExport(c *xin.Context) {
-	pq, err := petListArgs(c)
+	pq, err := bindPetQueryArg(c)
 	if err != nil {
 		vadutil.AddBindErrors(c, err, "pet.")
 		c.JSON(http.StatusBadRequest, handlers.E(c))

@@ -17,38 +17,38 @@ type TenantInfo struct {
 	Default bool `json:"default,omitempty"`
 }
 
-type TenantQuery struct {
+type TenantQueryArg struct {
 	xsm.SchemaQuery
 }
 
-func tenantListArgs(c *xin.Context) (tq *TenantQuery, err error) {
-	tq = &TenantQuery{}
-	tq.Col, tq.Dir = "name", "asc"
+func bindTenantQueryArg(c *xin.Context) (tqa *TenantQueryArg, err error) {
+	tqa = &TenantQueryArg{}
+	tqa.Col, tqa.Dir = "name", "asc"
 
-	err = c.Bind(tq)
+	err = c.Bind(tqa)
 	return
 }
 
 func TenantIndex(c *xin.Context) {
 	h := handlers.H(c)
 
-	tq, _ := tenantListArgs(c)
-	tq.Normalize(tbsutil.GetPagerLimits(c.Locale))
+	tqa, _ := bindTenantQueryArg(c)
+	tqa.Normalize(tbsutil.GetPagerLimits(c.Locale))
 
-	h["Q"] = tq
+	h["Q"] = tqa
 	c.HTML(http.StatusOK, "super/tenants", h)
 }
 
 func TenantList(c *xin.Context) {
-	tq, err := tenantListArgs(c)
+	tqa, err := bindTenantQueryArg(c)
 	if err != nil {
 		vadutil.AddBindErrors(c, err, "tenant.")
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}
 
-	tq.Total, err = tenant.CountSchemas(&tq.SchemaQuery)
-	tq.Normalize(tbsutil.GetPagerLimits(c.Locale))
+	tqa.Total, err = tenant.CountSchemas(&tqa.SchemaQuery)
+	tqa.Normalize(tbsutil.GetPagerLimits(c.Locale))
 
 	if err != nil {
 		c.AddError(err)
@@ -58,8 +58,8 @@ func TenantList(c *xin.Context) {
 
 	h := handlers.H(c)
 
-	if tq.Total > 0 {
-		schemas, err := tenant.FindSchemas(&tq.SchemaQuery)
+	if tqa.Total > 0 {
+		schemas, err := tenant.FindSchemas(&tqa.SchemaQuery)
 		if err != nil {
 			c.AddError(err)
 			c.JSON(http.StatusBadRequest, handlers.E(c))
@@ -82,9 +82,9 @@ func TenantList(c *xin.Context) {
 		}
 
 		h["Tenants"] = tenants
-		tq.Count = len(tenants)
+		tqa.Count = len(tenants)
 	}
 
-	h["Q"] = tq
+	h["Q"] = tqa
 	c.HTML(http.StatusOK, "super/tenants_list", h)
 }
