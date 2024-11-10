@@ -261,7 +261,7 @@
 		$jrs.attr('status', jrs.status);
 		$jrs.find('.jnm').text(jobnames[jrs.name] || jrs.name);
 
-		jobchain_jrs_set_state($jrs, jrs, 'total', jrs.state.total || jrs.state.limit || '-');
+		jobchain_jrs_set_state($jrs, jrs, 'total', jrs.state.limit || jrs.state.total || '-');
 		jobchain_jrs_set_state($jrs, jrs, 'skipped');
 		jobchain_jrs_set_state($jrs, jrs, 'success', jrs.state.success || '-');
 		jobchain_jrs_set_state($jrs, jrs, 'failure');
@@ -271,11 +271,11 @@
 		if (jrs.status == 'C') {
 			p = 100;
 			t = '100%';
-		} else if (jrs.state.total) {
-			p = Math.floor((jrs.state.step || 0) * 100 / jrs.state.total)
-			t = p + '%';
 		} else if (jrs.state.limit) {
 			p = Math.floor((jrs.state.success || 0) * 100 / jrs.state.limit)
+			t = p + '%';
+		} else if (jrs.state.total) {
+			p = Math.floor((jrs.state.step || 0) * 100 / jrs.state.total)
 			t = p + '%';
 		} else {
 			p = 10;

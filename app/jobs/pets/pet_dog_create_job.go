@@ -61,7 +61,7 @@ func (pdc *PetDogCreateJob) Run() {
 	err := pdc.Checkout()
 	if err == nil {
 		if pdc.Step == 0 {
-			pdc.Total = pdc.arg.Items
+			pdc.SetTotalLimit(pdc.arg.Items, 0)
 		}
 		err = pdc.run()
 	}
@@ -72,7 +72,7 @@ func (pdc *PetDogCreateJob) run() error {
 	pdc.gen = NewPetGenerator(pdc.Tenant, "dog")
 
 	for {
-		if pdc.Step >= pdc.arg.Items {
+		if pdc.Step >= pdc.Total {
 			break
 		}
 

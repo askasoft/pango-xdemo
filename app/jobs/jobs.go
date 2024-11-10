@@ -13,6 +13,7 @@ import (
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango/asg"
 	"github.com/askasoft/pango/cog/treemap"
+	"github.com/askasoft/pango/gog"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/sqx/sqlx"
@@ -137,12 +138,28 @@ type JobState struct {
 	Failure int `json:"failure,omitempty"`
 }
 
+func (js *JobState) SetTotalLimit(total, limit int) {
+	js.Total = total
+	js.Limit = gog.If(limit > total, total, limit)
+}
+
+func (js *JobState) IsStepLimited() bool {
+	return js.Limit > 0 && js.Step >= js.Limit
+}
+
+func (js *JobState) IsSuccessLimited() bool {
+	return js.Limit > 0 && js.Success >= js.Limit
+}
+
 func (js *JobState) Progress() string {
-	if js.Total > 0 {
-		return fmt.Sprintf("[%d/%d]", js.Step, js.Total)
+	if js.Limit > 0 && js.Total > 0 {
+		return fmt.Sprintf("[%d/%d] [%d/%d]", js.Success, js.Limit, js.Step, js.Total)
 	}
 	if js.Limit > 0 {
 		return fmt.Sprintf("[%d/%d]", js.Success, js.Limit)
+	}
+	if js.Total > 0 {
+		return fmt.Sprintf("[%d/%d]", js.Step, js.Total)
 	}
 	if js.Success > 0 {
 		return fmt.Sprintf("[%d/%d]", js.Success, js.Step)

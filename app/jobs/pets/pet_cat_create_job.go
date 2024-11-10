@@ -61,7 +61,7 @@ func (pcc *PetCatCreateJob) Run() {
 	err := pcc.Checkout()
 	if err == nil {
 		if pcc.Step == 0 {
-			pcc.Total = pcc.arg.Items
+			pcc.SetTotalLimit(pcc.arg.Items, 0)
 		}
 		err = pcc.run()
 	}
@@ -72,7 +72,7 @@ func (pcc *PetCatCreateJob) run() error {
 	pcc.gen = NewPetGenerator(pcc.Tenant, "cat")
 
 	for {
-		if pcc.Step >= pcc.arg.Items {
+		if pcc.Step >= pcc.Total {
 			break
 		}
 
