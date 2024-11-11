@@ -36,8 +36,8 @@ func TenantCreate(c *xin.Context) {
 	}
 
 	c.JSON(http.StatusOK, xin.H{
-		"tenant":  ti,
 		"success": tbs.GetText(c.Locale, "success.created"),
+		"tenant":  ti,
 	})
 }
 
@@ -96,8 +96,8 @@ func TenantUpdate(c *xin.Context) {
 	}
 
 	c.JSON(http.StatusOK, xin.H{
-		"tenant":  te,
 		"success": tbs.GetText(c.Locale, "success.updated"),
+		"tenant":  te,
 	})
 }
 
@@ -133,7 +133,7 @@ func TenantDelete(c *xin.Context) {
 	}
 
 	c.JSON(http.StatusOK, xin.H{
-		"tenant":  ti,
 		"success": tbs.GetText(c.Locale, "success.deleted"),
+		"tenant":  ti,
 	})
 }

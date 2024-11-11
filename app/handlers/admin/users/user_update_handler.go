@@ -177,8 +177,8 @@ func UserCreate(c *xin.Context) {
 	user.ID = uid
 	user.Password = ""
 	c.JSON(http.StatusOK, xin.H{
-		"user":    user,
 		"success": tbs.GetText(c.Locale, "success.created"),
+		"user":    user,
 	})
 }
 
@@ -243,8 +243,8 @@ func UserUpdate(c *xin.Context) {
 	cnt, _ := r.RowsAffected()
 
 	c.JSON(http.StatusOK, xin.H{
-		"user":    user,
 		"success": tbs.Format(c.Locale, "user.success.updates", cnt),
+		"user":    user,
 	})
 }
 

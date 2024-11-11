@@ -65,7 +65,9 @@ func PasswordResetSend(c *xin.Context) {
 
 	if user == nil {
 		// show success message even user is not found
-		c.JSON(http.StatusOK, xin.H{"success": tbs.Format(c.Locale, "pwdrst.success.sent", email)})
+		c.JSON(http.StatusOK, xin.H{
+			"success": tbs.Format(c.Locale, "pwdrst.success.sent", email),
+		})
 		return
 	}
 
@@ -102,7 +104,9 @@ func PasswordResetSend(c *xin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, xin.H{"success": tbs.Format(c.Locale, "pwdrst.success.sent", email)})
+	c.JSON(http.StatusOK, xin.H{
+		"success": tbs.Format(c.Locale, "pwdrst.success.sent", email),
+	})
 }
 
 func passwordResetToken(c *xin.Context) *PwdRstToken {

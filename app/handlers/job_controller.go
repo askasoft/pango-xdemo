@@ -201,7 +201,10 @@ func (jc *JobController) Start(c *xin.Context) {
 
 	go jobs.StartJobs(tt) //nolint: errcheck
 
-	c.JSON(http.StatusOK, xin.H{"jid": jid, "success": tbs.GetText(c.Locale, "job.message.started")})
+	c.JSON(http.StatusOK, xin.H{
+		"jid":     jid,
+		"success": tbs.GetText(c.Locale, "job.message.started"),
+	})
 }
 
 func (jc *JobController) Abort(c *xin.Context) {

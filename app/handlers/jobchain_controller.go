@@ -208,7 +208,10 @@ func (jcc *JobChainController) StartJob(c *xin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, xin.H{"cid": cid, "success": tbs.GetText(c.Locale, "job.message.started")})
+	c.JSON(http.StatusOK, xin.H{
+		"cid":     cid,
+		"success": tbs.GetText(c.Locale, "job.message.started"),
+	})
 }
 
 func (jcc *JobChainController) Abort(c *xin.Context) {

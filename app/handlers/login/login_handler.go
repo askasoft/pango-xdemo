@@ -138,8 +138,8 @@ func loginMFACheck(c *xin.Context, au *models.User, up *UserPass) bool {
 	case "M":
 		if up.Passcode == nil {
 			c.JSON(http.StatusOK, xin.H{
-				"mfa":     "M",
 				"message": tbs.GetText(c.Locale, "login.mfa.mobile.notice"),
+				"mfa":     "M",
 			})
 			return false
 		}
@@ -182,8 +182,8 @@ func loginSendEmailPasscode(c *xin.Context, email, passcode string, expire time.
 	}
 
 	c.JSON(http.StatusOK, xin.H{
-		"mfa":     "E",
 		"message": tbs.Format(c.Locale, "login.mfa.email.notice", email),
+		"mfa":     "E",
 	})
 }
 
