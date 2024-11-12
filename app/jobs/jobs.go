@@ -321,7 +321,7 @@ func (jr *JobRunner) Done(err error) {
 	if errors.Is(err, xjm.ErrJobAborted) {
 		job, err := jr.GetJob()
 		if err != nil {
-			jr.Log.Error(err.Error())
+			jr.Log.Error(err)
 			return
 		}
 
@@ -330,7 +330,7 @@ func (jr *JobRunner) Done(err error) {
 			// It's necessary to call jobChainAbort() again.
 			// The jobChainCheckout()/jobChainContinue() method may update job chain status to 'R' to a aborted job chain.
 			if err := jr.jobChainAbort(job.Error); err != nil {
-				jr.Log.Error(err.Error())
+				jr.Log.Error(err)
 			}
 			jr.Log.Warn("ABORTED.")
 			return

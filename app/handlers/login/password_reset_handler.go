@@ -153,7 +153,6 @@ func PasswordResetExecute(c *xin.Context) {
 
 	user, err := tenant.FindUser(c, token.Email)
 	if err != nil {
-		c.Logger.Error(err)
 		c.AddError(err)
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
@@ -197,7 +196,6 @@ func PasswordResetExecute(c *xin.Context) {
 	sql, args := sqb.Build()
 
 	if _, err := app.SDB.Exec(sql, args...); err != nil {
-		c.Logger.Error(err)
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return

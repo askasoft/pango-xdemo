@@ -6,6 +6,7 @@ import (
 
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/tenant"
+	"github.com/askasoft/pango-xdemo/app/utils/pgutil"
 	"github.com/askasoft/pango/fsu"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/log/sqlog/sqlxlog"
@@ -43,11 +44,19 @@ func openDatabase() error {
 	db.SetMaxOpenConns(sec.GetInt("maxOpenConns", 10))
 	db.SetConnMaxLifetime(sec.GetDuration("connMaxLifetime", time.Hour))
 
-	app.DBS = dbs
-	app.SDB = sqlx.NewDB(db, typ, sqlxlog.NewSqlxLogger(
+	slg := sqlxlog.NewSqlxLogger(
 		log.GetLogger("SQL"),
 		sec.GetDuration("slowSql", time.Second),
-	).Trace)
+	)
+	slg.GetSQLErrLogLevel = func(err error) log.Level {
+		if pgutil.IsUniqueViolationError(err) {
+			return log.LevelWarn
+		}
+		return log.LevelError
+	}
+
+	app.DBS = dbs
+	app.SDB = sqlx.NewDB(db, typ, slg.Trace)
 
 	return nil
 }

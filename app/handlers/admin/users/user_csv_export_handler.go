@@ -35,7 +35,6 @@ func UserCsvExport(c *xin.Context) {
 
 	rows, err := app.SDB.Queryx(sql, args...)
 	if err != nil {
-		c.Logger.Error(err)
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return

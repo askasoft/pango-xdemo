@@ -215,7 +215,6 @@ func ConfigSave(c *xin.Context) {
 
 		r, err := tx.Exec(sql, args...)
 		if err != nil {
-			c.Logger.Error(err)
 			c.Errors = []error{err}
 			c.JSON(http.StatusInternalServerError, handlers.E(c))
 			_ = tx.Rollback()
@@ -329,7 +328,6 @@ func ConfigImport(c *xin.Context) {
 
 		r, err := tx.Exec(sql, args...)
 		if err != nil {
-			c.Logger.Error(err)
 			c.Errors = []error{err}
 			c.JSON(http.StatusInternalServerError, handlers.E(c))
 			_ = tx.Rollback()

@@ -1,6 +1,8 @@
 package tools
 
 import (
+	"time"
+
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/log/sqlog/gormlog"
 	"github.com/askasoft/pango/xsm/pgsm/pggormsm"
@@ -56,6 +58,7 @@ func openDatabase(dsn string) (*gorm.DB, error) {
 	gdc := &gorm.Config{
 		Logger: gormlog.NewGormLogger(
 			log.GetLogger("SQL"),
+			time.Second,
 		),
 		SkipDefaultTransaction: true,
 	}
@@ -70,6 +73,7 @@ func migrateSchema(dsn, schema string) error {
 		NamingStrategy: gormschema.NamingStrategy{TablePrefix: schema + "."},
 		Logger: gormlog.NewGormLogger(
 			log.GetLogger("SQL"),
+			time.Second,
 		),
 	}
 
