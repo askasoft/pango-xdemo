@@ -25,13 +25,6 @@ func PetCsvExport(c *xin.Context) {
 		return
 	}
 
-	c.SetAttachmentHeader("pets.csv")
-
-	_, _ = c.Writer.WriteString(string(iox.BOM))
-
-	cw := csv.NewWriter(c.Writer)
-	cw.UseCRLF = true
-
 	tt := tenant.FromCtx(c)
 
 	sqb := app.SDB.Builder()
@@ -44,13 +37,20 @@ func PetCsvExport(c *xin.Context) {
 	rows, err := app.SDB.Queryx(sql, args...)
 	if err != nil {
 		c.Logger.Error(err)
-		_ = cw.Write([]string{err.Error()})
-		cw.Flush()
+		c.AddError(err)
+		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return
 	}
 	defer rows.Close()
 
-	err = cw.Write([]string{
+	c.SetAttachmentHeader("pets.csv")
+	_, _ = c.Writer.WriteString(string(iox.BOM))
+
+	cw := csv.NewWriter(c.Writer)
+	cw.UseCRLF = true
+	defer cw.Flush()
+
+	cols := []string{
 		tbs.GetText(c.Locale, "pet.id"),
 		tbs.GetText(c.Locale, "pet.name"),
 		tbs.GetText(c.Locale, "pet.gender"),
@@ -67,8 +67,8 @@ func PetCsvExport(c *xin.Context) {
 		tbs.GetText(c.Locale, "pet.description"),
 		tbs.GetText(c.Locale, "pet.created_at"),
 		tbs.GetText(c.Locale, "pet.updated_at"),
-	})
-	if err != nil {
+	}
+	if err = cw.Write(cols); err != nil {
 		c.Logger.Error(err)
 		return
 	}
@@ -80,10 +80,8 @@ func PetCsvExport(c *xin.Context) {
 
 	for rows.Next() {
 		var pet models.Pet
-		err = rows.StructScan(&pet)
-		if err != nil {
+		if err = rows.StructScan(&pet); err != nil {
 			_ = cw.Write([]string{err.Error()})
-			cw.Flush()
 			return
 		}
 
@@ -92,7 +90,7 @@ func PetCsvExport(c *xin.Context) {
 			habits = append(habits, phm.SafeGet(h, h))
 		}
 
-		err = cw.Write([]string{
+		cols = []string{
 			num.Ltoa(pet.ID),
 			pet.Name,
 			pgm.SafeGet(pet.Gender, pet.Gender),
@@ -108,12 +106,10 @@ func PetCsvExport(c *xin.Context) {
 			pet.ShopLink,
 			app.FormatTime(pet.CreatedAt),
 			app.FormatTime(pet.UpdatedAt),
-		})
-		if err != nil {
+		}
+		if err = cw.Write(cols); err != nil {
 			c.Logger.Error(err)
 			return
 		}
 	}
-
-	cw.Flush()
 }

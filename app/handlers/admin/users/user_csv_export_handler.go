@@ -24,13 +24,6 @@ func UserCsvExport(c *xin.Context) {
 		return
 	}
 
-	c.SetAttachmentHeader("users.csv")
-
-	_, _ = c.Writer.WriteString(string(iox.BOM))
-
-	cw := csv.NewWriter(c.Writer)
-	cw.UseCRLF = true
-
 	tt := tenant.FromCtx(c)
 
 	sqb := app.SDB.Builder()
@@ -43,13 +36,20 @@ func UserCsvExport(c *xin.Context) {
 	rows, err := app.SDB.Queryx(sql, args...)
 	if err != nil {
 		c.Logger.Error(err)
-		_ = cw.Write([]string{err.Error()})
-		cw.Flush()
+		c.AddError(err)
+		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return
 	}
 	defer rows.Close()
 
-	err = cw.Write([]string{
+	c.SetAttachmentHeader("users.csv")
+	_, _ = c.Writer.WriteString(string(iox.BOM))
+
+	cw := csv.NewWriter(c.Writer)
+	cw.UseCRLF = true
+	defer cw.Flush()
+
+	cols := []string{
 		tbs.GetText(c.Locale, "user.id"),
 		tbs.GetText(c.Locale, "user.name"),
 		tbs.GetText(c.Locale, "user.email"),
@@ -59,8 +59,8 @@ func UserCsvExport(c *xin.Context) {
 		tbs.GetText(c.Locale, "user.cidr"),
 		tbs.GetText(c.Locale, "user.created_at"),
 		tbs.GetText(c.Locale, "user.updated_at"),
-	})
-	if err != nil {
+	}
+	if err = cw.Write(cols); err != nil {
 		c.Logger.Error(err)
 		return
 	}
@@ -70,15 +70,13 @@ func UserCsvExport(c *xin.Context) {
 	rm := tbsutil.GetUserRoleMap(c.Locale, au.Role)
 	for rows.Next() {
 		var user models.User
-		err = rows.StructScan(&user)
-		if err != nil {
+		if err = rows.StructScan(&user); err != nil {
 			c.Logger.Error(err)
 			_ = cw.Write([]string{err.Error()})
-			cw.Flush()
 			return
 		}
 
-		err = cw.Write([]string{
+		cols = []string{
 			num.Ltoa(user.ID),
 			user.Name,
 			user.Email,
@@ -88,12 +86,10 @@ func UserCsvExport(c *xin.Context) {
 			user.CIDR,
 			app.FormatTime(user.CreatedAt),
 			app.FormatTime(user.UpdatedAt),
-		})
-		if err != nil {
+		}
+		if err = cw.Write(cols); err != nil {
 			c.Logger.Error(err)
 			return
 		}
 	}
-
-	cw.Flush()
 }

@@ -251,11 +251,11 @@ func ConfigExport(c *xin.Context) {
 	configs := configList(c, "editor")
 
 	c.SetAttachmentHeader("configs.csv")
-
 	_, _ = c.Writer.WriteString(string(iox.BOM))
 
 	cw := csv.NewWriter(c.Writer)
 	cw.UseCRLF = true
+	defer cw.Flush()
 
 	if err := cw.Write([]string{"Name", "Value", "Display"}); err != nil {
 		c.Logger.Error(err)
@@ -275,8 +275,6 @@ func ConfigExport(c *xin.Context) {
 			}
 		}
 	}
-
-	cw.Flush()
 }
 
 type ConfigCsvRecord struct {

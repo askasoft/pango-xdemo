@@ -59,13 +59,13 @@ func (ucijc *UserCsvImportJobController) Start(c *xin.Context) {
 
 func UserCsvImportSample(c *xin.Context) {
 	c.SetAttachmentHeader("users_import_sample.csv")
-
 	_, _ = c.Writer.WriteString(string(iox.BOM))
 
 	cw := csv.NewWriter(c.Writer)
 	cw.UseCRLF = true
+	defer cw.Flush()
 
-	err := cw.Write([]string{
+	cols := []string{
 		tbs.GetText(c.Locale, "user.id"),
 		tbs.GetText(c.Locale, "user.name"),
 		tbs.GetText(c.Locale, "user.email"),
@@ -73,8 +73,8 @@ func UserCsvImportSample(c *xin.Context) {
 		tbs.GetText(c.Locale, "user.status"),
 		tbs.GetText(c.Locale, "user.password"),
 		tbs.GetText(c.Locale, "user.cidr"),
-	})
-	if err != nil {
+	}
+	if err := cw.Write(cols); err != nil {
 		c.Logger.Error(err)
 		return
 	}
@@ -91,10 +91,8 @@ func UserCsvImportSample(c *xin.Context) {
 		{"", "disabled", "disabled@" + domain, rm.SafeGet(models.RoleViewer), sm.SafeGet(models.UserDisabled), ran.RandString(16), "127.0.0.1/32\n192.168.1.1/32"},
 	}
 
-	err = cw.WriteAll(data)
-	if err != nil {
+	if err := cw.WriteAll(data); err != nil {
 		c.Logger.Error(err)
 		return
 	}
-	cw.Flush()
 }
