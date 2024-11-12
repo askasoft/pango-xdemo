@@ -61,3 +61,11 @@ func (c *Config) DisplayValue() string {
 func (c *Config) Values() []string {
 	return str.FieldsByte(c.Value, '\t')
 }
+
+func (c *Config) IsSameMeta(n *Config) bool {
+	return c.Name == n.Name &&
+		c.Style == n.Style && c.Order == n.Order &&
+		c.Required == n.Required && c.Secret == n.Secret &&
+		c.Viewer == n.Viewer && c.Editor == n.Editor &&
+		c.Validation == n.Validation
+}

@@ -55,6 +55,26 @@ func (tt Tenant) MigrateConfig(configs []*models.Config) error {
 
 	log.Infof("Migrate %q", tb)
 
+	sqb := app.SDB.Builder()
+	sqb.Select().From(tb)
+	sql, args := sqb.Build()
+
+	oconfigs := make(map[string]*models.Config)
+	rows, err := app.SDB.Queryx(sql, args...)
+	if err != nil {
+		return err
+	}
+
+	for rows.Next() {
+		var cfg models.Config
+		if err := rows.StructScan(&cfg); err != nil {
+			rows.Close()
+			return err
+		}
+		oconfigs[cfg.Name] = &cfg
+	}
+	rows.Close()
+
 	sqbu := app.SDB.Builder()
 	sqbu.Update(tb)
 	sqbu.Names("style", "order", "required", "secret", "viewer", "editor", "validation")
@@ -78,19 +98,24 @@ func (tt Tenant) MigrateConfig(configs []*models.Config) error {
 	defer stmtc.Close()
 
 	for _, cfg := range configs {
-		cfg.UpdatedAt = time.Now()
-		r, err := stmtu.Exec(cfg)
-		if err != nil {
-			return err
-		}
+		if ocfg, ok := oconfigs[cfg.Name]; ok {
+			if ocfg.IsSameMeta(cfg) {
+				continue
+			}
 
-		if cnt, _ := r.RowsAffected(); cnt == 0 {
-			cfg.CreatedAt = cfg.UpdatedAt
-
-			log.Infof("INSERT INTO %s: %v", tb, cfg)
-			if _, err := stmtc.Exec(cfg); err != nil {
+			log.Infof("UPDATE %s: %s", tb, cfg.Name)
+			if _, err := stmtu.Exec(cfg); err != nil {
 				return err
 			}
+			continue
+		}
+
+		cfg.CreatedAt = time.Now()
+		cfg.UpdatedAt = cfg.CreatedAt
+
+		log.Infof("INSERT %s: %v", tb, cfg)
+		if _, err := stmtc.Exec(cfg); err != nil {
+			return err
 		}
 	}
 
