@@ -29,8 +29,8 @@ type PetResetJobChainController struct {
 func (prjcc *PetResetJobChainController) Index(c *xin.Context) {
 	h := handlers.H(c)
 
-	h["JobchainJobnamesMap"] = tbsutil.GetPetResetJobnamesMap(c.Locale)
-	h["JobchainJslabelsMap"] = tbsutil.GetPetResetJslabelsMap(c.Locale)
+	h["JobchainJobnamesMap"] = tbsutil.GetJobchainJobnamesMap(c.Locale)
+	h["JobchainJslabelsMap"] = tbsutil.GetJobchainJslabelsMap(c.Locale)
 
 	prjcc.BindJobCtx(c, h)
 

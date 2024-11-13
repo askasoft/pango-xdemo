@@ -133,6 +133,7 @@ type JobState struct {
 	Step    int `json:"step,omitempty"`
 	Total   int `json:"total,omitempty"`
 	Limit   int `json:"limit,omitempty"`
+	Exists  int `json:"exists,omitempty"`
 	Skipped int `json:"skipped,omitempty"`
 	Success int `json:"success,omitempty"`
 	Failure int `json:"failure,omitempty"`
@@ -140,7 +141,7 @@ type JobState struct {
 
 func (js *JobState) SetTotalLimit(total, limit int) {
 	js.Total = total
-	js.Limit = gog.If(limit > total, total, limit)
+	js.Limit = gog.If(total > 0 && limit > total, total, limit)
 }
 
 func (js *JobState) IsStepLimited() bool {
