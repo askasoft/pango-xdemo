@@ -3,7 +3,7 @@
 APPNAME=xdemo
 APPHOME=/app/${APPNAME}
 PREFIX=
-LOG_WRITERS="stdout, file, dump, access"
+LOG_WRITERS="stdout, textfile, jsonfile, httpdump, xalfile, xajfile"
 
 #LOG_OPENSEARCH_APPLOG=https://localhost:9200/xdemo_applog/_bulk
 #LOG_OPENSEARCH_ACCESS=https://localhost:9200/xdemo_access/_bulk
@@ -37,7 +37,7 @@ if ! [ -z "${LOG_SLACK_WEBHOOK}" ]; then
 		${APPHOME}/conf/log.ini
 fi
 if ! [ -z "${LOG_OPENSEARCH_APPLOG}" ]; then
-	LOG_WRITERS="${LOG_WRITERS}, osapplog"
+	LOG_WRITERS="${LOG_WRITERS}, appos"
 	sed -i \
 		-e "s;LOG_OPENSEARCH_APPLOG;${LOG_OPENSEARCH_APPLOG};g" \
 		-e "s;LOG_OPENSEARCH_USERNAME;${LOG_OPENSEARCH_USERNAME};g" \
@@ -46,7 +46,7 @@ if ! [ -z "${LOG_OPENSEARCH_APPLOG}" ]; then
 		${APPHOME}/conf/log.ini
 fi
 if ! [ -z "${LOG_OPENSEARCH_ACCESS}" ]; then
-	LOG_WRITERS="${LOG_WRITERS}, osaccess"
+	LOG_WRITERS="${LOG_WRITERS}, xajos"
 	sed -i \
 		-e "s;LOG_OPENSEARCH_ACCESS;${LOG_OPENSEARCH_ACCESS};g" \
 		-e "s;LOG_OPENSEARCH_USERNAME;${LOG_OPENSEARCH_USERNAME};g" \
