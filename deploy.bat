@@ -16,7 +16,7 @@ rmdir /S /Q %APPHOME%\web
 
 powershell -command "(gc conf\app.ini -Encoding utf8) | %% { $_ -replace 'prefix =.*', 'prefix = %PREFIX%' } | Out-File %APPHOME%\conf\app.ini -Encoding utf8"
 
-powershell -command "(gc conf\log.ini -Encoding utf8).Replace('DEBUG', '%LOG_LEVEL%').Replace('HOSTNAME', '%COMPUTERNAME%') | Out-File %APPHOME%\conf\log.ini -Encoding utf8"
+powershell -command "(gc conf\log.ini -Encoding utf8).Replace('DEBUG', '%LOG_LEVEL%') | Out-File %APPHOME%\conf\log.ini -Encoding utf8"
 
 copy /Y conf\config.csv %APPHOME%\conf\
 copy /Y conf\schema.sql %APPHOME%\conf\

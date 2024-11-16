@@ -23,7 +23,6 @@ sed -e "s;prefix =.*;prefix = ${PREFIX};g" \
 	conf/app.ini > ${APPHOME}/conf/app.ini
 
 sed -e "s;DEBUG;${LOG_LEVEL};g" \
-	-e "s;HOSTNAME;${HOSTNAME};g" \
 	conf/log.ini > ${APPHOME}/conf/log.ini
 
 cp -a conf/config.csv ${APPHOME}/conf/
