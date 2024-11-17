@@ -26,8 +26,8 @@ const (
 type User struct {
 	ID        int64     `gorm:"not null;primaryKey;autoIncrement" json:"id" form:"id"`
 	Name      string    `gorm:"size:100;not null" json:"name" form:"name,strip" validate:"required,maxlen=100"`
-	Email     string    `gorm:"size:100;not null;uniqueIndex" json:"email" form:"email,strip" validate:"required,maxlen=100,email"`
-	Password  string    `gorm:"size:128;not null" json:"password" form:"password,strip" validate:"omitempty,printascii"`
+	Email     string    `gorm:"size:200;not null;uniqueIndex" json:"email" form:"email,strip" validate:"required,maxlen=200,email"`
+	Password  string    `gorm:"size:200;not null" json:"password" form:"password,strip" validate:"omitempty,printascii"`
 	Role      string    `gorm:"size:1;not null" json:"role" form:"role,strip" validate:"required"`
 	Status    string    `gorm:"size:1;not null" json:"status" form:"status,strip" validate:"required"`
 	CIDR      string    `gorm:"column:cidr;not null" json:"cidr" form:"cidr,strip" validate:"omitempty,cidrs"`

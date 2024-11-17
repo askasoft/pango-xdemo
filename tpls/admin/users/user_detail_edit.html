@@ -19,13 +19,13 @@
 		<div class="row">
 			<label class="col-md-2 col-form-label required">{{T .Loc "user.email"}}</label>
 			<div class="col-md-10">
-				<input name="email" type="text" class="form-control" maxlength="100" textclear value="{{$u.Email}}">
+				<input name="email" type="text" class="form-control" maxlength="200" textclear value="{{$u.Email}}">
 			</div>
 		</div>
 		<div class="row">
 			<label class="col-md-2 col-form-label">{{T .Loc "user.password"}}</label>
 			<div class="col-md-10">
-				<input name="password" type="text" class="form-control" maxlength="16" textclear value="">
+				<input name="password" type="text" class="form-control" maxlength="64" textclear value="">
 				<div class="desc">{{T .Loc $pwd_desc}}</div>
 			</div>
 		</div>

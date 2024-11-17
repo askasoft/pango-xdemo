@@ -20,19 +20,19 @@
 			<div class="row">
 				<label class="col-md-3 col-form-label">{{T .Loc "login.username"}}</label>
 				<div class="col-md-8">
-					<input name="username" type="text" class="form-control" maxlength="250" textclear/>
+					<input name="username" type="text" class="form-control" maxlength="200" textclear/>
 				</div>
 			</div>
 			<div class="row">
 				<label class="col-md-3 col-form-label">{{T .Loc "login.password"}}</label>
 				<div class="col-md-8">
-					<input name="password" type="password" class="form-control" maxlength="250" textclear/>
+					<input name="password" type="password" class="form-control" maxlength="64" textclear/>
 				</div>
 			</div>
 			<div class="row hidden">
 				<label class="col-md-3 col-form-label">{{T .Loc "login.passcode"}}</label>
 				<div class="col-md-8">
-					<input name="passcode" type="text" class="form-control" maxlength="250" disabled textclear/>
+					<input name="passcode" type="text" class="form-control" maxlength="64" disabled textclear/>
 					<div class="desc M hidden">{{T .Loc "login.mfa.mobile.desc"}} <button 
 						type="button" class="btn btn-sm btn-outline-primary"
 						id="login_mfa_enroll" popup-target="#login_mfa_enroll_popup"

@@ -63,11 +63,12 @@ CREATE TABLE "SCHEMA"."configs" (
 CREATE TABLE "SCHEMA"."users" (
 	"id" bigserial NOT NULL,
 	"name" varchar(100) NOT NULL,
-	"email" varchar(100) NOT NULL,
-	"password" varchar(128) NOT NULL,
+	"email" varchar(200) NOT NULL,
+	"password" varchar(200) NOT NULL,
 	"role" varchar(1) NOT NULL,
 	"status" varchar(1) NOT NULL,
 	"cidr" text NOT NULL,
+	"secret" bigint NOT NULL,
 	"created_at" timestamptz NOT NULL,
 	"updated_at" timestamptz NOT NULL,
 	PRIMARY KEY ("id")
