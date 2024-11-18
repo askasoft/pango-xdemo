@@ -215,9 +215,9 @@ func ConfigSave(c *xin.Context) {
 
 		r, err := tx.Exec(sql, args...)
 		if err != nil {
-			c.Errors = []error{err}
-			c.JSON(http.StatusInternalServerError, handlers.E(c))
 			_ = tx.Rollback()
+			c.SetError(err)
+			c.JSON(http.StatusInternalServerError, handlers.E(c))
 			return
 		}
 
@@ -318,19 +318,27 @@ func ConfigImport(c *xin.Context) {
 	}
 
 	sqb := app.SDB.Builder()
-	for _, cfg := range cfgs {
-		sqb.Reset()
-		sqb.Update(tt.TableConfigs())
-		sqb.Setc("value", cfg.Value)
-		sqb.Setc("updated_at", time.Now())
-		sqb.Where("editor >= ?", au.Role)
-		sql, args := sqb.Build()
+	sqb.Update(tt.TableConfigs())
+	sqb.Setc("value", "")
+	sqb.Setc("updated_at", "")
+	sqb.Where("name = ?", "")
+	sqb.Where("editor >= ?", "")
+	sql := sqb.SQL()
 
-		r, err := tx.Exec(sql, args...)
+	stmt, err := app.SDB.Prepare(sql)
+	if err != nil {
+		c.AddError(err)
+		c.JSON(http.StatusInternalServerError, handlers.E(c))
+		return
+	}
+	defer stmt.Close()
+
+	for _, cfg := range cfgs {
+		r, err := stmt.Exec(cfg.Value, time.Now(), cfg.Name, au.Role)
 		if err != nil {
-			c.Errors = []error{err}
-			c.JSON(http.StatusInternalServerError, handlers.E(c))
 			_ = tx.Rollback()
+			c.SetError(err)
+			c.JSON(http.StatusInternalServerError, handlers.E(c))
 			return
 		}
 
