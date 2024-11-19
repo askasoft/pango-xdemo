@@ -5,7 +5,7 @@ import (
 	"github.com/askasoft/pango-xdemo/app/tenant"
 )
 
-func PetResetJobChainStart(tt tenant.Tenant) error {
+func PetResetJobChainStart(tt *tenant.Tenant) error {
 	pca := NewPetClearArg(tt, "")
 
 	states := jobs.JobChainInitStates(jobs.JobNamePetClear, jobs.JobNamePetCatCreate, jobs.JobNamePetDogCreate)

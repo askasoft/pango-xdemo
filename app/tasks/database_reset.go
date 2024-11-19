@@ -10,7 +10,7 @@ func ResetDatabase() {
 }
 
 func ResetShcemasData() error {
-	return tenant.Iterate(func(tt tenant.Tenant) error {
+	return tenant.Iterate(func(tt *tenant.Tenant) error {
 		return pets.PetResetJobChainStart(tt)
 	})
 }

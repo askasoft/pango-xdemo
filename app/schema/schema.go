@@ -1,0 +1,148 @@
+package schema
+
+import (
+	"sync"
+
+	"github.com/askasoft/pango-xdemo/app"
+	"github.com/askasoft/pango/log"
+	"github.com/askasoft/pango/sqx/sqlx"
+	"github.com/askasoft/pango/xfs"
+	"github.com/askasoft/pango/xfs/sqlxfs"
+	"github.com/askasoft/pango/xjm"
+	"github.com/askasoft/pango/xjm/sqlxjm"
+	"github.com/askasoft/pango/xsm"
+	"github.com/askasoft/pango/xsm/pgsm/pgsqlxsm"
+)
+
+type Schema string
+
+func (sm Schema) IsDefault() bool {
+	return string(sm) == DefaultSchema()
+}
+
+func (sm Schema) Logger(name string) log.Logger {
+	logger := log.GetLogger(name)
+	logger.SetProp("TENANT", string(sm))
+	return logger
+}
+
+func (sm Schema) FQDN() string {
+	if sm.IsDefault() {
+		return app.Domain
+	}
+	return string(sm) + "." + app.Domain
+}
+
+func (sm Schema) SJC(db sqlx.Sqlx) xjm.JobChainer {
+	return sqlxjm.JC(db, sm.TableJobChains())
+}
+
+func (sm Schema) SJM(db sqlx.Sqlx) xjm.JobManager {
+	return sqlxjm.JM(db, sm.TableJobs(), sm.TableJobLogs())
+}
+
+func (sm Schema) SFS(db sqlx.Sqlx) xfs.XFS {
+	return sqlxfs.FS(db, sm.TableFiles())
+}
+
+func (sm Schema) JC() xjm.JobChainer {
+	return sm.SJC(app.SDB)
+}
+
+func (sm Schema) JM() xjm.JobManager {
+	return sm.SJM(app.SDB)
+}
+
+func (sm Schema) FS() xfs.XFS {
+	return sm.SFS(app.SDB)
+}
+
+func IsMultiTenant() bool {
+	return app.INI.GetBool("tenant", "multiple")
+}
+
+func DefaultSchema() string {
+	return app.INI.GetString("database", "schema", "public")
+}
+
+func SSM(db *sqlx.DB) xsm.SchemaManager {
+	return pgsqlxsm.SM(db)
+}
+
+func SM() xsm.SchemaManager {
+	return SSM(app.SDB)
+}
+
+func ExistsSchema(s string) (bool, error) {
+	return SM().ExistsSchema(s)
+}
+
+func ListSchemas() ([]string, error) {
+	return SM().ListSchemas()
+}
+
+func CreateSchema(name string, comment string) error {
+	return SM().CreateSchema(name, comment)
+}
+
+func CommentSchema(name string, comment string) error {
+	return SM().CommentSchema(name, comment)
+}
+
+func RenameSchema(old string, new string) error {
+	return SM().RenameSchema(old, new)
+}
+
+func DeleteSchema(name string) error {
+	return SM().DeleteSchema(name)
+}
+
+func CountSchemas(sq *xsm.SchemaQuery) (total int, err error) {
+	return SM().CountSchemas(sq)
+}
+
+func FindSchemas(sq *xsm.SchemaQuery) (schemas []*xsm.SchemaInfo, err error) {
+	return SM().FindSchemas(sq)
+}
+
+func Iterate(itf func(sm Schema) error) error {
+	if !IsMultiTenant() {
+		return itf(Schema(""))
+	}
+
+	ss, err := ListSchemas()
+	if err != nil {
+		return err
+	}
+
+	for _, s := range ss {
+		if err := itf(Schema(s)); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+var muSCMAS sync.Mutex
+
+func CheckSchema(name string) (bool, error) {
+	if v, ok := app.SCMAS.Get(name); ok {
+		return v, nil
+	}
+
+	muSCMAS.Lock()
+	defer muSCMAS.Unlock()
+
+	// get again to prevent duplicated load
+	if v, ok := app.SCMAS.Get(name); ok {
+		return v, nil
+	}
+
+	exists, err := ExistsSchema(name)
+	if err != nil {
+		return false, err
+	}
+
+	app.SCMAS.Set(name, exists)
+	return exists, nil
+}

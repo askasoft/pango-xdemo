@@ -10,21 +10,20 @@ import (
 )
 
 func SetCtxLogProp(c *xin.Context) {
-	tt := tenant.FromCtx(c)
-	c.Logger.SetProp("TENANT", tt.Schema())
+	s, _ := tenant.GetSchema(c)
+	c.Logger.SetProp("TENANT", s)
 }
 
-func CheckTenant(c *xin.Context) {
-	tt := tenant.FromCtx(c)
-
-	ok, err := tenant.FindTenant(tt)
+// TenantProtect only allow access for known tenant
+func TenantProtect(c *xin.Context) {
+	tt, err := tenant.FindAndSetTenant(c)
 	if err != nil {
-		c.Logger.Errorf("Failed to find schema '%s': %v", tt.Schema(), err)
+		c.Logger.Error(err)
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
 
-	if !ok {
+	if tt == nil {
 		c.AbortWithStatus(http.StatusNotFound)
 		return
 	}

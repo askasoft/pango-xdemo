@@ -131,10 +131,11 @@ func doExecTask() {
 	tf, ok := schedules.Get(tn)
 	if !ok {
 		fmt.Fprintf(os.Stderr, "Invalid Task %q\n", tn)
-		app.Exit(app.ExitErrSCH)
+		app.Exit(app.ExitErrCMD)
 	}
 
 	initConfigs()
+	initCaches()
 	initDatabase()
 
 	tf()

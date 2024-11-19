@@ -23,7 +23,7 @@ type PetDogCreateArg struct {
 	Delay int `json:"delay,omitempty" form:"delay" validate:"min=0,max=1000"`
 }
 
-func NewPetDogCreateArg(tt tenant.Tenant, locale string) jobs.IArg {
+func NewPetDogCreateArg(tt *tenant.Tenant, locale string) jobs.IArg {
 	pdca := &PetDogCreateArg{}
 	pdca.Locale = locale
 	pdca.Items = 100
@@ -44,7 +44,7 @@ type PetDogCreateJob struct {
 	gen *PetGenerator
 }
 
-func NewPetDogCreateJob(tt tenant.Tenant, job *xjm.Job) jobs.IRun {
+func NewPetDogCreateJob(tt *tenant.Tenant, job *xjm.Job) jobs.IRun {
 	pdc := &PetDogCreateJob{}
 
 	pdc.JobRunner = jobs.NewJobRunner(tt, job.Name, job.ID)

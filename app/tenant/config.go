@@ -2,114 +2,30 @@ package tenant
 
 import (
 	"net"
-	"sync"
 
-	"github.com/askasoft/pango-xdemo/app"
-	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/utils/pwdutil"
 	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
 	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
 	"github.com/askasoft/pango/cog/linkedhashmap"
-	"github.com/askasoft/pango/doc/csvx"
-	"github.com/askasoft/pango/ini"
-	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/num"
-	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/tbs"
 )
 
-func ReadConfigFile() ([]*models.Config, error) {
-	log.Infof("Read config file '%s'", app.DBConfigFile)
-
-	configs := []*models.Config{}
-	if err := csvx.ScanFile(app.DBConfigFile, &configs); err != nil {
-		return nil, err
-	}
-
-	return configs, nil
+func (tt *Tenant) ConfigMap() map[string]string {
+	return tt.config
 }
 
-// CONFS write lock
-var muCONFS sync.Mutex
-
-func (tt Tenant) PurgeConfig() {
-	muCONFS.Lock()
-	app.CONFS.Delete(tt.Schema())
-	muCONFS.Unlock()
+func (tt *Tenant) ConfigValue(k string) string {
+	return tt.config[k]
 }
 
-func (tt Tenant) ConfigMap() map[string]string {
-	if dcm, ok := app.CONFS.Get(tt.Schema()); ok {
-		return dcm
-	}
-
-	muCONFS.Lock()
-	defer muCONFS.Unlock()
-
-	// get again to prevent duplicated load
-	if dcm, ok := app.CONFS.Get(tt.Schema()); ok {
-		return dcm
-	}
-
-	dcm, err := tt.loadConfigMap(app.SDB)
-	if err != nil {
-		panic(err)
-	}
-
-	app.CONFS.Set(tt.Schema(), dcm)
-	return dcm
-}
-
-func (tt Tenant) loadConfigMap(db *sqlx.DB) (map[string]string, error) {
-	sqb := db.Builder()
-	sqb.Select().From(tt.TableConfigs())
-	sql, args := sqb.Build()
-
-	configs := []*models.Config{}
-	if err := db.Select(&configs, sql, args...); err != nil {
-		return nil, err
-	}
-
-	cm := make(map[string]string, len(configs))
-	for _, c := range configs {
-		cm[c.Name] = c.Value
-	}
-
-	tv := cm["tenant_vars"]
-	if tv != "" {
-		i := ini.NewIni()
-		if err := i.LoadData(str.NewReader(tv)); err != nil {
-			tt.Logger("CFG").Errorf("Invalid tenant_vars: %s", tv)
-		} else {
-			var kvs []string
-			sec := i.Section("")
-			for _, key := range sec.Keys() {
-				kvs = append(kvs, "{{"+key+"}}", sec.GetString(key))
-			}
-
-			sr := str.NewReplacer(kvs...)
-			for ck, cv := range cm {
-				if ck != "tenant_vars" {
-					cm[ck] = sr.Replace(cv)
-				}
-			}
-		}
-	}
-
-	return cm, nil
-}
-
-func (tt Tenant) ConfigValue(k string) string {
-	return tt.ConfigMap()[k]
-}
-
-func (tt Tenant) ConfigValues(k string) []string {
+func (tt *Tenant) ConfigValues(k string) []string {
 	val := tt.ConfigValue(k)
 	return str.FieldsByte(val, '\t')
 }
 
-func (tt Tenant) GetCIDRs() []*net.IPNet {
+func (tt *Tenant) GetCIDRs() []*net.IPNet {
 	val := tt.ConfigValue("secure_client_cidr")
 	return vadutil.ParseCIDRs(val)
 }
@@ -152,7 +68,7 @@ func (pp *PasswordPolicy) ValidatePassword(pwd string) (vs []string) {
 	return
 }
 
-func (tt Tenant) GetPasswordPolicy(loc string) *PasswordPolicy {
+func (tt *Tenant) GetPasswordPolicy(loc string) *PasswordPolicy {
 	pp := &PasswordPolicy{Locale: loc}
 	pp.MinLength, pp.MaxLength = num.Atoi(tt.ConfigValue("password_policy_minlen"), 8), 64
 	pp.Strengths = tt.ConfigValues("password_policy_strength")
@@ -160,6 +76,6 @@ func (tt Tenant) GetPasswordPolicy(loc string) *PasswordPolicy {
 	return pp
 }
 
-func (tt Tenant) ValidatePassword(loc, pwd string) []string {
+func (tt *Tenant) ValidatePassword(loc, pwd string) []string {
 	return tt.GetPasswordPolicy(loc).ValidatePassword(pwd)
 }

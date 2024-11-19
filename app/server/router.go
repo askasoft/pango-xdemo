@@ -35,8 +35,6 @@ func initRouter() {
 	app.VAD.RegisterValidation("cidrs", vadutil.ValidateCIDRs)
 	app.VAD.RegisterValidation("regexps", vadutil.ValidateRegexps)
 
-	app.XIN.NoRoute(handlers.NotFound)
-
 	app.XAL = xmw.NewAccessLogger(nil)
 	app.XRL = xmw.NewRequestLimiter(0)
 	app.XRC = xmw.DefaultResponseCompressor()
@@ -59,7 +57,7 @@ func initRouter() {
 
 	configMiddleware()
 
-	configHandlers()
+	initHandlers()
 }
 
 func configMiddleware() {
@@ -170,7 +168,7 @@ func configAccessLogger() {
 	}
 }
 
-func configHandlers() {
+func initHandlers() {
 	log.Infof("Context Path: %s", app.Base)
 
 	r := app.XIN
@@ -190,7 +188,9 @@ func configHandlers() {
 	rg.HEAD("/healthcheck", handlers.HealthCheck)
 	rg.GET("/healthcheck", handlers.HealthCheck)
 
-	rg.Use(app.XSR.Handler())
+	rg.Use(app.XSR.Handler()) // https redirect
+	rg.Use(TenantProtect)     // schema protect
+
 	rg.GET("/", app.XCN.Handler(), handlers.Index)
 	rg.GET("/403", app.XCN.Handler(), handlers.Forbidden)
 	rg.GET("/404", app.XCN.Handler(), handlers.NotFound)
@@ -207,8 +207,7 @@ func configHandlers() {
 	addAdminHandlers(rg.Group("/a"))
 	addSuperHandlers(rg.Group("/s"))
 
-	// any other path
-	r.Use(app.XCN.Handler())
+	app.XIN.NoRoute(TenantProtect, app.XCN.Handler(), handlers.NotFound)
 }
 
 func addStaticHandlers(rg *xin.RouterGroup) {
@@ -233,8 +232,6 @@ func addAPIHandlers(rg *xin.RouterGroup) {
 	rg.Use(app.XAC.Handler()) // access control
 	rg.OPTIONS("/*path", xin.Next)
 
-	rg.Use(CheckTenant) // schema protect
-
 	addMyApiHandlers(rg)
 
 	rgb := rg.Group("/basic")
@@ -251,7 +248,6 @@ func addMyApiHandlers(rg *xin.RouterGroup) {
 }
 
 func addFilesHandlers(rg *xin.RouterGroup) {
-	rg.Use(CheckTenant) // schema protect
 	rg.POST("/upload", files.Upload)
 	rg.POST("/uploads", files.Uploads)
 
@@ -264,7 +260,6 @@ func addFilesHandlers(rg *xin.RouterGroup) {
 }
 
 func addLoginHandlers(rg *xin.RouterGroup) {
-	rg.Use(CheckTenant)       // schema protect
 	rg.Use(app.XTP.Handler()) // token protect
 	rg.Use(app.XCN.Handler())
 
@@ -284,7 +279,6 @@ func addLoginPasswordResetHandlers(rg *xin.RouterGroup) {
 }
 
 func addDemosHandlers(rg *xin.RouterGroup) {
-	rg.Use(CheckTenant)       // schema protect
 	rg.Use(app.XTP.Handler()) // token protect
 	rg.Use(app.XCN.Handler())
 
@@ -327,7 +321,6 @@ func addDemosChineseHandlers(rg *xin.RouterGroup) {
 }
 
 func addUserHandlers(rg *xin.RouterGroup) {
-	rg.Use(CheckTenant)       // schema protect
 	rg.Use(app.XCA.Handler()) // cookie auth
 	rg.Use(IPProtect)         // IP protect
 	rg.Use(app.XTP.Handler()) // token protect
@@ -341,7 +334,6 @@ func addUserPwdchgHandlers(rg *xin.RouterGroup) {
 }
 
 func addAdminHandlers(rg *xin.RouterGroup) {
-	rg.Use(CheckTenant)       // schema protect
 	rg.Use(app.XCA.Handler()) // cookie auth
 	rg.Use(IPProtect)         // IP protect
 	rg.Use(RoleAdminProtect)  // role protect
@@ -388,7 +380,6 @@ func addAdminUserCsvImportHandlers(rg *xin.RouterGroup) {
 }
 
 func addSuperHandlers(rg *xin.RouterGroup) {
-	rg.Use(CheckTenant)       // schema protect
 	rg.Use(app.XCA.Handler()) // cookie auth
 	rg.Use(IPProtect)         // IP protect
 	rg.Use(RoleRootProtect)   // role protect

@@ -143,8 +143,8 @@ var (
 	// DBS database settings
 	DBS map[string]string
 
-	// TENAS tenants cache
-	TENAS *imc.Cache[bool]
+	// SCMAS schema cache
+	SCMAS *imc.Cache[bool]
 
 	// CONFS tenant config map cache
 	CONFS *imc.Cache[map[string]string]

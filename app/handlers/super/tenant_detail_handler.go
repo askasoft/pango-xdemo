@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/askasoft/pango-xdemo/app/handlers"
+	"github.com/askasoft/pango-xdemo/app/schema"
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
 	"github.com/askasoft/pango/tbs"
@@ -19,7 +20,7 @@ func TenantCreate(c *xin.Context) {
 		return
 	}
 
-	if ok, err := tenant.ExistsSchema(ti.Name); err != nil {
+	if ok, err := schema.ExistsSchema(ti.Name); err != nil {
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return
@@ -55,13 +56,13 @@ func TenantUpdate(c *xin.Context) {
 	}
 
 	tt := tenant.FromCtx(c)
-	if te.Oname != te.Name && (te.Oname == tt.Schema() || te.Oname == tenant.DefaultSchema()) {
+	if te.Oname != te.Name && (te.Oname == string(tt.Schema) || te.Oname == schema.DefaultSchema()) {
 		c.AddError(fmt.Errorf(tbs.GetText(c.Locale, "tenant.error.unrename"), te.Oname))
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}
 
-	if ok, err := tenant.ExistsSchema(te.Oname); err != nil {
+	if ok, err := schema.ExistsSchema(te.Oname); err != nil {
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return
@@ -72,7 +73,7 @@ func TenantUpdate(c *xin.Context) {
 	}
 
 	if te.Oname != te.Name {
-		if ok, err := tenant.ExistsSchema(te.Name); err != nil {
+		if ok, err := schema.ExistsSchema(te.Name); err != nil {
 			c.AddError(err)
 			c.JSON(http.StatusInternalServerError, handlers.E(c))
 			return
@@ -82,14 +83,14 @@ func TenantUpdate(c *xin.Context) {
 			return
 		}
 
-		if err := tenant.RenameSchema(te.Oname, te.Name); err != nil {
+		if err := schema.RenameSchema(te.Oname, te.Name); err != nil {
 			c.AddError(err)
 			c.JSON(http.StatusInternalServerError, handlers.E(c))
 			return
 		}
 	}
 
-	if err := tenant.CommentSchema(te.Name, te.Comment); err != nil {
+	if err := schema.CommentSchema(te.Name, te.Comment); err != nil {
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return
@@ -110,13 +111,13 @@ func TenantDelete(c *xin.Context) {
 	}
 
 	tt := tenant.FromCtx(c)
-	if ti.Name == tt.Schema() || ti.Name == tenant.DefaultSchema() {
+	if ti.Name == string(tt.Schema) || ti.Name == schema.DefaultSchema() {
 		c.AddError(fmt.Errorf(tbs.GetText(c.Locale, "tenant.error.undelete"), ti.Name))
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}
 
-	if ok, err := tenant.ExistsSchema(ti.Name); err != nil {
+	if ok, err := schema.ExistsSchema(ti.Name); err != nil {
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return
@@ -126,7 +127,7 @@ func TenantDelete(c *xin.Context) {
 		return
 	}
 
-	if err := tenant.DeleteSchema(ti.Name); err != nil {
+	if err := schema.DeleteSchema(ti.Name); err != nil {
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return

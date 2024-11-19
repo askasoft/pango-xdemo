@@ -22,7 +22,7 @@ var muUSERS sync.Mutex
 func FindUser(c *xin.Context, username string) (xmw.AuthUser, error) {
 	tt := FromCtx(c)
 
-	k := tt.Schema() + "\n" + username
+	k := string(tt.Schema) + "\n" + username
 
 	if u, ok := app.USERS.Get(k); ok {
 		if u.ID == 0 {

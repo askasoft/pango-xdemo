@@ -1,4 +1,4 @@
-package tenant
+package schema
 
 import (
 	"errors"
@@ -8,6 +8,7 @@ import (
 
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/models"
+	"github.com/askasoft/pango/doc/csvx"
 	"github.com/askasoft/pango/fsu"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/ran"
@@ -16,12 +17,23 @@ import (
 	"github.com/askasoft/pango/str"
 )
 
-func (tt Tenant) InitSchema() error {
-	if err := tt.MigrateSchema(); err != nil {
+func ReadConfigFile() ([]*models.Config, error) {
+	log.Infof("Read config file '%s'", app.DBConfigFile)
+
+	configs := []*models.Config{}
+	if err := csvx.ScanFile(app.DBConfigFile, &configs); err != nil {
+		return nil, err
+	}
+
+	return configs, nil
+}
+
+func (sm Schema) InitSchema() error {
+	if err := sm.MigrateSchema(); err != nil {
 		return err
 	}
 
-	if err := tt.MigrateSuper(); err != nil {
+	if err := sm.MigrateSuper(); err != nil {
 		return err
 	}
 
@@ -30,15 +42,15 @@ func (tt Tenant) InitSchema() error {
 		return err
 	}
 
-	if err := tt.MigrateConfig(configs); err != nil {
+	if err := sm.MigrateConfig(configs); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (tt Tenant) MigrateSchema() error {
-	log.Infof("Migrate schema %q", tt.Schema())
+func (sm Schema) MigrateSchema() error {
+	log.Infof("Migrate schema %q", sm)
 
 	log.Infof("Read SQL file '%s'", app.SQLSchemaFile)
 
@@ -47,11 +59,11 @@ func (tt Tenant) MigrateSchema() error {
 		return err
 	}
 
-	return tt.ExecSQL(sql)
+	return sm.ExecSQL(sql)
 }
 
-func (tt Tenant) MigrateConfig(configs []*models.Config) error {
-	tb := tt.TableConfigs()
+func (sm Schema) MigrateConfig(configs []*models.Config) error {
+	tb := sm.TableConfigs()
 
 	log.Infof("Migrate %q", tb)
 
@@ -122,7 +134,7 @@ func (tt Tenant) MigrateConfig(configs []*models.Config) error {
 	return nil
 }
 
-func (tt Tenant) MigrateSuper() error {
+func (sm Schema) MigrateSuper() error {
 	suc := app.INI.GetSection("super")
 	if suc == nil {
 		return errors.New("missing [super] settings")
@@ -133,10 +145,10 @@ func (tt Tenant) MigrateSuper() error {
 		return errors.New("missing [super] email settings")
 	}
 
-	log.Infof("Migrate super %q: %s", tt, superEmail)
+	log.Infof("Migrate super %q: %s", sm, superEmail)
 
 	sqb := app.SDB.Builder()
-	sqb.Select().From(tt.TableUsers()).Where("email = ?", superEmail)
+	sqb.Select().From(sm.TableUsers()).Where("email = ?", superEmail)
 	sql, args := sqb.Build()
 
 	user := &models.User{}
@@ -158,7 +170,7 @@ func (tt Tenant) MigrateSuper() error {
 		user.UpdatedAt = user.CreatedAt
 
 		sqb.Reset()
-		sqb.Insert(tt.TableUsers())
+		sqb.Insert(sm.TableUsers())
 		sqb.StructNames(user)
 		sql := sqb.SQL()
 
@@ -167,11 +179,11 @@ func (tt Tenant) MigrateSuper() error {
 			return err
 		}
 
-		return tt.ResetSequence(app.SDB, "users", models.UserStartID)
+		return sm.ResetSequence(app.SDB, "users", models.UserStartID)
 	}
 
 	sqb.Reset()
-	sqb.Update(tt.TableUsers())
+	sqb.Update(sm.TableUsers())
 	sqb.Setc("role", models.RoleSuper)
 	sqb.Setc("status", models.UserActive)
 	sql, args = sqb.Build()
@@ -179,10 +191,10 @@ func (tt Tenant) MigrateSuper() error {
 	return err
 }
 
-func (tt Tenant) ExecSQL(sql string) error {
-	log.Info(str.PadCenter(" "+tt.Schema()+" ", 78, "="))
+func (sm Schema) ExecSQL(sql string) error {
+	log.Info(str.PadCenter(" "+string(sm)+" ", 78, "="))
 
-	tsql := str.ReplaceAll(sql, `"SCHEMA"`, tt.Schema())
+	tsql := str.ReplaceAll(sql, `"SCHEMA"`, string(sm))
 
 	sr := sqx.NewSqlReader(strings.NewReader(tsql))
 

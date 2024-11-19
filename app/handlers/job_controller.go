@@ -25,7 +25,7 @@ type JobArg struct {
 	Param string
 }
 
-func (ja *JobArg) SetFile(tt tenant.Tenant, mfh *multipart.FileHeader) error {
+func (ja *JobArg) SetFile(tt *tenant.Tenant, mfh *multipart.FileHeader) error {
 	fid := app.MakeFileID(models.PrefixJobFile, mfh.Filename)
 	tfs := tt.FS()
 	if _, err := xfs.SaveUploadedFile(tfs, fid, mfh); err != nil {

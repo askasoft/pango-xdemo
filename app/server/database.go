@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/askasoft/pango-xdemo/app"
-	"github.com/askasoft/pango-xdemo/app/tenant"
+	"github.com/askasoft/pango-xdemo/app/schema"
 	"github.com/askasoft/pango-xdemo/app/utils/pgutil"
 	"github.com/askasoft/pango/fsu"
 	"github.com/askasoft/pango/log"
@@ -62,19 +62,19 @@ func openDatabase() error {
 }
 
 func dbMigrateConfigs(schemas ...string) error {
-	configs, err := tenant.ReadConfigFile()
+	configs, err := schema.ReadConfigFile()
 	if err != nil {
 		return err
 	}
 
 	if len(schemas) == 0 {
-		return tenant.Iterate(func(tt tenant.Tenant) error {
-			return tt.MigrateConfig(configs)
+		return schema.Iterate(func(sm schema.Schema) error {
+			return sm.MigrateConfig(configs)
 		})
 	}
 
 	for _, s := range schemas {
-		if err := tenant.Tenant(s).MigrateConfig(configs); err != nil {
+		if err := schema.Schema(s).MigrateConfig(configs); err != nil {
 			return err
 		}
 	}
@@ -83,13 +83,13 @@ func dbMigrateConfigs(schemas ...string) error {
 
 func dbMigrateSupers(schemas ...string) error {
 	if len(schemas) == 0 {
-		return tenant.Iterate(func(tt tenant.Tenant) error {
-			return tt.MigrateSuper()
+		return schema.Iterate(func(sm schema.Schema) error {
+			return sm.MigrateSuper()
 		})
 	}
 
 	for _, s := range schemas {
-		if err := tenant.Tenant(s).MigrateSuper(); err != nil {
+		if err := schema.Schema(s).MigrateSuper(); err != nil {
 			return err
 		}
 	}
@@ -105,13 +105,13 @@ func dbExecSQL(sqlfile string, schemas ...string) error {
 	}
 
 	if len(schemas) == 0 {
-		return tenant.Iterate(func(tt tenant.Tenant) error {
-			return tt.ExecSQL(sql)
+		return schema.Iterate(func(sm schema.Schema) error {
+			return sm.ExecSQL(sql)
 		})
 	}
 
 	for _, s := range schemas {
-		if err := tenant.Tenant(s).ExecSQL(sql); err != nil {
+		if err := schema.Schema(s).ExecSQL(sql); err != nil {
 			return err
 		}
 	}

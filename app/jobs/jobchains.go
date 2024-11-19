@@ -42,7 +42,7 @@ func JobChainInitStates(jns ...string) []*JobRunState {
 	return states
 }
 
-func JobChainStart(tt tenant.Tenant, chainName string, states []*JobRunState, jobName string, jobFile string, jobParam IArgChain) (cid int64, err error) {
+func JobChainStart(tt *tenant.Tenant, chainName string, states []*JobRunState, jobName string, jobFile string, jobParam IArgChain) (cid int64, err error) {
 	state := JobChainEncodeStates(states)
 
 	err = app.SDB.Transaction(func(tx *sqlx.Tx) error {
@@ -68,7 +68,7 @@ func JobChainStart(tt tenant.Tenant, chainName string, states []*JobRunState, jo
 	return
 }
 
-func JobFindAndAbortChain(tt tenant.Tenant, jid int64, reason string) error {
+func JobFindAndAbortChain(tt *tenant.Tenant, jid int64, reason string) error {
 	tjc := tt.JC()
 
 	if jc, err := tjc.FindJobChain("", true); err != nil {
@@ -252,7 +252,7 @@ func (jr *JobRunner) jobChainContinue() error {
 	return nil
 }
 
-func JobChainAppendJob(name string, tt tenant.Tenant, locale string, cid int64, csq int, cdt bool) error {
+func JobChainAppendJob(name string, tt *tenant.Tenant, locale string, cid int64, csq int, cdt bool) error {
 	tjm := tt.JM()
 
 	var arg any
@@ -283,11 +283,11 @@ func JobChainAppendJob(name string, tt tenant.Tenant, locale string, cid int64, 
 func CleanOutdatedJobChains() {
 	before := time.Now().Add(-1 * app.INI.GetDuration("jobchain", "outdatedBefore", time.Hour*24*10))
 
-	_ = tenant.Iterate(func(tt tenant.Tenant) error {
+	_ = tenant.Iterate(func(tt *tenant.Tenant) error {
 		tjc := tt.JC()
 		_, err := tjc.CleanOutdatedJobChains(before)
 		if err != nil {
-			tt.Logger("JOB").Errorf("Failed to CleanOutdatedJobChains(%q, %q): %v", tt.Schema(), before.Format(time.RFC3339), err)
+			tt.Logger("JOB").Errorf("Failed to CleanOutdatedJobChains(%q, %q): %v", string(tt.Schema), before.Format(time.RFC3339), err)
 		}
 		return err
 	})

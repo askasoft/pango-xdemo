@@ -41,7 +41,7 @@ type IRun interface {
 	Run()
 }
 
-type JobRunCreator func(tenant.Tenant, *xjm.Job) IRun
+type JobRunCreator func(*tenant.Tenant, *xjm.Job) IRun
 
 var jobRunCreators = map[string]JobRunCreator{}
 
@@ -53,7 +53,7 @@ type IArg interface {
 	Bind(c *xin.Context) error
 }
 
-type JobArgCreater func(tenant.Tenant, string) IArg
+type JobArgCreater func(*tenant.Tenant, string) IArg
 
 var jobArgCreators = map[string]JobArgCreater{}
 
@@ -225,11 +225,11 @@ type JobRunner struct {
 	*xjm.JobRunner
 	ArgChain
 
-	Tenant tenant.Tenant
+	Tenant *tenant.Tenant
 	Locale string
 }
 
-func NewJobRunner(tt tenant.Tenant, jnm string, jid int64) *JobRunner {
+func NewJobRunner(tt *tenant.Tenant, jnm string, jid int64) *JobRunner {
 	rid := time.Now().UnixMilli()
 	rsx := app.INI.GetString("job", "ridSuffix")
 	if rsx != "" {
@@ -380,32 +380,32 @@ func (tj *TenantJobs) Total() int {
 	return total
 }
 
-func (tj *TenantJobs) Count(tt tenant.Tenant) int {
+func (tj *TenantJobs) Count(tt *tenant.Tenant) int {
 	tj.mu.Lock()
 	defer tj.mu.Unlock()
 
-	if js, ok := tj.rs.Get(tt.Schema()); ok {
+	if js, ok := tj.rs.Get(string(tt.Schema)); ok {
 		return len(js)
 	}
 	return 0
 }
 
-func (tj *TenantJobs) Add(tt tenant.Tenant, job *xjm.Job) {
+func (tj *TenantJobs) Add(tt *tenant.Tenant, job *xjm.Job) {
 	tj.mu.Lock()
 	defer tj.mu.Unlock()
 
-	js, _ := tj.rs.Get(tt.Schema())
+	js, _ := tj.rs.Get(string(tt.Schema))
 	js = append(js, job)
-	tj.rs.Set(tt.Schema(), js)
+	tj.rs.Set(string(tt.Schema), js)
 }
 
-func (tj *TenantJobs) Del(tt tenant.Tenant, job *xjm.Job) {
+func (tj *TenantJobs) Del(tt *tenant.Tenant, job *xjm.Job) {
 	tj.mu.Lock()
 	defer tj.mu.Unlock()
 
-	if js, ok := tj.rs.Get(tt.Schema()); ok {
+	if js, ok := tj.rs.Get(string(tt.Schema)); ok {
 		js = asg.DeleteFunc(js, func(j *xjm.Job) bool { return j.ID == job.ID })
-		tj.rs.Set(tt.Schema(), js)
+		tj.rs.Set(string(tt.Schema), js)
 	}
 }
 
@@ -464,7 +464,7 @@ func Starts() {
 }
 
 // StartJobs start tenant jobs
-func StartJobs(tt tenant.Tenant) error {
+func StartJobs(tt *tenant.Tenant) error {
 	mu.Lock()
 	defer mu.Unlock()
 
@@ -491,7 +491,7 @@ func StartJobs(tt tenant.Tenant) error {
 	})
 }
 
-func runJob(tt tenant.Tenant, job *xjm.Job) {
+func runJob(tt *tenant.Tenant, job *xjm.Job) {
 	logger := tt.Logger("JOB")
 
 	jrc, ok := jobRunCreators[job.Name]
@@ -521,13 +521,13 @@ func runJob(tt tenant.Tenant, job *xjm.Job) {
 
 // ------------------------------------
 func Reappend() {
-	_ = tenant.Iterate(func(tt tenant.Tenant) error {
+	_ = tenant.Iterate(func(tt *tenant.Tenant) error {
 		d := app.INI.GetDuration("job", "reappendBefore", time.Minute*30)
 		before := time.Now().Add(-d)
 		tjm := tt.JM()
 		_, err := tjm.ReappendJobs(before)
 		if err != nil {
-			tt.Logger("JOB").Errorf("Failed to ReappendJob(%q, %q): %v", tt.Schema(), before.Format(time.RFC3339), err)
+			tt.Logger("JOB").Errorf("Failed to ReappendJob(%q, %q): %v", string(tt.Schema), before.Format(time.RFC3339), err)
 		}
 		return err
 	})
@@ -538,7 +538,7 @@ func Reappend() {
 func CleanOutdatedJobs() {
 	before := time.Now().Add(-1 * app.INI.GetDuration("job", "outdatedBefore", time.Hour*24*10))
 
-	_ = tenant.Iterate(func(tt tenant.Tenant) error {
+	_ = tenant.Iterate(func(tt *tenant.Tenant) error {
 		return app.SDB.Transaction(func(tx *sqlx.Tx) error {
 			logger := tt.Logger("JOB")
 
@@ -570,7 +570,7 @@ func CleanOutdatedJobs() {
 			sjm := tt.SJM(tx)
 			_, _, err := sjm.CleanOutdatedJobs(before)
 			if err != nil {
-				logger.Errorf("Failed to CleanOutdatedJobs(%q, %q): %v", tt.Schema(), before.Format(time.RFC3339), err)
+				logger.Errorf("Failed to CleanOutdatedJobs(%q, %q): %v", string(tt.Schema), before.Format(time.RFC3339), err)
 			}
 			return err
 		})

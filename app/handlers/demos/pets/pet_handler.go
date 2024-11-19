@@ -122,7 +122,7 @@ func bindPetMaps(c *xin.Context, h xin.H) {
 	h["PetHabitsMap"] = tbsutil.GetPetHabitsMap(c.Locale)
 }
 
-func countPets(tt tenant.Tenant, pqa *PetQueryArg) (total int, err error) {
+func countPets(tt *tenant.Tenant, pqa *PetQueryArg) (total int, err error) {
 	sqb := app.SDB.Builder()
 	sqb.Count()
 	sqb.From(tt.TablePets())
@@ -133,7 +133,7 @@ func countPets(tt tenant.Tenant, pqa *PetQueryArg) (total int, err error) {
 	return
 }
 
-func findPets(tt tenant.Tenant, pqa *PetQueryArg) (pets []*models.Pet, err error) {
+func findPets(tt *tenant.Tenant, pqa *PetQueryArg) (pets []*models.Pet, err error) {
 	sqb := app.SDB.Builder()
 	sqb.Select(petListColumns...)
 	sqb.From(tt.TablePets())

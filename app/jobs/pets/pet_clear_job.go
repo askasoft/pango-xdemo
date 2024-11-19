@@ -21,7 +21,7 @@ type PetClearArg struct {
 	ResetSequence bool `json:"reset_sequence" form:"reset_sequence"`
 }
 
-func NewPetClearArg(tt tenant.Tenant, locale string) jobs.IArg {
+func NewPetClearArg(tt *tenant.Tenant, locale string) jobs.IArg {
 	pca := &PetClearArg{}
 	pca.Locale = locale
 	pca.ResetSequence = true
@@ -40,7 +40,7 @@ type PetClearJob struct {
 	arg PetClearArg
 }
 
-func NewPetClearJob(tt tenant.Tenant, job *xjm.Job) jobs.IRun {
+func NewPetClearJob(tt *tenant.Tenant, job *xjm.Job) jobs.IRun {
 	pc := &PetClearJob{}
 
 	pc.JobRunner = jobs.NewJobRunner(tt, job.Name, job.ID)

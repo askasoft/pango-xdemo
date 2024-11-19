@@ -1,177 +1,113 @@
 package tenant
 
 import (
-	"sync"
+	"fmt"
 
 	"github.com/askasoft/pango-xdemo/app"
-	"github.com/askasoft/pango/cog/linkedhashset"
-	"github.com/askasoft/pango/log"
-	"github.com/askasoft/pango/sqx/sqlx"
+	"github.com/askasoft/pango-xdemo/app/schema"
 	"github.com/askasoft/pango/str"
-	"github.com/askasoft/pango/xfs"
-	"github.com/askasoft/pango/xfs/sqlxfs"
 	"github.com/askasoft/pango/xin"
-	"github.com/askasoft/pango/xjm"
-	"github.com/askasoft/pango/xjm/sqlxjm"
 )
 
-type Tenant string
-
 func IsMultiTenant() bool {
-	return app.INI.GetBool("tenant", "multiple")
+	return schema.IsMultiTenant()
 }
 
-// TENAS write lock
-var muTENAS sync.Mutex
-
-func FindTenant(tt Tenant) (bool, error) {
-	if !IsMultiTenant() {
-		return true, nil
-	}
-
-	s := tt.Schema()
-
-	if v, ok := app.TENAS.Get(s); ok {
-		return v, nil
-	}
-
-	muTENAS.Lock()
-	defer muTENAS.Unlock()
-
-	// get again to prevent duplicated load
-	if v, ok := app.TENAS.Get(s); ok {
-		return v, nil
-	}
-
-	ok, err := ExistsSchema(s)
-	if err != nil {
-		return false, err
-	}
-
-	app.TENAS.Set(s, ok)
-	return ok, nil
+type Tenant struct {
+	schema.Schema
+	config map[string]string
 }
 
-func ListTenants() ([]Tenant, error) {
+func NewTenant(name string) *Tenant {
+	tt := &Tenant{Schema: schema.Schema(name)}
+	tt.config = tt.GetConfigMap()
+	return tt
+}
+
+func GetSchema(c *xin.Context) (string, bool) {
 	if !IsMultiTenant() {
-		return []Tenant{""}, nil
+		return "", true
 	}
 
-	ss, err := ListSchemas()
-	if err != nil {
-		return nil, err
+	host := c.Request.Host
+	domain := app.Domain
+	if host == domain {
+		return "", true
 	}
 
-	ds := DefaultSchema()
+	suffix := "." + domain
+	if !str.EndsWith(host, suffix) {
+		return "", false
+	}
 
-	ts := linkedhashset.NewLinkedHashSet[Tenant]()
-	for _, s := range ss {
-		if s == ds {
-			ts.PushHead(Tenant(""))
-		} else {
-			ts.Add(Tenant(s))
+	s := host[0 : len(host)-len(suffix)]
+	return s, true
+}
+
+const TENANT_CTXKEY = "TENANT"
+
+func FromCtx(c *xin.Context) *Tenant {
+	tt, ok := c.Get(TENANT_CTXKEY)
+	if !ok {
+		panic("Invalid Tenant!")
+	}
+	return tt.(*Tenant)
+}
+
+func FindAndSetTenant(c *xin.Context) (*Tenant, error) {
+	if tt, ok := c.Get(TENANT_CTXKEY); ok {
+		return tt.(*Tenant), nil
+	}
+
+	s, ok := GetSchema(c)
+	if !ok {
+		return nil, fmt.Errorf("Invalid host %q", c.Request.Host)
+	}
+
+	if IsMultiTenant() {
+		if s == "" {
+			s = schema.DefaultSchema()
+		}
+
+		if ok, err := schema.CheckSchema(s); !ok || err != nil {
+			return nil, err
 		}
 	}
 
-	return ts.Values(), nil
+	tt := NewTenant(s)
+	c.Set(TENANT_CTXKEY, tt)
+	return tt, nil
 }
 
-func Iterate(it func(tt Tenant) error) error {
-	tts, err := ListTenants()
+func Iterate(itf func(tt *Tenant) error) error {
+	if !IsMultiTenant() {
+		tt := NewTenant("")
+		return itf(tt)
+	}
+
+	ss, err := schema.ListSchemas()
 	if err != nil {
 		return err
 	}
 
-	for _, tt := range tts {
-		err = it(tt)
-		if err != nil {
+	for _, s := range ss {
+		tt := NewTenant(s)
+		if err := itf(tt); err != nil {
 			return err
 		}
 	}
-
 	return nil
 }
 
 func Create(name string, comment string) error {
-	if err := CreateSchema(name, comment); err != nil {
+	if err := schema.CreateSchema(name, comment); err != nil {
 		return err
 	}
 
-	if err := Tenant(name).InitSchema(); err != nil {
-		_ = DeleteSchema(name)
+	if err := schema.Schema(name).InitSchema(); err != nil {
+		_ = schema.DeleteSchema(name)
 		return err
 	}
 
 	return nil
-}
-
-func FromCtx(c *xin.Context) (tt Tenant) {
-	if IsMultiTenant() {
-		host := c.Request.Host
-		domain := app.Domain
-		suffix := "." + domain
-		if host != domain && str.EndsWith(host, suffix) {
-			tt = Tenant(host[0 : len(host)-len(suffix)])
-			if string(tt) != "" && tt.IsDefault() {
-				tt = ""
-			}
-		}
-	}
-	return
-}
-
-func (tt Tenant) Logger(name string) log.Logger {
-	logger := log.GetLogger(name)
-	logger.SetProp("TENANT", tt.Schema())
-	return logger
-}
-
-func (tt Tenant) String() string {
-	return string(tt)
-}
-
-func (tt Tenant) FQDN() string {
-	if tt == "" {
-		return app.Domain
-	}
-	return string(tt) + "." + app.Domain
-}
-
-func (tt Tenant) IsDefault() bool {
-	return tt == "" || string(tt) == DefaultSchema()
-}
-
-func (tt Tenant) Schema() string {
-	if tt == "" {
-		return DefaultSchema()
-	}
-	return string(tt)
-}
-
-func (tt Tenant) Prefix() string {
-	return tt.Schema() + "."
-}
-
-func (tt Tenant) SJC(db sqlx.Sqlx) xjm.JobChainer {
-	return sqlxjm.JC(db, tt.TableJobChains())
-}
-
-func (tt Tenant) SJM(db sqlx.Sqlx) xjm.JobManager {
-	return sqlxjm.JM(db, tt.TableJobs(), tt.TableJobLogs())
-}
-
-func (tt Tenant) SFS(db sqlx.Sqlx) xfs.XFS {
-	return sqlxfs.FS(db, tt.TableFiles())
-}
-
-func (tt Tenant) JC() xjm.JobChainer {
-	return tt.SJC(app.SDB)
-}
-
-func (tt Tenant) JM() xjm.JobManager {
-	return tt.SJM(app.SDB)
-}
-
-func (tt Tenant) FS() xfs.XFS {
-	return tt.SFS(app.SDB)
 }

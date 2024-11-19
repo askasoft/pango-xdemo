@@ -21,7 +21,7 @@ import (
 )
 
 type PetGenerator struct {
-	tt tenant.Tenant
+	tt *tenant.Tenant
 
 	cat  string
 	pgs  []string
@@ -31,7 +31,7 @@ type PetGenerator struct {
 	imgs []string
 }
 
-func NewPetGenerator(tt tenant.Tenant, cat string) *PetGenerator {
+func NewPetGenerator(tt *tenant.Tenant, cat string) *PetGenerator {
 	pg := &PetGenerator{tt: tt, cat: cat}
 
 	pg.pgs = tbsutil.GetPetGenderMap("").Keys()

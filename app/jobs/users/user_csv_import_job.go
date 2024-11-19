@@ -60,7 +60,7 @@ type UserCsvImportJob struct {
 	pwdPolicy *tenant.PasswordPolicy
 }
 
-func NewUserCsvImportJob(tt tenant.Tenant, job *xjm.Job) jobs.IRun {
+func NewUserCsvImportJob(tt *tenant.Tenant, job *xjm.Job) jobs.IRun {
 	ucij := &UserCsvImportJob{}
 
 	ucij.JobRunner = jobs.NewJobRunner(tt, job.Name, job.ID)
