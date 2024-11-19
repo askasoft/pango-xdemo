@@ -184,9 +184,6 @@ type JobStateEx struct {
 	LastID int64 `json:"last_id,omitempty"`
 }
 
-func (jse *JobStateEx) String() string {
-	return fmt.Sprintf("#%d %s", jse.LastID, jse.Progress())
-}
 
 type FailedItem struct {
 	ID    int64  `json:"id"`
@@ -279,11 +276,34 @@ func (jr *JobRunner) Running(state iState) error {
 	return jr.jobChainRunning(state)
 }
 
-func (jr *JobRunner) Abort(reason string) error {
+func (jr *JobRunner) Abort(reason string) {
 	if err := jr.JobRunner.Abort(reason); err != nil {
-		return err
+		if !errors.Is(err, xjm.ErrJobMissing) {
+			jr.Log.Error(err)
+		}
 	}
-	return jr.jobChainAbort(reason)
+
+	// Abort job chain
+	if err := jr.jobChainAbort(reason); err != nil {
+		jr.Log.Error(err)
+	}
+	jr.Log.Warn("ABORTED.")
+}
+
+func (jr *JobRunner) Complete() {
+	if err := jr.JobRunner.Complete(); err != nil {
+		if !errors.Is(err, xjm.ErrJobMissing) {
+			jr.Log.Error(err)
+		}
+		jr.Abort(err.Error())
+		return
+	}
+
+	// Continue job chain
+	if err := jr.jobChainContinue(); err != nil {
+		jr.Log.Error(err)
+	}
+	jr.Log.Info("DONE.")
 }
 
 func (jr *JobRunner) Done(err error) {
@@ -296,21 +316,7 @@ func (jr *JobRunner) Done(err error) {
 	}
 
 	if err == nil || errors.Is(err, xjm.ErrJobComplete) {
-		if err := jr.Complete(); err != nil {
-			if !errors.Is(err, xjm.ErrJobMissing) {
-				jr.Log.Error(err)
-			}
-			if err := jr.Abort(err.Error()); err != nil {
-				jr.Log.Error(err)
-			}
-			return
-		}
-		jr.Log.Info("DONE.")
-
-		// Continue job chain
-		if err := jr.jobChainContinue(); err != nil {
-			jr.Log.Error(err)
-		}
+		jr.Complete()
 		return
 	}
 
@@ -348,10 +354,7 @@ func (jr *JobRunner) Done(err error) {
 		jr.Log.Error(err)
 	}
 
-	if err := jr.Abort(err.Error()); err != nil {
-		jr.Log.Error(err)
-	}
-	jr.Log.Warn("ABORTED.")
+	jr.Abort(err.Error())
 }
 
 //------------------------------------
