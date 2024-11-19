@@ -148,7 +148,7 @@ func (tt Tenant) MigrateSuper() error {
 
 		user.ID = suc.GetInt64("id", 1)
 		user.Email = superEmail
-		user.Name = suc.GetString("name", "SUPER") + "@" + tt.String()
+		user.Name = suc.GetString("name", "SUPER")
 		user.SetPassword(suc.GetString("password", "changeme"))
 		user.Role = models.RoleSuper
 		user.Status = models.UserActive

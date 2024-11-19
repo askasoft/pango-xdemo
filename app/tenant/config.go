@@ -35,12 +35,12 @@ var muCONFS sync.Mutex
 
 func (tt Tenant) PurgeConfig() {
 	muCONFS.Lock()
-	app.CONFS.Delete(string(tt))
+	app.CONFS.Delete(tt.Schema())
 	muCONFS.Unlock()
 }
 
 func (tt Tenant) ConfigMap() map[string]string {
-	if dcm, ok := app.CONFS.Get(string(tt)); ok {
+	if dcm, ok := app.CONFS.Get(tt.Schema()); ok {
 		return dcm
 	}
 
@@ -48,7 +48,7 @@ func (tt Tenant) ConfigMap() map[string]string {
 	defer muCONFS.Unlock()
 
 	// get again to prevent duplicated load
-	if dcm, ok := app.CONFS.Get(string(tt)); ok {
+	if dcm, ok := app.CONFS.Get(tt.Schema()); ok {
 		return dcm
 	}
 
@@ -57,7 +57,7 @@ func (tt Tenant) ConfigMap() map[string]string {
 		panic(err)
 	}
 
-	app.CONFS.Set(string(tt), dcm)
+	app.CONFS.Set(tt.Schema(), dcm)
 	return dcm
 }
 

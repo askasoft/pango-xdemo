@@ -11,21 +11,24 @@ import (
 
 func SetCtxLogProp(c *xin.Context) {
 	tt := tenant.FromCtx(c)
-	c.Logger.SetProp("TENANT", string(tt))
+	c.Logger.SetProp("TENANT", tt.Schema())
 }
 
 func CheckTenant(c *xin.Context) {
 	tt := tenant.FromCtx(c)
+
 	ok, err := tenant.FindTenant(tt)
 	if err != nil {
 		c.Logger.Errorf("Failed to find schema '%s': %v", tt.Schema(), err)
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
+
 	if !ok {
 		c.AbortWithStatus(http.StatusNotFound)
 		return
 	}
+
 	c.Next()
 }
 
@@ -47,6 +50,7 @@ func IPProtect(c *xin.Context) {
 
 func RoleProtect(c *xin.Context, role string) {
 	au := tenant.AuthUser(c)
+
 	if !au.HasRole(role) {
 		c.AddError(handlers.ErrRestrictedFunction)
 		handlers.Forbidden(c)

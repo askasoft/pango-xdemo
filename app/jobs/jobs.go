@@ -184,7 +184,6 @@ type JobStateEx struct {
 	LastID int64 `json:"last_id,omitempty"`
 }
 
-
 type FailedItem struct {
 	ID    int64  `json:"id"`
 	Title string `json:"title"`
@@ -385,7 +384,7 @@ func (tj *TenantJobs) Count(tt tenant.Tenant) int {
 	tj.mu.Lock()
 	defer tj.mu.Unlock()
 
-	if js, ok := tj.rs.Get(string(tt)); ok {
+	if js, ok := tj.rs.Get(tt.Schema()); ok {
 		return len(js)
 	}
 	return 0
@@ -395,18 +394,18 @@ func (tj *TenantJobs) Add(tt tenant.Tenant, job *xjm.Job) {
 	tj.mu.Lock()
 	defer tj.mu.Unlock()
 
-	js, _ := tj.rs.Get(string(tt))
+	js, _ := tj.rs.Get(tt.Schema())
 	js = append(js, job)
-	tj.rs.Set(string(tt), js)
+	tj.rs.Set(tt.Schema(), js)
 }
 
 func (tj *TenantJobs) Del(tt tenant.Tenant, job *xjm.Job) {
 	tj.mu.Lock()
 	defer tj.mu.Unlock()
 
-	if js, ok := tj.rs.Get(string(tt)); ok {
+	if js, ok := tj.rs.Get(tt.Schema()); ok {
 		js = asg.DeleteFunc(js, func(j *xjm.Job) bool { return j.ID == job.ID })
-		tj.rs.Set(string(tt), js)
+		tj.rs.Set(tt.Schema(), js)
 	}
 }
 
@@ -528,7 +527,7 @@ func Reappend() {
 		tjm := tt.JM()
 		_, err := tjm.ReappendJobs(before)
 		if err != nil {
-			tt.Logger("JOB").Errorf("Failed to reappend job (%s): %v", string(tt), err)
+			tt.Logger("JOB").Errorf("Failed to ReappendJob(%q, %q): %v", tt.Schema(), before.Format(time.RFC3339), err)
 		}
 		return err
 	})
@@ -571,7 +570,7 @@ func CleanOutdatedJobs() {
 			sjm := tt.SJM(tx)
 			_, _, err := sjm.CleanOutdatedJobs(before)
 			if err != nil {
-				logger.Errorf("Failed to CleanOutdatedJobs('%s', '%s')", string(tt), before.Format(time.RFC3339))
+				logger.Errorf("Failed to CleanOutdatedJobs(%q, %q): %v", tt.Schema(), before.Format(time.RFC3339), err)
 			}
 			return err
 		})

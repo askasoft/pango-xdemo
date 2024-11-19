@@ -112,6 +112,9 @@ func FromCtx(c *xin.Context) (tt Tenant) {
 		suffix := "." + domain
 		if host != domain && str.EndsWith(host, suffix) {
 			tt = Tenant(host[0 : len(host)-len(suffix)])
+			if string(tt) != "" && tt.IsDefault() {
+				tt = ""
+			}
 		}
 	}
 	return
@@ -119,7 +122,7 @@ func FromCtx(c *xin.Context) (tt Tenant) {
 
 func (tt Tenant) Logger(name string) log.Logger {
 	logger := log.GetLogger(name)
-	logger.SetProp("TENANT", string(tt))
+	logger.SetProp("TENANT", tt.Schema())
 	return logger
 }
 

@@ -287,8 +287,7 @@ func CleanOutdatedJobChains() {
 		tjc := tt.JC()
 		_, err := tjc.CleanOutdatedJobChains(before)
 		if err != nil {
-			logger := tt.Logger("JOB")
-			logger.Errorf("Failed to CleanOutdatedJobChains('%s', '%s')", string(tt), before.Format(time.RFC3339))
+			tt.Logger("JOB").Errorf("Failed to CleanOutdatedJobChains(%q, %q): %v", tt.Schema(), before.Format(time.RFC3339), err)
 		}
 		return err
 	})
