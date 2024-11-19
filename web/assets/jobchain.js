@@ -262,6 +262,7 @@
 		$jrs.find('.jnm').text(jobnames[jrs.name] || jrs.name);
 
 		jobchain_jrs_set_state($jrs, jrs, 'total', jrs.state.limit || jrs.state.total || '-');
+		jobchain_jrs_set_state($jrs, jrs, 'exists');
 		jobchain_jrs_set_state($jrs, jrs, 'skipped');
 		jobchain_jrs_set_state($jrs, jrs, 'success', jrs.state.success || '-');
 		jobchain_jrs_set_state($jrs, jrs, 'failure');
