@@ -5,12 +5,12 @@
 
 <div class="s-section">
 	<div class="s-section-head">
-		<h2>{{I "demos.pets.catcreate"}}<span>{{T .Loc "menu.demos.pets.catcreate"}}</span></h2>
+		<h2>{{I (printf "demos.pets.create.%s" .Kind)}}<span>{{T .Loc (printf "menu.demos.pets.create.%s" .Kind)}}</span></h2>
 	</div>
 	<div class="s-section-body">
 		<div class="well">{{T .Loc "pet.create.well.cat"}}</div>
 
-		<form id="job_form" class="ui-form grey padded" data-form="{{T .Loc "job.label.parameter"}}" data-copy="{{T .Loc "button.copy"}}">
+		<form id="job_form" class="ui-form grey padded" autocomplete="off" data-form="{{T .Loc "job.label.parameter"}}" data-copy="{{T .Loc "button.copy"}}">
 {{define "pet_create_params"}}
 			<div class="row">
 				<label class="col-md-2 col-form-label">{{T .Loc "pet.create.items"}}</label>

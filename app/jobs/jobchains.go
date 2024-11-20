@@ -159,7 +159,7 @@ func (jr *JobRunner) jobChainCheckout() error {
 	return fmt.Errorf("Failed to Checkout JobChain %s#%d on %s", jc.Name, jc.ID, jr.JobName())
 }
 
-func (jr *JobRunner) jobChainRunning(state iState) error {
+func (jr *JobRunner) jobChainSetState(state iState) error {
 	if jr.ChainID == 0 {
 		return nil
 	}

@@ -53,7 +53,10 @@ func main() {
 		os.Exit(0)
 	}
 
-	log.SetFormat("%t [%p] - %m%n%T")
+	cw := &log.StreamWriter{Output: os.Stdout, Color: true}
+	cw.SetFormat("%t [%p] - %m%n%T")
+
+	log.SetWriter(cw)
 	log.SetLevel(gog.If(debug, log.LevelDebug, log.LevelInfo))
 
 	arg := flag.Arg(0)

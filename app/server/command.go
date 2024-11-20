@@ -53,7 +53,10 @@ func (s *service) Usage() {
 // Basic: 'help' 'usage' 'version'
 // Windows only: 'install' 'remove' 'start' 'stop' 'debug'
 func (s *service) Exec(cmd string) {
-	log.SetFormat("%t [%p] - %m%n%T")
+	cw := &log.StreamWriter{Output: os.Stdout, Color: true}
+	cw.SetFormat("%t [%p] - %m%n%T")
+
+	log.SetWriter(cw)
 	log.SetLevel(gog.If(s.debug, log.LevelDebug, log.LevelInfo))
 
 	switch cmd {

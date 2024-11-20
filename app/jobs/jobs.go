@@ -267,12 +267,12 @@ func (jr *JobRunner) Checkout() error {
 	return jr.jobChainCheckout()
 }
 
-func (jr *JobRunner) Running(state iState) error {
-	if err := jr.JobRunner.Running(xjm.MustEncode(state)); err != nil {
+func (jr *JobRunner) SetState(state iState) error {
+	if err := jr.JobRunner.SetState(xjm.MustEncode(state)); err != nil {
 		return err
 	}
 
-	return jr.jobChainRunning(state)
+	return jr.jobChainSetState(state)
 }
 
 func (jr *JobRunner) Abort(reason string) {

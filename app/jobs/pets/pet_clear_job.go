@@ -84,7 +84,7 @@ func (pc *PetClearJob) clear() error {
 	pc.Log.Infof("%d Pets Deleted.", cnt)
 
 	pc.Success = int(cnt)
-	if err = pc.Running(&pc.JobState); err != nil {
+	if err = pc.SetState(&pc.JobState); err != nil {
 		return err
 	}
 

@@ -137,28 +137,17 @@ func UserCreate(c *xin.Context) {
 		user.Password = pwdutil.RandomPassword()
 	}
 	user.SetPassword(user.Password)
+	user.Secret = ran.RandInt63()
 	user.CreatedAt = time.Now()
 	user.UpdatedAt = user.CreatedAt
 
 	db := app.SDB
 	sqb := db.Builder()
 	sqb.Insert(tt.TableUsers())
-	if user.ID == 0 {
-		if !db.SupportLastInsertID() {
-			sqb.Returns("id")
-		}
-	} else {
-		sqb.Setc("id", user.ID)
+	sqb.StructNames(user, "id")
+	if !db.SupportLastInsertID() {
+		sqb.Returns("id")
 	}
-	sqb.Setc("name", user.Name)
-	sqb.Setc("email", user.Email)
-	sqb.Setc("password", user.Password)
-	sqb.Setc("role", user.Role)
-	sqb.Setc("status", user.Status)
-	sqb.Setc("cidr", user.CIDR)
-	sqb.Setc("secret", ran.RandInt63())
-	sqb.Setc("created_at", user.UpdatedAt)
-	sqb.Setc("updated_at", user.UpdatedAt)
 	sql, args := sqb.Build()
 
 	uid, err := db.Create(sql, args...)
@@ -176,6 +165,7 @@ func UserCreate(c *xin.Context) {
 
 	user.ID = uid
 	user.Password = ""
+	user.Secret = 0
 	c.JSON(http.StatusOK, xin.H{
 		"success": tbs.GetText(c.Locale, "success.created"),
 		"user":    user,
