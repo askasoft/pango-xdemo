@@ -35,8 +35,8 @@ func UserNew(c *xin.Context) {
 }
 
 func userDetail(c *xin.Context, action string) {
-	aid := num.Atol(c.Query("id"))
-	if aid == 0 {
+	uid := num.Atol(c.Query("id"))
+	if uid == 0 {
 		c.AddError(vadutil.ErrInvalidID(c))
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
@@ -45,13 +45,13 @@ func userDetail(c *xin.Context, action string) {
 	tt := tenant.FromCtx(c)
 
 	sqb := app.SDB.Builder()
-	sqb.Select().From(tt.TableUsers()).Where("id = ?", aid)
+	sqb.Select().From(tt.TableUsers()).Where("id = ?", uid)
 	sql, args := sqb.Build()
 
 	user := &models.User{}
 	err := app.SDB.Get(user, sql, args...)
 	if errors.Is(err, sqlx.ErrNoRows) {
-		c.AddError(err)
+		c.AddError(errors.New(tbs.Format(c.Locale, "error.detail.notfound", uid)))
 		c.JSON(http.StatusNotFound, handlers.E(c))
 		return
 	}

@@ -58,7 +58,7 @@ func petDetail(c *xin.Context, action string) {
 	pet := &models.Pet{}
 	err := app.SDB.Get(pet, sql, args...)
 	if errors.Is(err, sqlx.ErrNoRows) {
-		c.AddError(err)
+		c.AddError(errors.New(tbs.Format(c.Locale, "error.detail.notfound", pid)))
 		c.JSON(http.StatusNotFound, handlers.E(c))
 		return
 	}
