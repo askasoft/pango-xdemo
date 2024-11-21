@@ -172,29 +172,30 @@ func (ucij *UserCsvImportJob) doReadCsv(ctx context.Context, callback func(rec *
 		case <-ctx.Done():
 			return ctx.Err()
 		default:
-			i++
-			row, err := cr.Read()
-			if errors.Is(err, io.EOF) {
-				return nil
-			}
-			if err != nil {
-				return fmt.Errorf(tbs.GetText(ucij.Locale, "csv.error.read"), err)
-			}
+		}
 
-			if i == 1 {
-				if err = ucij.parseHead(row); err != nil {
-					return err
-				}
-				continue
-			}
+		i++
+		row, err := cr.Read()
+		if errors.Is(err, io.EOF) {
+			return nil
+		}
+		if err != nil {
+			return fmt.Errorf(tbs.GetText(ucij.Locale, "csv.error.read"), err)
+		}
 
-			rec := ucij.parseData(row)
-			rec.Line = i
-
-			err = callback(rec)
-			if err != nil && !errors.Is(err, jobs.ErrItemSkip) {
+		if i == 1 {
+			if err = ucij.parseHead(row); err != nil {
 				return err
 			}
+			continue
+		}
+
+		rec := ucij.parseData(row)
+		rec.Line = i
+
+		err = callback(rec)
+		if err != nil && !errors.Is(err, jobs.ErrItemSkip) {
+			return err
 		}
 	}
 }

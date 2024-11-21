@@ -56,8 +56,7 @@ func (sm Schema) loadConfigMap(db *sqlx.DB) (map[string]string, error) {
 		cm[c.Name] = c.Value
 	}
 
-	tv := cm["tenant_vars"]
-	if tv != "" {
+	if tv, ok := cm["tenant_vars"]; ok && tv != "" {
 		i := ini.NewIni()
 		if err := i.LoadData(str.NewReader(tv)); err != nil {
 			sm.Logger("CFG").Errorf("Invalid tenant_vars: %s", tv)

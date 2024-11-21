@@ -493,7 +493,7 @@ func StartJobs(tt *tenant.Tenant) error {
 
 	tjm := tt.JM()
 	return tjm.StartJobs(c, func(job *xjm.Job) {
-		runJob(tt, job)
+		go runJob(tt, job)
 	})
 }
 
