@@ -49,12 +49,12 @@ func ShellExec(c *xin.Context) {
 	arg := &ShellArg{}
 	_ = c.Bind(arg)
 
-	sr := shellExec(arg.Command, arg.Timeout)
+	sr := shellExec(c, arg.Command, arg.Timeout)
 
 	c.JSON(http.StatusOK, sr)
 }
 
-func shellExec(command string, timeout time.Duration) (sr ShellResult) {
+func shellExec(c context.Context, command string, timeout time.Duration) (sr ShellResult) {
 	if command == "" {
 		return
 	}
@@ -82,12 +82,10 @@ func shellExec(command string, timeout time.Duration) (sr ShellResult) {
 		timeout = 300 * time.Second
 	}
 
-	var cancel context.CancelFunc
-	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	ctx, cancel := context.WithTimeout(c, timeout)
 	defer cancel()
 
 	start := time.Now()
-
 	stdout := &strings.Builder{}
 
 	cmd := exec.CommandContext(ctx, exe, arg...)

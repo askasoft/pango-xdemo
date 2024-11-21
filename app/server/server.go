@@ -138,7 +138,7 @@ func Shutdown() {
 
 	// The context is used to inform the server it has 5 seconds to finish
 	// the request it is currently handling
-	ctx, cancel := context.WithTimeout(context.Background(), app.INI.GetDuration("server", "shutdownTimeout", 5*time.Second))
+	ctx, cancel := context.WithTimeout(context.TODO(), app.INI.GetDuration("server", "shutdownTimeout", 5*time.Second))
 	defer cancel()
 
 	if err := app.HTTP.Shutdown(ctx); err != nil {
