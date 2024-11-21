@@ -3,7 +3,7 @@
 APPNAME=xdemo
 APPHOME=/app/${APPNAME}
 PREFIX=
-LOG_WRITERS="stdout, textfile, jsonfile, httpdump, xalfile, xajfile"
+LOG_WRITERS="stdout, textfile, jsonfile, xalfile, xajfile, httpdump"
 
 #LOG_OPENSEARCH_APPLOG=https://localhost:9200/xdemo_applog/_bulk
 #LOG_OPENSEARCH_ACCESS=https://localhost:9200/xdemo_access/_bulk

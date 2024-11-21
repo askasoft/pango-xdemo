@@ -27,5 +27,5 @@ var Statics = map[string]embed.FS{
 	"summernote":         summernote.FS,
 }
 
-//go:embed assets favicon.ico
+//go:embed assets favicon.ico robots.txt
 var FS embed.FS
