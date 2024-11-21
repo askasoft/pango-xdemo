@@ -47,9 +47,7 @@ func NewPetClearJob(tt *tenant.Tenant, job *xjm.Job) jobs.IRun {
 
 	xjm.MustDecode(job.Param, &pc.arg)
 
-	pc.Locale = pc.arg.Locale
 	pc.ArgChain = pc.arg.ArgChain
-
 	return pc
 }
 
@@ -65,23 +63,23 @@ func (pc *PetClearJob) clear() error {
 	tt := pc.Tenant
 	db := app.SDB
 
-	pc.Log.Infof("Delete Pet Files: /%s ...", models.PrefixPetFile)
+	pc.Logger.Infof("Delete Pet Files: /%s ...", models.PrefixPetFile)
 
 	sfs := tt.SFS(db)
 	cnt, err := sfs.DeletePrefix("/" + models.PrefixPetFile + "/")
 	if err != nil {
 		return err
 	}
-	pc.Log.Infof("%d Pet Files Deleted.", cnt)
+	pc.Logger.Infof("%d Pet Files Deleted.", cnt)
 
-	pc.Log.Info("Delete Pets ...")
+	pc.Logger.Info("Delete Pets ...")
 	r, err := db.Exec("DELETE FROM " + tt.TablePets())
 	if err != nil {
 		return err
 	}
 
 	cnt, _ = r.RowsAffected()
-	pc.Log.Infof("%d Pets Deleted.", cnt)
+	pc.Logger.Infof("%d Pets Deleted.", cnt)
 
 	pc.Success = int(cnt)
 	if err = pc.SetState(&pc.JobState); err != nil {
@@ -89,7 +87,7 @@ func (pc *PetClearJob) clear() error {
 	}
 
 	if pc.arg.ResetSequence {
-		pc.Log.Info("Reset Pets Sequence")
+		pc.Logger.Info("Reset Pets Sequence")
 		err = tt.ResetSequence(db, "pets")
 		if err != nil {
 			return err

@@ -104,7 +104,7 @@ func (ucij *UserCsvImportJob) Run() {
 	ucij.Step = 0
 	ucij.SetTotalLimit(total, 0)
 
-	ucij.Log.Info(tbs.GetText(ucij.Locale, "csv.info.importing"))
+	ucij.Logger.Info(tbs.GetText(ucij.Locale, "csv.info.importing"))
 
 	ctx, cancel := context.WithCancelCause(context.TODO())
 	go func() {
@@ -200,7 +200,7 @@ func (ucij *UserCsvImportJob) doReadCsv(ctx context.Context, callback func(rec *
 }
 
 func (ucij *UserCsvImportJob) doCheckCsv() (total int, err error) {
-	ucij.Log.Info(tbs.GetText(ucij.Locale, "csv.info.checking"))
+	ucij.Logger.Info(tbs.GetText(ucij.Locale, "csv.info.checking"))
 
 	valid := true
 	err = ucij.doReadCsv(context.TODO(), func(rec *csvUserRecord) error {
@@ -208,7 +208,7 @@ func (ucij *UserCsvImportJob) doCheckCsv() (total int, err error) {
 		err := ucij.checkRecord(rec)
 		if err != nil {
 			valid = false
-			ucij.Log.Warn(err.Error())
+			ucij.Logger.Warn(err.Error())
 		}
 		return nil
 	})
@@ -256,7 +256,7 @@ func (ucij *UserCsvImportJob) checkRecord(rec *csvUserRecord) error {
 
 func (ucij *UserCsvImportJob) importRecord(rec *csvUserRecord) error {
 	ucij.Step++
-	ucij.Log.Infof(tbs.GetText(ucij.Locale, "user.import.csv.step.info"), ucij.Progress(), rec.ID, rec.Name, rec.Email)
+	ucij.Logger.Infof(tbs.GetText(ucij.Locale, "user.import.csv.step.info"), ucij.Progress(), rec.ID, rec.Name, rec.Email)
 
 	user := &models.User{
 		ID:        num.Atol(rec.ID),
@@ -294,16 +294,16 @@ func (ucij *UserCsvImportJob) importRecord(rec *csvUserRecord) error {
 				r, err := tx.NamedExec(sql, user)
 				if err != nil {
 					if pgutil.IsUniqueViolationError(err) {
-						ucij.Log.Warnf(tbs.GetText(ucij.Locale, "user.import.csv.step.duplicated"), ucij.Progress(), user.ID, user.Name, user.Email)
+						ucij.Logger.Warnf(tbs.GetText(ucij.Locale, "user.import.csv.step.duplicated"), ucij.Progress(), user.ID, user.Name, user.Email)
 						return jobs.ErrItemSkip
 					}
 					return err
 				}
 
 				if cnt, _ := r.RowsAffected(); cnt > 0 {
-					ucij.Log.Infof(tbs.GetText(ucij.Locale, "user.import.csv.step.updated"), ucij.Progress(), user.ID, user.Name, user.Email)
+					ucij.Logger.Infof(tbs.GetText(ucij.Locale, "user.import.csv.step.updated"), ucij.Progress(), user.ID, user.Name, user.Email)
 				} else {
-					ucij.Log.Warnf(tbs.GetText(ucij.Locale, "user.import.csv.step.ufailed"), ucij.Progress(), user.ID, user.Name, user.Email)
+					ucij.Logger.Warnf(tbs.GetText(ucij.Locale, "user.import.csv.step.ufailed"), ucij.Progress(), user.ID, user.Name, user.Email)
 				}
 				return nil
 			}
@@ -335,13 +335,13 @@ func (ucij *UserCsvImportJob) importRecord(rec *csvUserRecord) error {
 		uid, err := tx.NamedCreate(sql, user)
 		if err != nil {
 			if pgutil.IsUniqueViolationError(err) {
-				ucij.Log.Warnf(tbs.GetText(ucij.Locale, "user.import.csv.step.duplicated"), ucij.Progress(), user.ID, user.Name, user.Email)
+				ucij.Logger.Warnf(tbs.GetText(ucij.Locale, "user.import.csv.step.duplicated"), ucij.Progress(), user.ID, user.Name, user.Email)
 				return jobs.ErrItemSkip
 			}
 			return err
 		}
 
-		ucij.Log.Infof(tbs.GetText(ucij.Locale, "user.import.csv.step.created"), ucij.Progress(), uid, user.Name, user.Email)
+		ucij.Logger.Infof(tbs.GetText(ucij.Locale, "user.import.csv.step.created"), ucij.Progress(), uid, user.Name, user.Email)
 		if user.ID != 0 {
 			// reset sequence if create with ID
 			if err := ucij.Tenant.ResetSequence(tx, "users", models.UserStartID); err != nil {

@@ -226,6 +226,7 @@ type JobRunner struct {
 	ArgChain
 
 	Tenant *tenant.Tenant
+	Logger log.Logger
 	Locale string
 }
 
@@ -247,6 +248,11 @@ func NewJobRunner(tt *tenant.Tenant, jnm string, jid int64) *JobRunner {
 		),
 		Tenant: tt,
 	}
+	jr.Log().SetProp("VERSION", app.Version)
+	jr.Log().SetProp("REVISION", app.Revision)
+	jr.Log().SetProp("TENANT", string(tt.Schema))
+	jr.Logger = jr.Log().GetLogger("JOB")
+
 	return jr
 }
 
@@ -278,21 +284,21 @@ func (jr *JobRunner) SetState(state iState) error {
 func (jr *JobRunner) Abort(reason string) {
 	if err := jr.JobRunner.Abort(reason); err != nil {
 		if !errors.Is(err, xjm.ErrJobMissing) {
-			jr.Log.Error(err)
+			jr.Logger.Error(err)
 		}
 	}
 
 	// Abort job chain
 	if err := jr.jobChainAbort(reason); err != nil {
-		jr.Log.Error(err)
+		jr.Logger.Error(err)
 	}
-	jr.Log.Warn("ABORTED.")
+	jr.Logger.Warn("ABORTED.")
 }
 
 func (jr *JobRunner) Complete() {
 	if err := jr.JobRunner.Complete(); err != nil {
 		if !errors.Is(err, xjm.ErrJobMissing) {
-			jr.Log.Error(err)
+			jr.Logger.Error(err)
 		}
 		jr.Abort(err.Error())
 		return
@@ -300,13 +306,13 @@ func (jr *JobRunner) Complete() {
 
 	// Continue job chain
 	if err := jr.jobChainContinue(); err != nil {
-		jr.Log.Error(err)
+		jr.Logger.Error(err)
 	}
-	jr.Log.Info("DONE.")
+	jr.Logger.Info("DONE.")
 }
 
 func (jr *JobRunner) Done(err error) {
-	defer jr.Log.Close()
+	defer jr.Log().Close()
 
 	if errors.Is(err, xjm.ErrJobCheckout) {
 		// do nothing, just log it
@@ -320,14 +326,14 @@ func (jr *JobRunner) Done(err error) {
 	}
 
 	if errors.Is(err, xjm.ErrJobMissing) {
-		jr.Log.Error(err)
+		jr.Logger.Error(err)
 		return
 	}
 
 	if errors.Is(err, xjm.ErrJobAborted) {
 		job, err := jr.GetJob()
 		if err != nil {
-			jr.Log.Error(err)
+			jr.Logger.Error(err)
 			return
 		}
 
@@ -336,21 +342,21 @@ func (jr *JobRunner) Done(err error) {
 			// It's necessary to call jobChainAbort() again.
 			// The jobChainCheckout()/jobChainContinue() method may update job chain status to 'R' to a aborted job chain.
 			if err := jr.jobChainAbort(job.Error); err != nil {
-				jr.Log.Error(err)
+				jr.Logger.Error(err)
 			}
-			jr.Log.Warn("ABORTED.")
+			jr.Logger.Warn("ABORTED.")
 			return
 		}
 
 		// ErrJobAborted should only occurred for Aborted Status
-		jr.Log.Errorf("Invalid Aborted Job #%d (%d): %s", jr.JobID(), jr.RunnerID(), xjm.MustEncode(job))
+		jr.Logger.Errorf("Invalid Aborted Job #%d (%d): %s", jr.JobID(), jr.RunnerID(), xjm.MustEncode(job))
 		return
 	}
 
 	if errors.Is(err, ErrClient) {
-		jr.Log.Warn(err)
+		jr.Logger.Warn(err)
 	} else {
-		jr.Log.Error(err)
+		jr.Logger.Error(err)
 	}
 
 	jr.Abort(err.Error())

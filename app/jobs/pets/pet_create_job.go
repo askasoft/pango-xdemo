@@ -111,7 +111,7 @@ func (pcj *PetCreateJob) run(ctx context.Context, cancel context.CancelCauseFunc
 			}
 
 			pcj.Step++
-			if err := pcj.gen.Create(pcj.Log, app.SDB, &pcj.JobState); err != nil {
+			if err := pcj.gen.Create(pcj.Logger, app.SDB, &pcj.JobState); err != nil {
 				cancel(err)
 				return
 			}
