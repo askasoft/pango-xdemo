@@ -14,6 +14,7 @@ import (
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango-xdemo/app/utils/csvutil"
+	"github.com/askasoft/pango-xdemo/app/utils/errutil"
 	"github.com/askasoft/pango-xdemo/app/utils/pgutil"
 	"github.com/askasoft/pango-xdemo/app/utils/pwdutil"
 	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
@@ -106,18 +107,12 @@ func (ucij *UserCsvImportJob) Run() {
 
 	ucij.Logger.Info(tbs.GetText(ucij.Locale, "csv.info.importing"))
 
-	ctx, cancel := context.WithCancelCause(context.TODO())
-	go func() {
-		if err := ucij.Running(ctx, time.Second); err != nil {
-			cancel(err)
-		}
-	}()
+	ctx, cancel := ucij.Running()
+	defer cancel(nil)
 
 	err = ucij.doReadCsv(ctx, ucij.importRecord)
 
-	if cause := context.Cause(ctx); cause != nil {
-		err = cause
-	}
+	err = errutil.ContextError(ctx, err)
 
 	ucij.Done(err)
 }

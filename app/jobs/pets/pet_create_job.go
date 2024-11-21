@@ -84,12 +84,8 @@ func (pcj *PetCreateJob) Run() {
 		pcj.SetTotalLimit(pcj.arg.Items, 0)
 	}
 
-	ctx, cancel := context.WithCancelCause(context.TODO())
-	go func() {
-		if err := pcj.Running(ctx, time.Second); err != nil {
-			cancel(err)
-		}
-	}()
+	ctx, cancel := pcj.Running()
+	defer cancel(nil)
 
 	pcj.run(ctx, cancel)
 

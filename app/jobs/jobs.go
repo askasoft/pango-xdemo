@@ -2,6 +2,7 @@ package jobs
 
 import (
 	"cmp"
+	"context"
 	"errors"
 	"fmt"
 	"math"
@@ -271,6 +272,16 @@ func (jr *JobRunner) Checkout() error {
 	}
 
 	return jr.jobChainCheckout()
+}
+
+func (jr *JobRunner) Running() (context.Context, context.CancelCauseFunc) {
+	ctx, cancel := context.WithCancelCause(context.TODO())
+	go func() {
+		if err := jr.JobRunner.Running(ctx, time.Second); err != nil {
+			cancel(err)
+		}
+	}()
+	return ctx, cancel
 }
 
 func (jr *JobRunner) SetState(state iState) error {
