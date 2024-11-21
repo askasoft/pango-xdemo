@@ -7,6 +7,7 @@ import (
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/jobs"
 	"github.com/askasoft/pango-xdemo/app/tenant"
+	"github.com/askasoft/pango-xdemo/app/utils/errutil"
 	"github.com/askasoft/pango/gog"
 	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pango/xjm"
@@ -92,7 +93,7 @@ func (pcj *PetCreateJob) Run() {
 
 	pcj.run(ctx, cancel)
 
-	err := context.Cause(ctx)
+	err := errutil.ContextError(ctx)
 	pcj.Done(err)
 }
 
