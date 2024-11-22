@@ -87,36 +87,34 @@ func (pcj *PetCreateJob) Run() {
 	ctx, cancel := pcj.Running()
 	defer cancel(nil)
 
-	pcj.run(ctx, cancel)
+	err := pcj.run(ctx)
+	cancel(err)
 
-	err := errutil.ContextError(ctx)
+	err = errutil.ContextCause(ctx, err)
 	pcj.Done(err)
 }
 
-func (pcj *PetCreateJob) run(ctx context.Context, cancel context.CancelCauseFunc) {
+func (pcj *PetCreateJob) run(ctx context.Context) error {
 	delay := time.Millisecond * time.Duration(gog.If(pcj.arg.Delay < 10, 10, pcj.arg.Delay))
 	timer := time.NewTimer(delay)
 
 	for {
 		select {
 		case <-ctx.Done():
-			return
+			return ctx.Err()
 		case <-timer.C:
 			if pcj.Step >= pcj.Total {
-				cancel(xjm.ErrJobComplete)
-				return
+				return xjm.ErrJobComplete
 			}
 
 			pcj.Step++
 			if err := pcj.gen.Create(pcj.Logger, app.SDB, &pcj.JobState); err != nil {
-				cancel(err)
-				return
+				return err
 			}
 
 			pcj.Success++
 			if err := pcj.SetState(&pcj.JobState); err != nil {
-				cancel(err)
-				return
+				return err
 			}
 
 			timer.Reset(delay)

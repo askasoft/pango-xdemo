@@ -5,7 +5,7 @@ import (
 	"errors"
 )
 
-func ContextError(ctx context.Context, errs ...error) error {
+func ContextCause(ctx context.Context, errs ...error) error {
 	for _, err := range errs {
 		if err != nil && !errors.Is(err, context.Canceled) {
 			return err

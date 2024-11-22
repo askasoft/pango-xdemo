@@ -112,7 +112,7 @@ func (ucij *UserCsvImportJob) Run() {
 
 	err = ucij.doReadCsv(ctx, ucij.importRecord)
 
-	err = errutil.ContextError(ctx, err)
+	err = errutil.ContextCause(ctx, err)
 
 	ucij.Done(err)
 }
