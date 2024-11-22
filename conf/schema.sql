@@ -44,6 +44,7 @@ CREATE TABLE "SCHEMA"."job_chains" (
 	"updated_at" timestamptz NOT NULL,
 	PRIMARY KEY ("id")
 );
+CREATE INDEX IF NOT EXISTS "idx_job_chains_name" ON "SCHEMA"."job_chains" ("name");
 ---------------------------------;
 CREATE TABLE "SCHEMA"."configs" (
 	"name" varchar(64) NOT NULL,
@@ -82,7 +83,7 @@ CREATE TABLE "SCHEMA"."pets" (
 	"born_at" timestamptz NOT NULL,
 	"origin" varchar(10) NOT NULL,
 	"temper" varchar(1) NOT NULL,
-	"habits" char(1) [],
+	"habits" character(1) [],
 	"amount" bigint NOT NULL,
 	"price" numeric(10, 2) NOT NULL,
 	"shop_name" varchar(200) NOT NULL,

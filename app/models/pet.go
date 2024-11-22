@@ -14,7 +14,7 @@ type Pet struct {
 	BornAt        time.Time       `gorm:"not null" json:"born_at" form:"born_at" validate:"required"`
 	Origin        string          `gorm:"size:10;not null" json:"origin" form:"origin,strip" validate:"required"`
 	Temper        string          `gorm:"size:1;not null" json:"temper" form:"temper,strip" validate:"required"`
-	Habits        pqx.StringArray `gorm:"type:char(1)[]" json:"habits" form:"habits,strip"`
+	Habits        pqx.StringArray `gorm:"type:character(1)[]" json:"habits" form:"habits,strip"`
 	Amount        int             `gorm:"not null" json:"amount" form:"amount"`
 	Price         float64         `gorm:"not null;precision:10;scale:2" json:"price" form:"price"`
 	ShopName      string          `gorm:"size:200;not null" json:"shop_name" form:"shop_name,strip" validate:"omitempty,maxlen=200"`

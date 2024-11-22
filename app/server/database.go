@@ -48,12 +48,7 @@ func openDatabase() error {
 		log.GetLogger("SQL"),
 		sec.GetDuration("slowSql", time.Second),
 	)
-	slg.GetSQLErrLogLevel = func(err error) log.Level {
-		if pgutil.IsUniqueViolationError(err) {
-			return log.LevelWarn
-		}
-		return log.LevelError
-	}
+	slg.GetErrLogLevel = pgutil.GetErrLogLevel
 
 	app.DBS = dbs
 	app.SDB = sqlx.NewDB(db, typ, slg.Trace)

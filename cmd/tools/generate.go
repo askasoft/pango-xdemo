@@ -43,12 +43,12 @@ func GenerateSchema(outfile string) error {
 
 	dsn := ini.GetString("database", "dsn")
 
-	gp := &GormPrinter{}
+	gsp := &GormSQLPrinter{}
 
 	dbc := &gorm.Config{
 		DryRun:         true,
 		NamingStrategy: gormschema.NamingStrategy{TablePrefix: "build."},
-		Logger:         gp,
+		Logger:         gsp,
 	}
 
 	gdd := postgres.Open(dsn)
@@ -60,61 +60,61 @@ func GenerateSchema(outfile string) error {
 
 	gmi := gdb.Migrator()
 	for _, m := range tables {
-		gp.Printf("---------------------------------")
+		gsp.Printf("---------------------------------")
 		if err := gmi.CreateTable(m); err != nil {
 			return err
 		}
 	}
 
-	sql := gp.SQL()
+	sql := gsp.SQL()
 	sql = str.ReplaceAll(sql, "idx_build_", "idx_")
 	sql = str.ReplaceAll(sql, `"build"`, `"SCHEMA"`)
 
 	return fsu.WriteString(outfile, sql, 0660)
 }
 
-type GormPrinter struct {
+type GormSQLPrinter struct {
 	sb strings.Builder
 }
 
-func (gp *GormPrinter) SQL() string {
-	return gp.sb.String()
+func (gsp *GormSQLPrinter) SQL() string {
+	return gsp.sb.String()
 }
 
-func (gp *GormPrinter) Printf(msg string, data ...any) {
+func (gsp *GormSQLPrinter) Printf(msg string, data ...any) {
 	s := fmt.Sprintf(msg, data...) + ";\n"
 
 	fmt.Print(s)
-	gp.sb.WriteString(s)
+	gsp.sb.WriteString(s)
 }
 
 // LogMode log mode
-func (gp *GormPrinter) LogMode(level logger.LogLevel) logger.Interface {
-	return gp
+func (gsp *GormSQLPrinter) LogMode(level logger.LogLevel) logger.Interface {
+	return gsp
 }
 
 // Info print info
-func (gp *GormPrinter) Info(ctx context.Context, msg string, data ...any) {
-	gp.Printf(msg, data...)
+func (gsp *GormSQLPrinter) Info(ctx context.Context, msg string, data ...any) {
+	gsp.Printf(msg, data...)
 }
 
 // Warn print warn messages
-func (gp *GormPrinter) Warn(ctx context.Context, msg string, data ...any) {
-	gp.Printf(msg, data...)
+func (gsp *GormSQLPrinter) Warn(ctx context.Context, msg string, data ...any) {
+	gsp.Printf(msg, data...)
 }
 
 // Error print error messages
-func (gp *GormPrinter) Error(ctx context.Context, msg string, data ...any) {
-	gp.Printf(msg, data...)
+func (gsp *GormSQLPrinter) Error(ctx context.Context, msg string, data ...any) {
+	gsp.Printf(msg, data...)
 }
 
 // Trace print sql message
-func (gp *GormPrinter) Trace(ctx context.Context, begin time.Time, fc func() (string, int64), err error) {
+func (gsp *GormSQLPrinter) Trace(ctx context.Context, begin time.Time, fc func() (string, int64), err error) {
 	sql, _ := fc()
-	gp.Printf("%s", sql)
+	gsp.Printf("%s", sql)
 }
 
 // Trace print sql message
-func (gp *GormPrinter) ParamsFilter(ctx context.Context, sql string, params ...any) (string, []any) {
+func (gsp *GormSQLPrinter) ParamsFilter(ctx context.Context, sql string, params ...any) (string, []any) {
 	return sql, params
 }
