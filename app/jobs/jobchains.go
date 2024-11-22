@@ -7,6 +7,7 @@ import (
 
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/tenant"
+	"github.com/askasoft/pango/asg"
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/xjm"
@@ -68,26 +69,25 @@ func JobChainStart(tt *tenant.Tenant, chainName string, states []*JobRunState, j
 	return
 }
 
-func JobFindAndAbortChain(tt *tenant.Tenant, jid int64, reason string) error {
+func JobFindAndCancelChain(tt *tenant.Tenant, jid int64, reason string) error {
 	tjc := tt.JC()
 
-	if jc, err := tjc.FindJobChain("", true); err != nil {
-		fmt.Println(jc.Name)
+	if _, err := tjc.FindJobChain("", true); err != nil {
 		return err
 	}
 
 	err := tjc.IterJobChains(func(jc *xjm.JobChain) error {
-		ok, err := JobAbortChain(tjc, jc, jid, reason)
+		ok, err := JobCancelChain(tjc, jc, jid, reason)
 		if err != nil {
 			return err
 		}
 		if ok {
-			return xjm.ErrJobAborted
+			return xjm.ErrJobCanceled
 		}
 		return nil
-	}, "", 0, 0, true, xjm.JobChainRunning)
+	}, "", 0, 0, true, xjm.JobStatusRunning)
 
-	if errors.Is(err, xjm.ErrJobAborted) {
+	if errors.Is(err, xjm.ErrJobCanceled) {
 		return nil
 	}
 
@@ -95,37 +95,49 @@ func JobFindAndAbortChain(tt *tenant.Tenant, jid int64, reason string) error {
 }
 
 func JobAbortChain(tjc xjm.JobChainer, jc *xjm.JobChain, jid int64, reason string) (bool, error) {
-	status := xjm.JobChainAborted
-	if jc.Status == xjm.JobChainAborted || jc.Status == xjm.JobChainCompleted {
-		status = ""
-	}
+	return jobAbortCancelChain(tjc, jc, jid, xjm.JobStatusAborted, reason)
+}
+
+func JobCancelChain(tjc xjm.JobChainer, jc *xjm.JobChain, jid int64, reason string) (bool, error) {
+	return jobAbortCancelChain(tjc, jc, jid, xjm.JobStatusCanceled, reason)
+}
+
+func jobAbortCancelChain(tjc xjm.JobChainer, jc *xjm.JobChain, jid int64, status, reason string) (bool, error) {
+	jcs := str.If(jc.IsDone(), "", status)
 
 	states := JobChainDecodeStates(jc.States)
 	for _, sta := range states {
 		if sta.JID == jid {
-			sta.Status = xjm.JobStatusAborted
+			sta.Status = status
 			if reason != "" {
 				sta.Error = reason
 			}
 			state := JobChainEncodeStates(states)
-			return true, tjc.UpdateJobChain(jc.ID, status, state)
+			return true, tjc.UpdateJobChain(jc.ID, jcs, state)
 		}
 	}
 	return false, nil
 }
 
 func JobChainAbort(tjc xjm.JobChainer, tjm xjm.JobManager, jc *xjm.JobChain, reason string) error {
+	return jobChainAbortCancel(tjc, tjm, jc, xjm.JobStatusAborted, reason, tjm.AbortJob)
+}
+
+func JobChainCancel(tjc xjm.JobChainer, tjm xjm.JobManager, jc *xjm.JobChain, reason string) error {
+	return jobChainAbortCancel(tjc, tjm, jc, xjm.JobStatusCanceled, reason, tjm.CancelJob)
+}
+
+func jobChainAbortCancel(tjc xjm.JobChainer, tjm xjm.JobManager, jc *xjm.JobChain, status, reason string, funcAbortCancel func(int64, string) error) error {
 	states := JobChainDecodeStates(jc.States)
 	for _, sta := range states {
-		if sta.JID != 0 && (sta.Status == xjm.JobStatusPending || sta.Status == xjm.JobStatusRunning) {
-			if err := tjm.AbortJob(sta.JID, reason); err != nil && !errors.Is(err, xjm.ErrJobMissing) {
+		if sta.JID != 0 && asg.Contains(xjm.JobUndoneStatus, sta.Status) {
+			if err := funcAbortCancel(sta.JID, reason); err != nil && !errors.Is(err, xjm.ErrJobMissing) {
 				return err
 			}
 			_ = tjm.AddJobLog(sta.JID, time.Now(), xjm.JobLogLevelWarn, reason)
 		}
 	}
-
-	return tjc.UpdateJobChain(jc.ID, xjm.JobChainAborted)
+	return tjc.UpdateJobChain(jc.ID, status)
 }
 
 func (jr *JobRunner) jobChainCheckout() error {
@@ -140,10 +152,12 @@ func (jr *JobRunner) jobChainCheckout() error {
 		return err
 	}
 
-	if jc.Status == xjm.JobChainAborted {
+	switch jc.States {
+	case xjm.JobStatusAborted:
 		return xjm.ErrJobAborted
-	}
-	if jc.Status == xjm.JobChainCompleted {
+	case xjm.JobStatusCanceled:
+		return xjm.ErrJobCanceled
+	case xjm.JobStatusFinished:
 		return xjm.ErrJobComplete
 	}
 
@@ -153,7 +167,7 @@ func (jr *JobRunner) jobChainCheckout() error {
 			sta.JID = jr.JobID()
 			sta.Status = xjm.JobStatusRunning
 			state := JobChainEncodeStates(states)
-			return tjc.UpdateJobChain(jc.ID, xjm.JobChainRunning, state)
+			return tjc.UpdateJobChain(jc.ID, xjm.JobStatusRunning, state)
 		}
 	}
 	return fmt.Errorf("Failed to Checkout JobChain %s#%d on %s", jc.Name, jc.ID, jr.JobName())
@@ -206,6 +220,28 @@ func (jr *JobRunner) jobChainAbort(reason string) error {
 	return fmt.Errorf("Failed to Abort JobChain %s#%d on %s#%d", jc.Name, jc.ID, jr.JobName(), jr.JobID())
 }
 
+func (jr *JobRunner) jobChainCancel(reason string) error {
+	if jr.ChainID == 0 {
+		return nil
+	}
+
+	tjc := jr.Tenant.JC()
+
+	jc, err := tjc.GetJobChain(jr.ChainID)
+	if err != nil {
+		return err
+	}
+
+	ok, err := JobCancelChain(tjc, jc, jr.JobID(), reason)
+	if err != nil {
+		return err
+	}
+	if ok {
+		return nil
+	}
+	return fmt.Errorf("Failed to Cancel JobChain %s#%d on %s#%d", jc.Name, jc.ID, jr.JobName(), jr.JobID())
+}
+
 func (jr *JobRunner) jobChainContinue() error {
 	if jr.ChainID == 0 {
 		return nil
@@ -235,18 +271,18 @@ func (jr *JobRunner) jobChainContinue() error {
 		return fmt.Errorf("Failed to Continue JobChain %s#%d on %s#%d", jc.Name, jc.ID, jr.JobName(), jr.JobID())
 	}
 
-	curr.Status = xjm.JobStatusCompleted
-	status := str.If(next == nil, xjm.JobChainCompleted, xjm.JobChainRunning)
+	curr.Status = xjm.JobStatusFinished
+	status := str.If(next == nil, xjm.JobStatusFinished, xjm.JobStatusRunning)
 	state := JobChainEncodeStates(states)
 
-	if jc.Status == xjm.JobChainAborted || jc.Status == xjm.JobChainCompleted {
+	if jc.IsDone() {
 		// do not update already done job chain status
 		status = ""
 	}
 	if err := tjc.UpdateJobChain(jc.ID, status, state); err != nil {
 		return err
 	}
-	if next != nil && status == xjm.JobChainRunning {
+	if next != nil && status == xjm.JobStatusRunning {
 		return JobChainAppendJob(next.Name, jr.Tenant, jr.Locale, jr.ChainID, jr.ChainSeq+1, jr.ChainData)
 	}
 	return nil

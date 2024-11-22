@@ -9,6 +9,7 @@ import (
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/jobs"
 	"github.com/askasoft/pango-xdemo/app/tenant"
+	"github.com/askasoft/pango/asg"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/str"
@@ -46,25 +47,10 @@ func NewJobChainInfo(locale string, jc *xjm.JobChain) *JobChainInfo {
 	jci := &JobChainInfo{
 		ID:        jc.ID,
 		Status:    jc.Status,
+		Caption:   tbs.GetText(locale, "job.status."+jobs.JobStatusText(jc.Status)),
 		States:    jobs.JobChainDecodeStates(jc.States),
 		CreatedAt: jc.CreatedAt,
 		UpdatedAt: jc.UpdatedAt,
-	}
-
-	var c string
-	switch jc.Status {
-	case xjm.JobChainPending:
-		c = "pending"
-	case xjm.JobChainRunning:
-		c = "running"
-	case xjm.JobChainCompleted:
-		c = "completed"
-	case xjm.JobChainAborted:
-		c = "aborted"
-	}
-
-	if c != "" {
-		jci.Caption = tbs.GetText(locale, "job.caption."+c)
 	}
 	return jci
 }
@@ -186,7 +172,7 @@ func (jcc *JobChainController) StartJob(c *xin.Context) {
 	tt := tenant.FromCtx(c)
 
 	tjc := tt.JC()
-	jc, err := tjc.FindJobChain(jcc.ChainName, false, xjm.JobChainPending, xjm.JobChainRunning)
+	jc, err := tjc.FindJobChain(jcc.ChainName, false, xjm.JobUndoneStatus...)
 	if err != nil {
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, E(c))
@@ -214,7 +200,7 @@ func (jcc *JobChainController) StartJob(c *xin.Context) {
 	})
 }
 
-func (jcc *JobChainController) Abort(c *xin.Context) {
+func (jcc *JobChainController) Cancel(c *xin.Context) {
 	cid := num.Atol(c.PostForm("cid"))
 	if cid <= 0 {
 		c.AddError(errors.New(tbs.Format(c.Locale, "error.param.invalid", "cid")))
@@ -233,25 +219,20 @@ func (jcc *JobChainController) Abort(c *xin.Context) {
 		return
 	}
 
-	if jc.Status == xjm.JobChainAborted {
-		c.JSON(http.StatusOK, xin.H{"warning": tbs.GetText(c.Locale, "job.message.aborted")})
-		return
-	}
-	if jc.Status == xjm.JobChainCompleted {
-		c.JSON(http.StatusOK, xin.H{"warning": tbs.GetText(c.Locale, "job.message.completed")})
+	if asg.Contains(xjm.JobDoneStatus, jc.Status) {
+		c.JSON(http.StatusOK, xin.H{"warning": tbs.GetText(c.Locale, "job.status."+jobs.JobStatusText(jc.Status))})
 		return
 	}
 
-	reason := tbs.GetText(c.Locale, "job.error.userabort", "User canceled.")
-
-	if err := jobs.JobChainAbort(tjc, tjm, jc, reason); err != nil {
-		c.Logger.Errorf("Failed to abort job chain #%d: %v", cid, err)
+	reason := tbs.GetText(c.Locale, "job.error.usercancel", "User canceled.")
+	if err := jobs.JobChainCancel(tjc, tjm, jc, reason); err != nil {
+		c.Logger.Errorf("Failed to cancel job chain #%d: %v", cid, err)
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, E(c))
 		return
 	}
 
-	c.JSON(http.StatusOK, xin.H{"warning": tbs.GetText(c.Locale, "job.message.aborted")})
+	c.JSON(http.StatusOK, xin.H{"warning": tbs.GetText(c.Locale, "job.message.canceled")})
 }
 
 func (jcc *JobChainController) FirstJobName() string {

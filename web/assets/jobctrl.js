@@ -23,7 +23,7 @@
 		return false;
 	}
 
-	function job_abort() {
+	function job_cancel() {
 		var $i = $(this).prop('disabled', true).find('i').addClass('fa-spinner fa-spin');
 
 		var jid = $(this).closest('.job').data('jid');
@@ -32,7 +32,7 @@
 		}
 
 		$.ajax({
-			url: './abort',
+			url: './cancel',
 			method: 'POST',
 			data: {
 				jid: jid
@@ -186,14 +186,15 @@
 		}
 		$b.find('i')[jpr ? 'addClass' : 'removeClass']('fa-spinner fa-spin');
 
-		$('#job_abort').prop('disabled', !jpr);
+		$('#job_cancel').prop('disabled', !jpr);
 	}
 
 	function job_status_icon(s) {
 		switch (s) {
 		case 'A':
-			return 'far fa-circle-xmark';
 		case 'C':
+			return 'far fa-circle-xmark';
+		case 'F':
 			return 'far fa-circle-check';
 		case 'P':
 			return 'fas fa-circle-notch fa-spin';
@@ -331,15 +332,15 @@
 
 	function build_job_tools(jst) {
 		var $jt = $('<div>', { 'class': 'jobtools' });
-		append_job_abort($jt, jst);
+		append_job_cancel($jt, jst);
 		return $jt;
 	}
 
-	function append_job_abort($jt, jst) {
+	function append_job_cancel($jt, jst) {
 		if (jst == 'P' || jst == 'R') {
-			var label = $('#job_form').data('abort');
+			var label = $('#job_form').data('cancel');
 			if (label) {
-				var $btn = $('<button>', { 'class': 'abort btn btn-danger' }),
+				var $btn = $('<button>', { 'class': 'cancel btn btn-danger' }),
 					$i = $('<i>', { 'class': 'fas fa-stop' }),
 					$t = $('<span>').text(label);
 				$jt.append($btn.append($i, $t));
@@ -354,7 +355,7 @@
 			$jh.find('i').attr('class', job_status_icon(job.status));
 
 			var $jt = $('#job_' + job.id).find('.jobtools').empty();
-			append_job_abort($jt, job.status);
+			append_job_cancel($jt, job.status);
 		}
 	}
 
@@ -385,13 +386,13 @@
 	function job_init() {
 		$('#job_form').on('submit', job_start);
 		$('#job_start').on('click', job_start);
-		$('#job_abort').on('click', job_abort);
+		$('#job_cancel').on('click', job_cancel);
 
 		$('#job_tabs')
 			.on('click', 'a', job_tab_show)
 			.on('shown.bs.tab', 'a', job_tab_shown);
 
-		$('#job_list').on('click', 'button.abort', job_abort);
+		$('#job_list').on('click', 'button.cancel', job_cancel);
 
 		job_list();
 	}

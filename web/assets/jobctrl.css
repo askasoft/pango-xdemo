@@ -1,6 +1,8 @@
 #job_tabs, #job_list {
 	--js-aborted: var(--bs-danger, #dc3545);
-	--js-completed: var(--bs-success, #198754);
+	/* --js-canceled: var(--bs-orange, #ffc107); */
+	--js-canceled: #8a6d3b;
+	--js-finished: var(--bs-success, #198754);
 	--js-pending: var(--bs-secondary-color, rgba(33, 37, 41, 0.75));
 	--js-running: var(--bs-primary, #337ab7);
 }
@@ -40,7 +42,10 @@ fieldset > form {
 	color: var(--js-aborted);
 }
 #job_tabs > ul > li[status=C] i {
-	color: var(--js-completed);
+	color: var(--js-canceled);
+}
+#job_tabs > ul > li[status=F] i {
+	color: var(--js-finished);
 }
 #job_tabs > ul > li[status=P] i {
 	color: var(--js-pending);

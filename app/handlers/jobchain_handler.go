@@ -8,7 +8,7 @@ type JobChainCtrl interface {
 	Index(*xin.Context)
 	List(*xin.Context)
 	Start(*xin.Context)
-	Abort(*xin.Context)
+	Cancel(*xin.Context)
 	Status(*xin.Context)
 }
 
@@ -34,8 +34,8 @@ func (jch *JobChainHandler) Start(c *xin.Context) {
 	jch.create(c).Start(c)
 }
 
-func (jch *JobChainHandler) Abort(c *xin.Context) {
-	jch.create(c).Abort(c)
+func (jch *JobChainHandler) Cancel(c *xin.Context) {
+	jch.create(c).Cancel(c)
 }
 
 func (jch *JobChainHandler) Status(c *xin.Context) {
@@ -47,5 +47,5 @@ func (jch *JobChainHandler) Router(rg *xin.RouterGroup) {
 	rg.GET("/list", jch.List)
 	rg.GET("/status", jch.Status)
 	rg.POST("/start", jch.Start)
-	rg.POST("/abort", jch.Abort)
+	rg.POST("/cancel", jch.Cancel)
 }

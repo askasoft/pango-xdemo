@@ -10,7 +10,7 @@ type JobCtrl interface {
 	Logs(*xin.Context)
 	Status(*xin.Context)
 	Start(*xin.Context)
-	Abort(*xin.Context)
+	Cancel(*xin.Context)
 }
 
 // JobHandler job handler
@@ -43,8 +43,8 @@ func (jh *JobHandler) Start(c *xin.Context) {
 	jh.create().Start(c)
 }
 
-func (jh *JobHandler) Abort(c *xin.Context) {
-	jh.create().Abort(c)
+func (jh *JobHandler) Cancel(c *xin.Context) {
+	jh.create().Cancel(c)
 }
 
 func (jh *JobHandler) Router(rg *xin.RouterGroup) {
@@ -53,5 +53,5 @@ func (jh *JobHandler) Router(rg *xin.RouterGroup) {
 	rg.GET("/logs", jh.Logs)
 	rg.GET("/status", jh.Status)
 	rg.POST("/start", jh.Start)
-	rg.POST("/abort", jh.Abort)
+	rg.POST("/cancel", jh.Cancel)
 }

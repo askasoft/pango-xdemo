@@ -17,3 +17,26 @@ func ContextError(ctx context.Context, errs ...error) error {
 	}
 	return ctx.Err()
 }
+
+type ClientError struct {
+	Err error
+}
+
+var ErrClient = &ClientError{}
+
+func NewClientError(err error) error {
+	return &ClientError{Err: err}
+}
+
+func (ce *ClientError) Is(err error) (ok bool) {
+	_, ok = err.(*ClientError)
+	return
+}
+
+func (ce *ClientError) Error() string {
+	return ce.Err.Error()
+}
+
+func (ce *ClientError) Unwrap() error {
+	return ce.Err
+}

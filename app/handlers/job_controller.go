@@ -207,7 +207,7 @@ func (jc *JobController) Start(c *xin.Context) {
 	})
 }
 
-func (jc *JobController) Abort(c *xin.Context) {
+func (jc *JobController) Cancel(c *xin.Context) {
 	jid := num.Atol(c.PostForm("jid"))
 	if jid <= 0 {
 		c.AddError(errors.New(tbs.Format(c.Locale, "error.param.invalid", "jid")))
@@ -219,42 +219,37 @@ func (jc *JobController) Abort(c *xin.Context) {
 
 	tjm := tt.JM()
 
-	reason := tbs.GetText(c.Locale, "job.error.userabort", "User canceled.")
+	reason := tbs.GetText(c.Locale, "job.error.usercancel", "User canceled.")
 
-	err := tjm.AbortJob(jid, reason)
+	err := tjm.CancelJob(jid, reason)
 	if err != nil {
-		if errors.Is(err, xjm.ErrJobMissing) {
-			job, err := tjm.GetJob(jid)
-			if err != nil {
-				c.Logger.Errorf("Failed to get job #%d: %v", jid, err)
-				c.AddError(err)
-				c.JSON(http.StatusInternalServerError, E(c))
-				return
-			}
-			if job.Status == xjm.JobStatusAborted {
-				c.JSON(http.StatusOK, xin.H{"warning": tbs.GetText(c.Locale, "job.message.aborted")})
-				return
-			}
-			if job.Status == xjm.JobStatusCompleted {
-				c.JSON(http.StatusOK, xin.H{"warning": tbs.GetText(c.Locale, "job.message.completed")})
-				return
-			}
+		if !errors.Is(err, xjm.ErrJobMissing) {
+			c.Logger.Errorf("Failed to cancel job #%d: %v", jid, err)
+			c.AddError(err)
+			c.JSON(http.StatusInternalServerError, E(c))
+			return
 		}
 
-		c.Logger.Errorf("Failed to abort job #%d: %v", jid, err)
-		c.AddError(err)
-		c.JSON(http.StatusInternalServerError, E(c))
+		job, err := tjm.GetJob(jid)
+		if err != nil {
+			c.Logger.Errorf("Failed to get job #%d: %v", jid, err)
+			c.AddError(err)
+			c.JSON(http.StatusInternalServerError, E(c))
+			return
+		}
+
+		c.JSON(http.StatusOK, xin.H{"warning": tbs.GetText(c.Locale, "job.status."+jobs.JobStatusText(job.Status))})
 		return
 	}
 
 	_ = tjm.AddJobLog(jid, time.Now(), xjm.JobLogLevelWarn, reason)
 
-	if err := jobs.JobFindAndAbortChain(tt, jid, reason); err != nil {
-		c.Logger.Errorf("Failed to abort job chain for job #%d: %v", jid, err)
+	if err := jobs.JobFindAndCancelChain(tt, jid, reason); err != nil {
+		c.Logger.Errorf("Failed to cancel job chain for job #%d: %v", jid, err)
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, E(c))
 		return
 	}
 
-	c.JSON(http.StatusOK, xin.H{"warning": tbs.GetText(c.Locale, "job.message.aborted")})
+	c.JSON(http.StatusOK, xin.H{"warning": tbs.GetText(c.Locale, "job.message.canceled")})
 }

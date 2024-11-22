@@ -25,7 +25,7 @@
 		return false;
 	}
 
-	function jobchain_abort() {
+	function jobchain_cancel() {
 		var $i = $(this).prop('disabled', true).find('i').addClass('fa-spinner fa-spin');
 
 		var cid = $(this).closest('.jobchain').data('cid');
@@ -34,7 +34,7 @@
 		}
 
 		$.ajax({
-			url: './abort',
+			url: './cancel',
 			method: 'POST',
 			data: {
 				cid: cid
@@ -81,8 +81,9 @@
 	}
 
 	function jobchain_is_done(jci) {
-		// (completed or aborted) and (updated_at is after 10sec)
-		return (jci.status == 'C' || jci.status == 'A') && (new Date().getTime() - new Date(jci.updated_at).getTime() > 10000);
+		// (aborted, canceled, finished) and (updated_at is after 10sec)
+		return (jci.status == 'A' || jci.status == 'C' || jci.status == 'F') &&
+			(new Date().getTime() - new Date(jci.updated_at).getTime() > 10000);
 	}
 
 	function refresh_jobchain_start() {
@@ -106,14 +107,15 @@
 		}
 		$b.find('i')[jpr ? 'addClass' : 'removeClass']('fa-spinner fa-spin');
 
-		$('#jobchain_abort').prop('disabled', !jpr);
+		$('#jobchain_cancel').prop('disabled', !jpr);
 	}
 
 	function jobchain_status_icon(s) {
 		switch (s) {
 		case 'A':
-			return 'far fa-circle-xmark';
 		case 'C':
+			return 'far fa-circle-xmark';
+		case 'F':
 			return 'far fa-circle-check';
 		case 'P':
 			return 'fas fa-circle-notch fa-spin';
@@ -196,7 +198,7 @@
 	function build_jobchain_tools(jci) {
 		var $jt = $('<div>', { 'class': 'jobtools' });
 
-		append_jobchain_abort($jt, jci.status);
+		append_jobchain_cancel($jt, jci.status);
 		append_jobchain_caption($jt, jci);
 		return $jt;
 	}
@@ -208,11 +210,11 @@
 		$jt.append($jcp);
 	}
 
-	function append_jobchain_abort($jt, jst) {
+	function append_jobchain_cancel($jt, jst) {
 		if (jst == 'P' || jst == 'R') {
-			var label = $('#jobchain_form').data('abort');
+			var label = $('#jobchain_form').data('cancel');
 			if (label) {
-				var $b = $('<button>', { 'class': 'abort btn btn-danger' }),
+				var $b = $('<button>', { 'class': 'cancel btn btn-danger' }),
 					$i = $('<i>', { 'class': 'fas fa-stop' }),
 					$t = $('<span>').text(label);
 				$jt.append($b.append($i, $t));
@@ -231,7 +233,7 @@
 			$jc.attr('status', jci.status);
 
 			var $jt = $jc.find('.jobtools').empty();
-			append_jobchain_abort($jt, jci.status);
+			append_jobchain_cancel($jt, jci.status);
 			append_jobchain_caption($jt, jci);
 		}
 
@@ -269,7 +271,7 @@
 		jobchain_jrs_set_error($jrs, jrs, 'error');
 
 		var p = 0, t = '・・・';
-		if (jrs.status == 'C') {
+		if (jrs.status == 'F') {
 			p = 100;
 			t = '100%';
 		} else if (jrs.state.limit) {
@@ -327,14 +329,14 @@
 
 		$('#jobchain_form').on('submit', jobchain_start);
 		$('#jobchain_start').on('click', jobchain_start);
-		$('#jobchain_abort').on('click', jobchain_abort);
+		$('#jobchain_cancel').on('click', jobchain_cancel);
 
 		$('#jobchain_tabs')
 			.on('click', 'a', jobchain_tab_show)
 			.on('shown.bs.tab', 'a', jobchain_tab_shown);
 
 		$('#jobchain_list')
-			.on('click', 'button.abort', jobchain_abort)
+			.on('click', 'button.cancel', jobchain_cancel)
 			.on('click', 'div.error', jobchain_error);
 
 		jobchain_list();

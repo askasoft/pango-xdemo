@@ -97,7 +97,7 @@ func (ucij *UserCsvImportJob) Run() {
 
 	total, err := ucij.doCheckCsv()
 	if err != nil {
-		err = jobs.NewClientError(err)
+		err = errutil.NewClientError(err)
 		ucij.Done(err)
 		return
 	}

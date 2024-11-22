@@ -1,6 +1,8 @@
 #jobchain_tabs, #jobchain_list {
 	--js-aborted: var(--bs-danger, #dc3545);
-	--js-completed: var(--bs-success, #198754);
+	/* --js-canceled: var(--bs-orange, #ffc107); */
+	--js-canceled: #8a6d3b;
+	--js-finished: var(--bs-success, #198754);
 	--js-pending: var(--bs-secondary-color, rgba(33, 37, 41, 0.75));
 	--js-running: var(--bs-primary, #337ab7);
 	--js-progress-bg: var(--bs-secondary-bg-subtle, #e2e3e5);
@@ -38,7 +40,10 @@
 	color: var(--js-aborted);
 }
 #jobchain_tabs > ul > li[status=C] i {
-	color: var(--js-completed);
+	color: var(--js-canceled);
+}
+#jobchain_tabs > ul > li[status=F] i {
+	color: var(--js-finished);
 }
 #jobchain_tabs > ul > li[status=P] i {
 	color: var(--js-pending);
@@ -61,7 +66,10 @@
 	border-color: var(--js-aborted);
 }
 .jobchain[status=C] {
-	border-color: var(--js-completed);
+	border-color: var(--js-canceled);
+}
+.jobchain[status=F] {
+	border-color: var(--js-finished);
 }
 .jobchain[status=P] {
 	border-color: var(--js-pending);
@@ -92,7 +100,10 @@
 	color: var(--js-aborted);
 }
 .jobchain[status=C] .jobcaption {
-	color: var(--js-completed);
+	color: var(--js-canceled);
+}
+.jobchain[status=F] .jobcaption {
+	color: var(--js-finished);
 }
 .jobchain[status=P] .jobcaption {
 	color: var(--js-pending);
@@ -133,7 +144,10 @@
 	border-color: var(--js-aborted);
 }
 .jrs[status=C] .jnm {
-	border-color: var(--js-completed);
+	border-color: var(--js-canceled);
+}
+.jrs[status=F] .jnm {
+	border-color: var(--js-finished);
 }
 .jrs[status=P] .jnm {
 	border-color: var(--js-pending);
@@ -225,7 +239,10 @@
 	stroke: var(--js-aborted);
 }
 .jrs[status=C] .pgcircle circle.fg {
-	stroke: var(--js-completed);
+	stroke: var(--js-canceled);
+}
+.jrs[status=F] .pgcircle circle.fg {
+	stroke: var(--js-finished);
 }
 .jrs[status=P] .pgcircle circle.bg {
 	stroke-dasharray: 15 11;

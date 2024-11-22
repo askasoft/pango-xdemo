@@ -12,6 +12,7 @@ import (
 
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/tenant"
+	"github.com/askasoft/pango-xdemo/app/utils/errutil"
 	"github.com/askasoft/pango/asg"
 	"github.com/askasoft/pango/cog/treemap"
 	"github.com/askasoft/pango/gog"
@@ -36,6 +37,23 @@ const (
 
 var hasFileJobs = []string{
 	JobNameUserCsvImport,
+}
+
+func JobStatusText(js string) string {
+	switch js {
+	case xjm.JobStatusAborted:
+		return "aborted"
+	case xjm.JobStatusCanceled:
+		return "canceled"
+	case xjm.JobStatusFinished:
+		return "finished"
+	case xjm.JobStatusPending:
+		return "pending"
+	case xjm.JobStatusRunning:
+		return "running"
+	default:
+		return "unknown"
+	}
 }
 
 type IRun interface {
@@ -199,29 +217,6 @@ func (si *FailedItem) String() string {
 	return fmt.Sprintf("#%d %s - %s", si.ID, si.Title, si.Error)
 }
 
-type ClientError struct {
-	Err error
-}
-
-var ErrClient = &ClientError{}
-
-func NewClientError(err error) error {
-	return &ClientError{Err: err}
-}
-
-func (ce *ClientError) Is(err error) (ok bool) {
-	_, ok = err.(*ClientError)
-	return
-}
-
-func (ce *ClientError) Error() string {
-	return ce.Err.Error()
-}
-
-func (ce *ClientError) Unwrap() error {
-	return ce.Err
-}
-
 type JobRunner struct {
 	*xjm.JobRunner
 	ArgChain
@@ -306,8 +301,8 @@ func (jr *JobRunner) Abort(reason string) {
 	jr.Logger.Warn("ABORTED.")
 }
 
-func (jr *JobRunner) Complete() {
-	if err := jr.JobRunner.Complete(); err != nil {
+func (jr *JobRunner) Finish() {
+	if err := jr.JobRunner.Finish(); err != nil {
 		if !errors.Is(err, xjm.ErrJobMissing) {
 			jr.Logger.Error(err)
 		}
@@ -332,23 +327,25 @@ func (jr *JobRunner) Done(err error) {
 	}
 
 	if err == nil || errors.Is(err, xjm.ErrJobComplete) {
-		jr.Complete()
+		jr.Finish()
 		return
 	}
 
 	if errors.Is(err, xjm.ErrJobMissing) {
+		// job is missing, unable to do anything, just log error
 		jr.Logger.Error(err)
 		return
 	}
 
-	if errors.Is(err, xjm.ErrJobAborted) {
+	if errors.Is(err, xjm.ErrJobAborted) || errors.Is(err, xjm.ErrJobCanceled) || errors.Is(err, xjm.ErrJobPin) {
 		job, err := jr.GetJob()
 		if err != nil {
 			jr.Logger.Error(err)
 			return
 		}
 
-		if job.Status == xjm.JobStatusAborted {
+		switch job.Status {
+		case xjm.JobStatusAborted:
 			// NOTE:
 			// It's necessary to call jobChainAbort() again.
 			// The jobChainCheckout()/jobChainContinue() method may update job chain status to 'R' to a aborted job chain.
@@ -357,14 +354,22 @@ func (jr *JobRunner) Done(err error) {
 			}
 			jr.Logger.Warn("ABORTED.")
 			return
+		case xjm.JobStatusCanceled:
+			// NOTE:
+			// It's necessary to call jobChainCancel() again.
+			// The jobChainCheckout()/jobChainContinue() method may update job chain status to 'R' to a aborted job chain.
+			if err := jr.jobChainCancel(job.Error); err != nil {
+				jr.Logger.Error(err)
+			}
+			jr.Logger.Warn("CANCELED.")
+			return
+		default:
+			jr.Logger.Errorf("Invalid Job #%d (%d): %s", jr.JobID(), jr.RunnerID(), xjm.MustEncode(job))
+			return
 		}
-
-		// ErrJobAborted should only occurred for Aborted Status
-		jr.Logger.Errorf("Invalid Aborted Job #%d (%d): %s", jr.JobID(), jr.RunnerID(), xjm.MustEncode(job))
-		return
 	}
 
-	if errors.Is(err, ErrClient) {
+	if errors.Is(err, errutil.ErrClient) {
 		jr.Logger.Warn(err)
 	} else {
 		jr.Logger.Error(err)
@@ -564,7 +569,7 @@ func CleanOutdatedJobs() {
 				sqa.Select("file").From(tt.TableJobs())
 				sqa.Where("updated_at < ?", before)
 				sqa.In("name", hasFileJobs)
-				sqa.In("status", xjm.JobAbortedCompleted)
+				sqa.In("status", xjm.JobDoneStatus)
 				sql, args := sqa.Build()
 
 				sqb := tx.Builder()
