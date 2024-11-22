@@ -272,7 +272,7 @@ func (jr *JobRunner) Checkout() error {
 func (jr *JobRunner) Running() (context.Context, context.CancelCauseFunc) {
 	ctx, cancel := context.WithCancelCause(context.TODO())
 	go func() {
-		if err := jr.JobRunner.Running(ctx, time.Second); err != nil {
+		if err := jr.JobRunner.Running(ctx, time.Second, time.Minute); err != nil {
 			cancel(err)
 		}
 	}()
