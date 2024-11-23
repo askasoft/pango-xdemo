@@ -352,7 +352,7 @@ func (jr *JobRunner) Done(err error) {
 		}
 	}
 
-	if errors.Is(err, errutil.ErrClient) {
+	if errutil.IsClientError(err) {
 		jr.Logger.Warn(err)
 	} else {
 		jr.Logger.Error(err)

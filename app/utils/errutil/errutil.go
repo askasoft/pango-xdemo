@@ -22,10 +22,13 @@ type ClientError struct {
 	Err error
 }
 
-var ErrClient = &ClientError{}
-
 func NewClientError(err error) error {
 	return &ClientError{Err: err}
+}
+
+func IsClientError(err error) bool {
+	var ce *ClientError
+	return errors.As(err, &ce)
 }
 
 func (ce *ClientError) Is(err error) (ok bool) {
