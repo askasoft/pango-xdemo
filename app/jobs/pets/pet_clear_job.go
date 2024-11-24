@@ -15,15 +15,13 @@ func init() {
 }
 
 type PetClearArg struct {
-	jobs.ArgLocale
 	jobs.ArgChain
 
 	ResetSequence bool `json:"reset_sequence" form:"reset_sequence"`
 }
 
-func NewPetClearArg(tt *tenant.Tenant, locale string) jobs.IArg {
+func NewPetClearArg(tt *tenant.Tenant) jobs.IArg {
 	pca := &PetClearArg{}
-	pca.Locale = locale
 	pca.ResetSequence = true
 	return pca
 }
@@ -33,21 +31,17 @@ func (pca *PetClearArg) Bind(c *xin.Context) error {
 }
 
 type PetClearJob struct {
-	*jobs.JobRunner
+	*jobs.JobRunner[PetClearArg]
 
 	jobs.JobState
-
-	arg PetClearArg
 }
 
 func NewPetClearJob(tt *tenant.Tenant, job *xjm.Job) jobs.IRun {
 	pc := &PetClearJob{}
 
-	pc.JobRunner = jobs.NewJobRunner(tt, job.Name, job.ID)
+	pc.JobRunner = jobs.NewJobRunner[PetClearArg](tt, job)
 
-	xjm.MustDecode(job.Param, &pc.arg)
-
-	pc.ArgChain = pc.arg.ArgChain
+	pc.ArgChain = pc.Arg.ArgChain
 	return pc
 }
 
@@ -86,7 +80,7 @@ func (pc *PetClearJob) clear() error {
 		return err
 	}
 
-	if pc.arg.ResetSequence {
+	if pc.Arg.ResetSequence {
 		pc.Logger.Info("Reset Pets Sequence")
 		err = tt.ResetSequence(db, "pets")
 		if err != nil {

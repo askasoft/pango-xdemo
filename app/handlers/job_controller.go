@@ -150,7 +150,6 @@ func (jc *JobController) Status(c *xin.Context) {
 		c.JSON(http.StatusInternalServerError, E(c))
 		return
 	}
-
 	if job == nil {
 		c.AddError(errors.New(tbs.GetText(c.Locale, "job.error.notfound")))
 		c.JSON(http.StatusBadRequest, E(c))
@@ -191,7 +190,7 @@ func (jc *JobController) Start(c *xin.Context) {
 		}
 	}
 
-	jid, err := tjm.AppendJob(jc.Name, jc.File, jc.Param)
+	jid, err := tjm.AppendJob(0, jc.Name, c.Locale, jc.File, jc.Param)
 	if err != nil {
 		log.Errorf("Failed to pending job %s: %v", jc.Name, err)
 		c.AddError(err)
@@ -221,34 +220,40 @@ func (jc *JobController) Cancel(c *xin.Context) {
 
 	reason := tbs.GetText(c.Locale, "job.error.usercancel", "User canceled.")
 
-	err := tjm.CancelJob(jid, reason)
+	job, err := tjm.GetJob(jid)
 	if err != nil {
-		if !errors.Is(err, xjm.ErrJobMissing) {
-			c.Logger.Errorf("Failed to cancel job #%d: %v", jid, err)
-			c.AddError(err)
-			c.JSON(http.StatusInternalServerError, E(c))
-			return
-		}
+		c.Logger.Errorf("Failed to get job #%d: %v", jid, err)
+		c.AddError(err)
+		c.JSON(http.StatusInternalServerError, E(c))
+		return
+	}
+	if job == nil {
+		c.AddError(errors.New(tbs.GetText(c.Locale, "job.error.notfound")))
+		c.JSON(http.StatusBadRequest, E(c))
+		return
+	}
 
-		job, err := tjm.GetJob(jid)
-		if err != nil {
-			c.Logger.Errorf("Failed to get job #%d: %v", jid, err)
-			c.AddError(err)
-			c.JSON(http.StatusInternalServerError, E(c))
-			return
-		}
-
+	if job.IsDone() {
 		c.JSON(http.StatusOK, xin.H{"warning": tbs.GetText(c.Locale, "job.status."+jobs.JobStatusText(job.Status))})
+		return
+	}
+
+	if err := tjm.CancelJob(jid, reason); err != nil {
+		c.Logger.Errorf("Failed to cancel job #%d: %v", jid, err)
+		c.AddError(err)
+		c.JSON(http.StatusInternalServerError, E(c))
 		return
 	}
 
 	_ = tjm.AddJobLog(jid, time.Now(), xjm.JobLogLevelWarn, reason)
 
-	if err := jobs.JobFindAndCancelChain(tt, jid, reason); err != nil {
-		c.Logger.Errorf("Failed to cancel job chain for job #%d: %v", jid, err)
-		c.AddError(err)
-		c.JSON(http.StatusInternalServerError, E(c))
-		return
+	if job.CID != 0 {
+		if err := jobs.JobFindAndCancelChain(tt, job.CID, jid, reason); err != nil {
+			c.Logger.Errorf("Failed to cancel job chain for job #%d: %v", jid, err)
+			c.AddError(err)
+			c.JSON(http.StatusInternalServerError, E(c))
+			return
+		}
 	}
 
 	c.JSON(http.StatusOK, xin.H{"warning": tbs.GetText(c.Locale, "job.message.canceled")})

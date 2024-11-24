@@ -186,7 +186,7 @@ func (jcc *JobChainController) StartJob(c *xin.Context) {
 	}
 
 	css := jobs.JobChainInitStates(jcc.ChainJobs...)
-	cid, err := jobs.JobChainStart(tt, jcc.ChainName, css, jcc.FirstJobName(), jcc.JobFile, jcc.JobParam)
+	cid, err := jobs.JobChainStart(tt, jcc.ChainName, css, jcc.FirstJobName(), c.Locale, jcc.JobFile, jcc.JobParam)
 	if err != nil {
 		log.Errorf("Failed to CreateJobChain(%q, %q): %v", jcc.ChainName, str.Join(jcc.ChainJobs, "|"), err)
 		c.AddError(err)

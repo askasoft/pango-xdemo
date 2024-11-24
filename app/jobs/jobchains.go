@@ -43,7 +43,7 @@ func JobChainInitStates(jns ...string) []*JobRunState {
 	return states
 }
 
-func JobChainStart(tt *tenant.Tenant, chainName string, states []*JobRunState, jobName string, jobFile string, jobParam IArgChain) (cid int64, err error) {
+func JobChainStart(tt *tenant.Tenant, chainName string, states []*JobRunState, jobName, jobLocale, jobFile string, jobParam IArgChain) (cid int64, err error) {
 	state := JobChainEncodeStates(states)
 
 	err = app.SDB.Transaction(func(tx *sqlx.Tx) error {
@@ -53,12 +53,12 @@ func JobChainStart(tt *tenant.Tenant, chainName string, states []*JobRunState, j
 			return err
 		}
 
-		_, _, cdt := jobParam.GetChain()
-		jobParam.SetChain(cid, 0, cdt)
+		_, cdt := jobParam.GetChain()
+		jobParam.SetChain(0, cdt)
 		jParam := xjm.MustEncode(jobParam)
 
 		sjm := tt.SJM(tx)
-		_, err = sjm.AppendJob(jobName, jobFile, jParam)
+		_, err = sjm.AppendJob(cid, jobName, jobLocale, jobFile, jParam)
 
 		return err
 	})
@@ -69,29 +69,25 @@ func JobChainStart(tt *tenant.Tenant, chainName string, states []*JobRunState, j
 	return
 }
 
-func JobFindAndCancelChain(tt *tenant.Tenant, jid int64, reason string) error {
+func JobFindAndCancelChain(tt *tenant.Tenant, cid, jid int64, reason string) error {
 	tjc := tt.JC()
 
-	if _, err := tjc.FindJobChain("", true); err != nil {
+	jc, err := tjc.GetJobChain(cid)
+	if err != nil {
 		return err
 	}
-
-	err := tjc.IterJobChains(func(jc *xjm.JobChain) error {
-		ok, err := JobCancelChain(tjc, jc, jid, reason)
-		if err != nil {
-			return err
-		}
-		if ok {
-			return xjm.ErrJobCanceled
-		}
-		return nil
-	}, "", 0, 0, true, xjm.JobStatusRunning)
-
-	if errors.Is(err, xjm.ErrJobCanceled) {
-		return nil
+	if jc == nil {
+		return xjm.ErrJobChainMissing
 	}
 
-	return err
+	ok, err := JobCancelChain(tjc, jc, jid, reason)
+	if err != nil {
+		return err
+	}
+	if !ok {
+		return xjm.ErrJobMissing
+	}
+	return nil
 }
 
 func JobAbortChain(tjc xjm.JobChainer, jc *xjm.JobChain, jid int64, reason string) (bool, error) {
@@ -140,14 +136,14 @@ func jobChainAbortCancel(tjc xjm.JobChainer, tjm xjm.JobManager, jc *xjm.JobChai
 	return tjc.UpdateJobChain(jc.ID, status)
 }
 
-func (jr *JobRunner) jobChainCheckout() error {
-	if jr.ChainID == 0 {
+func (jr *JobRunner[T]) jobChainCheckout() error {
+	if jr.ChainID() == 0 {
 		return nil
 	}
 
 	tjc := jr.Tenant.JC()
 
-	jc, err := tjc.GetJobChain(jr.ChainID)
+	jc, err := tjc.GetJobChain(jr.ChainID())
 	if err != nil {
 		return err
 	}
@@ -173,14 +169,14 @@ func (jr *JobRunner) jobChainCheckout() error {
 	return fmt.Errorf("Failed to Checkout JobChain %s#%d on %s", jc.Name, jc.ID, jr.JobName())
 }
 
-func (jr *JobRunner) jobChainSetState(state iState) error {
-	if jr.ChainID == 0 {
+func (jr *JobRunner[T]) jobChainSetState(state iState) error {
+	if jr.ChainID() == 0 {
 		return nil
 	}
 
 	tjc := jr.Tenant.JC()
 
-	jc, err := tjc.GetJobChain(jr.ChainID)
+	jc, err := tjc.GetJobChain(jr.ChainID())
 	if err != nil {
 		return err
 	}
@@ -198,14 +194,14 @@ func (jr *JobRunner) jobChainSetState(state iState) error {
 	return fmt.Errorf("Failed to Update JobChain %s#%d on %s#%d", jc.Name, jc.ID, jr.JobName(), jr.JobID())
 }
 
-func (jr *JobRunner) jobChainAbort(reason string) error {
-	if jr.ChainID == 0 {
+func (jr *JobRunner[T]) jobChainAbort(reason string) error {
+	if jr.ChainID() == 0 {
 		return nil
 	}
 
 	tjc := jr.Tenant.JC()
 
-	jc, err := tjc.GetJobChain(jr.ChainID)
+	jc, err := tjc.GetJobChain(jr.ChainID())
 	if err != nil {
 		return err
 	}
@@ -220,14 +216,14 @@ func (jr *JobRunner) jobChainAbort(reason string) error {
 	return fmt.Errorf("Failed to Abort JobChain %s#%d on %s#%d", jc.Name, jc.ID, jr.JobName(), jr.JobID())
 }
 
-func (jr *JobRunner) jobChainCancel(reason string) error {
-	if jr.ChainID == 0 {
+func (jr *JobRunner[T]) jobChainCancel(reason string) error {
+	if jr.ChainID() == 0 {
 		return nil
 	}
 
 	tjc := jr.Tenant.JC()
 
-	jc, err := tjc.GetJobChain(jr.ChainID)
+	jc, err := tjc.GetJobChain(jr.ChainID())
 	if err != nil {
 		return err
 	}
@@ -242,14 +238,14 @@ func (jr *JobRunner) jobChainCancel(reason string) error {
 	return fmt.Errorf("Failed to Cancel JobChain %s#%d on %s#%d", jc.Name, jc.ID, jr.JobName(), jr.JobID())
 }
 
-func (jr *JobRunner) jobChainContinue() error {
-	if jr.ChainID == 0 {
+func (jr *JobRunner[T]) jobChainContinue() error {
+	if jr.ChainID() == 0 {
 		return nil
 	}
 
 	tjc := jr.Tenant.JC()
 
-	jc, err := tjc.GetJobChain(jr.ChainID)
+	jc, err := tjc.GetJobChain(jr.ChainID())
 	if err != nil {
 		return err
 	}
@@ -283,30 +279,30 @@ func (jr *JobRunner) jobChainContinue() error {
 		return err
 	}
 	if next != nil && status == xjm.JobStatusRunning {
-		return JobChainAppendJob(next.Name, jr.Tenant, jr.Locale, jr.ChainID, jr.ChainSeq+1, jr.ChainData)
+		return JobChainAppendJob(jr.Tenant, next.Name, jr.Locale(), jr.ChainID(), jr.ChainSeq+1, jr.ChainData)
 	}
 	return nil
 }
 
-func JobChainAppendJob(name string, tt *tenant.Tenant, locale string, cid int64, csq int, cdt bool) error {
+func JobChainAppendJob(tt *tenant.Tenant, name, locale string, cid int64, csq int, cdt bool) error {
 	tjm := tt.JM()
 
 	var arg any
 
 	if jac, ok := jobArgCreators[name]; ok {
-		arg = jac(tt, locale)
+		arg = jac(tt)
 	} else {
 		return fmt.Errorf("Invalid chain job %q", name)
 	}
 
 	if isc, ok := arg.(IArgChain); ok {
-		isc.SetChain(cid, csq, cdt)
+		isc.SetChain(csq, cdt)
 	} else {
 		return fmt.Errorf("Invalid chain job %q", name)
 	}
 
 	param := xjm.MustEncode(arg)
-	if _, err := tjm.AppendJob(name, "", param); err != nil {
+	if _, err := tjm.AppendJob(cid, name, locale, "", param); err != nil {
 		return err
 	}
 

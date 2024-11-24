@@ -33,26 +33,20 @@ func init() {
 }
 
 type UserCsvImportArg struct {
-	jobs.ArgLocale
-
 	Role string `json:"role,omitempty"`
 }
 
 func NewUserCsvImportArg(locale, role string) *UserCsvImportArg {
 	ucij := &UserCsvImportArg{}
-	ucij.Locale = locale
 	ucij.Role = role
 	return ucij
 }
 
 type UserCsvImportJob struct {
-	*jobs.JobRunner
+	*jobs.JobRunner[UserCsvImportArg]
 
 	jobs.JobState
 
-	arg UserCsvImportArg
-
-	file string
 	data []byte
 	head csvUserHeader
 
@@ -65,12 +59,7 @@ type UserCsvImportJob struct {
 func NewUserCsvImportJob(tt *tenant.Tenant, job *xjm.Job) jobs.IRun {
 	ucij := &UserCsvImportJob{}
 
-	ucij.JobRunner = jobs.NewJobRunner(tt, job.Name, job.ID)
-
-	xjm.MustDecode(job.Param, &ucij.arg)
-
-	ucij.Locale = ucij.arg.Locale
-	ucij.file = job.File
+	ucij.JobRunner = jobs.NewJobRunner[UserCsvImportArg](tt, job)
 
 	ucij.head.init()
 
@@ -85,7 +74,7 @@ func (ucij *UserCsvImportJob) Run() {
 	}
 
 	tfs := ucij.Tenant.FS()
-	ucij.data, err = tfs.ReadFile(ucij.file)
+	ucij.data, err = tfs.ReadFile(ucij.JobFile())
 	if err != nil {
 		ucij.Done(err)
 		return
@@ -93,7 +82,7 @@ func (ucij *UserCsvImportJob) Run() {
 
 	ucij.roleRevMap = tbsutil.GetUserRoleReverseMap()
 	ucij.statusRevMap = tbsutil.GetUserStatusReverseMap()
-	ucij.pwdPolicy = ucij.Tenant.GetPasswordPolicy(ucij.Locale)
+	ucij.pwdPolicy = ucij.Tenant.GetPasswordPolicy(ucij.Locale())
 
 	total, err := ucij.doCheckCsv()
 	if err != nil {
@@ -105,7 +94,7 @@ func (ucij *UserCsvImportJob) Run() {
 	ucij.Step = 0
 	ucij.SetTotalLimit(total, 0)
 
-	ucij.Logger.Info(tbs.GetText(ucij.Locale, "csv.info.importing"))
+	ucij.Logger.Info(tbs.GetText(ucij.Locale(), "csv.info.importing"))
 
 	ctx, cancel := ucij.Running()
 	defer cancel(nil)
@@ -157,7 +146,7 @@ func (ucij *UserCsvImportJob) doReadCsv(ctx context.Context, callback func(rec *
 
 	bp, err := iox.SkipBOM(fp)
 	if err != nil {
-		return fmt.Errorf(tbs.GetText(ucij.Locale, "csv.error.read"), err)
+		return fmt.Errorf(tbs.GetText(ucij.Locale(), "csv.error.read"), err)
 	}
 
 	i := 0
@@ -175,7 +164,7 @@ func (ucij *UserCsvImportJob) doReadCsv(ctx context.Context, callback func(rec *
 			return nil
 		}
 		if err != nil {
-			return fmt.Errorf(tbs.GetText(ucij.Locale, "csv.error.read"), err)
+			return fmt.Errorf(tbs.GetText(ucij.Locale(), "csv.error.read"), err)
 		}
 
 		if i == 1 {
@@ -196,7 +185,7 @@ func (ucij *UserCsvImportJob) doReadCsv(ctx context.Context, callback func(rec *
 }
 
 func (ucij *UserCsvImportJob) doCheckCsv() (total int, err error) {
-	ucij.Logger.Info(tbs.GetText(ucij.Locale, "csv.info.checking"))
+	ucij.Logger.Info(tbs.GetText(ucij.Locale(), "csv.info.checking"))
 
 	valid := true
 	err = ucij.doReadCsv(context.TODO(), func(rec *csvUserRecord) error {
@@ -214,7 +203,7 @@ func (ucij *UserCsvImportJob) doCheckCsv() (total int, err error) {
 	}
 
 	if !valid {
-		err = errors.New(tbs.GetText(ucij.Locale, "csv.error.data"))
+		err = errors.New(tbs.GetText(ucij.Locale(), "csv.error.data"))
 	}
 	return
 }
@@ -223,28 +212,28 @@ func (ucij *UserCsvImportJob) checkRecord(rec *csvUserRecord) error {
 	var errs []string
 
 	if rec.ID != "" && num.Atol(rec.ID) < models.UserStartID {
-		errs = append(errs, tbs.Format(ucij.Locale, "error.param.gte", tbs.GetText(ucij.Locale, "user.id", "ID"), num.Ltoa(models.UserStartID)))
+		errs = append(errs, tbs.Format(ucij.Locale(), "error.param.gte", tbs.GetText(ucij.Locale(), "user.id", "ID"), num.Ltoa(models.UserStartID)))
 	}
 	if rec.Name == "" {
-		errs = append(errs, tbs.GetText(ucij.Locale, "user.name"))
+		errs = append(errs, tbs.GetText(ucij.Locale(), "user.name"))
 	}
 	if rec.Email == "" {
-		errs = append(errs, tbs.GetText(ucij.Locale, "user.email"))
+		errs = append(errs, tbs.GetText(ucij.Locale(), "user.email"))
 	}
 	if rec.Role != "" && !ucij.roleRevMap.Contain(rec.Role) {
-		errs = append(errs, tbs.GetText(ucij.Locale, "user.role"))
+		errs = append(errs, tbs.GetText(ucij.Locale(), "user.role"))
 	}
 	if rec.Status != "" && !ucij.statusRevMap.Contain(rec.Status) {
-		errs = append(errs, tbs.GetText(ucij.Locale, "user.status"))
+		errs = append(errs, tbs.GetText(ucij.Locale(), "user.status"))
 	}
 	if rec.Password != "" {
 		if vs := ucij.pwdPolicy.ValidatePassword(rec.Password); len(vs) > 0 {
-			errs = append(errs, tbs.GetText(ucij.Locale, "user.password")+":["+str.Join(vs, ",")+"]")
+			errs = append(errs, tbs.GetText(ucij.Locale(), "user.password")+":["+str.Join(vs, ",")+"]")
 		}
 	}
 
 	if len(errs) > 0 {
-		return fmt.Errorf(tbs.GetText(ucij.Locale, "csv.error.line"), rec.Line, str.Join(errs, ","))
+		return fmt.Errorf(tbs.GetText(ucij.Locale(), "csv.error.line"), rec.Line, str.Join(errs, ","))
 	}
 
 	return nil
@@ -252,7 +241,7 @@ func (ucij *UserCsvImportJob) checkRecord(rec *csvUserRecord) error {
 
 func (ucij *UserCsvImportJob) importRecord(rec *csvUserRecord) error {
 	ucij.Step++
-	ucij.Logger.Infof(tbs.GetText(ucij.Locale, "user.import.csv.step.info"), ucij.Progress(), rec.ID, rec.Name, rec.Email)
+	ucij.Logger.Infof(tbs.GetText(ucij.Locale(), "user.import.csv.step.info"), ucij.Progress(), rec.ID, rec.Name, rec.Email)
 
 	user := &models.User{
 		ID:        num.Atol(rec.ID),
@@ -290,16 +279,16 @@ func (ucij *UserCsvImportJob) importRecord(rec *csvUserRecord) error {
 				r, err := tx.NamedExec(sql, user)
 				if err != nil {
 					if pgutil.IsUniqueViolationError(err) {
-						ucij.Logger.Warnf(tbs.GetText(ucij.Locale, "user.import.csv.step.duplicated"), ucij.Progress(), user.ID, user.Name, user.Email)
+						ucij.Logger.Warnf(tbs.GetText(ucij.Locale(), "user.import.csv.step.duplicated"), ucij.Progress(), user.ID, user.Name, user.Email)
 						return jobs.ErrItemSkip
 					}
 					return err
 				}
 
 				if cnt, _ := r.RowsAffected(); cnt > 0 {
-					ucij.Logger.Infof(tbs.GetText(ucij.Locale, "user.import.csv.step.updated"), ucij.Progress(), user.ID, user.Name, user.Email)
+					ucij.Logger.Infof(tbs.GetText(ucij.Locale(), "user.import.csv.step.updated"), ucij.Progress(), user.ID, user.Name, user.Email)
 				} else {
-					ucij.Logger.Warnf(tbs.GetText(ucij.Locale, "user.import.csv.step.ufailed"), ucij.Progress(), user.ID, user.Name, user.Email)
+					ucij.Logger.Warnf(tbs.GetText(ucij.Locale(), "user.import.csv.step.ufailed"), ucij.Progress(), user.ID, user.Name, user.Email)
 				}
 				return nil
 			}
@@ -331,13 +320,13 @@ func (ucij *UserCsvImportJob) importRecord(rec *csvUserRecord) error {
 		uid, err := tx.NamedCreate(sql, user)
 		if err != nil {
 			if pgutil.IsUniqueViolationError(err) {
-				ucij.Logger.Warnf(tbs.GetText(ucij.Locale, "user.import.csv.step.duplicated"), ucij.Progress(), user.ID, user.Name, user.Email)
+				ucij.Logger.Warnf(tbs.GetText(ucij.Locale(), "user.import.csv.step.duplicated"), ucij.Progress(), user.ID, user.Name, user.Email)
 				return jobs.ErrItemSkip
 			}
 			return err
 		}
 
-		ucij.Logger.Infof(tbs.GetText(ucij.Locale, "user.import.csv.step.created"), ucij.Progress(), uid, user.Name, user.Email)
+		ucij.Logger.Infof(tbs.GetText(ucij.Locale(), "user.import.csv.step.created"), ucij.Progress(), uid, user.Name, user.Email)
 		if user.ID != 0 {
 			// reset sequence if create with ID
 			if err := ucij.Tenant.ResetSequence(tx, "users", models.UserStartID); err != nil {
@@ -354,7 +343,7 @@ func (ucij *UserCsvImportJob) parseHead(row []string) error {
 	h.ParseHead(row)
 
 	if h.IdxName < 0 || h.IdxEmail < 0 {
-		return errors.New(tbs.GetText(ucij.Locale, "csv.error.head"))
+		return errors.New(tbs.GetText(ucij.Locale(), "csv.error.head"))
 	}
 
 	return nil

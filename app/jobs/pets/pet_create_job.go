@@ -8,7 +8,6 @@ import (
 	"github.com/askasoft/pango-xdemo/app/jobs"
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango-xdemo/app/utils/errutil"
-	"github.com/askasoft/pango/gog"
 	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pango/xjm"
 )
@@ -21,16 +20,14 @@ func init() {
 }
 
 type PetCreateArg struct {
-	jobs.ArgLocale
 	jobs.ArgChain
 
 	Items int `json:"items,omitempty" form:"items" validate:"min=1,max=1000"`
 	Delay int `json:"delay,omitempty" form:"delay" validate:"min=0,max=1000"`
 }
 
-func NewPetCreateArg(tt *tenant.Tenant, locale string) jobs.IArg {
+func NewPetCreateArg(tt *tenant.Tenant) jobs.IArg {
 	pca := &PetCreateArg{}
-	pca.Locale = locale
 	pca.Items = 100
 	pca.Delay = 200
 	return pca
@@ -41,11 +38,10 @@ func (pca *PetCreateArg) Bind(c *xin.Context) error {
 }
 
 type PetCreateJob struct {
-	*jobs.JobRunner
+	*jobs.JobRunner[PetCreateArg]
 
 	jobs.JobState
 
-	arg PetCreateArg
 	gen *PetGenerator
 }
 
@@ -64,12 +60,9 @@ func NewPetDogCreateJob(tt *tenant.Tenant, job *xjm.Job) jobs.IRun {
 func newPetCreateJob(tt *tenant.Tenant, job *xjm.Job) *PetCreateJob {
 	pcj := &PetCreateJob{}
 
-	pcj.JobRunner = jobs.NewJobRunner(tt, job.Name, job.ID)
+	pcj.JobRunner = jobs.NewJobRunner[PetCreateArg](tt, job)
 
-	xjm.MustDecode(job.Param, &pcj.arg)
-
-	pcj.Locale = pcj.arg.Locale
-	pcj.ArgChain = pcj.arg.ArgChain
+	pcj.ArgChain = pcj.Arg.ArgChain
 
 	return pcj
 }
@@ -81,7 +74,7 @@ func (pcj *PetCreateJob) Run() {
 	}
 
 	if pcj.Step == 0 {
-		pcj.SetTotalLimit(pcj.arg.Items, 0)
+		pcj.SetTotalLimit(pcj.Arg.Items, 0)
 	}
 
 	ctx, cancel := pcj.Running()
@@ -95,7 +88,7 @@ func (pcj *PetCreateJob) Run() {
 }
 
 func (pcj *PetCreateJob) run(ctx context.Context) error {
-	delay := time.Millisecond * time.Duration(gog.If(pcj.arg.Delay < 10, 10, pcj.arg.Delay))
+	delay := time.Millisecond * time.Duration(max(10, pcj.Arg.Delay))
 	timer := time.NewTimer(delay)
 
 	for {

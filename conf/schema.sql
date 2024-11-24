@@ -11,9 +11,11 @@ CREATE TABLE "SCHEMA"."files" (
 ---------------------------------;
 CREATE TABLE "SCHEMA"."jobs" (
 	"id" bigserial NOT NULL,
+	"cid" bigint NOT NULL,
 	"rid" bigint NOT NULL,
 	"name" varchar(250) NOT NULL,
 	"status" varchar(1) NOT NULL,
+	"locale" varchar(20) NOT NULL,
 	"file" text NOT NULL,
 	"param" text NOT NULL,
 	"state" text NOT NULL,

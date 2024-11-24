@@ -36,7 +36,7 @@ type PetClearJobController struct {
 func bindPetClearJobCtx(c *xin.Context, h xin.H) {
 	tt := tenant.FromCtx(c)
 
-	h["Arg"] = pets.NewPetClearArg(tt, c.Locale)
+	h["Arg"] = pets.NewPetClearArg(tt)
 	h["PetResetSequenceMap"] = tbsutil.GetBoolMap(c.Locale)
 }
 
@@ -50,7 +50,6 @@ func (pcjc *PetClearJobController) Index(c *xin.Context) {
 
 func bindPetClearJobArg(c *xin.Context) (jobs.IArgChain, bool) {
 	pca := &pets.PetClearArg{}
-	pca.Locale = c.Locale
 
 	if err := pca.Bind(c); err != nil {
 		vadutil.AddBindErrors(c, err, "pet.clear.")

@@ -48,7 +48,7 @@ type PetCreateJobController struct {
 func bindPetCreateJobCtx(c *xin.Context, h xin.H, kind string) {
 	tt := tenant.FromCtx(c)
 
-	h["Arg"] = pets.NewPetCreateArg(tt, c.Locale)
+	h["Arg"] = pets.NewPetCreateArg(tt)
 	h["Kind"] = kind
 }
 
@@ -62,7 +62,6 @@ func (pdjc *PetCreateJobController) Index(c *xin.Context) {
 
 func bindPetCreateJobArg(c *xin.Context) (jobs.IArgChain, bool) {
 	pca := &pets.PetCreateArg{}
-	pca.Locale = c.Locale
 
 	if err := pca.Bind(c); err != nil {
 		vadutil.AddBindErrors(c, err, "pet.create.")

@@ -55,7 +55,7 @@ type IArg interface {
 	Bind(c *xin.Context) error
 }
 
-type JobArgCreater func(*tenant.Tenant, string) IArg
+type JobArgCreater func(*tenant.Tenant) IArg
 
 var jobArgCreators = map[string]JobArgCreater{}
 
@@ -64,32 +64,26 @@ func RegisterJobArg(name string, jac JobArgCreater) {
 }
 
 type IArgChain interface {
-	GetChain() (int64, int, bool)
-	SetChain(chainID int64, chainSeq int, chainData bool)
+	GetChain() (int, bool)
+	SetChain(chainSeq int, chainData bool)
 }
 
 type ArgChain struct {
-	ChainID   int64 `json:"chain_id,omitempty" form:"-"`
-	ChainSeq  int   `json:"chain_seq,omitempty" form:"-"`
-	ChainData bool  `json:"chain_data,omitempty" form:"chain_data"`
+	ChainSeq  int  `json:"chain_seq,omitempty" form:"-"`
+	ChainData bool `json:"chain_data,omitempty" form:"chain_data"`
 }
 
-func (ac *ArgChain) GetChain() (int64, int, bool) {
-	return ac.ChainID, ac.ChainSeq, ac.ChainData
+func (ac *ArgChain) GetChain() (int, bool) {
+	return ac.ChainSeq, ac.ChainData
 }
 
-func (ac *ArgChain) SetChain(cid int64, csq int, cdt bool) {
-	ac.ChainID = cid
+func (ac *ArgChain) SetChain(csq int, cdt bool) {
 	ac.ChainSeq = csq
 	ac.ChainData = cdt
 }
 
 func (ac *ArgChain) ShouldChainData() bool {
 	return ac.ChainData && ac.ChainSeq > 0
-}
-
-type ArgLocale struct {
-	Locale string `json:"locale,omitempty" form:"-"`
 }
 
 type ArgItems struct {
@@ -200,33 +194,31 @@ func (si *FailedItem) String() string {
 	return fmt.Sprintf("#%d %s - %s", si.ID, si.Title, si.Error)
 }
 
-type JobRunner struct {
+type JobRunner[T any] struct {
 	*xjm.JobRunner
 	ArgChain
 
 	Tenant *tenant.Tenant
 	Logger log.Logger
-	Locale string
+	Arg    T
 }
 
-func NewJobRunner(tt *tenant.Tenant, jnm string, jid int64) *JobRunner {
+func NewJobRunner[T any](tt *tenant.Tenant, job *xjm.Job) *JobRunner[T] {
 	rid := time.Now().UnixMilli()
 	rsx := app.INI.GetString("job", "ridSuffix")
 	if rsx != "" {
 		sx := int64(math.Pow10(len(rsx)))
 		rid = rid*sx + num.Atol(str.TrimLeft(rsx, "0"))
 	}
+	job.RID = rid
 
-	jr := &JobRunner{
-		JobRunner: xjm.NewJobRunner(
-			tt.JM(),
-			jnm,
-			jid,
-			rid,
-			tt.Logger("JOB"),
-		),
-		Tenant: tt,
+	jr := &JobRunner[T]{
+		JobRunner: xjm.NewJobRunner(job, tt.JM(), tt.Logger("JOB")),
+		Tenant:    tt,
 	}
+
+	xjm.MustDecode(job.Param, &jr.Arg)
+
 	jr.Log().SetProp("VERSION", app.Version)
 	jr.Log().SetProp("REVISION", app.Revision)
 	jr.Log().SetProp("TENANT", string(tt.Schema))
@@ -235,7 +227,7 @@ func NewJobRunner(tt *tenant.Tenant, jnm string, jid int64) *JobRunner {
 	return jr
 }
 
-func (jr *JobRunner) AddFailedItem(id int64, title, reason string) {
+func (jr *JobRunner[T]) AddFailedItem(id int64, title, reason string) {
 	si := FailedItem{
 		ID:    id,
 		Title: title,
@@ -244,7 +236,7 @@ func (jr *JobRunner) AddFailedItem(id int64, title, reason string) {
 	_ = jr.AddResult(si.Quoted())
 }
 
-func (jr *JobRunner) Checkout() error {
+func (jr *JobRunner[T]) Checkout() error {
 	if err := jr.JobRunner.Checkout(); err != nil {
 		return err
 	}
@@ -252,7 +244,7 @@ func (jr *JobRunner) Checkout() error {
 	return jr.jobChainCheckout()
 }
 
-func (jr *JobRunner) Running() (context.Context, context.CancelCauseFunc) {
+func (jr *JobRunner[T]) Running() (context.Context, context.CancelCauseFunc) {
 	ctx, cancel := context.WithCancelCause(context.TODO())
 	go func() {
 		if err := jr.JobRunner.Running(ctx, time.Second, time.Minute); err != nil {
@@ -262,7 +254,7 @@ func (jr *JobRunner) Running() (context.Context, context.CancelCauseFunc) {
 	return ctx, cancel
 }
 
-func (jr *JobRunner) SetState(state iState) error {
+func (jr *JobRunner[T]) SetState(state iState) error {
 	if err := jr.JobRunner.SetState(xjm.MustEncode(state)); err != nil {
 		return err
 	}
@@ -270,7 +262,7 @@ func (jr *JobRunner) SetState(state iState) error {
 	return jr.jobChainSetState(state)
 }
 
-func (jr *JobRunner) Abort(reason string) {
+func (jr *JobRunner[T]) Abort(reason string) {
 	if err := jr.JobRunner.Abort(reason); err != nil {
 		if !errors.Is(err, xjm.ErrJobMissing) {
 			jr.Logger.Error(err)
@@ -284,7 +276,7 @@ func (jr *JobRunner) Abort(reason string) {
 	jr.Logger.Warn("ABORTED.")
 }
 
-func (jr *JobRunner) Finish() {
+func (jr *JobRunner[T]) Finish() {
 	if err := jr.JobRunner.Finish(); err != nil {
 		if !errors.Is(err, xjm.ErrJobMissing) {
 			jr.Logger.Error(err)
@@ -300,7 +292,7 @@ func (jr *JobRunner) Finish() {
 	jr.Logger.Info("DONE.")
 }
 
-func (jr *JobRunner) Done(err error) {
+func (jr *JobRunner[T]) Done(err error) {
 	defer jr.Log().Close()
 
 	if errors.Is(err, xjm.ErrJobCheckout) {
