@@ -50,12 +50,12 @@ func userDetail(c *xin.Context, action string) {
 
 	user := &models.User{}
 	err := app.SDB.Get(user, sql, args...)
-	if errors.Is(err, sqlx.ErrNoRows) {
-		c.AddError(errors.New(tbs.Format(c.Locale, "error.detail.notfound", uid)))
-		c.JSON(http.StatusNotFound, handlers.E(c))
-		return
-	}
 	if err != nil {
+		if errors.Is(err, sqlx.ErrNoRows) {
+			c.AddError(errors.New(tbs.Format(c.Locale, "error.detail.notfound", uid)))
+			c.JSON(http.StatusNotFound, handlers.E(c))
+			return
+		}
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return
@@ -148,9 +148,9 @@ func UserCreate(c *xin.Context) {
 	if !db.SupportLastInsertID() {
 		sqb.Returns("id")
 	}
-	sql, args := sqb.Build()
+	sql := sqb.SQL()
 
-	uid, err := db.Create(sql, args...)
+	uid, err := db.NamedCreate(sql, user)
 	if err != nil {
 		if pgutil.IsUniqueViolationError(err) {
 			err = &vadutil.ParamError{

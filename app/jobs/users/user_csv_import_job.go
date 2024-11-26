@@ -36,7 +36,7 @@ type UserCsvImportArg struct {
 	Role string `json:"role,omitempty"`
 }
 
-func NewUserCsvImportArg(locale, role string) *UserCsvImportArg {
+func NewUserCsvImportArg(role string) *UserCsvImportArg {
 	ucij := &UserCsvImportArg{}
 	ucij.Role = role
 	return ucij

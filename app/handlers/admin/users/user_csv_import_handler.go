@@ -52,7 +52,7 @@ func (ucijc *UserCsvImportJobController) Start(c *xin.Context) {
 	}
 
 	au := tenant.AuthUser(c)
-	ucia := users.NewUserCsvImportArg(c.Locale, au.Role)
+	ucia := users.NewUserCsvImportArg(au.Role)
 	ucijc.SetParam(ucia)
 	ucijc.JobController.Start(c)
 }
