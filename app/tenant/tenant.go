@@ -24,7 +24,7 @@ func NewTenant(name string) *Tenant {
 	return tt
 }
 
-func GetSchema(c *xin.Context) (string, bool) {
+func GetSubdomain(c *xin.Context) (string, bool) {
 	if !IsMultiTenant() {
 		return "", true
 	}
@@ -59,7 +59,7 @@ func FindAndSetTenant(c *xin.Context) (*Tenant, error) {
 		return tt.(*Tenant), nil
 	}
 
-	s, ok := GetSchema(c)
+	s, ok := GetSubdomain(c)
 	if !ok {
 		return nil, fmt.Errorf("Invalid host %q", c.Request.Host)
 	}
@@ -80,23 +80,10 @@ func FindAndSetTenant(c *xin.Context) (*Tenant, error) {
 }
 
 func Iterate(itf func(tt *Tenant) error) error {
-	if !IsMultiTenant() {
-		tt := NewTenant("")
+	return schema.Iterate(func(sm schema.Schema) error {
+		tt := NewTenant(string(sm))
 		return itf(tt)
-	}
-
-	ss, err := schema.ListSchemas()
-	if err != nil {
-		return err
-	}
-
-	for _, s := range ss {
-		tt := NewTenant(s)
-		if err := itf(tt); err != nil {
-			return err
-		}
-	}
-	return nil
+	})
 }
 
 func Create(name string, comment string) error {

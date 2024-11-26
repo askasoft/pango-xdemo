@@ -10,7 +10,7 @@ import (
 )
 
 func SetCtxLogProp(c *xin.Context) {
-	s, _ := tenant.GetSchema(c)
+	s, _ := tenant.GetSubdomain(c)
 	c.Logger.SetProp("TENANT", s)
 }
 

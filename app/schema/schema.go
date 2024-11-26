@@ -81,16 +81,16 @@ func ListSchemas() ([]string, error) {
 	return SM().ListSchemas()
 }
 
-func CreateSchema(name string, comment string) error {
+func CreateSchema(name, comment string) error {
 	return SM().CreateSchema(name, comment)
 }
 
-func CommentSchema(name string, comment string) error {
+func CommentSchema(name, comment string) error {
 	return SM().CommentSchema(name, comment)
 }
 
-func RenameSchema(old string, new string) error {
-	return SM().RenameSchema(old, new)
+func RenameSchema(_old, _new string) error {
+	return SM().RenameSchema(_old, _new)
 }
 
 func DeleteSchema(name string) error {
@@ -107,7 +107,7 @@ func FindSchemas(sq *xsm.SchemaQuery) (schemas []*xsm.SchemaInfo, err error) {
 
 func Iterate(itf func(sm Schema) error) error {
 	if !IsMultiTenant() {
-		return itf(Schema(""))
+		return itf(Schema(DefaultSchema()))
 	}
 
 	ss, err := ListSchemas()
