@@ -137,10 +137,6 @@
 	}
 
 	function build_jobchain_list(data, cid) {
-		if (!data || data.length == 0) {
-			return;
-		}
-
 		var $jchs = $('#jobchain_tabs > ul');
 		var $jcs = $('#jobchain_list');
 
@@ -302,13 +298,13 @@
 			dataType: 'json',
 			beforeSend: $jchs.loadmask.bind($jchs),
 			success: function(data) {
-				setTimeout(function() {
-					if (data && data.length && !cid) {
+				if (data && data.length) {
+					setTimeout(function() {
 						$('#jobchain_history').fieldset('expand');
-					}
-					build_jobchain_list(data, cid);
-					refresh_jobchain_start();
-				}, 10);
+						build_jobchain_list(data, cid);
+						refresh_jobchain_start();
+					}, 10);
+				}
 			},
 			error: main.ajax_error,
 			complete: $jchs.unloadmask.bind($jchs)
