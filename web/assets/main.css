@@ -260,7 +260,7 @@ blockquote {
 #footer .ver {
 	color: #999;
 	position: absolute;
-	right: 5px;
+	left: 5px;
 	bottom: 5px;
 }
 
