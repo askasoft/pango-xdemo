@@ -45,6 +45,7 @@
 			<label class="col-md-2 col-form-label">{{T .Loc "user.cidr"}}</label>
 			<div class="col-md-10">
 				<textarea name="cidr" class="form-control" rows="2" autosize enterfire textclear>{{$u.CIDR}}</textarea>
+				<div class="desc">{{T .Loc "user.desc.cidr"}}</div>
 			</div>
 		</div>
 		<button type="submit" class="hidden"></button>
