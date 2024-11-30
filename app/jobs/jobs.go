@@ -1,7 +1,6 @@
 package jobs
 
 import (
-	"bytes"
 	"cmp"
 	"errors"
 	"fmt"
@@ -128,7 +127,7 @@ func (tws *tenantWorkers) Stats() string {
 	total, stats, detail := 0, "JOB RUNNING: 0", ""
 
 	if tws.ws.Len() > 0 {
-		bb := &bytes.Buffer{}
+		sb := &str.Builder{}
 		for it := tws.ws.Iterator(); it.Next(); {
 			cnt := it.Value().Runnings()
 			if cnt == 0 {
@@ -137,13 +136,13 @@ func (tws *tenantWorkers) Stats() string {
 
 			total += cnt
 
-			fmt.Fprintf(bb, "%30s: [%d]", str.IfEmpty(it.Key(), "_"), cnt)
+			fmt.Fprintf(sb, "%30s: [%d]", str.IfEmpty(it.Key(), "_"), cnt)
 			for _, job := range it.Value().RunningJobs {
-				fmt.Fprintf(bb, " %s#%d", job.Name, job.ID)
+				fmt.Fprintf(sb, " %s#%d", job.Name, job.ID)
 			}
-			bb.WriteByte('\n')
+			sb.WriteByte('\n')
 		}
-		detail = str.UnsafeString(bb.Bytes())
+		detail = sb.String()
 	}
 
 	if total > 0 {

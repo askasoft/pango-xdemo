@@ -386,9 +386,11 @@ func addSuperHandlers(rg *xin.RouterGroup) {
 	rg.Use(app.XTP.Handler()) // token protect
 
 	addSuperTenantHandlers(rg.Group("/tenants"))
-	addSuperJobHandlers(rg.Group("/job"))
 	addSuperShellHandlers(rg.Group("/shell"))
 	addSuperSqlHandlers(rg.Group("/sql"))
+
+	rg.GET("/job", super.JobStats)
+	rg.GET("/sys", super.SysStats)
 }
 
 func addSuperTenantHandlers(rg *xin.RouterGroup) {
@@ -397,10 +399,6 @@ func addSuperTenantHandlers(rg *xin.RouterGroup) {
 	rg.POST("/create", super.TenantCreate)
 	rg.POST("/update", super.TenantUpdate)
 	rg.POST("/delete", super.TenantDelete)
-}
-
-func addSuperJobHandlers(rg *xin.RouterGroup) {
-	rg.GET("/", super.JobStats)
 }
 
 func addSuperShellHandlers(rg *xin.RouterGroup) {
