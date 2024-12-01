@@ -1,11 +1,24 @@
 {{template "main_header" .}}
 
+<style>
+.stats .card {
+	min-width: 10em;
+}
+</style>
+
 <div class="s-section">
 	<div class="s-section-head">
 		<h2>{{I "super.sys"}}<span>{{T .Loc "menu.super.sys"}}</span></h2>
 	</div>
 	<div class="s-section-body">
-		<pre>{{$.Stats}}</pre>
+		<div class="stats d-flex flex-row flex-wrap gap-3">
+			{{range $e := $.Stats.Entries}}
+			<div class="card">
+				<div class="card-header">{{$e.Key}}</div>
+				<div class="card-body">{{$e.Value}}</div>
+			</div>
+			{{end}}
+		</div>
 	</div>
 </div>
 
