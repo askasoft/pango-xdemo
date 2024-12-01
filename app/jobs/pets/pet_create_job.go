@@ -105,7 +105,7 @@ func (pcj *PetCreateJob) run(ctx context.Context) error {
 				return err
 			}
 
-			pcj.Success++
+			pcj.IncSuccess()
 			if err := pcj.SetState(&pcj.JobState); err != nil {
 				return err
 			}

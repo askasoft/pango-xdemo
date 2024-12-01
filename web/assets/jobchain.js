@@ -270,11 +270,8 @@
 		if (jrs.status == 'F') {
 			p = 100;
 			t = '100%';
-		} else if (jrs.state.limit) {
-			p = Math.floor((jrs.state.success || 0) * 100 / jrs.state.limit)
-			t = p + '%';
-		} else if (jrs.state.total) {
-			p = Math.floor((jrs.state.step || 0) * 100 / jrs.state.total)
+		} else if (jrs.state.limit || jrs.state.total) {
+			p = Math.floor((jrs.state.count || jrs.state.step || 0) * 100 / (jrs.state.limit || jrs.state.total))
 			t = p + '%';
 		} else {
 			p = 10;

@@ -127,6 +127,7 @@ type iState interface {
 
 type JobState struct {
 	Step    int `json:"step,omitempty"`
+	Count   int `json:"count,omitempty"`
 	Total   int `json:"total,omitempty"`
 	Limit   int `json:"limit,omitempty"`
 	Exists  int `json:"exists,omitempty"`
@@ -144,19 +145,72 @@ func (js *JobState) IsStepLimited() bool {
 	return js.Limit > 0 && js.Step >= js.Limit
 }
 
-func (js *JobState) IsSuccessLimited() bool {
-	return js.Limit > 0 && js.Success >= js.Limit
+func (js *JobState) IncSkipped() {
+	js.Count++
+	js.Skipped++
+}
+
+func (js *JobState) IncSuccess() {
+	js.Count++
+	js.Success++
+}
+
+func (js *JobState) IncFailure() {
+	js.Count++
+	js.Failure++
 }
 
 func (js *JobState) Progress() string {
-	if js.Limit > 0 && js.Total > 0 {
-		return fmt.Sprintf("[%d/%d] [%d/%d]", js.Success, js.Limit, js.Step, js.Total)
+	if js.Limit > 0 {
+		return fmt.Sprintf("[%d/%d]", js.Count, js.Limit)
 	}
+	if js.Total > 0 {
+		return fmt.Sprintf("[%d/%d]", js.Count, js.Total)
+	}
+	if js.Count > 0 {
+		return fmt.Sprintf("[%d/%d]", js.Count, js.Step)
+	}
+	if js.Step > 0 {
+		return fmt.Sprintf("[%d]", js.Step)
+	}
+	return ""
+}
+
+func (js *JobState) Counts() string {
+	return fmt.Sprintf("[%d/%d/%d] (-%d|+%d|!%d)", js.Step, js.Limit, js.Total, js.Skipped, js.Success, js.Failure)
+}
+
+func (js *JobState) State() JobState {
+	return *js
+}
+
+type JobStateSx struct {
+	JobState
+}
+
+func (js *JobStateSx) IsSuccessLimited() bool {
+	return js.Limit > 0 && js.Success >= js.Limit
+}
+
+func (js *JobStateSx) IncSkipped() {
+	js.Skipped++
+}
+
+func (js *JobStateSx) IncSuccess() {
+	js.Count++
+	js.IncSuccess()
+}
+
+func (js *JobStateSx) IncFailure() {
+	js.Failure++
+}
+
+func (js *JobStateSx) Progress() string {
 	if js.Limit > 0 {
 		return fmt.Sprintf("[%d/%d]", js.Success, js.Limit)
 	}
 	if js.Total > 0 {
-		return fmt.Sprintf("[%d/%d]", js.Step, js.Total)
+		return fmt.Sprintf("[%d/%d]", js.Success, js.Total)
 	}
 	if js.Success > 0 {
 		return fmt.Sprintf("[%d/%d]", js.Success, js.Step)
@@ -167,17 +221,15 @@ func (js *JobState) Progress() string {
 	return ""
 }
 
-func (js *JobState) String() string {
-	return fmt.Sprintf("[%d/%d/%d] (-%d|+%d|!%d)", js.Step, js.Limit, js.Total, js.Skipped, js.Success, js.Failure)
-}
-
-func (js *JobState) State() JobState {
-	return *js
-}
-
 type JobStateEx struct {
 	JobState
 	LastID int64 `json:"last_id,omitempty"`
+}
+
+type JobStateFsx struct {
+	JobStateSx
+	LastID        int64     `json:"last_id,omitempty"`
+	LastUpdatedAt time.Time `json:"last_updated_at,omitempty"`
 }
 
 type FailedItem struct {
