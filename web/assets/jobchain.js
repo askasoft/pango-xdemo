@@ -298,13 +298,13 @@
 			dataType: 'json',
 			beforeSend: $jchs.loadmask.bind($jchs),
 			success: function(data) {
-				if (data && data.length) {
-					setTimeout(function() {
+				setTimeout(function() {
+					if (data && data.length) {
 						$('#jobchain_history').fieldset('expand');
 						build_jobchain_list(data, cid);
-						refresh_jobchain_start();
-					}, 10);
-				}
+					}
+					refresh_jobchain_start();
+				}, 10);
 			},
 			error: main.ajax_error,
 			complete: $jchs.unloadmask.bind($jchs)

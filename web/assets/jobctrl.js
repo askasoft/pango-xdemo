@@ -364,13 +364,13 @@
 			dataType: 'json',
 			beforeSend: $jhs.loadmask.bind($jhs),
 			success: function(data) {
-				if (data && data.length) {
-					setTimeout(function() {
+				setTimeout(function() {
+					if (data && data.length) {
 						$('#job_history').fieldset('expand');
 						build_job_list(data, jid);
-						refresh_job_start();
-					}, 10);
-				}
+					}
+					refresh_job_start();
+				}, 10);
 			},
 			error: main.ajax_error,
 			complete: $jhs.unloadmask.bind($jhs)
