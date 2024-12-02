@@ -198,7 +198,7 @@ func (js *JobStateSx) IncSkipped() {
 
 func (js *JobStateSx) IncSuccess() {
 	js.Count++
-	js.IncSuccess()
+	js.Success++
 }
 
 func (js *JobStateSx) IncFailure() {

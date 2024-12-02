@@ -100,12 +100,10 @@ func (pcj *PetCreateJob) run(ctx context.Context) error {
 				return xjm.ErrJobComplete
 			}
 
-			pcj.Step++
 			if err := pcj.gen.Create(pcj.Logger, app.SDB, &pcj.JobState); err != nil {
 				return err
 			}
 
-			pcj.IncSuccess()
 			if err := pcj.SetState(&pcj.JobState); err != nil {
 				return err
 			}

@@ -71,6 +71,7 @@ func (pg *PetGenerator) Create(logger log.Logger, db *sqlx.DB, js *jobs.JobState
 		UpdatedAt:   time.Now(),
 	}
 
+	js.Step++
 	logger.Infof("%s Create Pet: %s", js.Progress(), pet.Name)
 
 	sqb := db.Builder()
@@ -87,6 +88,8 @@ func (pg *PetGenerator) Create(logger log.Logger, db *sqlx.DB, js *jobs.JobState
 	}
 
 	pet.ID = pid
+
+	js.IncSuccess()
 	logger.Infof("%s Pet #%d Created: %s", js.Progress(), pet.ID, pet.Name)
 
 	if len(pg.imgs) > 0 {

@@ -279,6 +279,7 @@ func (ucij *UserCsvImportJob) importRecord(rec *csvUserRecord) error {
 				r, err := tx.NamedExec(sql, user)
 				if err != nil {
 					if pgutil.IsUniqueViolationError(err) {
+						ucij.IncFailure()
 						ucij.Logger.Warnf(tbs.GetText(ucij.Locale(), "user.import.csv.step.duplicated"), ucij.Progress(), user.ID, user.Name, user.Email)
 						return jobs.ErrItemSkip
 					}
@@ -286,8 +287,10 @@ func (ucij *UserCsvImportJob) importRecord(rec *csvUserRecord) error {
 				}
 
 				if cnt, _ := r.RowsAffected(); cnt > 0 {
+					ucij.IncSuccess()
 					ucij.Logger.Infof(tbs.GetText(ucij.Locale(), "user.import.csv.step.updated"), ucij.Progress(), user.ID, user.Name, user.Email)
 				} else {
+					ucij.IncFailure()
 					ucij.Logger.Warnf(tbs.GetText(ucij.Locale(), "user.import.csv.step.ufailed"), ucij.Progress(), user.ID, user.Name, user.Email)
 				}
 				return nil
@@ -320,13 +323,16 @@ func (ucij *UserCsvImportJob) importRecord(rec *csvUserRecord) error {
 		uid, err := tx.NamedCreate(sql, user)
 		if err != nil {
 			if pgutil.IsUniqueViolationError(err) {
+				ucij.IncFailure()
 				ucij.Logger.Warnf(tbs.GetText(ucij.Locale(), "user.import.csv.step.duplicated"), ucij.Progress(), user.ID, user.Name, user.Email)
 				return jobs.ErrItemSkip
 			}
 			return err
 		}
 
+		ucij.IncSuccess()
 		ucij.Logger.Infof(tbs.GetText(ucij.Locale(), "user.import.csv.step.created"), ucij.Progress(), uid, user.Name, user.Email)
+
 		if user.ID != 0 {
 			// reset sequence if create with ID
 			if err := ucij.Tenant.ResetSequence(tx, "users", models.UserStartID); err != nil {
