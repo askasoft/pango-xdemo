@@ -2,8 +2,6 @@ package schema
 
 import (
 	"errors"
-	"io"
-	"strings"
 	"time"
 
 	"github.com/askasoft/pango-xdemo/app"
@@ -12,9 +10,7 @@ import (
 	"github.com/askasoft/pango/fsu"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/ran"
-	"github.com/askasoft/pango/sqx"
 	"github.com/askasoft/pango/sqx/sqlx"
-	"github.com/askasoft/pango/str"
 )
 
 func ReadConfigFile() ([]*models.Config, error) {
@@ -54,12 +50,12 @@ func (sm Schema) MigrateSchema() error {
 
 	log.Infof("Read SQL file '%s'", app.SQLSchemaFile)
 
-	sql, err := fsu.ReadString(app.SQLSchemaFile)
+	sqls, err := fsu.ReadString(app.SQLSchemaFile)
 	if err != nil {
 		return err
 	}
 
-	return sm.ExecSQL(sql)
+	return sm.ExecSQL(sqls)
 }
 
 func (sm Schema) MigrateConfig(configs []*models.Config) error {
@@ -188,36 +184,5 @@ func (sm Schema) MigrateSuper() error {
 	sqb.Setc("status", models.UserActive)
 	sql, args = sqb.Build()
 	_, err = app.SDB.Exec(sql, args...)
-	return err
-}
-
-func (sm Schema) ExecSQL(sql string) error {
-	log.Info(str.PadCenter(" "+string(sm)+" ", 78, "="))
-
-	tsql := str.ReplaceAll(sql, `"SCHEMA"`, string(sm))
-
-	sr := sqx.NewSqlReader(strings.NewReader(tsql))
-
-	err := app.SDB.Transaction(func(tx *sqlx.Tx) error {
-		for i := 1; ; i++ {
-			sql, err := sr.ReadSql()
-			if errors.Is(err, io.EOF) {
-				return nil
-			}
-			if err != nil {
-				return err
-			}
-
-			r, err := tx.Exec(sql)
-			if err != nil {
-				log.Errorf("#%d = %s", i, sql)
-				return err
-			}
-
-			cnt, _ := r.RowsAffected()
-			log.Infof("#%d [%d] = %s", i, cnt, sql)
-		}
-	})
-
 	return err
 }
