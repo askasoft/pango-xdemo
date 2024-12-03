@@ -52,7 +52,7 @@ func (c *Config) DisplayValue() string {
 		case ConfigStyleNumeric:
 			return num.Comma(num.Atol(c.Value))
 		case ConfigStyleDecimal:
-			return num.CommaFloat(num.Atof(c.Value))
+			return num.Comma(num.Atof(c.Value))
 		}
 	}
 	return c.Value

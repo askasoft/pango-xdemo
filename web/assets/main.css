@@ -346,13 +346,17 @@ blockquote {
 .s-section-head > h2 > i, .s-section-head > h3 > i {
 	font-size: 1.25em;
 }
-.s-section-head > h2 > i + * {
+.s-section-head > h2 > i + *, .s-section-head > h3 > i + * {
 	margin-left: 0.5rem;
 }
 .s-section-body {
 	background-color: var(--bs-body-bg);
 	border-radius: 0.75rem;
 	padding: 1.5rem;
+}
+.s-section-body > h3, .s-section-body > h4 {
+	border-bottom: 1px solid #ccc;
+	padding: 0.25rem 0;
 }
 
 /** login **/
