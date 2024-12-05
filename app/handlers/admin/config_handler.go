@@ -183,7 +183,7 @@ func ConfigSave(c *xin.Context) {
 			validation = "required"
 		}
 		if cfg.Validation != "" {
-			validation += str.If(validation == "", "", ",") + "omitempty," + cfg.Validation
+			validation += str.If(validation == "", "omitempty,", ",") + cfg.Validation
 		}
 		if validation != "" {
 			var vv any

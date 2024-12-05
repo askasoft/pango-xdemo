@@ -27,6 +27,7 @@ sed -e "s;DEBUG;${LOG_LEVEL};g" \
 
 cp -a conf/config.csv ${APPHOME}/conf/
 cp -a conf/schema.sql ${APPHOME}/conf/
+cp -a conf/xdemo.*    ${APPHOME}/conf/
 
 if ! [ -z "${LOG_SLACK_WEBHOOK}" ]; then
 	LOG_WRITERS="${LOG_WRITERS}, slack"

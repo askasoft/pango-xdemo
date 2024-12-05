@@ -2,6 +2,8 @@ package server
 
 import (
 	"context"
+	"crypto/tls"
+	"crypto/x509"
 	"errors"
 	"fmt"
 	golog "log"
@@ -88,6 +90,8 @@ func (s *service) Wait() {
 func Init() {
 	initLog()
 
+	initCertificate()
+
 	initConfigs()
 
 	initCaches()
@@ -168,6 +172,22 @@ func initLog() {
 	log.Infof("BuildTime: %s", app.BuildTime.Local())
 	log.Infof("Runtime:   %s %s/%s", runtime.Version(), runtime.GOOS, runtime.GOARCH)
 	log.Infof("Directory: %s", dir)
+}
+
+func initCertificate() {
+	keyPair, err := tls.LoadX509KeyPair(app.SAMLCertificateFile, app.SAMLCertKeyFile)
+	if err != nil {
+		log.Errorf("Failed to load certificate file (%q, %q): %v", app.SAMLCertificateFile, app.SAMLCertKeyFile, err)
+		app.Exit(app.ExitErrCFG)
+	}
+
+	keyPair.Leaf, err = x509.ParseCertificate(keyPair.Certificate[0])
+	if err != nil {
+		log.Errorf("Failed to parse certificate: %v", err)
+		app.Exit(app.ExitErrCFG)
+	}
+
+	app.Certificate = &keyPair
 }
 
 func initConfigs() {

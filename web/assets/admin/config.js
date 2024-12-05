@@ -1,4 +1,10 @@
 (function($) {
+	function toggle_login_method() {
+		var saml = $('input[name="secure_login_method"]:checked').val() == 'S';
+		$('[name="secure_login_mfa"]').prop('disabled', saml).closest('.row')[saml ? 'slideUp' : 'slideDown']();
+		$('[name^="secure_saml_"]').prop('disabled', !saml).closest('.row')[saml ? 'slideDown' : 'slideUp']();
+	}
+
 	function configs_import() {
 		var $p = $('#configs_import_popup').popup('update', { keyboard: false });
 
@@ -88,6 +94,9 @@
 		if (cg.startsWith('cg_')) {
 			configs_tab_show(cg);
 		}
+
+		$('.cfgform input[name="secure_login_method"]').change(toggle_login_method);
+		toggle_login_method();
 	}
 
 	$(window).on('load', configs_init);

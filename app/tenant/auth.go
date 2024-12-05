@@ -19,10 +19,8 @@ var noUser = &models.User{}
 // USERS write lock
 var muUSERS sync.Mutex
 
-func FindUser(c *xin.Context, username string) (xmw.AuthUser, error) {
-	tt := FromCtx(c)
-
-	k := string(tt.Schema) + "\n" + username
+func (tt *Tenant) FindUser(username string) (xmw.AuthUser, error) {
+	k := string(tt.Schema) + "/" + username
 
 	if u, ok := app.USERS.Get(k); ok {
 		if u.ID == 0 {
@@ -48,8 +46,7 @@ func FindUser(c *xin.Context, username string) (xmw.AuthUser, error) {
 	sql, args := sqb.Build()
 
 	u := &models.User{}
-	err := app.SDB.Get(u, sql, args...)
-	if err != nil {
+	if err := app.SDB.Get(u, sql, args...); err != nil {
 		if errors.Is(err, sqlx.ErrNoRows) {
 			app.USERS.Set(k, noUser)
 			return nil, nil
@@ -59,6 +56,25 @@ func FindUser(c *xin.Context, username string) (xmw.AuthUser, error) {
 
 	app.USERS.Set(k, u)
 	return u, nil
+}
+
+func (tt *Tenant) RevokeUser(username string) {
+	k := string(tt.Schema) + "/" + username
+
+	app.USERS.Delete(k)
+}
+
+func (tt *Tenant) CacheUser(u *models.User) {
+	k := string(tt.Schema) + "/" + u.Email
+
+	app.USERS.Set(k, u)
+}
+
+//----------------------------------------------------
+
+func FindUser(c *xin.Context, username string) (xmw.AuthUser, error) {
+	tt := FromCtx(c)
+	return tt.FindUser(username)
 }
 
 func GetAuthUser(c *xin.Context) *models.User {

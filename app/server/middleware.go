@@ -3,6 +3,7 @@ package server
 import (
 	"net/http"
 
+	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/handlers"
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/tenant"
@@ -30,6 +31,19 @@ func TenantProtect(c *xin.Context) {
 
 	c.Next()
 }
+
+// ----------------------------------------------------
+func AppAuth(c *xin.Context) {
+	tt := tenant.FromCtx(c)
+
+	if tt.IsSAMLLogin() {
+		SAMLProtect(c)
+	} else {
+		app.XCA.Handle(c)
+	}
+}
+
+//----------------------------------------------------
 
 // IPProtect allow access by cidr of user or tenant
 func IPProtect(c *xin.Context) {

@@ -79,3 +79,12 @@ func (tt *Tenant) GetPasswordPolicy(loc string) *PasswordPolicy {
 func (tt *Tenant) ValidatePassword(loc, pwd string) []string {
 	return tt.GetPasswordPolicy(loc).ValidatePassword(pwd)
 }
+
+const (
+	AuthMethodPassword = "P"
+	AuthMethodSSOSaml  = "S"
+)
+
+func (tt *Tenant) IsSAMLLogin() bool {
+	return tt.ConfigValue("secure_login_method") == AuthMethodSSOSaml && tt.ConfigValue("secure_saml_idpmeta") != ""
+}

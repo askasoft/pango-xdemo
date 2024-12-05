@@ -254,3 +254,8 @@ POST xdemo_access/_delete_by_query
 	}
 }
 ```
+
+## SAML
+```sh
+openssl req -x509 -newkey rsa:2048 -keyout xdemo.key -out xdemo.cer -days 36500 -nodes -subj "/CN=*.xdemo.local"
+```

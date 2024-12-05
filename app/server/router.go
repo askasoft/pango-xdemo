@@ -34,6 +34,7 @@ func initRouter() {
 	app.VAD.RegisterValidation("ini", vadutil.ValidateINI)
 	app.VAD.RegisterValidation("cidrs", vadutil.ValidateCIDRs)
 	app.VAD.RegisterValidation("regexps", vadutil.ValidateRegexps)
+	app.VAD.RegisterValidation("samlmeta", vadutil.ValidateSAMLMeta)
 
 	app.XAL = xmw.NewAccessLogger(nil)
 	app.XRL = xmw.NewRequestLimiter(0)
@@ -199,6 +200,7 @@ func initHandlers() {
 
 	addStaticHandlers(rg)
 
+	addSAMLHandlers(rg.Group("/saml"))
 	addAPIHandlers(rg.Group("/api"))
 	addFilesHandlers(rg.Group("/files"))
 	addDemosHandlers(rg.Group("/demos"))
@@ -288,7 +290,6 @@ func addDemosHandlers(rg *xin.RouterGroup) {
 	rg.GET("/tags/", demos.TagsIndex)
 	rg.POST("/tags/", demos.TagsIndex)
 	rg.GET("/uploads/", demos.UploadsIndex)
-
 }
 
 func addDemosPetsHandlers(rg *xin.RouterGroup) {
@@ -321,7 +322,7 @@ func addDemosChineseHandlers(rg *xin.RouterGroup) {
 }
 
 func addUserHandlers(rg *xin.RouterGroup) {
-	rg.Use(app.XCA.Handler()) // cookie auth
+	rg.Use(AppAuth)           // app auth
 	rg.Use(IPProtect)         // IP protect
 	rg.Use(app.XTP.Handler()) // token protect
 
@@ -334,7 +335,7 @@ func addUserPwdchgHandlers(rg *xin.RouterGroup) {
 }
 
 func addAdminHandlers(rg *xin.RouterGroup) {
-	rg.Use(app.XCA.Handler()) // cookie auth
+	rg.Use(AppAuth)           // app auth
 	rg.Use(IPProtect)         // IP protect
 	rg.Use(RoleAdminProtect)  // role protect
 	rg.Use(app.XTP.Handler()) // token protect
@@ -380,7 +381,7 @@ func addAdminUserCsvImportHandlers(rg *xin.RouterGroup) {
 }
 
 func addSuperHandlers(rg *xin.RouterGroup) {
-	rg.Use(app.XCA.Handler()) // cookie auth
+	rg.Use(AppAuth)           // app auth
 	rg.Use(IPProtect)         // IP protect
 	rg.Use(RoleRootProtect)   // role protect
 	rg.Use(app.XTP.Handler()) // token protect

@@ -1,6 +1,7 @@
 package app
 
 import (
+	"crypto/tls"
 	"fmt"
 	"net/http"
 	"os"
@@ -28,6 +29,12 @@ const (
 
 	// Schema DDL sql file
 	SQLSchemaFile = "conf/schema.sql"
+
+	// SAML certificate file
+	SAMLCertificateFile = "conf/xdemo.cer"
+
+	// SAML cert key file
+	SAMLCertKeyFile = "conf/xdemo.key"
 )
 
 const (
@@ -137,11 +144,14 @@ var (
 	// HTTP global http server
 	HTTP *http.Server
 
+	// DBS database settings
+	DBS map[string]string
+
 	// SDB sqx database instance
 	SDB *sqlx.DB
 
-	// DBS database settings
-	DBS map[string]string
+	// Certificate X509 KeyPair
+	Certificate *tls.Certificate
 
 	// SCMAS schema cache
 	SCMAS *imc.Cache[bool]

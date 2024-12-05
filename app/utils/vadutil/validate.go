@@ -12,6 +12,7 @@ import (
 	"github.com/askasoft/pango/vad"
 	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pango/xin/binding"
+	"github.com/crewjam/saml/samlsp"
 )
 
 type ParamError struct {
@@ -151,4 +152,9 @@ func ParseCIDRs(cidr string) (cidrs []*net.IPNet) {
 		}
 	}
 	return
+}
+
+func ValidateSAMLMeta(fl vad.FieldLevel) bool {
+	_, err := samlsp.ParseMetadata(str.UnsafeBytes(fl.Field().String()))
+	return err == nil
 }
