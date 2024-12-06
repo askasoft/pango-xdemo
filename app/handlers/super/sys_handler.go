@@ -2,6 +2,7 @@ package super
 
 import (
 	"net/http"
+	"os"
 	"runtime"
 
 	"github.com/askasoft/pango-xdemo/app/handlers"
@@ -14,7 +15,9 @@ import (
 func SysStats(c *xin.Context) {
 	h := handlers.H(c)
 
+	host, _ := os.Hostname()
 	rtm := linkedhashmap.NewLinkedHashMap[string, string]()
+	rtm.Set("Host", host)
 	rtm.Set("CPU", num.Comma(runtime.NumCPU()))
 	rtm.Set("Goroutine", num.Comma(runtime.NumGoroutine()))
 
