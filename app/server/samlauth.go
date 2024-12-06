@@ -102,7 +102,7 @@ func samlServiceProvider(c *xin.Context) *samlsp.Middleware {
 
 	rootURL := url.URL{
 		Scheme: str.If(c.IsSecure(), "https", "http"),
-		Host:   c.Request.Host,
+		Host:   c.RequestHostname(),
 		Path:   app.Base,
 	}
 

@@ -17,22 +17,23 @@ func SetCtxLogProp(c *xin.Context) {
 
 // TenantProtect only allow access for known tenant
 func TenantProtect(c *xin.Context) {
-	tt, err := tenant.FindAndSetTenant(c)
-	if err != nil {
-		c.Logger.Error(err)
-		c.AbortWithError(http.StatusInternalServerError, err)
-		return
-	}
-
-	if tt == nil {
-		c.AbortWithStatus(http.StatusNotFound)
+	if _, err := tenant.FindAndSetTenant(c); err != nil {
+		if tenant.IsHostnameError(err) {
+			c.Logger.Warn(err)
+			c.AbortWithStatus(http.StatusNotFound)
+		} else {
+			c.Logger.Error(err)
+			c.AbortWithError(http.StatusInternalServerError, err)
+		}
 		return
 	}
 
 	c.Next()
 }
 
-// ----------------------------------------------------
+//----------------------------------------------------
+
+// AppAuth use Cookie Auth or SAML Auth middleware
 func AppAuth(c *xin.Context) {
 	tt := tenant.FromCtx(c)
 

@@ -112,7 +112,7 @@ func loginPassed(c *xin.Context, up *UserPass) {
 }
 
 func loginMFASecret(c *xin.Context, au *models.User) string {
-	return cptutil.MustEncrypt(app.Secret(), c.Request.Host+"/"+au.Email+"/"+num.Ltoa(au.Secret))
+	return cptutil.MustEncrypt(app.Secret(), c.RequestHostname()+"/"+au.Email+"/"+num.Ltoa(au.Secret))
 }
 
 func loginMFACheck(c *xin.Context, au *models.User, up *UserPass) bool {

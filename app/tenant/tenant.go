@@ -1,6 +1,7 @@
 package tenant
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/askasoft/pango-xdemo/app"
@@ -9,8 +10,17 @@ import (
 	"github.com/askasoft/pango/xin"
 )
 
-func IsMultiTenant() bool {
-	return schema.IsMultiTenant()
+type HostnameError struct {
+	host string
+}
+
+func (he *HostnameError) Error() string {
+	return fmt.Sprintf("Invalid host %q", he.host)
+}
+
+func IsHostnameError(err error) bool {
+	var he *HostnameError
+	return errors.As(err, &he)
 }
 
 type Tenant struct {
@@ -24,24 +34,27 @@ func NewTenant(name string) *Tenant {
 	return tt
 }
 
+func IsMultiTenant() bool {
+	return schema.IsMultiTenant()
+}
+
 func GetSubdomain(c *xin.Context) (string, bool) {
 	if !IsMultiTenant() {
 		return "", true
 	}
 
-	host := c.Request.Host
-	domain := app.Domain
-	if host == domain {
+	domain := c.RequestHostname()
+
+	if domain == app.Domain {
 		return "", true
 	}
 
-	suffix := "." + domain
-	if !str.EndsWith(host, suffix) {
-		return "", false
+	suffix := "." + app.Domain
+	if str.EndsWith(domain, suffix) {
+		return domain[:len(domain)-len(suffix)], true
 	}
 
-	s := host[0 : len(host)-len(suffix)]
-	return s, true
+	return "", false
 }
 
 const TENANT_CTXKEY = "TENANT"
@@ -61,7 +74,7 @@ func FindAndSetTenant(c *xin.Context) (*Tenant, error) {
 
 	s, ok := GetSubdomain(c)
 	if !ok {
-		return nil, fmt.Errorf("Invalid host %q", c.Request.Host)
+		return nil, &HostnameError{c.Request.Host}
 	}
 
 	if IsMultiTenant() {
@@ -69,8 +82,12 @@ func FindAndSetTenant(c *xin.Context) (*Tenant, error) {
 			s = schema.DefaultSchema()
 		}
 
-		if ok, err := schema.CheckSchema(s); !ok || err != nil {
+		ok, err := schema.CheckSchema(s)
+		if err != nil {
 			return nil, err
+		}
+		if !ok {
+			return nil, &HostnameError{c.Request.Host}
 		}
 	}
 
