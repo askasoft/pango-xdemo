@@ -13,8 +13,9 @@ import (
 var schedules = linkedhashmap.NewLinkedHashMap(
 	cog.KV("tmpClean", tasks.CleanTemporaryFiles),
 	cog.KV("jobStart", jobs.Starts),
-	cog.KV("jobReappend", jobs.Reappend),
+	cog.KV("jobReappend", jobs.ReappendJobs),
 	cog.KV("jobClean", jobs.CleanOutdatedJobs),
+	cog.KV("jobchainClean", jobs.CleanOutdatedJobChains),
 	cog.KV("dbReset", tasks.ResetDatabase),
 )
 

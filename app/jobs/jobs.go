@@ -167,7 +167,7 @@ func Starts() {
 	if mar-ttWorkers.Total() > 0 {
 		err := tenant.Iterate(StartJobs)
 		if err != nil && !errors.Is(err, ErrJobOverflow) {
-			log.Errorf("jobs.Start(): %v", err)
+			log.Errorf("jobs.Starts(): %v", err)
 		}
 
 		// sleep 1s to let all job go-routine start
@@ -239,14 +239,17 @@ func Stats() string {
 }
 
 // ------------------------------------
-func Reappend() {
+func ReappendJobs() {
 	_ = tenant.Iterate(func(tt *tenant.Tenant) error {
 		d := app.INI.GetDuration("job", "reappendBefore", time.Minute*30)
 		before := time.Now().Add(-d)
+
 		tjm := tt.JM()
-		_, err := tjm.ReappendJobs(before)
+		cnt, err := tjm.ReappendJobs(before)
 		if err != nil {
-			tt.Logger("JOB").Errorf("Failed to ReappendJob(%q, %q): %v", string(tt.Schema), before.Format(time.RFC3339), err)
+			tt.Logger("JOB").Errorf("Failed to ReappendJobs(%q, %q): %v", string(tt.Schema), before.Format(time.RFC3339), err)
+		} else if cnt > 0 {
+			tt.Logger("JOB").Infof("ReappendJobs(%q, %q): %d", string(tt.Schema), before.Format(time.RFC3339), cnt)
 		}
 		return err
 	})
