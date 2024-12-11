@@ -386,20 +386,17 @@ func addSuperHandlers(rg *xin.RouterGroup) {
 	rg.Use(RoleRootProtect)   // role protect
 	rg.Use(app.XTP.Handler()) // token protect
 
-	addSuperTenantHandlers(rg.Group("/tenants"))
+	rg.GET("/job", super.JobStats)
+
+	addSuperDebugHandlers(rg.Group("/debug"))
 	addSuperShellHandlers(rg.Group("/shell"))
 	addSuperSqlHandlers(rg.Group("/sql"))
-
-	rg.GET("/job", super.JobStats)
-	rg.GET("/sys", super.SysStats)
+	addSuperTenantHandlers(rg.Group("/tenants"))
 }
 
-func addSuperTenantHandlers(rg *xin.RouterGroup) {
-	rg.GET("/", super.TenantIndex)
-	rg.POST("/list", super.TenantList)
-	rg.POST("/create", super.TenantCreate)
-	rg.POST("/update", super.TenantUpdate)
-	rg.POST("/delete", super.TenantDelete)
+func addSuperDebugHandlers(rg *xin.RouterGroup) {
+	rg.GET("/", super.DebugIndex)
+	rg.GET("/pprof/:prof", super.DebugPprof)
 }
 
 func addSuperShellHandlers(rg *xin.RouterGroup) {
@@ -410,4 +407,12 @@ func addSuperShellHandlers(rg *xin.RouterGroup) {
 func addSuperSqlHandlers(rg *xin.RouterGroup) {
 	rg.GET("/", super.SqlIndex)
 	rg.POST("/exec", super.SqlExec)
+}
+
+func addSuperTenantHandlers(rg *xin.RouterGroup) {
+	rg.GET("/", super.TenantIndex)
+	rg.POST("/list", super.TenantList)
+	rg.POST("/create", super.TenantCreate)
+	rg.POST("/update", super.TenantUpdate)
+	rg.POST("/delete", super.TenantDelete)
 }

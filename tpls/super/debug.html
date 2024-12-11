@@ -1,0 +1,68 @@
+{{template "main_header" .}}
+
+<style>
+.dbginfo .card {
+	min-width: 10em;
+	max-width: 20em;
+}
+</style>
+
+{{define "dbgcards"}}
+<div class="d-flex flex-row flex-wrap gap-3 p-2 mb-4">
+	{{range $e := .Entries}}
+	<div class="card">
+		<div class="card-header">{{$e.Key}}</div>
+		<div class="card-body">{{$e.Value}}</div>
+	</div>
+	{{end}}
+</div>
+{{end}}
+
+<div class="s-section">
+	<div class="s-section-head">
+		<h2>{{I "super.debug"}}<span>{{T .Loc "menu.super.debug"}}</span></h2>
+	</div>
+	<div class="s-section-body dbginfo">
+		<h3><i class="fas fa-fw fa-server"></i> System</h3>
+		{{template "dbgcards" .System}}
+
+		<h3><i class="fab fa-fw fa-golang"></i> Runtime</h3>
+		{{template "dbgcards" .Runtime}}
+
+		<h3><i class="fas fa-fw fa-memory"></i> Memory</h3>
+		{{template "dbgcards" .MemStats}}
+
+		<h3><i class="fas fa-fw fa-bugs"></i> Profiles</h3>
+		<div class="d-flex flex-row flex-wrap gap-3 p-2 mb-4">
+			{{range $p := .Profiles}}
+			<div class="card">
+				<div class="card-header">({{$p.Count}}) <a href="./pprof/{{$p.Name}}?debug=1">{{$p.Name}}</a>
+					<a href="./pprof/{{$p.Name}}">{{I "dnload"}}</a>
+					{{if eq $p.Name "goroutine"}}
+					<a class="float-end" href="./pprof/{{$p.Name}}?debug=2">debug=2</a>
+					{{end}}
+					{{if eq $p.Name "heap"}}
+					<span class="float-end">
+						<a href="./pprof/{{$p.Name}}?debug=1&GC=1">GC=1</a>
+						<a href="./pprof/{{$p.Name}}?GC=1">{{I "dnload"}}</a>
+					</span>
+					{{end}}
+				</div>
+				<div class="card-body">{{$p.Desc}}</div>
+			</div>
+			{{end}}
+		</div>
+
+		<h3><i class="fas fa-fw fa-gears"></i> Trace</h3>
+		<div class="d-flex flex-row flex-wrap gap-3 p-2 mb-4">
+			{{range $t := .Traces}}
+			<div class="card">
+				<div class="card-header"><a href="./pprof/{{$t.Name}}">{{$t.Name}}</a></div>
+				<div class="card-body">{{$t.Desc}}</div>
+			</div>
+			{{end}}
+		</div>
+	</div>
+</div>
+
+{{template "main_footer" .}}
