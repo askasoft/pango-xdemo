@@ -356,8 +356,8 @@ var main = {
 		var prev = $tr.prev('tr').length || $pg.find('.page-item.prev.disabled').length == 0;
 		var next = $tr.next('tr').length || $pg.find('.page-item.next.disabled').length == 0;
 
-		$p[(id != '0' && prev) ? 'show' : 'hide']();
-		$n[(id != '0' && next) ? 'show' : 'hide']();
+		$p.toggle(id != '0' && prev);
+		$n.toggle(id != '0' && next);
 	},
 	detail_popup_keydown: function(evt) {
 		if (evt.altKey) {

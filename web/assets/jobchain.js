@@ -245,13 +245,13 @@
 
 		val ||= jrs.state[key];
 		$d.find('span').text(Number.comma(val));
-		$d[val ? 'show' : 'hide']();
+		$d.toggle(!!val);
 	}
 
 	function jobchain_jrs_set_error($jrs, jrs, key) {
 		var $d = $jrs.find('div.' + key).data(key, jrs[key]);
 		$d.find('label').text(jslabels[jrs.name + '.' + key] || jslabels[key] || key);
-		$d[jrs[key] ? 'show' : 'hide']();
+		$d.toggle(!!jrs[key]);
 	}
 
 	function jobchain_jrs_refresh($jrs, jrs) {
