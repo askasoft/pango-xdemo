@@ -6,6 +6,8 @@
 <div class="s-section">
 	<div class="s-section-head">
 		<h2>{{I "admin.users.import"}}<span>{{T .Loc "menu.admin.users.import"}}</span></h2>
+		<div class="ms-auto"></div>
+		<a class="btn btn-secondary" href="./sample" target="_blank">{{I "dnload"}} {{T .Loc "button.sample"}}</a>
 	</div>
 	<div class="s-section-body">
 		<div class="well">{{T .Loc "user.import.csv.well"}}</div>
@@ -24,7 +26,6 @@
 				<div class="offset-md-2 col">
 					<button id="job_start" class="btn btn-success" disabled data-processing="{{T .Loc "button.processing"}}">{{I "start"}} <span>{{T .Loc "button.start"}}</span></button>
 					<button id="job_cancel" class="btn btn-danger" disabled>{{I "stop"}} {{T .Loc "button.stop"}}</button>
-					<a class="btn btn-secondary" href="./sample" target="_blank">{{I "dnload"}} {{T .Loc "button.sample"}}</a>
 				</div>
 			</div>
 		</div>

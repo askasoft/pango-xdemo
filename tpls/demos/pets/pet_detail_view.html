@@ -1,9 +1,6 @@
 {{$p := .Pet}}
 <div class="ui-popup-header">
-	<h4>{{I "demos.pets.detail"}}
-		{{T .Loc "pet.detail.header"}}
-		#{{$p.ID}}
-	</h4>
+	<h4><span>{{I "demos.pets.detail"}} {{T .Loc "pet.detail.header"}} #{{$p.ID}}</h4>
 </div>
 <div class="ui-popup-body grey">
 	<div class="ui-view lined label-bold">

@@ -27,7 +27,7 @@
 
 				<div class="row">
 					<label class="col-md-2 col-form-label">{{T .Loc "tenant.name"}}</label>
-					<div class="col-md-10">
+					<div class="col">
 						<input name="name" type="text" class="form-control" textclear value="{{.Q.Name}}"/>
 					</div>
 				</div>
@@ -48,9 +48,7 @@
 	popup-position="center" popup-mouse="false" popup-closer="true"
 	popup-focus="[name=name]">
 	<div class="ui-popup-header">
-		<h4>{{I "edit"}}
-			{{T .Loc "tenant.create.header"}}
-		</h4>
+		<h4><span>{{I "edit"}} {{T .Loc "tenant.create.header"}}</span></h4>
 	</div>
 	<form class="ui-popup-body ui-form lined grey">
 		<div class="row">
@@ -78,9 +76,7 @@
 	popup-position="center" popup-mouse="false" popup-closer="true"
 	popup-focus="[name=comment]">
 	<div class="ui-popup-header">
-		<h4>{{I "edit"}}
-			{{T .Loc "tenant.update.header"}}
-		</h4>
+		<h4><span>{{I "edit"}} {{T .Loc "tenant.update.header"}}</span></h4>
 	</div>
 	<div class="ui-popup-body grey">
 		<form class="ui-form lined">
@@ -110,7 +106,7 @@
 	popup-mask="true" popup-position="center" popup-mouse="false">
 	<form>
 		<div class="ui-popup-header">
-			<h4>{{T .Loc "tenant.delete.header"}}</h4>
+			<h4><span>{{T .Loc "tenant.delete.header"}}</span></h4>
 		</div>
 		<div class="ui-popup-body">
 			<i class="icon fas fa-3x fa-fw fa-triangle-exclamation text-danger"></i>

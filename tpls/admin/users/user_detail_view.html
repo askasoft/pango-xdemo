@@ -1,9 +1,6 @@
 {{$u := .User}}
 <div class="ui-popup-header">
-	<h4>{{I "user.detail"}}
-		{{T .Loc "user.detail.header"}}
-		#{{$u.ID}}
-	</h4>
+	<h4><span>{{I "user.detail"}} {{T .Loc "user.detail.header"}} #{{$u.ID}}</span></h4>
 </div>
 <div class="ui-popup-body grey">
 	<div class="ui-view lined label-bold">

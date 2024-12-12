@@ -517,6 +517,13 @@ form div.verr {
 	width: 90vw;
 	max-width: 767px;
 }
+.s-popup-detail .ui-popup-header {
+	display: flex;
+}
+.s-popup-detail .ui-popup-header > h4 {
+	display: flex;
+	align-items: center;
+}
 .s-popup-detail .ui-popup-body {
 	min-height: 150px;
 	max-height: calc(100vh - 200px);
@@ -531,6 +538,7 @@ form div.verr {
 .s-popup-detail.xlarge {
 	max-width: 90vw;
 }
+
 .s-popup-detail .ui-popup-body pre {
 	white-space: pre-wrap;
 }
@@ -579,9 +587,6 @@ form div.verr {
 	border-color: var(--bs-light);
 }
 
-.s-popup-detail.xcol2 .ui-popup-header {
-	display: flex;
-}
 .s-popup-detail.xcol2 .ui-popup-header > * {
 	width: 50%;
 }

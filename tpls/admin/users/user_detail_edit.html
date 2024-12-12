@@ -2,10 +2,7 @@
 {{$pwd_desc := "user.desc.update.password"}}
 {{if eq $u.ID 0}}{{$pwd_desc = "user.desc.create.password"}}{{end}}
 <div class="ui-popup-header">
-	<h4>{{I "edit"}}
-		{{T .Loc "user.detail.header"}}
-		{{if ne $u.ID 0}}#{{$u.ID}}{{end}}
-	</h4>
+	<h4><span>{{I "edit"}} {{T .Loc "user.detail.header"}} {{if ne $u.ID 0}}#{{$u.ID}}{{end}}</span></h4>
 </div>
 <div class="ui-popup-body grey">
 	<form class="ui-form lined">
