@@ -45,7 +45,7 @@
 </div>
 
 <div id="tenants_create_popup" class="ui-popup s-popup-detail" data-spy="popup" tabindex="-1"
-	popup-position="center" popup-mouse="false" popup-closer="true"
+	popup-position="center" popup-mask="true" popup-scroll="false" popup-mouse="false" popup-closer="true"
 	popup-focus="[name=name]">
 	<div class="ui-popup-header">
 		<h4><span>{{I "edit"}} {{T .Loc "tenant.create.header"}}</span></h4>
@@ -73,7 +73,7 @@
 </div>
 
 <div id="tenants_update_popup" class="ui-popup s-popup-detail" data-spy="popup" tabindex="-1"
-	popup-position="center" popup-mouse="false" popup-closer="true"
+	popup-position="center" popup-mask="true" popup-scroll="false" popup-mouse="false" popup-closer="true"
 	popup-focus="[name=comment]">
 	<div class="ui-popup-header">
 		<h4><span>{{I "edit"}} {{T .Loc "tenant.update.header"}}</span></h4>
@@ -103,7 +103,7 @@
 </div>
 
 <div id="tenants_delete_popup" class="ui-popup s-popup-confirm" data-spy="popup" tabindex="-1"
-	popup-mask="true" popup-position="center" popup-mouse="false">
+	popup-position="center" popup-mask="true" popup-scroll="false" popup-mouse="false">
 	<form>
 		<div class="ui-popup-header">
 			<h4><span>{{T .Loc "tenant.delete.header"}}</span></h4>
