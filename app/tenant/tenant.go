@@ -77,11 +77,11 @@ func FindAndSetTenant(c *xin.Context) (*Tenant, error) {
 		return nil, &HostnameError{c.Request.Host}
 	}
 
-	if IsMultiTenant() {
-		if s == "" {
-			s = schema.DefaultSchema()
-		}
+	if s == "" {
+		s = schema.DefaultSchema()
+	}
 
+	if IsMultiTenant() {
 		ok, err := schema.CheckSchema(s)
 		if err != nil {
 			return nil, err

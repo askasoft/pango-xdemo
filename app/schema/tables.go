@@ -19,6 +19,9 @@ func (sm Schema) ResetSequence(db sqlx.Sqlx, table string, starts ...int64) erro
 }
 
 func (sm Schema) Prefix() string {
+	if len(sm) == 0 {
+		return ""
+	}
 	return string(sm) + "."
 }
 
