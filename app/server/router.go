@@ -8,6 +8,7 @@ import (
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/handlers"
 	"github.com/askasoft/pango-xdemo/app/handlers/admin"
+	"github.com/askasoft/pango-xdemo/app/handlers/admin/configs"
 	"github.com/askasoft/pango-xdemo/app/handlers/admin/users"
 	"github.com/askasoft/pango-xdemo/app/handlers/api"
 	"github.com/askasoft/pango-xdemo/app/handlers/demos"
@@ -294,10 +295,10 @@ func addDemosHandlers(rg *xin.RouterGroup) {
 
 func addDemosPetsHandlers(rg *xin.RouterGroup) {
 	rg.GET("/", pets.PetIndex)
-	rg.POST("/list", pets.PetList)
 	rg.GET("/new", pets.PetNew)
 	rg.GET("/view", pets.PetView)
 	rg.GET("/edit", pets.PetEdit)
+	rg.POST("/list", pets.PetList)
 	rg.POST("/create", pets.PetCreate)
 	rg.POST("/update", pets.PetUpdate)
 	rg.POST("/updates", pets.PetUpdates)
@@ -342,23 +343,23 @@ func addAdminHandlers(rg *xin.RouterGroup) {
 
 	rg.GET("/", admin.Index)
 
-	addAdminConfigHandlers(rg.Group("/config"))
+	addAdminConfigHandlers(rg.Group("/configs"))
 	addAdminUserHandlers(rg.Group("/users"))
 }
 
 func addAdminConfigHandlers(rg *xin.RouterGroup) {
-	rg.GET("/", admin.ConfigIndex)
-	rg.POST("/save", admin.ConfigSave)
-	rg.POST("/export", admin.ConfigExport)
-	rg.POST("/import", admin.ConfigImport)
+	rg.GET("/", configs.ConfigIndex)
+	rg.POST("/save", configs.ConfigSave)
+	rg.POST("/export", configs.ConfigExport)
+	rg.POST("/import", configs.ConfigImport)
 }
 
 func addAdminUserHandlers(rg *xin.RouterGroup) {
 	rg.GET("/", users.UserIndex)
-	rg.POST("/list", users.UserList)
 	rg.GET("/new", users.UserNew)
 	rg.GET("/view", users.UserView)
 	rg.GET("/edit", users.UserEdit)
+	rg.POST("/list", users.UserList)
 	rg.POST("/create", users.UserCreate)
 	rg.POST("/update", users.UserUpdate)
 	rg.POST("/updates", users.UserUpdates)

@@ -2,6 +2,7 @@ package tbsutil
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango/cog/hashmap"
@@ -17,18 +18,16 @@ func GetStrings(locale, name string) []string {
 
 func GetLinkedHashMap(locale, name string) *linkedhashmap.LinkedHashMap[string, string] {
 	m := &linkedhashmap.LinkedHashMap[string, string]{}
-	err := m.UnmarshalJSON(str.UnsafeBytes(tbs.GetText(locale, name)))
-	if err != nil {
-		panic(err)
+	if err := m.UnmarshalJSON(str.UnsafeBytes(tbs.GetText(locale, name))); err != nil {
+		panic(fmt.Errorf("invalid [%s] %s: %w", locale, name, err))
 	}
 	return m
 }
 
 func GetReverseMap(locale, name string) *hashmap.HashMap[string, string] {
 	m := make(map[string]string)
-	err := json.Unmarshal(str.UnsafeBytes(tbs.GetText(locale, name)), &m)
-	if err != nil {
-		panic(err)
+	if err := json.Unmarshal(str.UnsafeBytes(tbs.GetText(locale, name)), &m); err != nil {
+		panic(fmt.Errorf("invalid [%s] %s: %w", locale, name, err))
 	}
 
 	rm := hashmap.NewHashMap[string, string]()

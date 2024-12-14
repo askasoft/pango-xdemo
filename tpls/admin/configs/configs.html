@@ -1,11 +1,11 @@
-{{MapSet .Ctx.Attrs "astyles" (Array "admin/config.css")}}
-{{MapSet .Ctx.Attrs "ascripts" (Array "admin/config.js")}}
+{{MapSet .Ctx.Attrs "astyles" (Array "admin/configs.css")}}
+{{MapSet .Ctx.Attrs "ascripts" (Array "admin/configs.js")}}
 
 {{template "main_header" .}}
 
 <div class="s-section">
 	<div class="s-section-head">
-		<h2>{{I "admin.config"}}<span>{{T .Loc "menu.admin.config"}}</span></h2>
+		<h2>{{I "admin.configs"}}<span>{{T .Loc "menu.admin.configs"}}</span></h2>
 		<div class="ms-auto"></div>
 		<button class="btn btn-sm btn-outline-primary" popup-target="#configs_import_popup">
 			{{I "upload"}} {{T .Loc "button.import"}}

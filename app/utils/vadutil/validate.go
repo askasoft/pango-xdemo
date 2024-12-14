@@ -73,6 +73,7 @@ func AddBindErrors(c *xin.Context, err error, ns string, fks ...string) {
 			if fk == "" && len(fks) > 0 {
 				fk = fks[0]
 			}
+
 			fn := ""
 			fm := tbs.GetText(c.Locale, ns+"error."+fk+"."+fe.Tag())
 			if fm == "" {
@@ -90,21 +91,18 @@ func AddBindErrors(c *xin.Context, err error, ns string, fks ...string) {
 			}
 
 			var em string
-			if fn == "" {
-				em = fm
-			} else if fe.Param() == "" {
-				em = fmt.Sprintf(fm, fn)
-			} else {
-				if str.Count(fm, "%s") > 1 {
-					fp := fe.Param()
-					if str.EndsWith(fe.Tag(), "field") {
-						tk := str.SnakeCase(fp)
-						fp = tbs.GetText(c.Locale, ns+tk, tk)
-					}
-					em = fmt.Sprintf(fm, fn, fp)
-				} else {
-					em = fmt.Sprintf(fm, fn)
+			switch str.Count(fm, "%s") {
+			case 2:
+				fp := fe.Param()
+				if str.EndsWith(fe.Tag(), "field") {
+					tk := str.SnakeCase(fp)
+					fp = tbs.GetText(c.Locale, ns+tk, tk)
 				}
+				em = fmt.Sprintf(fm, fn, fp)
+			case 1:
+				em = fmt.Sprintf(fm, fn)
+			default:
+				em = fm
 			}
 
 			c.AddError(&ParamError{Param: fk, Message: em})

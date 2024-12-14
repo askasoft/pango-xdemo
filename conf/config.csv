@@ -1,7 +1,7 @@
 ﻿Name,Value,Style,Order,Required,Secret,Viewer,Editor,Validation
 secure_login_method,P,R,1,FALSE,FALSE,A,A,
 secure_login_mfa,-,R,2,FALSE,FALSE,A,A,
-secure_saml_usersync,true,R,11,FALSE,FALSE,A,A,
+secure_saml_usersync,true,R,11,FALSE,FALSE,A,A,boolean
 secure_saml_userrole,V,R,12,FALSE,FALSE,A,A,
 secure_saml_idpmeta,,T,13,FALSE,FALSE,A,A,samlmeta
 secure_client_cidr,,T,21,FALSE,FALSE,A,A,cidrs
