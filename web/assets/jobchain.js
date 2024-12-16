@@ -266,24 +266,29 @@
 		jobchain_jrs_set_state($jrs, jrs, 'failure');
 		jobchain_jrs_set_error($jrs, jrs, 'error');
 
-		var p = 0, t = '・・・';
+		var p = 5, t = '・・・';
 		if (jrs.status == 'F') {
 			p = 100;
 			t = '100%';
 		} else if (jrs.state.limit || jrs.state.total) {
 			p = Math.floor((jrs.state.count || jrs.state.step || 0) * 100 / (jrs.state.limit || jrs.state.total))
 			t = p + '%';
-		} else {
-			p = 10;
 		}
 		$jrs.find('.txt').text(t);
+
+		var sd = jobchain_jrs_calc_stroke_dasharray(p);
+		$jrs.find('svg .fg').css('stroke-dasharray', sd);
+	}
+
+	function jobchain_jrs_calc_stroke_dasharray(p) {
+		p = p < 5 ? 5 : (p > 95 && p < 100 ? 95 : p); // prevent too small or large stroke
 
 		var size = 80, stroke_width = 8;
 		var radius = (size - stroke_width) / 2;
 		var circumference = radius * 3.14 * 2;
 		var dash = p * circumference / 100;
-		var stroke_dasharray = dash + ' ' + (circumference - dash);
-		$jrs.find('svg .fg').css('stroke-dasharray', stroke_dasharray);
+
+		return dash + ' ' + (circumference - dash);
 	}
 
 	function jobchain_list(cid) {
