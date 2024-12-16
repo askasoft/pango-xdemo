@@ -131,8 +131,8 @@
 		return false;
 	}
 
-	function jobchain_tab_shown(e) {
-		jobchain_status($(e.target).data('cid'));
+	function jobchain_tab_shown() {
+		jobchain_status($(this).data('cid'));
 		return false;
 	}
 

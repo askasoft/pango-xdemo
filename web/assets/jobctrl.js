@@ -210,8 +210,8 @@
 		return false;
 	}
 
-	function job_tab_shown(e) {
-		job_status($(e.target).data('jid'));
+	function job_tab_shown() {
+		job_status($(this).data('jid'));
 		return false;
 	}
 

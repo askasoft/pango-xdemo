@@ -72,8 +72,8 @@
 	}
 
 	function configs_init() {
-		$('a[data-bs-toggle="tab"]').on('shown.bs.tab', function(e) {
-			var t = $(e.target).attr('href');
+		$('a[data-bs-toggle="tab"]').on('shown.bs.tab', function() {
+			var t = $(this).attr('href');
 			$(t).find('textarea').autosize();
 			history.replaceState(null, null, location.href.split('#')[0] + t);
 		});
