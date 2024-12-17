@@ -26,6 +26,10 @@ if not "%LOG_SLACK_WEBHOOK%." == "." (
 	set LOG_WRITERS=%LOG_WRITERS%, slack
 	powershell -command "(gc %APPHOME%\conf\log.ini -Encoding utf8).Replace('LOG_SLACK_WEBHOOK', '%LOG_SLACK_WEBHOOK%') | %% { $_ -replace 'writer =.*', 'writer = %LOG_WRITERS%' } | Out-File %APPHOME%\conf\log.ini -Encoding utf8"
 )
+if not "%LOG_TEAMS_WEBHOOK%." == "." (
+	set LOG_WRITERS=%LOG_WRITERS%, teams
+	powershell -command "(gc %APPHOME%\conf\log.ini -Encoding utf8).Replace('LOG_TEAMS_WEBHOOK', '%LOG_TEAMS_WEBHOOK%') | %% { $_ -replace 'writer =.*', 'writer = %LOG_WRITERS%' } | Out-File %APPHOME%\conf\log.ini -Encoding utf8"
+)
 if not "%LOG_OPENSEARCH_APPLOG%." == "." (
 	set LOG_WRITERS=%LOG_WRITERS%, appos
 	powershell -command "(gc %APPHOME%\conf\log.ini -Encoding utf8).Replace('LOG_OPENSEARCH_APPLOG', '%LOG_OPENSEARCH_APPLOG%') | %% { $_ -replace 'writer =.*', 'writer = %LOG_WRITERS%' } | Out-File %APPHOME%\conf\log.ini -Encoding utf8"

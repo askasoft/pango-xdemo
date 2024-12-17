@@ -36,6 +36,13 @@ if ! [ -z "${LOG_SLACK_WEBHOOK}" ]; then
 		-e "s;writer =.*;writer = ${LOG_WRITERS};g" \
 		${APPHOME}/conf/log.ini
 fi
+if ! [ -z "${LOG_TEAMS_WEBHOOK}" ]; then
+	LOG_WRITERS="${LOG_WRITERS}, teams"
+	sed -i \
+		-e "s;LOG_TEAMS_WEBHOOK;${LOG_TEAMS_WEBHOOK};g" \
+		-e "s;writer =.*;writer = ${LOG_WRITERS};g" \
+		${APPHOME}/conf/log.ini
+fi
 if ! [ -z "${LOG_OPENSEARCH_APPLOG}" ]; then
 	LOG_WRITERS="${LOG_WRITERS}, appos"
 	sed -i \
