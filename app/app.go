@@ -69,6 +69,9 @@ var (
 
 	// BuildTime app build time
 	BuildTime, _ = time.ParseInLocation("2006-01-02T15:04:05Z", buildTime, time.UTC)
+
+	// StartupTime app start time
+	StartupTime = time.Now()
 )
 
 var (

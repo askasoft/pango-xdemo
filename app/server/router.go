@@ -397,6 +397,7 @@ func addSuperHandlers(rg *xin.RouterGroup) {
 
 func addSuperDebugHandlers(rg *xin.RouterGroup) {
 	rg.GET("/", super.DebugIndex)
+	rg.GET("/json", super.DebugJSON)
 	rg.GET("/pprof/:prof", super.DebugPprof)
 }
 
