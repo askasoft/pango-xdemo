@@ -50,8 +50,8 @@ type trace struct {
 	Desc string
 }
 
-func debugSystem() any {
-	// system
+func debugServer() any {
+	// server
 	host, _ := os.Hostname()
 	stm := linkedhashmap.NewLinkedHashMap[string, string]()
 	stm.Set("Host", host)
@@ -61,23 +61,61 @@ func debugSystem() any {
 
 	var val string
 
-	// memory usage
-	mu, err := mem.GetMemoryUsage()
+	// uptime
+	upt, err := uptime.GetUptime()
 	if err != nil {
-		val = err.Error()
+		stm.Set("Uptime", err.Error())
 	} else {
-		val = num.HumanSize(mu.Free()) + " / " + num.HumanSize(mu.Total())
+		stm.Set("Uptime", tmu.HumanDuration(upt))
 	}
-	stm.Set("Memory (Free / Total)", val)
 
-	// disk usage
-	du, err := disk.GetDiskUsage(".")
+	// memory stats
+	ms, err := mem.GetMemoryStats()
 	if err != nil {
 		val = err.Error()
 	} else {
-		val = num.HumanSize(du.Used()) + " / " + num.HumanSize(du.Available()) + " / " + num.HumanSize(du.Total()) + " / " + num.FtoaWithDigits(du.Usage()*100, 2) + "%"
+		val = fmt.Sprintf("%s / %s (%s%%)",
+			num.HumanSize(ms.Used()),
+			num.HumanSize(ms.Total),
+			num.FtoaWithDigits(ms.Usage()*100, 2),
+		)
 	}
-	stm.Set("Disk (Used / Available / Total / Usage)", val)
+	stm.Set("Memory", val)
+
+	// disk stats
+	ds, err := disk.GetDiskStats(".")
+	if err != nil {
+		val = err.Error()
+	} else {
+		val = fmt.Sprintf("%s / %s (%s%%)",
+			num.HumanSize(ds.Used()),
+			num.HumanSize(ds.Total),
+			num.FtoaWithDigits(ds.Usage()*100, 2),
+		)
+	}
+	stm.Set("Disk", val)
+
+	// cpu stats
+	cs, err := cpu.GetCPUStats()
+	if err != nil {
+		val = err.Error()
+	} else {
+		val = fmt.Sprintf(
+			"%.2f us, %.2f sy, %.2f ni, %.2f id, %.2f wa, %.2f hi, %.2f si, %.2f st, %.2f%%",
+			cs.UserUsage()*100, cs.SystemUsage()*100, cs.NiceUsage()*100, cs.IdleUsage()*100, cs.IowaitUsage()*100,
+			cs.IrqUsage()*100, cs.SoftirqUsage()*100, cs.StealUsage()*100, cs.CPUUsage()*100,
+		)
+	}
+	stm.Set("%Cpu(s)", val)
+
+	// loadavg
+	la, err := loadavg.GetLoadAvg()
+	if err != nil {
+		val = err.Error()
+	} else {
+		val = fmt.Sprintf("%.3f, %.3f, %.3f", la.Loadavg1, la.Loadavg5, la.Loadavg15)
+	}
+	stm.Set("Load Average (1,5,15)", val)
 
 	return stm
 }
@@ -90,45 +128,7 @@ func debugRuntime() any {
 	rtm.Set("Goroutine", num.Comma(runtime.NumGoroutine()))
 	rtm.Set("Cmdline", str.Join(os.Args, " "))
 	rtm.Set("Startup", fmt.Sprintf("%s (%s)", app.StartupTime.Format(time.RFC3339), tmu.HumanDuration(time.Since(app.StartupTime))))
-
-	upt, err := uptime.GetUptime()
-	if err != nil {
-		rtm.Set("Uptime", err.Error())
-	} else {
-		rtm.Set("Uptime", tmu.HumanDuration(upt))
-	}
-
 	return rtm
-}
-
-func debugCPUStats() any {
-	csm := linkedhashmap.NewLinkedHashMap[string, string]()
-
-	var val string
-
-	// cpu stats
-	cs, err := cpu.GetCPUStats()
-	if err != nil {
-		val = err.Error()
-	} else {
-		val = fmt.Sprintf(
-			"%.2f us, %.2f sy, %.2f ni, %.2f id, %.2f wa, %.2f hi, %.2f si, %.2f st, %.2f%%",
-			cs.UserUsage(), cs.SystemUsage(), cs.NiceUsage(), cs.IdleUsage(), cs.IowaitUsage(),
-			cs.IrqUsage(), cs.SoftirqUsage(), cs.StealUsage(), cs.CPUUsage(),
-		)
-	}
-	csm.Set("%Cpu(s)", val)
-
-	// loadavg
-	la, err := loadavg.GetLoadAvg()
-	if err != nil {
-		val = err.Error()
-	} else {
-		val = fmt.Sprintf("%.3f / %.3f / %.3f", la.Loadavg1, la.Loadavg5, la.Loadavg15)
-	}
-	csm.Set("Load Average (1 / 5 / 15)", val)
-
-	return csm
 }
 
 func debugMemStats() any {
@@ -191,9 +191,8 @@ func debugTrace() any {
 func DebugIndex(c *xin.Context) {
 	h := handlers.H(c)
 
-	h["System"] = debugSystem()
+	h["Server"] = debugServer()
 	h["Runtime"] = debugRuntime()
-	h["CPUStats"] = debugCPUStats()
 	h["MemStats"] = debugMemStats()
 	h["Profiles"] = debugProfiles()
 	h["Traces"] = debugTrace()
@@ -204,9 +203,8 @@ func DebugIndex(c *xin.Context) {
 func DebugJSON(c *xin.Context) {
 	stats := make(map[string]any)
 
-	stats["system"] = debugSystem()
+	stats["server"] = debugServer()
 	stats["runtime"] = debugRuntime()
-	stats["cpustats"] = debugCPUStats()
 	stats["memstats"] = debugMemStats()
 
 	c.JSON(http.StatusOK, stats)

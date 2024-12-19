@@ -2,8 +2,11 @@
 
 <style>
 .dbginfo .card {
-	min-width: 10em;
-	max-width: 20em;
+	min-width: 9rem;
+	max-width: 19rem;
+}
+.dbginfo .card .card-header {
+	white-space: nowrap;
 }
 </style>
 
@@ -23,14 +26,11 @@
 		<h2>{{I "super.debug"}}<span>{{T .Loc "menu.super.debug"}}</span></h2>
 	</div>
 	<div class="s-section-body dbginfo">
-		<h3><i class="fas fa-fw fa-server"></i> System</h3>
-		{{template "dbgcards" .System}}
+		<h3><i class="fas fa-fw fa-server"></i> Server</h3>
+		{{template "dbgcards" .Server}}
 
 		<h3><i class="fab fa-fw fa-golang"></i> Runtime</h3>
 		{{template "dbgcards" .Runtime}}
-
-		<h3><i class="fas fa-fw fa-microchip"></i> CPU</h3>
-		{{template "dbgcards" .CPUStats}}
 
 		<h3><i class="fas fa-fw fa-memory"></i> Memory</h3>
 		{{template "dbgcards" .MemStats}}
