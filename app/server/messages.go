@@ -4,6 +4,7 @@ import (
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/txts"
 	"github.com/askasoft/pango/fsw"
+	"github.com/askasoft/pango/ini"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/tbs"
 )
@@ -22,7 +23,7 @@ func loadMessages(msgPath string) (tb *tbs.TextBundles, err error) {
 }
 
 func initMessages() {
-	messages = app.INI.GetString("app", "messages")
+	messages = ini.GetString("app", "messages")
 
 	tb, err := loadMessages(messages)
 	if err != nil {
@@ -34,7 +35,7 @@ func initMessages() {
 }
 
 func reloadMessages(path string, op fsw.Op) {
-	msgPath := app.INI.GetString("app", "messages")
+	msgPath := ini.GetString("app", "messages")
 
 	if op == fsw.OpNone {
 		if msgPath != messages {

@@ -11,6 +11,7 @@ import (
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango/bol"
+	"github.com/askasoft/pango/ini"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/tbs"
@@ -64,7 +65,7 @@ func (jc *JobController) List(c *xin.Context) {
 
 	skip := num.Atoi(c.Query("skip"))
 	limit := num.Atoi(c.Query("limit"))
-	max := app.INI.GetInt("job", "maxJobList", 10)
+	max := ini.GetInt("job", "maxJobList", 10)
 	if limit <= 0 || limit > max {
 		limit = max
 	}
@@ -110,7 +111,7 @@ func (jc *JobController) logs(c *xin.Context, tjm xjm.JobManager) (logs []*xjm.J
 	limit := num.Atoi(c.Query("limit"))
 
 	if jid > 0 && limit > 0 {
-		maxlogs := app.INI.GetInt("job", "maxJobLogsFetch", 10000)
+		maxlogs := ini.GetInt("job", "maxJobLogsFetch", 10000)
 		if limit > maxlogs {
 			limit = maxlogs
 		}

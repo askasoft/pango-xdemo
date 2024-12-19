@@ -4,6 +4,7 @@ import (
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango/fsu"
 	"github.com/askasoft/pango/fsw"
+	"github.com/askasoft/pango/ini"
 	"github.com/askasoft/pango/log"
 )
 
@@ -21,13 +22,13 @@ func initFileWatch() {
 	}
 
 	if err == nil {
-		msgPath := app.INI.GetString("app", "messages")
+		msgPath := ini.GetString("app", "messages")
 		if msgPath != "" {
 			err = fsw.AddRecursive(msgPath, fsw.OpModifies, reloadMessages)
 		}
 	}
 	if err == nil {
-		tplPath := app.INI.GetString("app", "templates")
+		tplPath := ini.GetString("app", "templates")
 		if tplPath != "" {
 			err = fsw.AddRecursive(tplPath, fsw.OpModifies, reloadTemplates)
 		}
@@ -46,7 +47,7 @@ func initFileWatch() {
 }
 
 func configFileWatch() error {
-	if app.INI.GetBool("app", "reloadable") {
+	if ini.GetBool("app", "reloadable") {
 		return fsw.Start()
 	}
 

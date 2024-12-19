@@ -20,6 +20,7 @@ import (
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
 	"github.com/askasoft/pango-xdemo/web"
+	"github.com/askasoft/pango/ini"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/net/httpx"
 	"github.com/askasoft/pango/str"
@@ -63,31 +64,29 @@ func initRouter() {
 }
 
 func configMiddleware() {
-	svc := app.INI.Section("server")
-
-	app.XRL.DrainBody = svc.GetBool("httpDrainRequestBody", false)
-	app.XRL.MaxBodySize = svc.GetSize("httpMaxRequestBodySize", 8<<20)
+	app.XRL.DrainBody = ini.GetBool("server", "httpDrainRequestBody", false)
+	app.XRL.MaxBodySize = ini.GetSize("server", "httpMaxRequestBodySize", 8<<20)
 	app.XRL.BodyTooLarge = handlers.BodyTooLarge
 
-	app.XRC.Disable(!svc.GetBool("httpGzip"))
-	app.XHD.Disable(!svc.GetBool("httpDump"))
-	app.XSR.Disable(!svc.GetBool("httpsRedirect"))
+	app.XRC.Disable(!ini.GetBool("server", "httpGzip"))
+	app.XHD.Disable(!ini.GetBool("server", "httpDump"))
+	app.XSR.Disable(!ini.GetBool("server", "httpsRedirect"))
 	app.XLL.Locales = app.Locales
 
-	app.XAC.SetAllowOrigins(str.Fields(svc.GetString("accessControlAllowOrigin"))...)
-	app.XAC.SetAllowCredentials(svc.GetBool("accessControlAllowCredentials"))
-	app.XAC.SetAllowHeaders(svc.GetString("accessControlAllowHeaders"))
-	app.XAC.SetAllowMethods(svc.GetString("accessControlAllowMethods"))
-	app.XAC.SetExposeHeaders(svc.GetString("accessControlExposeHeaders"))
-	app.XAC.SetMaxAge(svc.GetInt("accessControlMaxAge"))
+	app.XAC.SetAllowOrigins(str.Fields(ini.GetString("server", "accessControlAllowOrigin"))...)
+	app.XAC.SetAllowCredentials(ini.GetBool("server", "accessControlAllowCredentials"))
+	app.XAC.SetAllowHeaders(ini.GetString("server", "accessControlAllowHeaders"))
+	app.XAC.SetAllowMethods(ini.GetString("server", "accessControlAllowMethods"))
+	app.XAC.SetExposeHeaders(ini.GetString("server", "accessControlExposeHeaders"))
+	app.XAC.SetMaxAge(ini.GetInt("server", "accessControlMaxAge"))
 
-	app.XCC.CacheControl = svc.GetString("staticCacheControl", "public, max-age=31536000, immutable")
+	app.XCC.CacheControl = ini.GetString("server", "staticCacheControl", "public, max-age=31536000, immutable")
 
 	app.XCA.RedirectURL = app.Base + "/login/"
 	app.XCA.CookiePath = str.IfEmpty(app.Base, "/")
-	app.XCA.CookieMaxAge = app.INI.GetDuration("login", "cookieMaxAge", time.Minute*30)
-	app.XCA.CookieSecure = app.INI.GetBool("login", "cookieSecure", true)
-	switch app.INI.GetString("login", "cookieSameSite", "strict") {
+	app.XCA.CookieMaxAge = ini.GetDuration("login", "cookieMaxAge", time.Minute*30)
+	app.XCA.CookieSecure = ini.GetBool("login", "cookieSecure", true)
+	switch ini.GetString("login", "cookieSameSite", "strict") {
 	case "lax":
 		app.XCA.CookieSameSite = http.SameSiteLaxMode
 	default:
@@ -107,7 +106,7 @@ func configMiddleware() {
 }
 
 func configWebAssetsHFS() {
-	was := app.INI.GetString("app", "webassets")
+	was := ini.GetString("app", "webassets")
 	if was == "" {
 		app.WAS = xin.FixedModTimeFS(xin.FS(web.FS), app.BuildTime)
 	} else {
@@ -116,10 +115,8 @@ func configWebAssetsHFS() {
 }
 
 func configResponseHeader() {
-	svc := app.INI.Section("server")
-
 	hm := map[string]string{}
-	hh := svc.GetString("httpResponseHeader")
+	hh := ini.GetString("server", "httpResponseHeader")
 	if hh == "" {
 		app.XRH.Header = hm
 	} else {
@@ -137,22 +134,20 @@ func configResponseHeader() {
 }
 
 func configAccessLogger() {
-	svc := app.INI.Section("server")
-
 	alws := []xmw.AccessLogWriter{}
-	alfs := str.Fields(svc.GetString("accessLog"))
+	alfs := str.Fields(ini.GetString("server", "accessLog"))
 	for _, alf := range alfs {
 		switch alf {
 		case "text":
 			alw := xmw.NewAccessLogWriter(
 				app.XIN.Logger.GetOutputer("XAL", log.LevelTrace),
-				svc.GetString("accessLogTextFormat", xmw.AccessLogTextFormat),
+				ini.GetString("server", "accessLogTextFormat", xmw.AccessLogTextFormat),
 			)
 			alws = append(alws, alw)
 		case "json":
 			alw := xmw.NewAccessLogWriter(
 				app.XIN.Logger.GetOutputer("XAJ", log.LevelTrace),
-				svc.GetString("accessLogJSONFormat", xmw.AccessLogJSONFormat),
+				ini.GetString("server", "accessLogJSONFormat", xmw.AccessLogJSONFormat),
 			)
 			alws = append(alws, alw)
 		default:

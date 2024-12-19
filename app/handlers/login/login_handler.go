@@ -16,6 +16,7 @@ import (
 	"github.com/askasoft/pango-xdemo/app/utils/otputil"
 	"github.com/askasoft/pango-xdemo/app/utils/smtputil"
 	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
+	"github.com/askasoft/pango/ini"
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/ran"
 	"github.com/askasoft/pango/tbs"
@@ -122,7 +123,7 @@ func loginMFACheck(c *xin.Context, au *models.User, up *UserPass) bool {
 	switch mfa {
 	case "E":
 		secret := loginMFASecret(c, au)
-		expire := app.INI.GetDuration("login", "emailPasscodeExpires", 10*time.Minute)
+		expire := ini.GetDuration("login", "emailPasscodeExpires", 10*time.Minute)
 		totp := otputil.NewTOTP(secret, expire)
 		if up.Passcode == nil {
 			loginSendEmailPasscode(c, au.Email, totp.Now(), expire)
@@ -145,7 +146,7 @@ func loginMFACheck(c *xin.Context, au *models.User, up *UserPass) bool {
 		}
 
 		secret := loginMFASecret(c, au)
-		expire := app.INI.GetDuration("login", "mobilePasscodeExpires", 30*time.Second)
+		expire := ini.GetDuration("login", "mobilePasscodeExpires", 30*time.Second)
 		totp := otputil.NewTOTP(secret, expire)
 
 		if otputil.TOTPVerify(totp, expire, *up.Passcode) {
@@ -212,7 +213,7 @@ func LoginMFAEnroll(c *xin.Context) {
 	}
 
 	secret := loginMFASecret(c, au)
-	expire := app.INI.GetDuration("login", "mobilePasscodeExpires", 30*time.Second)
+	expire := ini.GetDuration("login", "mobilePasscodeExpires", 30*time.Second)
 	totp := otputil.NewTOTP(secret, expire)
 	loginSendEmailQrcode(c, au.Email, totp)
 }

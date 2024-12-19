@@ -11,6 +11,7 @@ import (
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango-xdemo/app/utils/errutil"
 	"github.com/askasoft/pango/gog"
+	"github.com/askasoft/pango/ini"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/str"
@@ -257,7 +258,7 @@ type JobRunner[T any] struct {
 
 func NewJobRunner[T any](tt *tenant.Tenant, job *xjm.Job) *JobRunner[T] {
 	rid := time.Now().UnixMilli()
-	rsx := app.INI.GetString("job", "ridSuffix")
+	rsx := ini.GetString("job", "ridSuffix")
 	if rsx != "" {
 		sx := int64(math.Pow10(len(rsx)))
 		rid = rid*sx + num.Atol(str.TrimLeft(rsx, "0"))

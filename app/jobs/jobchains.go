@@ -8,6 +8,7 @@ import (
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango/asg"
+	"github.com/askasoft/pango/ini"
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/xjm"
@@ -313,7 +314,7 @@ func JobChainAppendJob(tt *tenant.Tenant, name, locale string, cid int64, csq in
 
 // CleanOutdatedJobChains iterate schemas to clean outdated job chains
 func CleanOutdatedJobChains() {
-	before := time.Now().Add(-1 * app.INI.GetDuration("jobchain", "outdatedBefore", time.Hour*24*10))
+	before := time.Now().Add(-1 * ini.GetDuration("jobchain", "outdatedBefore", time.Hour*24*10))
 
 	_ = tenant.Iterate(func(tt *tenant.Tenant) error {
 		tjc := tt.JC()

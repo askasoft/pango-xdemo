@@ -11,6 +11,7 @@ import (
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango/asg"
 	"github.com/askasoft/pango/cog/treemap"
+	"github.com/askasoft/pango/ini"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/sqx/sqlx"
@@ -162,7 +163,7 @@ var mu sync.Mutex
 
 // Starts iterate tenants to start jobs
 func Starts() {
-	mar := app.INI.GetInt("job", "maxTotalRunnings", 10)
+	mar := ini.GetInt("job", "maxTotalRunnings", 10)
 
 	if mar-ttWorkers.Total() > 0 {
 		err := tenant.Iterate(StartJobs)
@@ -183,8 +184,8 @@ func StartJobs(tt *tenant.Tenant) error {
 	mu.Lock()
 	defer mu.Unlock()
 
-	mar := app.INI.GetInt("job", "maxTotalRunnings", 10)
-	mtr := app.INI.GetInt("job", "maxTenantRunnings", 10)
+	mar := ini.GetInt("job", "maxTotalRunnings", 10)
+	mtr := ini.GetInt("job", "maxTenantRunnings", 10)
 
 	a := mar - ttWorkers.Total()
 	if a <= 0 {
@@ -241,7 +242,7 @@ func Stats() string {
 // ------------------------------------
 func ReappendJobs() {
 	_ = tenant.Iterate(func(tt *tenant.Tenant) error {
-		d := app.INI.GetDuration("job", "reappendBefore", time.Minute*30)
+		d := ini.GetDuration("job", "reappendBefore", time.Minute*30)
 		before := time.Now().Add(-d)
 
 		tjm := tt.JM()
@@ -258,7 +259,7 @@ func ReappendJobs() {
 // ------------------------------------
 // CleanOutdatedJobs iterate schemas to clean outdated jobs
 func CleanOutdatedJobs() {
-	before := time.Now().Add(-1 * app.INI.GetDuration("job", "outdatedBefore", time.Hour*24*10))
+	before := time.Now().Add(-1 * ini.GetDuration("job", "outdatedBefore", time.Hour*24*10))
 
 	_ = tenant.Iterate(func(tt *tenant.Tenant) error {
 		return app.SDB.Transaction(func(tx *sqlx.Tx) error {

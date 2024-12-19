@@ -16,6 +16,7 @@ import (
 	"github.com/askasoft/pango-xdemo/app/utils/cptutil"
 	"github.com/askasoft/pango-xdemo/app/utils/smtputil"
 	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
+	"github.com/askasoft/pango/ini"
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/tbs"
@@ -75,7 +76,7 @@ func PasswordResetSend(c *xin.Context) {
 	tkenc := cptutil.MustEncrypt(app.Secret(), token.String())
 	rsurl := fmt.Sprintf("%s://%s%s/login/pwdrst/reset/%s", str.If(c.IsSecure(), "https", "http"), c.RequestHostname(), app.Base, tkenc)
 
-	tkexp := num.Itoa(int(app.INI.GetDuration("login", "passwordResetTokenExpires", time.Minute*10).Minutes()))
+	tkexp := num.Itoa(int(ini.GetDuration("login", "passwordResetTokenExpires", time.Minute*10).Minutes()))
 
 	sr := strings.NewReplacer(
 		"{{SITE_NAME}}", tbs.GetText(c.Locale, "title"),
@@ -123,7 +124,7 @@ func passwordResetToken(c *xin.Context) *PwdRstToken {
 		return nil
 	}
 
-	tkexp := app.INI.GetDuration("login", "passwordResetTokenExpires", time.Minute*10)
+	tkexp := ini.GetDuration("login", "passwordResetTokenExpires", time.Minute*10)
 	tktm := time.UnixMilli(token.Timestamp)
 	if time.Since(tktm) > tkexp {
 		c.AddError(errors.New(tbs.GetText(c.Locale, "pwdrst.error.expired")))

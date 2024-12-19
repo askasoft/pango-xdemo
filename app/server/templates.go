@@ -4,6 +4,7 @@ import (
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/tpls"
 	"github.com/askasoft/pango/fsw"
+	"github.com/askasoft/pango/ini"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/tpl"
 	"github.com/askasoft/pango/xin/render"
@@ -36,7 +37,7 @@ func loadTemplates(tplPath string) (ht render.HTMLTemplates, err error) {
 }
 
 func initTemplates() {
-	templates = app.INI.GetString("app", "templates")
+	templates = ini.GetString("app", "templates")
 
 	ht, err := loadTemplates(templates)
 	if err != nil {
@@ -48,7 +49,7 @@ func initTemplates() {
 }
 
 func reloadTemplates(path string, op fsw.Op) {
-	tplPath := app.INI.GetString("app", "templates")
+	tplPath := ini.GetString("app", "templates")
 
 	if op == fsw.OpNone {
 		if tplPath != templates {

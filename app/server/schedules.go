@@ -6,6 +6,7 @@ import (
 	"github.com/askasoft/pango-xdemo/app/tasks"
 	"github.com/askasoft/pango/cog"
 	"github.com/askasoft/pango/cog/linkedhashmap"
+	"github.com/askasoft/pango/ini"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/sch"
 )
@@ -26,7 +27,7 @@ func initScheduler() {
 		name := it.Key()
 		callback := it.Value()
 
-		cron := app.INI.GetString("task", name)
+		cron := ini.GetString("task", name)
 		if cron == "" {
 			sch.Schedule(name, sch.ZeroTrigger, callback)
 		} else {
@@ -43,7 +44,7 @@ func initScheduler() {
 
 func reScheduler() {
 	for _, name := range schedules.Keys() {
-		cron := app.INI.GetString("task", name)
+		cron := ini.GetString("task", name)
 		task, ok := sch.GetTask(name)
 		if !ok {
 			log.Errorf("Failed to find task %s", name)

@@ -4,6 +4,7 @@ import (
 	"sync"
 
 	"github.com/askasoft/pango-xdemo/app"
+	"github.com/askasoft/pango/ini"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/xfs"
@@ -58,11 +59,11 @@ func (sm Schema) FS() xfs.XFS {
 }
 
 func IsMultiTenant() bool {
-	return app.INI.GetBool("tenant", "multiple")
+	return ini.GetBool("tenant", "multiple")
 }
 
 func DefaultSchema() string {
-	return app.INI.GetString("database", "schema", "public")
+	return ini.GetString("database", "schema", "public")
 }
 
 func SSM(db *sqlx.DB) xsm.SchemaManager {

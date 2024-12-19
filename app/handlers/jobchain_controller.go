@@ -6,10 +6,10 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/jobs"
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango/asg"
+	"github.com/askasoft/pango/ini"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/str"
@@ -78,7 +78,7 @@ func (jcc *JobChainController) List(c *xin.Context) {
 
 	skip := num.Atoi(c.Query("skip"))
 	limit := num.Atoi(c.Query("limit"))
-	max := app.INI.GetInt("jobchain", "maxJobChainList", 10)
+	max := ini.GetInt("jobchain", "maxJobChainList", 10)
 	if limit <= 0 || limit > max {
 		limit = max
 	}

@@ -22,7 +22,6 @@ func H(c *xin.Context) xin.H {
 
 	h := xin.H{
 		"CFG":    app.CFG,
-		"INI":    app.INI,
 		"VER":    app.Version,
 		"REV":    app.Revision,
 		"Host":   c.Request.Host,

@@ -2,12 +2,14 @@ package server
 
 import (
 	"database/sql"
+	"errors"
 	"time"
 
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/schema"
 	"github.com/askasoft/pango-xdemo/app/utils/pgutil"
 	"github.com/askasoft/pango/fsu"
+	"github.com/askasoft/pango/ini"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/log/sqlog/sqlxlog"
 	"github.com/askasoft/pango/mag"
@@ -22,7 +24,10 @@ func initDatabase() {
 }
 
 func openDatabase() error {
-	sec := app.INI.Section("database")
+	sec := ini.GetSection("database")
+	if sec == nil {
+		return errors.New("missing [database] settings")
+	}
 
 	dbs := sec.StringMap()
 	if mag.Equal(app.DBS, dbs) {
@@ -30,9 +35,7 @@ func openDatabase() error {
 	}
 
 	typ := sec.GetString("type")
-
 	dsn := sec.GetString("dsn")
-
 	log.Infof("Connect Database (%s): %s", typ, dsn)
 
 	db, err := sql.Open(typ, dsn)

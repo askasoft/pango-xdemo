@@ -7,6 +7,7 @@ import (
 
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/models"
+	"github.com/askasoft/pango/ini"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/xin"
@@ -102,7 +103,7 @@ func IsClientBlocked(c *xin.Context) bool {
 	cip := c.ClientIP()
 
 	if cnt, ok := app.AFIPS.Get(cip); ok {
-		if cnt >= app.INI.GetInt("login", "maxFailure", 5) {
+		if cnt >= ini.GetInt("login", "maxFailure", 5) {
 			return true
 		}
 	}

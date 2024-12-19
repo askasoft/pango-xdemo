@@ -2,13 +2,17 @@ package smtputil
 
 import (
 	"crypto/tls"
+	"errors"
 
-	"github.com/askasoft/pango-xdemo/app"
+	"github.com/askasoft/pango/ini"
 	"github.com/askasoft/pango/net/email"
 )
 
 func SendHTMLMail(to string, subject, message string) error {
-	sec := app.INI.Section("smtp")
+	sec := ini.GetSection("smtp")
+	if sec == nil {
+		return errors.New("missing [smtp] settings")
+	}
 
 	em := &email.Email{}
 	if err := em.SetFrom(sec.GetString("fromaddr")); err != nil {

@@ -124,7 +124,7 @@ func Run() {
 	go start()
 
 	// Start jobs (Resume interrupted jobs)
-	if app.INI.GetBool("job", "startAtStartup") {
+	if ini.GetBool("job", "startAtStartup") {
 		go jobs.Starts()
 	}
 }
@@ -142,7 +142,7 @@ func Shutdown() {
 
 	// The context is used to inform the server it has 5 seconds to finish
 	// the request it is currently handling
-	ctx, cancel := context.WithTimeout(context.TODO(), app.INI.GetDuration("server", "shutdownTimeout", 5*time.Second))
+	ctx, cancel := context.WithTimeout(context.TODO(), ini.GetDuration("server", "shutdownTimeout", 5*time.Second))
 	defer cancel()
 
 	if err := app.HTTP.Shutdown(ctx); err != nil {
@@ -191,32 +191,29 @@ func initCertificate() {
 }
 
 func initConfigs() {
-	ini, err := loadConfigs()
+	cfg, err := loadConfigs()
 	if err != nil {
 		app.Exit(app.ExitErrCFG)
 	}
 
-	app.INI = ini
+	ini.SetDefault(cfg)
 	initAppCfg()
 }
 
 func initAppCfg() {
-	app.CFG = app.INI.StringMap()
+	app.CFG = ini.StringMap()
 
-	apc := app.INI.Section("app")
-	app.Locales = str.FieldsAny(apc.GetString("locales"), ",; ")
+	app.Locales = str.FieldsAny(ini.GetString("app", "locales"), ",; ")
 
-	svc := app.INI.Section("server")
-	app.Domain = svc.GetString("domain")
-	app.Base = svc.GetString("prefix")
+	app.Domain = ini.GetString("server", "domain")
+	app.Base = ini.GetString("server", "prefix")
 }
 
 func initCaches() {
-	cac := app.INI.Section("cache")
-	app.SCMAS = imc.New[bool](cac.GetDuration("schemaCacheExpires", time.Minute), time.Minute)
-	app.CONFS = imc.New[map[string]string](cac.GetDuration("configCacheExpires", time.Minute), time.Minute)
-	app.USERS = imc.New[*models.User](cac.GetDuration("userCacheExpires", time.Minute), time.Minute)
-	app.AFIPS = imc.New[int](cac.GetDuration("afipCacheExpires", time.Minute*30), time.Minute)
+	app.SCMAS = imc.New[bool](ini.GetDuration("cache", "schemaCacheExpires", time.Minute), time.Minute)
+	app.CONFS = imc.New[map[string]string](ini.GetDuration("cache", "configCacheExpires", time.Minute), time.Minute)
+	app.USERS = imc.New[*models.User](ini.GetDuration("cache", "userCacheExpires", time.Minute), time.Minute)
+	app.AFIPS = imc.New[int](ini.GetDuration("cache", "afipCacheExpires", time.Minute*30), time.Minute)
 }
 
 func loadConfigs() (*ini.Ini, error) {
@@ -238,9 +235,7 @@ func loadConfigs() (*ini.Ini, error) {
 }
 
 func initListener() {
-	svc := app.INI.Section("server")
-
-	addr := svc.GetString("listen", ":6060")
+	addr := ini.GetString("server", "listen", ":6060")
 	log.Infof("Listening %s ...", addr)
 
 	tcp, err := net.Listen("tcp", addr)
@@ -250,15 +245,15 @@ func initListener() {
 	}
 
 	app.TCP = netutil.DumpListener(tcp, "logs")
-	app.TCP.Disable(!svc.GetBool("tcpDump"))
+	app.TCP.Disable(!ini.GetBool("server", "tcpDump"))
 
 	app.HTTP = &http.Server{
 		Addr:              addr,
 		Handler:           app.XIN,
-		ReadHeaderTimeout: svc.GetDuration("httpReadHeaderTimeout", 10*time.Second),
-		ReadTimeout:       svc.GetDuration("httpReadTimeout", 120*time.Second),
-		WriteTimeout:      svc.GetDuration("httpWriteTimeout", 300*time.Second),
-		IdleTimeout:       svc.GetDuration("httpIdleTimeout", 30*time.Second),
+		ReadHeaderTimeout: ini.GetDuration("server", "httpReadHeaderTimeout", 10*time.Second),
+		ReadTimeout:       ini.GetDuration("server", "httpReadTimeout", 120*time.Second),
+		WriteTimeout:      ini.GetDuration("server", "httpWriteTimeout", 300*time.Second),
+		IdleTimeout:       ini.GetDuration("server", "httpIdleTimeout", 30*time.Second),
 	}
 }
 
@@ -288,18 +283,17 @@ func reloadLog(path string, op fsw.Op) {
 func reloadConfigs(path string, op fsw.Op) {
 	log.Infof("Reloading configuration %v [%v]", path, op)
 
-	ini, err := loadConfigs()
+	cfg, err := loadConfigs()
 	if err != nil {
 		return
 	}
 
-	app.INI = ini
+	ini.SetDefault(cfg)
 
 	initAppCfg()
 	initCaches()
 
-	svc := app.INI.Section("server")
-	app.TCP.Disable(!svc.GetBool("tcpDump"))
+	app.TCP.Disable(!ini.GetBool("server", "tcpDump"))
 
 	if err := openDatabase(); err != nil {
 		log.Error(err)

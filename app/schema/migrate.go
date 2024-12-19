@@ -8,6 +8,7 @@ import (
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango/doc/csvx"
 	"github.com/askasoft/pango/fsu"
+	"github.com/askasoft/pango/ini"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/ran"
 	"github.com/askasoft/pango/sqx/sqlx"
@@ -131,7 +132,7 @@ func (sm Schema) MigrateConfig(configs []*models.Config) error {
 }
 
 func (sm Schema) MigrateSuper() error {
-	suc := app.INI.GetSection("super")
+	suc := ini.GetSection("super")
 	if suc == nil {
 		return errors.New("missing [super] settings")
 	}

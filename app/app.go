@@ -75,9 +75,6 @@ var (
 )
 
 var (
-	// INI global ini
-	INI *ini.Ini
-
 	// CFG global ini map
 	CFG map[string]map[string]string
 
@@ -179,5 +176,5 @@ func Versions() string {
 }
 
 func Secret() string {
-	return INI.GetString("app", "secret", "~ pango  xdemo ~")
+	return ini.GetString("app", "secret", "~ pango  xdemo ~")
 }
