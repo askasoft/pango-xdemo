@@ -17,7 +17,6 @@ var schedules = linkedhashmap.NewLinkedHashMap(
 	cog.KV("jobReappend", jobs.ReappendJobs),
 	cog.KV("jobClean", jobs.CleanOutdatedJobs),
 	cog.KV("jobchainClean", jobs.CleanOutdatedJobChains),
-	cog.KV("serverMonitor", tasks.MonitorServer),
 	cog.KV("dbReset", tasks.ResetDatabase),
 )
 

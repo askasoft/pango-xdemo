@@ -18,6 +18,7 @@ import (
 	"github.com/askasoft/pango/oss/disk"
 	"github.com/askasoft/pango/oss/loadavg"
 	"github.com/askasoft/pango/oss/mem"
+	"github.com/askasoft/pango/oss/osm"
 	"github.com/askasoft/pango/oss/uptime"
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/tmu"
@@ -55,7 +56,7 @@ func debugServer() any {
 
 	// server
 	host, _ := os.Hostname()
-	stm.Set("Host", host)
+	stm.Set("Hostname", host)
 	stm.Set("OS", runtime.GOOS)
 	stm.Set("Arch", runtime.GOARCH)
 	stm.Set("CPU", num.Comma(runtime.NumCPU()))
@@ -65,10 +66,11 @@ func debugServer() any {
 	// uptime
 	upt, err := uptime.GetUptime()
 	if err != nil {
-		stm.Set("Uptime", err.Error())
+		val = err.Error()
 	} else {
-		stm.Set("Uptime", tmu.HumanDuration(upt))
+		val = tmu.HumanDuration(upt)
 	}
+	stm.Set("Uptime", val)
 
 	// memory stats
 	ms, err := mem.GetMemoryStats()
@@ -125,15 +127,24 @@ func debugPerformance() any {
 	prm.Set("Load Average (1,5,15)", val)
 
 	// cpu stats
-	cs, err := cpu.GetCPUStatsDelta(time.Millisecond * 250)
-	if err != nil {
-		val = err.Error()
-	} else {
+	if osm.Monitoring() {
+		cu := osm.LastCPUUsage()
 		val = fmt.Sprintf(
-			"%.2f us, %.2f sy, %.2f ni, %.2f id, %.2f wa, %.2f hi, %.2f si, %.2f st, %.2f%%",
-			cs.UserUsage()*100, cs.SystemUsage()*100, cs.NiceUsage()*100, cs.IdleUsage()*100, cs.IowaitUsage()*100,
-			cs.IrqUsage()*100, cs.SoftirqUsage()*100, cs.StealUsage()*100, cs.CPUUsage()*100,
+			"%.2f us, %.2f sy, %.2f ni, %.2f id, %.2f wa, %.2f hi, %.2f si, %.2f st, %.2f gu, %.2f gn",
+			cu.UserUsage()*100, cu.SystemUsage()*100, cu.NiceUsage()*100, cu.IdleUsage()*100, cu.IowaitUsage()*100,
+			cu.IrqUsage()*100, cu.SoftirqUsage()*100, cu.StealUsage()*100, cu.GuestUsage()*100, cu.GuestNiceUsage()*100,
 		)
+	} else {
+		cu, err := cpu.GetCPUUsage(time.Millisecond * 250)
+		if err != nil {
+			val = err.Error()
+		} else {
+			val = fmt.Sprintf(
+				"%.2f us, %.2f sy, %.2f ni, %.2f id, %.2f wa, %.2f hi, %.2f si, %.2f st, %.2f gu, %.2f gn",
+				cu.UserUsage()*100, cu.SystemUsage()*100, cu.NiceUsage()*100, cu.IdleUsage()*100, cu.IowaitUsage()*100,
+				cu.IrqUsage()*100, cu.SoftirqUsage()*100, cu.StealUsage()*100, cu.GuestUsage()*100, cu.GuestNiceUsage()*100,
+			)
+		}
 	}
 	prm.Set("%Cpu(s)", val)
 

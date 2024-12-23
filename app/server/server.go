@@ -108,6 +108,8 @@ func Init() {
 
 	initFileWatch()
 
+	initStatsMonitor()
+
 	initScheduler()
 }
 
@@ -308,6 +310,8 @@ func reloadConfigs(path string, op fsw.Op) {
 	reloadMessages(path, fsw.OpNone)
 
 	reloadTemplates(path, fsw.OpNone)
+
+	runStatsMonitor()
 
 	reScheduler()
 }
