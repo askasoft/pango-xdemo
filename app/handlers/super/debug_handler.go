@@ -51,9 +51,10 @@ type trace struct {
 }
 
 func debugServer() any {
+	stm := linkedhashmap.NewLinkedHashMap[string, string]()
+
 	// server
 	host, _ := os.Hostname()
-	stm := linkedhashmap.NewLinkedHashMap[string, string]()
 	stm.Set("Host", host)
 	stm.Set("OS", runtime.GOOS)
 	stm.Set("Arch", runtime.GOARCH)
@@ -82,40 +83,18 @@ func debugServer() any {
 	}
 	stm.Set("Memory", val)
 
-	// disk stats
-	ds, err := disk.GetDiskStats(".")
+	// disk usage
+	du, err := disk.GetDiskUsage(".")
 	if err != nil {
 		val = err.Error()
 	} else {
 		val = fmt.Sprintf("%s / %s (%s%%)",
-			num.HumanSize(ds.Used()),
-			num.HumanSize(ds.Total),
-			num.FtoaWithDigits(ds.Usage()*100, 2),
+			num.HumanSize(du.Used()),
+			num.HumanSize(du.Total),
+			num.FtoaWithDigits(du.Usage()*100, 2),
 		)
 	}
 	stm.Set("Disk", val)
-
-	// cpu stats
-	cs, err := cpu.GetCPUStats()
-	if err != nil {
-		val = err.Error()
-	} else {
-		val = fmt.Sprintf(
-			"%.2f us, %.2f sy, %.2f ni, %.2f id, %.2f wa, %.2f hi, %.2f si, %.2f st, %.2f%%",
-			cs.UserUsage()*100, cs.SystemUsage()*100, cs.NiceUsage()*100, cs.IdleUsage()*100, cs.IowaitUsage()*100,
-			cs.IrqUsage()*100, cs.SoftirqUsage()*100, cs.StealUsage()*100, cs.CPUUsage()*100,
-		)
-	}
-	stm.Set("%Cpu(s)", val)
-
-	// loadavg
-	la, err := loadavg.GetLoadAvg()
-	if err != nil {
-		val = err.Error()
-	} else {
-		val = fmt.Sprintf("%.3f, %.3f, %.3f", la.Loadavg1, la.Loadavg5, la.Loadavg15)
-	}
-	stm.Set("Load Average (1,5,15)", val)
 
 	return stm
 }
@@ -131,11 +110,41 @@ func debugRuntime() any {
 	return rtm
 }
 
+func debugPerformance() any {
+	var val string
+
+	prm := linkedhashmap.NewLinkedHashMap[string, string]()
+
+	// loadavg
+	la, err := loadavg.GetLoadAvg()
+	if err != nil {
+		val = err.Error()
+	} else {
+		val = fmt.Sprintf("%.3f, %.3f, %.3f", la.Loadavg1, la.Loadavg5, la.Loadavg15)
+	}
+	prm.Set("Load Average (1,5,15)", val)
+
+	// cpu stats
+	cs, err := cpu.GetCPUStatsDelta(time.Millisecond * 250)
+	if err != nil {
+		val = err.Error()
+	} else {
+		val = fmt.Sprintf(
+			"%.2f us, %.2f sy, %.2f ni, %.2f id, %.2f wa, %.2f hi, %.2f si, %.2f st, %.2f%%",
+			cs.UserUsage()*100, cs.SystemUsage()*100, cs.NiceUsage()*100, cs.IdleUsage()*100, cs.IowaitUsage()*100,
+			cs.IrqUsage()*100, cs.SoftirqUsage()*100, cs.StealUsage()*100, cs.CPUUsage()*100,
+		)
+	}
+	prm.Set("%Cpu(s)", val)
+
+	return prm
+}
+
 func debugMemStats() any {
-	// memory
+	msm := linkedhashmap.NewLinkedHashMap[string, string]()
+
 	var ms runtime.MemStats
 	runtime.ReadMemStats(&ms)
-	msm := linkedhashmap.NewLinkedHashMap[string, string]()
 	msm.Set("Mallocs", num.HumanSize(float64(ms.Mallocs)))
 	msm.Set("Frees", num.Comma(ms.Frees))
 	msm.Set("Alloc", num.HumanSize(float64(ms.Alloc)))
@@ -167,11 +176,12 @@ func debugMemStats() any {
 }
 
 func debugProfiles() any {
-	// profiles
 	var pfs []*profile
+
 	for _, p := range pprof.Profiles() {
 		pfs = append(pfs, &profile{p.Name(), profileDescriptions[p.Name()], p.Count()})
 	}
+
 	sort.Slice(pfs, func(i, j int) bool {
 		return pfs[i].Name < pfs[j].Name
 	})
@@ -179,7 +189,6 @@ func debugProfiles() any {
 }
 
 func debugTrace() any {
-	// traces
 	trs := []*trace{
 		{"profile", traceDescriptions["profile"]},
 		{"symbol", traceDescriptions["symbol"]},
@@ -193,6 +202,7 @@ func DebugIndex(c *xin.Context) {
 
 	h["Server"] = debugServer()
 	h["Runtime"] = debugRuntime()
+	h["Performance"] = debugPerformance()
 	h["MemStats"] = debugMemStats()
 	h["Profiles"] = debugProfiles()
 	h["Traces"] = debugTrace()
@@ -201,13 +211,14 @@ func DebugIndex(c *xin.Context) {
 }
 
 func DebugJSON(c *xin.Context) {
-	stats := make(map[string]any)
+	j := make(map[string]any)
 
-	stats["server"] = debugServer()
-	stats["runtime"] = debugRuntime()
-	stats["memstats"] = debugMemStats()
+	j["server"] = debugServer()
+	j["runtime"] = debugRuntime()
+	j["performance"] = debugPerformance()
+	j["memstats"] = debugMemStats()
 
-	c.JSON(http.StatusOK, stats)
+	c.JSON(http.StatusOK, j)
 }
 
 func DebugPprof(c *xin.Context) {

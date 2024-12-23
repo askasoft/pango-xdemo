@@ -24,75 +24,90 @@ func MonitorServer() {
 
 func monitorDisk() {
 	diskFree := ini.GetSize("monitor", "diskFree")
-	if diskFree > 0 {
-		ds, err := disk.GetDiskStats(".")
-		if err != nil {
-			log.GetLogger("MONITOR").Error(err)
-		} else {
-			disks.Push(ds.Available)
+	if diskFree <= 0 {
+		return
+	}
 
-			diskCount := ini.GetInt("monitor", "diskCount", 1)
-			if disks.Len() > diskCount {
-				disks.Poll()
-			}
+	du, err := disk.GetDiskUsage(".")
+	if err != nil {
+		log.GetLogger("MONITOR").Error(err)
+		return
+	}
 
-			if disks.Len() == diskCount {
-				daa := calcAverage(disks)
-				if daa < uint64(diskFree) { //nolint: gosec
-					log.GetLogger("MONITOR").Errorf("insufficient free disk space %s", num.HumanSize(ds.Available))
-					disks.Clear()
-				}
-			}
+	disks.Push(du.Available)
+
+	diskCount := ini.GetInt("monitor", "diskCount", 1)
+	if disks.Len() > diskCount {
+		disks.Poll()
+	}
+
+	if disks.Len() == diskCount {
+		daa := calcAverage(disks)
+		if daa < uint64(diskFree) {
+			log.GetLogger("MONITOR").Errorf("insufficient free disk space %s", num.HumanSize(du.Available))
+			disks.Clear()
 		}
 	}
 }
 
+var lastCPUStats cpu.CPUStats
+
 func monitorCPUUsage() {
 	cpuUsage := ini.GetFloat("monitor", "cpuUsage")
-	if cpuUsage > 0 {
-		cs, err := cpu.GetCPUStats()
-		if err != nil {
-			log.GetLogger("MONITOR").Error(err)
-		} else {
-			cpus.Push(cs.CPUUsage())
+	if cpuUsage <= 0 {
+		return
+	}
 
-			cpuCount := ini.GetInt("monitor", "cpuCount", 1)
-			if cpus.Len() > cpuCount {
-				cpus.Poll()
-			}
+	cs, err := cpu.GetCPUStats()
+	if err != nil {
+		log.GetLogger("MONITOR").Error(err)
+		return
+	}
 
-			if cpus.Len() == cpuCount {
-				cua := calcAverage(cpus)
-				if cua > cpuUsage {
-					log.GetLogger("MONITOR").Errorf("cpu usage %.2f%% is too high", cua*100)
-					cpus.Clear()
-				}
-			}
+	thisCPUUsage := cs
+	cs.Subtract(&lastCPUStats)
+	lastCPUStats = thisCPUUsage
+
+	cpus.Push(cs.CPUUsage())
+
+	cpuCount := ini.GetInt("monitor", "cpuCount", 1)
+	if cpus.Len() > cpuCount {
+		cpus.Poll()
+	}
+
+	if cpus.Len() == cpuCount {
+		cua := calcAverage(cpus)
+		if cua > cpuUsage {
+			log.GetLogger("MONITOR").Errorf("cpu usage %.2f%% is too high", cua*100)
+			cpus.Clear()
 		}
 	}
 }
 
 func monitorMemUsage() {
 	memUsage := ini.GetFloat("monitor", "memUsage")
-	if memUsage > 0 {
-		ms, err := mem.GetMemoryStats()
-		if err != nil {
-			log.GetLogger("MONITOR").Error(err)
-		} else {
-			mems.Push(ms.Usage())
+	if memUsage <= 0 {
+		return
+	}
 
-			memCount := ini.GetInt("monitor", "memCount", 1)
-			if mems.Len() > memCount {
-				mems.Poll()
-			}
+	ms, err := mem.GetMemoryStats()
+	if err != nil {
+		log.GetLogger("MONITOR").Error(err)
+		return
+	}
 
-			if mems.Len() == memCount {
-				mua := calcAverage(mems)
-				if mua > memUsage {
-					log.GetLogger("MONITOR").Errorf("memory usage %.2f%% is too high", mua*100)
-					mems.Clear()
-				}
-			}
+	mems.Push(ms.Usage())
+
+	memCount := ini.GetInt("monitor", "memCount", 1)
+	if mems.Len() > memCount {
+		mems.Poll()
+	}
+
+	if mems.Len() == memCount {
+		mua := calcAverage(mems)
+		if mua > memUsage {
+			log.GetLogger("MONITOR").Errorf("memory usage %.2f%% is too high", mua*100)
+			mems.Clear()
 		}
 	}
 }
