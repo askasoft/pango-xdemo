@@ -9,13 +9,13 @@
 }
 
 #jobchain_form {
-	margin-bottom: 20px;
+	margin-bottom: 1.5em;
 }
 
 #jobchain_tabs {
 	overflow-x: hidden;
 	overflow-y: auto;
-	max-height: 94px;
+	max-height: 5.5em;
 	scrollbar-width: thin;
 }
 #jobchain_tabs > ul.nav-pills > li {
@@ -33,7 +33,7 @@
 }
 #jobchain_tabs > ul > li i {
 	font-size: 1.5em;
-	margin-right: 0.5rem;
+	margin-right: 0.5em;
 	vertical-align: middle;
 }
 #jobchain_tabs > ul > li[status=A] i {
@@ -53,14 +53,14 @@
 }
 
 #jobchain_list {
-	margin-top: 20px;
+	margin-top: 1.5em;
 	width: 100%;
 }
 
 .jobchain {
 	border: solid 1px transparent;
-	margin-bottom: 20px;
-	padding: 15px 15px 0 15px;
+	margin-bottom: 1.5em;
+	padding: 1em 1em 0 1em;
 }
 .jobchain[status=A] {
 	border-color: var(--js-aborted);
@@ -82,19 +82,19 @@
 	text-align: left;
 }
 .jobtools > * {
-	margin-bottom: 15px;
+	margin-bottom: 1em;
 }
 .jobtools > button {
 	float: right;
 }
 .jobtools > .jobcaption > i {
-	font-size: 150%;
+	font-size: 1.5em;
 }
 .jobtools > .jobcaption > * {
 	vertical-align: middle;
 }
 .jobtools > .jobcaption > i, .jobtools > button > i {
-	margin-right: 8px;
+	margin-right: 0.5em;
 }
 .jobchain[status=A] .jobcaption {
 	color: var(--js-aborted);
@@ -118,8 +118,8 @@
 }
 
 .jrs {
-	margin: 0 60px 15px 0;
-	min-width: 250px;
+	margin: 0 60px 1em 0;
+	min-width: 17em;
 	position: relative;
 }
 .jrs:after {
@@ -136,8 +136,8 @@
 }
 .jnm {
 	border: solid 2px transparent;
-	margin: 0 0 5px 0;
-	padding: 10px 15px;
+	margin: 0 0 0.5em 0;
+	padding: 0.5em 1em;
 	text-align: center;
 }
 .jrs[status=A] .jnm {
@@ -170,7 +170,7 @@
 	display: flex;
 }
 .jpg {
-	margin: 10px 20px 10px 0;
+	margin: 1em 1.5em 1em 0;
 	position: relative;
 }
 .jpg .txt {
@@ -195,8 +195,8 @@
 	padding: 2px 0;
 }
 .jss label {
-	width: 80px;
-	margin-right: 5px;
+	width: 6em;
+	margin-right: .5em;
 }
 .jss .error, .jss .failure {
 	color: var(--js-aborted);

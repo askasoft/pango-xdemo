@@ -74,7 +74,7 @@ func (pcj *PetCreateJob) Run() {
 	}
 
 	if pcj.Step == 0 {
-		pcj.SetTotalLimit(pcj.Arg.Items, 0)
+		pcj.Total = pcj.Arg.Items
 	}
 
 	ctx, cancel := pcj.Running()

@@ -92,7 +92,7 @@ func (ucij *UserCsvImportJob) Run() {
 	}
 
 	ucij.Step = 0
-	ucij.SetTotalLimit(total, 0)
+	ucij.Total = total
 
 	ucij.Logger.Info(tbs.GetText(ucij.Locale(), "csv.info.importing"))
 

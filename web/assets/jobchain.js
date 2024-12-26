@@ -263,6 +263,7 @@
 		jobchain_jrs_set_state($jrs, jrs, 'exists');
 		jobchain_jrs_set_state($jrs, jrs, 'skipped');
 		jobchain_jrs_set_state($jrs, jrs, 'success', jrs.state.success || '-');
+		jobchain_jrs_set_state($jrs, jrs, 'warning');
 		jobchain_jrs_set_state($jrs, jrs, 'failure');
 		jobchain_jrs_set_error($jrs, jrs, 'error');
 

@@ -130,20 +130,15 @@ type JobState struct {
 	Step    int `json:"step,omitempty"`
 	Count   int `json:"count,omitempty"`
 	Total   int `json:"total,omitempty"`
-	Limit   int `json:"limit,omitempty"`
 	Exists  int `json:"exists,omitempty"`
 	Skipped int `json:"skipped,omitempty"`
 	Success int `json:"success,omitempty"`
 	Failure int `json:"failure,omitempty"`
+	Warning int `json:"warning,omitempty"`
 }
 
-func (js *JobState) SetTotalLimit(total, limit int) {
-	js.Total = total
-	js.Limit = gog.If(total > 0 && limit > total, total, limit)
-}
-
-func (js *JobState) IsStepLimited() bool {
-	return js.Limit > 0 && js.Step >= js.Limit
+func (js *JobState) IsStepExceeded() bool {
+	return js.Total > 0 && js.Step >= js.Total
 }
 
 func (js *JobState) IncSkipped() {
@@ -162,9 +157,6 @@ func (js *JobState) IncFailure() {
 }
 
 func (js *JobState) Progress() string {
-	if js.Limit > 0 {
-		return fmt.Sprintf("[%d/%d]", js.Count, js.Limit)
-	}
 	if js.Total > 0 {
 		return fmt.Sprintf("[%d/%d]", js.Count, js.Total)
 	}
@@ -178,15 +170,40 @@ func (js *JobState) Progress() string {
 }
 
 func (js *JobState) Counts() string {
-	return fmt.Sprintf("[%d/%d/%d] (-%d|+%d|!%d)", js.Step, js.Limit, js.Total, js.Skipped, js.Success, js.Failure)
+	return fmt.Sprintf("[%d/%d] (-%d|+%d|!%d)", js.Step, js.Total, js.Skipped, js.Success, js.Failure)
 }
 
 func (js *JobState) State() JobState {
 	return *js
 }
 
-type JobStateSx struct {
+type JobStateLx struct {
 	JobState
+	Limit int `json:"limit,omitempty"`
+}
+
+func (js *JobStateLx) SetTotalLimit(total, limit int) {
+	js.Total = total
+	js.Limit = gog.If(total > 0 && limit > total, total, limit)
+}
+
+func (js *JobStateLx) IsStepLimited() bool {
+	return js.Limit > 0 && js.Step >= js.Limit
+}
+
+func (js *JobStateLx) Progress() string {
+	if js.Limit > 0 {
+		return fmt.Sprintf("[%d/%d]", js.Count, js.Limit)
+	}
+	return js.JobState.Progress()
+}
+
+func (js *JobStateLx) Counts() string {
+	return fmt.Sprintf("[%d/%d/%d] (-%d|+%d|!%d)", js.Step, js.Limit, js.Total, js.Skipped, js.Success, js.Failure)
+}
+
+type JobStateSx struct {
+	JobStateLx
 }
 
 func (js *JobStateSx) IsSuccessLimited() bool {
@@ -222,15 +239,14 @@ func (js *JobStateSx) Progress() string {
 	return ""
 }
 
-type JobStateEx struct {
-	JobState
+type JobStateLix struct {
+	JobStateLx
 	LastID int64 `json:"last_id,omitempty"`
 }
 
-type JobStateFsx struct {
+type JobStateSix struct {
 	JobStateSx
-	LastID        int64     `json:"last_id,omitempty"`
-	LastUpdatedAt time.Time `json:"last_updated_at,omitempty"`
+	LastID int64 `json:"last_id,omitempty"`
 }
 
 type FailedItem struct {
