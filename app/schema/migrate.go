@@ -26,7 +26,9 @@ func ReadConfigFile() ([]*models.Config, error) {
 }
 
 func (sm Schema) InitSchema() error {
-	if err := sm.MigrateSchema(); err != nil {
+	log.Infof("Initialize schema %q", sm)
+
+	if err := sm.ExecSchemaSQL(); err != nil {
 		return err
 	}
 
@@ -46,10 +48,8 @@ func (sm Schema) InitSchema() error {
 	return nil
 }
 
-func (sm Schema) MigrateSchema() error {
-	log.Infof("Migrate schema %q", sm)
-
-	log.Infof("Read SQL file '%s'", app.SQLSchemaFile)
+func (sm Schema) ExecSchemaSQL() error {
+	log.Infof("Execute Schema SQL file '%s'", app.SQLSchemaFile)
 
 	sqls, err := fsu.ReadString(app.SQLSchemaFile)
 	if err != nil {
@@ -112,7 +112,6 @@ func (sm Schema) MigrateConfig(configs []*models.Config) error {
 				continue
 			}
 
-			log.Infof("UPDATE %s: %s", tb, cfg.Name)
 			if _, err := stmtu.Exec(cfg); err != nil {
 				return err
 			}
@@ -121,8 +120,6 @@ func (sm Schema) MigrateConfig(configs []*models.Config) error {
 
 		cfg.CreatedAt = time.Now()
 		cfg.UpdatedAt = cfg.CreatedAt
-
-		log.Infof("INSERT %s: %v", tb, cfg)
 		if _, err := stmtc.Exec(cfg); err != nil {
 			return err
 		}

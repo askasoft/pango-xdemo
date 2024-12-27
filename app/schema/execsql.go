@@ -17,13 +17,14 @@ import (
 func (sm Schema) ExecSQL(sqls string) error {
 	log.Info(str.PadCenter(" "+string(sm)+" ", 78, "="))
 
-	tsql := str.ReplaceAll(sqls, `"SCHEMA"`, string(sm))
+	var sb str.Builder
 
-	sr := sqx.NewSqlReader(strings.NewReader(tsql))
+	tsql := str.ReplaceAll(sqls, `"SCHEMA"`, string(sm))
+	sqlr := sqx.NewSqlReader(strings.NewReader(tsql))
 
 	err := app.SDB.Transaction(func(tx *sqlx.Tx) error {
 		for i := 1; ; i++ {
-			sqs, err := sr.ReadSql()
+			sqs, err := sqlr.ReadSql()
 			if errors.Is(err, io.EOF) {
 				return nil
 			}
@@ -34,18 +35,16 @@ func (sm Schema) ExecSQL(sqls string) error {
 			if str.StartsWithFold(sqs, "SELECT") {
 				rows, err := tx.Query(sqs)
 				if err != nil {
-					log.Errorf("#%d = %s", i, sqs)
 					return err
 				}
+				defer rows.Close()
 
 				columns, err := rows.Columns()
 				if err != nil {
-					log.Errorf("#%d = %s", i, sqs)
 					return err
 				}
 
-				var sb str.Builder
-
+				sb.Reset()
 				sb.WriteString("| # |")
 				for _, c := range columns {
 					sb.WriteByte(' ')
@@ -89,7 +88,6 @@ func (sm Schema) ExecSQL(sqls string) error {
 			} else {
 				r, err := tx.Exec(sqs)
 				if err != nil {
-					log.Errorf("#%d = %s", i, sqs)
 					return err
 				}
 
