@@ -587,14 +587,20 @@ form div.verr {
 	border-color: var(--bs-light);
 }
 
+.s-popup-detail.xcol2 .ui-popup-header {
+	overflow-x: hidden;
+	padding: 0;
+}
 .s-popup-detail.xcol2 .ui-popup-header > * {
-	width: 50%;
+	flex: 0 0 50%;
+	padding: 20px;
 }
 .s-popup-detail.xcol2 .ui-popup-body {
 	display: flex;
 	padding: 0;
+	overflow-x: hidden;
 }
-.s-popup-detail.xcol2 .ui-popup-body > div {
+.s-popup-detail.xcol2 .ui-popup-body > * {
 	flex: 0 0 50%;
 	padding: 10px 20px;
 	max-height: 100%;

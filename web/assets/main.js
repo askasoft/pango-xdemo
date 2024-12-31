@@ -294,6 +294,16 @@ var main = {
 		}
 	},
 
+	ui_init: function($d) {
+		$d.find('[data-spy="fieldset"]').fieldset();
+		$d.find('[data-spy="niceSelect"]').niceSelect();
+		$d.find('[data-spy="uploader"]').uploader();
+		$d.find('[textclear]').textclear();
+		$d.find('textarea[autosize]').autosize();
+		$d.find('textarea[enterfire]').enterfire();
+		main.summernote($d.find('textarea[summernote]'));
+	},
+
 	// list
 	list_init: function(name, sskey) {
 		var $l = $('#' + name + '_list'), $f = $('#' + name + '_listform'), tb = '#' + name + '_table';
@@ -336,13 +346,7 @@ var main = {
 	// detail popup
 	detail_popup_shown: function($d) {
 		$d.find('.ui-popup-body').prop('scrollTop', 0);
-		$d.find('[data-spy="fieldset"]').fieldset();
-		$d.find('[data-spy="niceSelect"]').niceSelect();
-		$d.find('[data-spy="uploader"]').uploader();
-		$d.find('[textclear]').textclear();
-		$d.find('textarea[autosize]').autosize();
-		$d.find('textarea[enterfire]').enterfire();
-		main.summernote($d.find('textarea[summernote]'));
+		main.ui_init($d);
 		$(window).trigger('resize');
 	},
 	detail_popup_shown2: function($d) {
