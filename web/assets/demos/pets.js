@@ -79,20 +79,22 @@
 	//----------------------------------------------------
 	// detail
 	//
-	function pet_detail(action) {
-		return pet_detail_show($(this).closest('tr'), action);
+	function pet_id_from_tr($tr) {
+		return $tr.attr('id').replace('pet_', '');
 	}
 
-	function pet_detail_show($tr, action) {
-		var params = { id: $tr.attr('id').replace('pet_', '') };
+	function pet_detail(action) {
+		return pet_detail_show(pet_id_from_tr($(this).closest('tr')), action);
+	}
 
+	function pet_detail_show(id, action) {
 		$('#pets_detail_popup').popup({
 			loaded: false,
 			keyboard: action == 'view',
 			ajax: {
 				url: action,
 				method: 'GET',
-				data: params
+				data: { id: id }
 			}
 		}).popup('show');
 
@@ -107,11 +109,11 @@
 		var action = $(this).attr('action');
 		var id = $('#pet_detail_id').val(), $tr = $('#pet_' + id);
 
-		$('#pets_detail_popup').popup('hide', $tr);
+		$('#pets_detail_popup').popup('hide');
 
 		var $pv = $tr.prev('tr');
 		if ($pv.length) {
-			pet_detail_show($pv, action);
+			pet_detail_show(pet_id_from_tr($pv), action);
 		} else {
 			pets_prev_page(pet_detail_action_trigger.callback(':last-child', action));
 		}
@@ -121,11 +123,11 @@
 		var action = $(this).attr('action');
 		var id = $('#pet_detail_id').val(), $tr = $('#pet_' + id);
 
-		$('#pets_detail_popup').popup('hide', $tr);
+		$('#pets_detail_popup').popup('hide');
 
 		var $nx = $tr.next('tr');
 		if ($nx.length) {
-			pet_detail_show($nx, action);
+			pet_detail_show(pet_id_from_tr($nx), action);
 		} else {
 			pets_next_page(pet_detail_action_trigger.callback(':first-child', action));
 		}

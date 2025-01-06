@@ -79,20 +79,22 @@
 	//----------------------------------------------------
 	// detail
 	//
-	function user_detail(action) {
-		return user_detail_show($(this).closest('tr'), action);
+	function user_id_from_tr($tr) {
+		return $tr.attr('id').replace('user_', '');
 	}
 
-	function user_detail_show($tr, action) {
-		var params = { id: $tr.attr('id').replace('user_', '') };
+	function user_detail(action) {
+		return user_detail_show(user_id_from_tr($(this).closest('tr')), action);
+	}
 
+	function user_detail_show(id, action) {
 		$('#users_detail_popup').popup({
 			loaded: false,
 			keyboard: action == 'view',
 			ajax: {
 				url: action,
 				method: 'GET',
-				data: params
+				data: { id: id }
 			}
 		}).popup('show');
 
@@ -107,11 +109,11 @@
 		var action = $(this).attr('action');
 		var id = $('#user_detail_id').val(), $tr = $('#user_' + id);
 
-		$('#users_detail_popup').popup('hide', $tr);
+		$('#users_detail_popup').popup('hide');
 
 		var $pv = $tr.prev('tr');
 		if ($pv.length) {
-			user_detail_show($pv, action);
+			user_detail_show(user_id_from_tr($pv), action);
 		} else {
 			users_prev_page(user_detail_action_trigger.callback(':last-child', action));
 		}
@@ -121,11 +123,11 @@
 		var action = $(this).attr('action');
 		var id = $('#user_detail_id').val(), $tr = $('#user_' + id);
 
-		$('#users_detail_popup').popup('hide', $tr);
+		$('#users_detail_popup').popup('hide');
 
 		var $nx = $tr.next('tr');
 		if ($nx.length) {
-			user_detail_show($nx, action);
+			user_detail_show(user_id_from_tr($nx), action);
 		} else {
 			users_next_page(user_detail_action_trigger.callback(':first-child', action));
 		}
