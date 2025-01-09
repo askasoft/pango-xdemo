@@ -183,16 +183,16 @@
 			.on('click', 'button.delete', tenant_delete_confirm);
 
 		$('#tenants_create_popup')
-			.find('form').submit(tenant_create).end()
-			.find('.ui-popup-footer button[type=submit]').on('click', tenant_create);
+			.on('submit', 'form', tenant_create)
+			.on('click', '.ui-popup-footer button[type=submit]', tenant_create);
 	
 		$('#tenants_update_popup')
-			.find('form').submit(tenant_update).end()
-			.find('.ui-popup-footer button[type=submit]').on('click', tenant_update);
-	
+			.on('submit', 'form', tenant_update)
+			.on('click', '.ui-popup-footer button[type=submit]', tenant_update);
+
 		$('#tenants_delete_popup')
-			.find('form').submit(tenant_delete).end()
-			.find('.ui-popup-footer button[type=submit]').on('click', tenant_delete);
+			.on('submit', 'form', tenant_delete)
+			.on('click', '.ui-popup-footer button[type=submit]', tenant_delete);
 
 		$('#tenant_delete_name').on('input', tenant_delete_check);
 	}

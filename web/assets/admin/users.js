@@ -369,13 +369,13 @@
 		$('#users_deleteall_popup form').on('submit', users_deletes.callback(true));
 
 		$('#users_deletebat_popup')
-			.find('form').on('submit', users_deletebat).end()
-			.find('.ui-popup-footer button[type=submit]').on('click', users_deletebat);
+			.on('submit', 'form', users_deletebat)
+			.on('click', '.ui-popup-footer button[type=submit]', users_deletebat);
 
 		$('#users_bulkedit_popup')
-			.find('.col-form-label > input').on('change', main.bulkedit_label_click).end()
-			.find('form').on('submit', users_updates).end()
-			.find('.ui-popup-footer button[type=submit]').on('click', users_updates);
+			.on('change', '.col-form-label > input', main.bulkedit_label_click)
+			.on('submit', 'form', users_updates)
+			.on('click', '.ui-popup-footer button[type=submit]', users_updates);
 	}
 
 	$(window).on('load', users_init);
