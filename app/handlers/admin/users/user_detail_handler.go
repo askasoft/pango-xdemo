@@ -81,7 +81,7 @@ func userValidateRole(c *xin.Context, role string) {
 	if role != "" {
 		au := tenant.AuthUser(c)
 		urm := tbsutil.GetUserRoleMap(c.Locale, au.Role)
-		if !urm.Contain(role) {
+		if !urm.Contains(role) {
 			c.AddError(vadutil.ErrInvalidField(c, "user.", "role"))
 		}
 	}
@@ -90,7 +90,7 @@ func userValidateRole(c *xin.Context, role string) {
 func userValidateStatus(c *xin.Context, status string) {
 	if status != "" {
 		sm := tbsutil.GetUserStatusMap(c.Locale)
-		if !sm.Contain(status) {
+		if !sm.Contains(status) {
 			c.AddError(vadutil.ErrInvalidField(c, "user.", "status"))
 		}
 	}

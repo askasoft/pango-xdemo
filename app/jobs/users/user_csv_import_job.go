@@ -220,10 +220,10 @@ func (ucij *UserCsvImportJob) checkRecord(rec *csvUserRecord) error {
 	if rec.Email == "" {
 		errs = append(errs, tbs.GetText(ucij.Locale(), "user.email"))
 	}
-	if rec.Role != "" && !ucij.roleRevMap.Contain(rec.Role) {
+	if rec.Role != "" && !ucij.roleRevMap.Contains(rec.Role) {
 		errs = append(errs, tbs.GetText(ucij.Locale(), "user.role"))
 	}
-	if rec.Status != "" && !ucij.statusRevMap.Contain(rec.Status) {
+	if rec.Status != "" && !ucij.statusRevMap.Contains(rec.Status) {
 		errs = append(errs, tbs.GetText(ucij.Locale(), "user.status"))
 	}
 	if rec.Password != "" {

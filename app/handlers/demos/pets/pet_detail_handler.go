@@ -91,21 +91,21 @@ func petBind(c *xin.Context) *PetWithFile {
 
 	if pet.Gender != "" {
 		pgm := tbsutil.GetPetGenderMap(c.Locale)
-		if !pgm.Contain(pet.Gender) {
+		if !pgm.Contains(pet.Gender) {
 			c.AddError(vadutil.ErrInvalidField(c, "pet.", "gender"))
 		}
 	}
 
 	if pet.Origin != "" {
 		pom := tbsutil.GetPetOriginMap(c.Locale)
-		if !pom.Contain(pet.Origin) {
+		if !pom.Contains(pet.Origin) {
 			c.AddError(vadutil.ErrInvalidField(c, "pet.", "origin"))
 		}
 	}
 
 	if pet.Temper != "" {
 		ptm := tbsutil.GetPetTemperMap(c.Locale)
-		if !ptm.Contain(pet.Temper) {
+		if !ptm.Contains(pet.Temper) {
 			c.AddError(vadutil.ErrInvalidField(c, "pet.", "temper"))
 		}
 	}
@@ -113,7 +113,7 @@ func petBind(c *xin.Context) *PetWithFile {
 	if len(pet.Habits) > 0 {
 		phm := tbsutil.GetPetHabitsMap(c.Locale)
 		for _, h := range pet.Habits {
-			if !phm.Contain(h) {
+			if !phm.Contains(h) {
 				c.AddError(vadutil.ErrInvalidField(c, "pet.", "habits"))
 				break
 			}

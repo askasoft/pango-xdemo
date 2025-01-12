@@ -206,9 +206,9 @@ func validateConfig(c *xin.Context, cfg *models.Config, v *string) bool {
 			switch cfg.Style {
 			case models.ConfigStyleChecks, models.ConfigStyleVerticalChecks, models.ConfigStyleOrderedChecks, models.ConfigStyleMultiSelect:
 				vs := str.FieldsByte(*v, '\t')
-				ok = lm.Contains(vs...)
+				ok = lm.ContainsAll(vs...)
 			default:
-				ok = lm.Contain(*v)
+				ok = lm.Contains(*v)
 			}
 
 			if !ok {
