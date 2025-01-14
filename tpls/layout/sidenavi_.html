@@ -3,7 +3,7 @@
 	<div class="mainnavi ui-sidenavi minimal">
 		<div id="navi_demos" class="card">
 			<div class="card-header">
-				{{I "demos"}}<span>{{T .Loc "menu.demos"}}</span>
+				<div>{{I "demos"}}<span>{{T .Loc "menu.demos"}}</span></div>
 			</div>
 			<div class="card-body">
 				<ul class="nav flex-column">
@@ -19,7 +19,7 @@
 
 		<div id="navi_demos_pets" class="card">
 			<div class="card-header">
-				{{I "demos.pets"}}<span>{{T .Loc "menu.demos.pets"}}</span>
+				<div>{{I "demos.pets"}}<span>{{T .Loc "menu.demos.pets"}}</span></div>
 			</div>
 			<div class="card-body">
 				<ul class="nav flex-column">
@@ -35,7 +35,7 @@
 		{{if and .TT.IsDefault .AU .AU.IsSuper}}
 		<div id="navi_super" class="card">
 			<div class="card-header">
-				{{I "super"}}<span>{{T .Loc "menu.super"}}</span>
+				<a href="{{.Base}}/s/">{{I "super"}}<span>{{T .Loc "menu.super"}}</span></a>
 			</div>
 			<div class="card-body">
 				<ul class="nav flex-column">
@@ -56,7 +56,7 @@
 	<div class="footnavi ui-sidenavi minimal">
 		<div id="navi_admin" class="card">
 			<div class="card-header">
-				{{I "admin"}}<span>{{T .Loc "menu.admin"}}</span>
+				<a href="{{.Base}}/a/">{{I "admin"}}<span>{{T .Loc "menu.admin"}}</span></a>
 			</div>
 			<div class="card-body">
 				<ul class="nav flex-column">

@@ -308,11 +308,19 @@ blockquote {
 .ui-sidenavi .card-header, .ui-sidenavi .card-body {
 	color: #fff;
 }
-.ui-sidenavi a {
-	color: #fff;
+.ui-sidenavi > .card > .card-header > * {
+	padding: 0.25rem 0.5rem;
+	align-items: center;
+	display: flex;
 }
-.ui-sidenavi ul.nav > li > a:focus, .ui-sidenavi ul.nav > li > a:hover {
+.ui-sidenavi a {
+	border-radius: 0.25rem;
+	color: #fff;
+	text-decoration: none;
+}
+.ui-sidenavi a:focus, .ui-sidenavi a:hover {
 	background-color: var(--bs-secondary-bg);
+	color: var(--bs-link-hover-color);
 }
 
 /** section **/
@@ -427,9 +435,6 @@ form div.verr {
 
 
 /** table **/
-.ui-sortable .sortable:hover {
-	background-color: var(--bs-secondary-bg);
-}
 
 .s-table {
 	border-top: 1px solid #ccc;
