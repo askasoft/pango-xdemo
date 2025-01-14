@@ -382,6 +382,7 @@ func addSuperHandlers(rg *xin.RouterGroup) {
 	rg.Use(RoleRootProtect)   // role protect
 	rg.Use(app.XTP.Handler()) // token protect
 
+	rg.GET("/", super.Index)
 	rg.GET("/job", super.JobStats)
 
 	addSuperDebugHandlers(rg.Group("/debug"))
