@@ -1,5 +1,5 @@
-{{MapSet .Ctx.Attrs "sstyles" (Array "summernote/summernote-bs5.min.css")}}
-{{MapSet .Ctx.Attrs "sscripts" (Array "summernote/summernote-bs5.min.js" "summernote/lang/summernote-ja-JP.min.js")}}
+{{MapSet .Ctx.Attrs "sstyles" (Array "summernote/summernote-lite.min.css")}}
+{{MapSet .Ctx.Attrs "sscripts" (Array "summernote/summernote-lite.min.js" (printf "summernote/lang/summernote-%s.min.js" (SummernoteLang .Loc "en")))}}
 
 {{template "main_header" .}}
 

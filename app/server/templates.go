@@ -1,6 +1,7 @@
 package server
 
 import (
+	"github.com/askasoft/pango-assets/html/summernote"
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/tpls"
 	"github.com/askasoft/pango/fsw"
@@ -21,6 +22,7 @@ func newHTMLTemplates() render.HTMLTemplates {
 	fm.Copy(xvw.Functions())
 	fm["DATE"] = app.FormatDate
 	fm["TIME"] = app.FormatTime
+	fm["SummernoteLang"] = summernote.Locale2Lang
 	ht.Funcs(fm)
 
 	return ht

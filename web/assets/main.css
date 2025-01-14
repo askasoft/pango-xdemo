@@ -52,6 +52,14 @@
 }
 **/
 
+/** summernote-lite patch for bootstrap5 **/
+.note-editor .dropdown-toggle::after {
+	display: none;
+}
+.note-editor .note-dropdown-menu {
+	padding: 5px 0;
+}
+
 /** bootstrap5 customize **/
 /* alert */
 .alert.alert-dismissible {
@@ -435,7 +443,6 @@ form div.verr {
 
 
 /** table **/
-
 .s-table {
 	border-top: 1px solid #ccc;
 	border-bottom: 1px solid #ccc;

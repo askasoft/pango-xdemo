@@ -296,6 +296,7 @@ var main = {
 		$d.find('[textclear]').textclear();
 		$d.find('textarea[autosize]').autosize();
 		$d.find('textarea[enterfire]').enterfire();
+		$d.find('[linkify]').linkify();
 		main.summernote($d.find('textarea[summernote]'));
 	},
 
@@ -455,7 +456,98 @@ var main = {
 		$e.addClass('ui-blink-1s2');
 		setTimeout(function() { $e.removeClass('ui-blink-1s2'); }, 2000);
 	},
-
+	summernoteLangs: {
+		"ar-AR": "ar-AR",
+		"az-AZ": "az-AZ",
+		"bg-BG": "bg-BG",
+		"bn-BD": "bn-BD",
+		"ca-ES": "ca-ES",
+		"cs-CZ": "cs-CZ",
+		"da-DK": "da-DK",
+		"de-CH": "de-CH",
+		"de-DE": "de-DE",
+		"el-GR": "el-GR",
+		"en-US": "en-US",
+		"es-ES": "es-ES",
+		"es-EU": "es-EU",
+		"fa-IR": "fa-IR",
+		"fi-FI": "fi-FI",
+		"fr-FR": "fr-FR",
+		"gl-ES": "gl-ES",
+		"he-IL": "he-IL",
+		"hr-HR": "hr-HR",
+		"hu-HU": "hu-HU",
+		"id-ID": "id-ID",
+		"it-IT": "it-IT",
+		"ja-JP": "ja-JP",
+		"ko-KR": "ko-KR",
+		"lt-LT": "lt-LT",
+		"lt-LV": "lt-LV",
+		"mn-MN": "mn-MN",
+		"nb-NO": "nb-NO",
+		"nl-NL": "nl-NL",
+		"pl-PL": "pl-PL",
+		"pt-BR": "pt-BR",
+		"pt-PT": "pt-PT",
+		"ro-RO": "ro-RO",
+		"ru-RU": "ru-RU",
+		"sk-SK": "sk-SK",
+		"sl-SI": "sl-SI",
+		"sr-RS-Latin": "sr-RS-Latin",
+		"sr-RS": "sr-RS",
+		"sv-SE": "sv-SE",
+		"ta-IN": "ta-IN",
+		"th-TH": "th-TH",
+		"tr-TR": "tr-TR",
+		"uk-UA": "uk-UA",
+		"uz-UZ": "uz-UZ",
+		"vi-VN": "vi-VN",
+		"zh-CN": "zh-CN",
+		"zh-TW": "zh-TW",
+		"ar": "ar-AR",
+		"az": "az-AZ",
+		"bg": "bg-BG",
+		"bn": "bn-BD",
+		"ca": "ca-ES",
+		"cs": "cs-CZ",
+		"da": "da-DK",
+		"de": "de-DE",
+		"el": "el-GR",
+		"en": "en-US",
+		"es": "es-ES",
+		"es": "es-EU",
+		"fa": "fa-IR",
+		"fi": "fi-FI",
+		"fr": "fr-FR",
+		"gl": "gl-ES",
+		"he": "he-IL",
+		"hr": "hr-HR",
+		"hu": "hu-HU",
+		"id": "id-ID",
+		"it": "it-IT",
+		"ja": "ja-JP",
+		"ko": "ko-KR",
+		"lt": "lt-LT",
+		"mn": "mn-MN",
+		"nb": "nb-NO",
+		"nl": "nl-NL",
+		"pl": "pl-PL",
+		"pt": "pt-PT",
+		"ro": "ro-RO",
+		"ru": "ru-RU",
+		"sk": "sk-SK",
+		"sl": "sl-SI",
+		"sr": "sr-RS",
+		"sv": "sv-SE",
+		"ta": "ta-IN",
+		"th": "th-TH",
+		"tr": "tr-TR",
+		"uk": "uk-UA",
+		"uz": "uz-UZ",
+		"vi": "vi-VN",
+		"zh": "zh-CN",
+		"zh-HK": "zh-CN"
+	},
 	summernote: function($el) {
 		if ($el.length) {
 			var sno = {
@@ -464,21 +556,22 @@ var main = {
 					[ 'style', [ 'style', 'fontname', 'fontsize', 'color' ] ],
 					[ 'text', [ 'bold', 'italic', 'underline', 'strikethrough', 'superscript', 'subscript' ] ],
 					[ 'para', [ /*'height', */'paragraph', 'ol', 'ul' ] ],
-					[ 'insert', [ 'hr', 'table', 'link' ] ],
-					[ 'media', [ 'picture', 'video' ] ],
-					[ 'edit', [ 'undo', 'redo', 'clear' ] ]
-					// [ 'misc', [ 'codeview', 'fullscreen', 'help' ] ],
+					[ 'insert', [ 'hr', 'table', 'link', 'picture', 'video' ] ],
+					[ 'edit', [ 'undo', 'redo', 'clear' ] ],
+					[ 'misc', [ 'codeview', 'fullscreen', 'help' ] ]
 				]
 			};
-			if ($('html').attr('lang') == 'ja') {
-				sno.lang = 'ja-JP';
+
+			var hln = $('html').attr('lang'), sln = main.summernoteLangs[hln];
+			if (hln || sln) {
+				sno.lang = (sln ? sln : hln);
 			}
 			$el.removeAttr('summernote').summernote(sno);
 
 			// summernote bs5 bug fix
-			$('.note-toolbar').find('[data-toggle]').each(function() {
-				$(this).attr('data-bs-toggle', $(this).attr('data-toggle')).removeAttr('data-toggle');
-			});
+			// $('.note-toolbar').find('[data-toggle]').each(function() {
+			// 	$(this).attr('data-bs-toggle', $(this).attr('data-toggle')).removeAttr('data-toggle');
+			// });
 		}
 	},
 
