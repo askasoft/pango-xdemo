@@ -15,7 +15,6 @@ var main = {
 
 	fmt_date: new DateFormat("yyyy-MM-dd"),
 	fmt_time: new DateFormat("yyyy-MM-dd HH:mm:ss"),
-
 	format_date: function(d) {
 		if (typeof(d) == 'string') {
 			d = new Date(d);
@@ -28,41 +27,11 @@ var main = {
 		}
 		return main.fmt_time.format(d);
 	},
-	index_any: function(s, ks) {
-		var i = 0;
-		while (s.length > 0) {
-			for (var j = 0; j < ks.length; j++) {
-				if (s.startsWith(ks[j])) {
-					return [i, ks[j]]
-				}
-			}
-			s = s.substring(1);
-			i++;
-		}
-		return [-1, ''];
-	},
-	markup: function($e, ks) {
-		if (!ks || ks.length == 0) {
-			return;
-		}
 
-		var t = $e.text(), ps = main.index_any(t, ks);
-		if (ps[0] < 0) {
-			return;
-		}
-		
-		var p = '';
-		while (true) {
-			p += t.substring(0, ps[0]).escapeHTML() + '<s>' + ps[1].escapeHTML() + '</s>';
-			t = t.substring(ps[0] + ps[1].length);
-			ps = main.index_any(t, ks);
-			if (ps[0] < 0) {
-				p += t.escapeHTML();
-				break;
-			}
-		}
-		$e.html(p);
+	isURL: function(s) {
+		return /^https?:\/\/[\w~!@#\$%&\*\(\)_\-\+=\[\]\|:;,\.\?\/']+$/i.test(s + '');
 	},
+
 	safe_parse_json: function(s, d) {
 		try {
 			return $.parseJSON(s);
