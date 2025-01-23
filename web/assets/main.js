@@ -136,9 +136,9 @@ var main = {
 			};
 		}
 
-		err = (xhr.status ? xhr.status + ' ' : '') + (err || status || 'error');
+		err = (xhr.status ? xhr.status + ' ' : '') + (err || status || 'error') + '\n' + xhr.responseText;
 		if (xhr.responseJSON) {
-			err = xhr.responseJSON.error || JSON.stringify(xhr.responseJSON, null, 4) || err;
+			err = xhr.responseJSON.error || JSON.stringify(xhr.responseJSON, null, 2) || err;
 		}
 
 		if ($.isArray(err)) {
