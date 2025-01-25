@@ -17,7 +17,7 @@
 			<li><a class="dropdown-item" href="{{.Base}}/403/">{{I "ban"}}<span>403</span></a></li>
 			<li><a class="dropdown-item" href="{{.Base}}/404/">{{I "compass"}}<span>404</span></a></li>
 			<li><a class="dropdown-item" href="{{.Base}}/500/">{{I "error"}}<span>500</span></a></li>
-			<li class="divider"></li>
+			<li><hr class="dropdown-divider"></li>
 			<li><a class="dropdown-item" href="{{.Base}}/demos/pets/">{{I "demos.pets.list"}}<span>{{T .Loc "menu.demos.pets.list"}}</span></a></li>
 			<li><a class="dropdown-item" href="{{.Base}}/demos/pets/jobs/clear/">{{I "demos.pets.clear"}}<span>{{T .Loc "menu.demos.pets.clear"}}</span></a></li>
 			<li><a class="dropdown-item" href="{{.Base}}/demos/pets/jobs/catcreate/">{{I "demos.pets.create.cat"}}<span>{{T .Loc "menu.demos.pets.create.cat"}}</span></a></li>
@@ -39,12 +39,12 @@
 			<li><a class="dropdown-item" href="{{.Base}}/s/shell/">{{I "super.shell"}}<span>{{T .Loc "menu.super.shell"}}</span></a></li>
 			<li><a class="dropdown-item" href="{{.Base}}/s/sql/">{{I "super.sql"}}<span>{{T .Loc "menu.super.sql"}}</span></a></li>
 			<li><a class="dropdown-item" href="{{.Base}}/s/debug/">{{I "super.debug"}}<span>{{T .Loc "menu.super.debug"}}</span></a></li>
-			<li class="divider"></li>
+			<li><hr class="dropdown-divider"></li>
 			{{end}}
 			{{if .AU.IsAdmin}}
 			<li><a class="dropdown-item" href="{{.Base}}/a/users/">{{I "admin.users"}}<span>{{T .Loc "menu.admin.users"}}</span></a></li>
 			<li><a class="dropdown-item" href="{{.Base}}/a/configs/">{{I "admin.configs"}}<span>{{T .Loc "menu.admin.configs"}}</span></a></li>
-			<li class="divider"></li>
+			<li><hr class="dropdown-divider"></li>
 			{{end}}
 			<li><a class="dropdown-item" href="{{.Base}}/u/pwdchg/">{{I "user.pwdchg"}}<span>{{T .Loc "menu.user.pwdchg"}}</span></a></li>
 			<li><a class="dropdown-item" href="{{.Base}}/login/logout">{{I "logout"}}<span>{{T .Loc "menu.logout"}}</span></a></li>

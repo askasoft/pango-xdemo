@@ -52,14 +52,6 @@
 }
 **/
 
-/** summernote-lite patch for bootstrap5 **/
-.note-editor .dropdown-toggle::after {
-	display: none;
-}
-.note-editor .note-dropdown-menu {
-	padding: 5px 0;
-}
-
 /** bootstrap5 customize **/
 /* alert */
 .alert.alert-dismissible {
@@ -76,21 +68,7 @@
 	top: -0.1em;
 }
 
-/* button */
-.btn-xs {
-	--bs-btn-padding-y: 0.15rem;
-	--bs-btn-padding-x: 0.25rem;
-	--bs-btn-font-size: 0.75rem;
-	--bs-btn-border-radius: var(--bs-border-radius-sm);
-}
-
-/* dropdown menu (copy from bootstrap3) */
-.dropdown-menu .divider {
-	height: 1px;
-	margin: 9px 0;
-	overflow: hidden;
-	background-color: #e5e5e5;
-}
+/* dropdown menu */
 .dropdown-menu > li > a > i {
 	margin-right: 8px;
 }
@@ -118,6 +96,44 @@ textarea.form-control {
 .well {
 	margin-bottom: 1.5rem;
 	white-space: pre-wrap;
+}
+
+
+/** summernote-lite patch for bootstrap5 **/
+.note-editor .dropdown-toggle::after {
+	display: none;
+}
+.note-editor .note-dropdown-menu {
+	padding: 5px 0;
+}
+
+
+/** plugins ui customize **/
+/* fieldset */
+/* .ui-fieldset {
+	border-radius: var(--bs-border-radius, 0.375rem);
+} */
+
+/* sidenavi */
+.ui-sidenavi .card-header {
+	border-bottom: solid 1px #fff;
+}
+.ui-sidenavi .card-header, .ui-sidenavi .card-body {
+	color: #fff;
+}
+.ui-sidenavi > .card > .card-header > * {
+	padding: 0.25rem 0.5rem;
+	align-items: center;
+	display: flex;
+}
+.ui-sidenavi a {
+	border-radius: 0.25rem;
+	color: #fff;
+	text-decoration: none;
+}
+.ui-sidenavi a:focus, .ui-sidenavi a:hover {
+	background-color: var(--bs-secondary-bg);
+	color: var(--bs-link-hover-color);
 }
 
 
@@ -309,28 +325,6 @@ blockquote {
 }
 
 
-/** sidenavi **/
-.ui-sidenavi .card-header {
-	border-bottom: solid 1px #fff;
-}
-.ui-sidenavi .card-header, .ui-sidenavi .card-body {
-	color: #fff;
-}
-.ui-sidenavi > .card > .card-header > * {
-	padding: 0.25rem 0.5rem;
-	align-items: center;
-	display: flex;
-}
-.ui-sidenavi a {
-	border-radius: 0.25rem;
-	color: #fff;
-	text-decoration: none;
-}
-.ui-sidenavi a:focus, .ui-sidenavi a:hover {
-	background-color: var(--bs-secondary-bg);
-	color: var(--bs-link-hover-color);
-}
-
 /** section **/
 .s-section {
 	margin-bottom: 2rem;
@@ -383,20 +377,6 @@ blockquote {
 .s-login > .s-section {
 	max-width: 720px;
 	width: 90vw;
-}
-
-/** nav-popup **/
-.nav.nav-popup {
-	margin: 5px;
-}
-.nav.nav-popup > li > a {
-	padding: 3px 5px;
-}
-.nav.nav-popup > li > a > i {
-	margin-right: 8px;
-}
-.nav.nav-popup > li > hr {
-	margin: 5px 0;
 }
 
 /** form **/
