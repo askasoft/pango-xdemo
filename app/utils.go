@@ -25,6 +25,8 @@ func MakeFileID(prefix, name string) string {
 	fid := "/" + prefix + time.Now().Format("/2006/0102/") + str.RemoveByte(uuid.New().String(), '-') + "/"
 
 	_, name = filepath.Split(name)
+	name = str.RemoveAny(name, `\/:*?"<>|`)
+
 	ext := filepath.Ext(name)
 	name = name[:len(name)-len(ext)] + str.ToLower(ext)
 	name = str.Right(name, 255-len(fid))

@@ -8,18 +8,18 @@
 <meta property="xdemo:domain" content="{{.Domain}}"/>
 <meta property="xdemo:token" content="{{.Token}}"/>
 <link rel="shortcut icon" href="{{.Base}}/favicon.ico"/>
-<link href="{{.Base}}/static/bootstrap5/css/bootstrap.min.css?r={{.REV}}" rel="stylesheet" type="text/css"/>
-{{/*<link href="{{.Base}}/static/bootswatch5/cosmo/bootstrap.min.css?r={{.REV}}" rel="stylesheet" type="text/css"/>*/}}
-{{/*<link href="{{.Base}}/static/bootswatch5/flatly/bootstrap.min.css?r={{.REV}}" rel="stylesheet" type="text/css"/>*/}}
-{{/*<link href="{{.Base}}/static/bootswatch5/pulse/bootstrap.min.css?r={{.REV}}" rel="stylesheet" type="text/css"/>*/}}
-<link href="{{.Base}}/static/fontawesome6/css/all.min.css?r={{.REV}}" rel="stylesheet" type="text/css"/>
-<link href="{{.Base}}/static/plugins/css/plugins.min.css?r={{.REV}}" rel="stylesheet" type="text/css"/>
-<link href="{{.Base}}/assets/main.css?r={{.REV}}" rel="stylesheet" type="text/css"/>
+<link rel="stylesheet" type="text/css" href="{{.Base}}/static/bootstrap5/css/bootstrap.min.css?r={{.REV}}"/>
+{{/*<link rel="stylesheet" type="text/css" href="{{.Base}}/static/bootswatch5/cosmo/bootstrap.min.css?r={{.REV}}"/>*/}}
+{{/*<link rel="stylesheet" type="text/css" href="{{.Base}}/static/bootswatch5/flatly/bootstrap.min.css?r={{.REV}}"/>*/}}
+{{/*<link rel="stylesheet" type="text/css" href="{{.Base}}/static/bootswatch5/pulse/bootstrap.min.css?r={{.REV}}"/>*/}}
+<link rel="stylesheet" type="text/css" href="{{.Base}}/static/fontawesome6/css/all.min.css?r={{.REV}}"/>
+<link rel="stylesheet" type="text/css" href="{{.Base}}/static/plugins/css/plugins.min.css?r={{.REV}}"/>
+<link rel="stylesheet" type="text/css" href="{{.Base}}/assets/main.css?r={{.REV}}"/>
 {{range $s := .Ctx.Attrs.sstyles}}
-<link href="{{$.Base}}/static/{{$s}}?r={{$.REV}}" rel="stylesheet" type="text/css"/>
+<link rel="stylesheet" type="text/css" href="{{$.Base}}/static/{{$s}}?r={{$.REV}}"/>
 {{end}}
 {{range $s := .Ctx.Attrs.astyles}}
-<link href="{{$.Base}}/assets/{{$s}}?r={{$.REV}}" rel="stylesheet" type="text/css"/>
+<link rel="stylesheet" type="text/css" href="{{$.Base}}/assets/{{$s}}?r={{$.REV}}"/>
 {{end}}
 </head>
 {{end}}
