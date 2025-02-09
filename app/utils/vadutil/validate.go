@@ -35,7 +35,7 @@ func ErrInvalidField(c *xin.Context, ns, field string) error {
 }
 
 func ErrInvalidID(c *xin.Context) error {
-	return errors.New(tbs.Format(c.Locale, "error.param.invalid", "ID"))
+	return tbs.Errorf(c.Locale, "error.param.invalid", "ID")
 }
 
 // AddBindErrors translate bind or validate errors

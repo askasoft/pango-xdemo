@@ -1,8 +1,6 @@
 package handlers
 
 import (
-	"errors"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -103,7 +101,7 @@ func (jcc *JobChainController) List(c *xin.Context) {
 func (jcc *JobChainController) Status(c *xin.Context) {
 	cid := num.Atol(c.Query("cid"))
 	if cid <= 0 {
-		c.AddError(errors.New(tbs.Format(c.Locale, "error.param.invalid", "cid")))
+		c.AddError(tbs.Errorf(c.Locale, "error.param.invalid", "cid"))
 		c.JSON(http.StatusBadRequest, E(c))
 		return
 	}
@@ -125,7 +123,7 @@ func (jcc *JobChainController) Status(c *xin.Context) {
 }
 
 func (jcc *JobChainController) InvalidChainJobs(c *xin.Context) {
-	c.AddError(fmt.Errorf(tbs.GetText(c.Locale, "error.config.invalid"), jcc.ChainName))
+	c.AddError(tbs.Errorf(c.Locale, "error.config.invalid", jcc.ChainName))
 	c.JSON(http.StatusInternalServerError, E(c))
 }
 
@@ -180,7 +178,7 @@ func (jcc *JobChainController) StartJob(c *xin.Context) {
 	}
 
 	if jc != nil {
-		c.AddError(errors.New(tbs.GetText(c.Locale, "job.existing")))
+		c.AddError(tbs.Error(c.Locale, "job.existing"))
 		c.JSON(http.StatusBadRequest, E(c))
 		return
 	}
@@ -203,7 +201,7 @@ func (jcc *JobChainController) StartJob(c *xin.Context) {
 func (jcc *JobChainController) Cancel(c *xin.Context) {
 	cid := num.Atol(c.PostForm("cid"))
 	if cid <= 0 {
-		c.AddError(errors.New(tbs.Format(c.Locale, "error.param.invalid", "cid")))
+		c.AddError(tbs.Errorf(c.Locale, "error.param.invalid", "cid"))
 		c.JSON(http.StatusBadRequest, E(c))
 		return
 	}

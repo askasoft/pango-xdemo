@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"errors"
 	"mime/multipart"
 	"net/http"
 	"time"
@@ -84,7 +83,7 @@ func (jc *JobController) List(c *xin.Context) {
 func (jc *JobController) Logs(c *xin.Context) {
 	jid := num.Atol(c.Query("jid"))
 	if jid <= 0 {
-		c.AddError(errors.New(tbs.Format(c.Locale, "error.param.invalid", "jid")))
+		c.AddError(tbs.Errorf(c.Locale, "error.param.invalid", "jid"))
 		c.JSON(http.StatusBadRequest, E(c))
 		return
 	}
@@ -136,7 +135,7 @@ func (jc *JobController) logs(c *xin.Context, tjm xjm.JobManager) (logs []*xjm.J
 func (jc *JobController) Status(c *xin.Context) {
 	jid := num.Atol(c.Query("jid"))
 	if jid <= 0 {
-		c.AddError(errors.New(tbs.Format(c.Locale, "error.param.invalid", "jid")))
+		c.AddError(tbs.Errorf(c.Locale, "error.param.invalid", "jid"))
 		c.JSON(http.StatusBadRequest, E(c))
 		return
 	}
@@ -152,7 +151,7 @@ func (jc *JobController) Status(c *xin.Context) {
 		return
 	}
 	if job == nil {
-		c.AddError(errors.New(tbs.GetText(c.Locale, "job.error.notfound")))
+		c.AddError(tbs.Error(c.Locale, "job.error.notfound"))
 		c.JSON(http.StatusBadRequest, E(c))
 		return
 	}
@@ -185,7 +184,7 @@ func (jc *JobController) Start(c *xin.Context) {
 		}
 
 		if job != nil {
-			c.AddError(errors.New(tbs.GetText(c.Locale, "job.error.existing")))
+			c.AddError(tbs.Error(c.Locale, "job.error.existing"))
 			c.JSON(http.StatusBadRequest, E(c))
 			return
 		}
@@ -210,7 +209,7 @@ func (jc *JobController) Start(c *xin.Context) {
 func (jc *JobController) Cancel(c *xin.Context) {
 	jid := num.Atol(c.PostForm("jid"))
 	if jid <= 0 {
-		c.AddError(errors.New(tbs.Format(c.Locale, "error.param.invalid", "jid")))
+		c.AddError(tbs.Errorf(c.Locale, "error.param.invalid", "jid"))
 		c.JSON(http.StatusBadRequest, E(c))
 		return
 	}
@@ -229,7 +228,7 @@ func (jc *JobController) Cancel(c *xin.Context) {
 		return
 	}
 	if job == nil {
-		c.AddError(errors.New(tbs.GetText(c.Locale, "job.error.notfound")))
+		c.AddError(tbs.Error(c.Locale, "job.error.notfound"))
 		c.JSON(http.StatusBadRequest, E(c))
 		return
 	}

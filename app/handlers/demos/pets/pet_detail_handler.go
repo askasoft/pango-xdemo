@@ -59,7 +59,7 @@ func petDetail(c *xin.Context, action string) {
 	err := app.SDB.Get(pet, sql, args...)
 	if err != nil {
 		if errors.Is(err, sqlx.ErrNoRows) {
-			c.AddError(errors.New(tbs.Format(c.Locale, "error.detail.notfound", pid)))
+			c.AddError(tbs.Errorf(c.Locale, "error.detail.notfound", pid))
 			c.JSON(http.StatusNotFound, handlers.E(c))
 			return
 		}
@@ -243,7 +243,7 @@ func PetUpdates(c *xin.Context) {
 		vadutil.AddBindErrors(c, err, "pet.")
 	}
 	if pua.IsEmpty() {
-		c.AddError(errors.New(tbs.GetText(c.Locale, "error.request.invalid")))
+		c.AddError(tbs.Error(c.Locale, "error.request.invalid"))
 	}
 	if pua.BornAt != nil && pua.BornAt.IsZero() {
 		c.AddError(&vadutil.ParamError{
@@ -368,7 +368,7 @@ func PetDeleteBatch(c *xin.Context) {
 	}
 
 	if !pqa.HasFilter() {
-		c.AddError(errors.New(tbs.GetText(c.Locale, "error.param.nofilter")))
+		c.AddError(tbs.Error(c.Locale, "error.param.nofilter"))
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}

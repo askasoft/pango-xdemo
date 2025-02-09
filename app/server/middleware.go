@@ -7,6 +7,7 @@ import (
 	"github.com/askasoft/pango-xdemo/app/handlers"
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/tenant"
+	"github.com/askasoft/pango/tbs"
 	"github.com/askasoft/pango/xin"
 )
 
@@ -51,7 +52,7 @@ func IPProtect(c *xin.Context) {
 	au := tenant.AuthUser(c)
 
 	if !tenant.CheckClientIP(c, au) {
-		c.AddError(handlers.ErrRestrictedIP)
+		c.AddError(tbs.Error(c.Locale, "error.forbidden.ip"))
 		handlers.Forbidden(c)
 		return
 	}
@@ -66,7 +67,7 @@ func RoleProtect(c *xin.Context, role string) {
 	au := tenant.AuthUser(c)
 
 	if !au.HasRole(role) {
-		c.AddError(handlers.ErrRestrictedFunction)
+		c.AddError(tbs.Error(c.Locale, "error.forbidden.function"))
 		handlers.Forbidden(c)
 		return
 	}
@@ -80,7 +81,7 @@ func RoleRootProtect(c *xin.Context) {
 		au := tenant.AuthUser(c)
 
 		if !tt.IsDefault() || !au.IsSuper() {
-			c.AddError(handlers.ErrRestrictedFunction)
+			c.AddError(tbs.Error(c.Locale, "error.forbidden.function"))
 			handlers.Forbidden(c)
 			return
 		}

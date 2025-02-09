@@ -2,8 +2,6 @@ package users
 
 import (
 	"encoding/csv"
-	"errors"
-	"fmt"
 	"net/http"
 
 	"github.com/askasoft/pango-xdemo/app/handlers"
@@ -37,7 +35,7 @@ type UserCsvImportJobController struct {
 func (ucijc *UserCsvImportJobController) Start(c *xin.Context) {
 	mfh, err := c.FormFile("file")
 	if err != nil {
-		err = errors.New(tbs.GetText(c.Locale, "csv.error.required"))
+		err = tbs.Error(c.Locale, "csv.error.required")
 		c.AddError(err)
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
@@ -45,7 +43,7 @@ func (ucijc *UserCsvImportJobController) Start(c *xin.Context) {
 
 	tt := tenant.FromCtx(c)
 	if err = ucijc.SetFile(tt, mfh); err != nil {
-		err = fmt.Errorf(tbs.GetText(c.Locale, "csv.error.read"), err)
+		err = tbs.Errorf(c.Locale, "csv.error.read", err.Error())
 		c.AddError(err)
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return

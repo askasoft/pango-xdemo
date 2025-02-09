@@ -359,7 +359,7 @@ type ConfigCsvRecord struct {
 func ConfigImport(c *xin.Context) {
 	mfh, err := c.FormFile("file")
 	if err != nil {
-		err = errors.New(tbs.GetText(c.Locale, "csv.error.required"))
+		err = tbs.Error(c.Locale, "csv.error.required")
 		c.AddError(err)
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
@@ -375,7 +375,7 @@ func ConfigImport(c *xin.Context) {
 
 	var csvcfgs []*ConfigCsvRecord
 	if err := csvx.ScanReader(uf, &csvcfgs); err != nil {
-		err = errors.New(tbs.GetText(c.Locale, "csv.error.data"))
+		err = tbs.Error(c.Locale, "csv.error.data")
 		c.AddError(err)
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return

@@ -1,7 +1,6 @@
 package super
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/askasoft/pango-xdemo/app/handlers"
@@ -25,7 +24,7 @@ func TenantCreate(c *xin.Context) {
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return
 	} else if ok {
-		c.AddError(fmt.Errorf(tbs.GetText(c.Locale, "tenant.error.duplicate"), ti.Name))
+		c.AddError(tbs.Errorf(c.Locale, "tenant.error.duplicate", ti.Name))
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}
@@ -57,7 +56,7 @@ func TenantUpdate(c *xin.Context) {
 
 	tt := tenant.FromCtx(c)
 	if te.Oname != te.Name && (te.Oname == string(tt.Schema) || te.Oname == schema.DefaultSchema()) {
-		c.AddError(fmt.Errorf(tbs.GetText(c.Locale, "tenant.error.unrename"), te.Oname))
+		c.AddError(tbs.Errorf(c.Locale, "tenant.error.unrename", te.Oname))
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}
@@ -67,7 +66,7 @@ func TenantUpdate(c *xin.Context) {
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return
 	} else if !ok {
-		c.AddError(fmt.Errorf(tbs.GetText(c.Locale, "tenant.error.notexists"), te.Oname))
+		c.AddError(tbs.Errorf(c.Locale, "tenant.error.notexists", te.Oname))
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}
@@ -78,7 +77,7 @@ func TenantUpdate(c *xin.Context) {
 			c.JSON(http.StatusInternalServerError, handlers.E(c))
 			return
 		} else if ok {
-			c.AddError(fmt.Errorf(tbs.GetText(c.Locale, "tenant.error.duplicate"), te.Name))
+			c.AddError(tbs.Errorf(c.Locale, "tenant.error.duplicate", te.Name))
 			c.JSON(http.StatusBadRequest, handlers.E(c))
 			return
 		}
@@ -112,7 +111,7 @@ func TenantDelete(c *xin.Context) {
 
 	tt := tenant.FromCtx(c)
 	if ti.Name == string(tt.Schema) || ti.Name == schema.DefaultSchema() {
-		c.AddError(fmt.Errorf(tbs.GetText(c.Locale, "tenant.error.undelete"), ti.Name))
+		c.AddError(tbs.Errorf(c.Locale, "tenant.error.undelete", ti.Name))
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}
@@ -122,7 +121,7 @@ func TenantDelete(c *xin.Context) {
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return
 	} else if !ok {
-		c.AddError(fmt.Errorf(tbs.GetText(c.Locale, "tenant.error.notexists"), ti.Name))
+		c.AddError(tbs.Errorf(c.Locale, "tenant.error.notexists", ti.Name))
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}

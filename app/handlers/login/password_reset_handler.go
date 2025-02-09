@@ -2,7 +2,6 @@ package login
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"html"
 	"net/http"
@@ -100,7 +99,7 @@ func PasswordResetSend(c *xin.Context) {
 
 	if err := smtputil.SendHTMLMail(email, subject, message); err != nil {
 		c.Logger.Error(err)
-		c.AddError(errors.New(tbs.GetText(c.Locale, "pwdrst.error.sendmail")))
+		c.AddError(tbs.Error(c.Locale, "pwdrst.error.sendmail"))
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return
 	}
@@ -114,20 +113,20 @@ func passwordResetToken(c *xin.Context) *PwdRstToken {
 	tkenc := c.Param("token")
 	tkstr, err := cptutil.Decrypt(app.Secret(), tkenc)
 	if tkenc == "" || err != nil {
-		c.AddError(errors.New(tbs.GetText(c.Locale, "pwdrst.error.invalid")))
+		c.AddError(tbs.Error(c.Locale, "pwdrst.error.invalid"))
 		return nil
 	}
 
 	token := &PwdRstToken{}
 	if err := json.Unmarshal(str.UnsafeBytes(tkstr), token); err != nil {
-		c.AddError(errors.New(tbs.GetText(c.Locale, "pwdrst.error.invalid")))
+		c.AddError(tbs.Error(c.Locale, "pwdrst.error.invalid"))
 		return nil
 	}
 
 	tkexp := ini.GetDuration("login", "passwordResetTokenExpires", time.Minute*10)
 	tktm := time.UnixMilli(token.Timestamp)
 	if time.Since(tktm) > tkexp {
-		c.AddError(errors.New(tbs.GetText(c.Locale, "pwdrst.error.expired")))
+		c.AddError(tbs.Error(c.Locale, "pwdrst.error.expired"))
 		return nil
 	}
 
@@ -159,7 +158,7 @@ func PasswordResetExecute(c *xin.Context) {
 		return
 	}
 	if user == nil {
-		c.AddError(errors.New(tbs.GetText(c.Locale, "pwdrst.error.invalid")))
+		c.AddError(tbs.Error(c.Locale, "pwdrst.error.invalid"))
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}

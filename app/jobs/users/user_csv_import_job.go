@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/csv"
 	"errors"
-	"fmt"
 	"io"
 	"time"
 
@@ -146,7 +145,7 @@ func (ucij *UserCsvImportJob) doReadCsv(ctx context.Context, callback func(rec *
 
 	bp, err := iox.SkipBOM(fp)
 	if err != nil {
-		return fmt.Errorf(tbs.GetText(ucij.Locale(), "csv.error.read"), err)
+		return tbs.Errorf(ucij.Locale(), "csv.error.read", err)
 	}
 
 	i := 0
@@ -164,7 +163,7 @@ func (ucij *UserCsvImportJob) doReadCsv(ctx context.Context, callback func(rec *
 			return nil
 		}
 		if err != nil {
-			return fmt.Errorf(tbs.GetText(ucij.Locale(), "csv.error.read"), err)
+			return tbs.Errorf(ucij.Locale(), "csv.error.read", err.Error())
 		}
 
 		if i == 1 {
@@ -203,7 +202,7 @@ func (ucij *UserCsvImportJob) doCheckCsv() (total int, err error) {
 	}
 
 	if !valid {
-		err = errors.New(tbs.GetText(ucij.Locale(), "csv.error.data"))
+		err = tbs.Error(ucij.Locale(), "csv.error.data")
 	}
 	return
 }
@@ -233,7 +232,7 @@ func (ucij *UserCsvImportJob) checkRecord(rec *csvUserRecord) error {
 	}
 
 	if len(errs) > 0 {
-		return fmt.Errorf(tbs.GetText(ucij.Locale(), "csv.error.line"), rec.Line, str.Join(errs, ","))
+		return tbs.Errorf(ucij.Locale(), "csv.error.line", rec.Line, str.Join(errs, ","))
 	}
 
 	return nil
@@ -349,7 +348,7 @@ func (ucij *UserCsvImportJob) parseHead(row []string) error {
 	h.ParseHead(row)
 
 	if h.IdxName < 0 || h.IdxEmail < 0 {
-		return errors.New(tbs.GetText(ucij.Locale(), "csv.error.head"))
+		return tbs.Error(ucij.Locale(), "csv.error.head")
 	}
 
 	return nil

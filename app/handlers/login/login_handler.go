@@ -2,7 +2,6 @@ package login
 
 import (
 	"encoding/base64"
-	"errors"
 	"html"
 	"net/http"
 	"strings"
@@ -60,7 +59,7 @@ func loginFindUser(c *xin.Context) (up *UserPass, au *models.User, ok bool) {
 	}
 
 	if tenant.IsClientBlocked(c) {
-		c.AddError(errors.New(tbs.GetText(c.Locale, "login.failed.blocked")))
+		c.AddError(tbs.Error(c.Locale, "login.failed.blocked"))
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}
@@ -94,7 +93,7 @@ func loginFindUser(c *xin.Context) (up *UserPass, au *models.User, ok bool) {
 
 func loginFailed(c *xin.Context, reason string) {
 	tenant.AuthFailed(c)
-	c.AddError(errors.New(tbs.GetText(c.Locale, reason)))
+	c.AddError(tbs.Error(c.Locale, reason))
 	c.JSON(http.StatusBadRequest, handlers.E(c))
 }
 
@@ -177,7 +176,7 @@ func loginSendEmailPasscode(c *xin.Context, email, passcode string, expire time.
 
 	if err := smtputil.SendHTMLMail(email, subject, message); err != nil {
 		c.Logger.Error(err)
-		c.AddError(errors.New(tbs.GetText(c.Locale, "login.error.sendmail")))
+		c.AddError(tbs.Error(c.Locale, "login.error.sendmail"))
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return
 	}
@@ -228,7 +227,7 @@ func loginSendEmailQrcode(c *xin.Context, email string, totp *gotp.TOTP) {
 	png, err := qrcode.Encode(purl, qrcode.Medium, 256)
 	if err != nil {
 		c.Logger.Error(err)
-		c.AddError(errors.New(tbs.GetText(c.Locale, "login.error.qrcode")))
+		c.AddError(tbs.Error(c.Locale, "login.error.qrcode"))
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return
 	}
@@ -242,7 +241,7 @@ func loginSendEmailQrcode(c *xin.Context, email string, totp *gotp.TOTP) {
 
 	if err := smtputil.SendHTMLMail(email, subject, message); err != nil {
 		c.Logger.Error(err)
-		c.AddError(errors.New(tbs.GetText(c.Locale, "login.error.sendmail")))
+		c.AddError(tbs.Error(c.Locale, "login.error.sendmail"))
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return
 	}

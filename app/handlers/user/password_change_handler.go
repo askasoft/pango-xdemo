@@ -1,7 +1,6 @@
 package user
 
 import (
-	"errors"
 	"net/http"
 
 	"github.com/askasoft/pango-xdemo/app"
@@ -56,7 +55,7 @@ func PasswordChangeChange(c *xin.Context) {
 
 	au := tenant.AuthUser(c)
 	if pca.Oldpwd != au.GetPassword() {
-		c.AddError(errors.New(tbs.GetText(c.Locale, "pwdchg.error.oldpwd")))
+		c.AddError(tbs.Error(c.Locale, "pwdchg.error.oldpwd"))
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}
@@ -84,7 +83,7 @@ func PasswordChangeChange(c *xin.Context) {
 
 	cnt, _ := r.RowsAffected()
 	if cnt != 1 {
-		c.AddError(errors.New(tbs.GetText(c.Locale, "error.update.notfound")))
+		c.AddError(tbs.Error(c.Locale, "error.update.notfound"))
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}

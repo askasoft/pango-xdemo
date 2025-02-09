@@ -1,19 +1,12 @@
 package handlers
 
 import (
-	"errors"
 	"time"
 
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
 	"github.com/askasoft/pango/xin"
-)
-
-var (
-	ErrRestrictedIP       = errors.New("Restricted IP Address")
-	ErrRestrictedFeature  = errors.New("Restricted Feature")
-	ErrRestrictedFunction = errors.New("Restricted Function")
 )
 
 func H(c *xin.Context) xin.H {

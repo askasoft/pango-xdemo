@@ -52,7 +52,7 @@ func userDetail(c *xin.Context, action string) {
 	err := app.SDB.Get(user, sql, args...)
 	if err != nil {
 		if errors.Is(err, sqlx.ErrNoRows) {
-			c.AddError(errors.New(tbs.Format(c.Locale, "error.detail.notfound", uid)))
+			c.AddError(tbs.Errorf(c.Locale, "error.detail.notfound", uid))
 			c.JSON(http.StatusNotFound, handlers.E(c))
 			return
 		}
@@ -258,7 +258,7 @@ func UserUpdates(c *xin.Context) {
 	userValidateStatus(c, uua.Status)
 
 	if uua.IsEmpty() {
-		c.AddError(errors.New(tbs.GetText(c.Locale, "error.request.invalid")))
+		c.AddError(tbs.Error(c.Locale, "error.request.invalid"))
 	}
 	if len(c.Errors) > 0 {
 		c.JSON(http.StatusBadRequest, handlers.E(c))
@@ -363,7 +363,7 @@ func UserDeleteBatch(c *xin.Context) {
 	}
 
 	if !uqa.HasFilter() {
-		c.AddError(errors.New(tbs.GetText(c.Locale, "error.param.nofilter")))
+		c.AddError(tbs.Error(c.Locale, "error.param.nofilter"))
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}
