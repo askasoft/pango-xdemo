@@ -3,7 +3,6 @@ package vadutil
 import (
 	"errors"
 	"fmt"
-	"net"
 	"regexp"
 
 	"github.com/askasoft/pango/ini"
@@ -139,17 +138,6 @@ func ValidateRegexps(fl vad.FieldLevel) bool {
 func ValidateINI(fl vad.FieldLevel) bool {
 	err := ini.NewIni().LoadData(str.NewReader(fl.Field().String()))
 	return err == nil
-}
-
-func ParseCIDRs(cidr string) (cidrs []*net.IPNet) {
-	ss := str.Fields(cidr)
-	for _, s := range ss {
-		_, cidr, err := net.ParseCIDR(s)
-		if err == nil {
-			cidrs = append(cidrs, cidr)
-		}
-	}
-	return
 }
 
 func ValidateSAMLMeta(fl vad.FieldLevel) bool {
