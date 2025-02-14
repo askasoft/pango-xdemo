@@ -1,9 +1,16 @@
 {{define "headnavi"}}
 <div id="headnavi" class="d-flex align-items-center justify-content-end">
+	<div class="locale">
+		<div class="btn-group btn-group-sm">
+			{{range $l := .Locales}}
+			<a class="btn btn-outline-primary{{if eq $l $.Loc}} active{{end}}" href="#{{$l}}">{{Upper $l}}</a>
+			{{end}}
+		</div>
+	</div>
 	<div class="theme">
 		<div class="btn-group btn-group-sm">
 			<a class="btn btn-outline-primary" href="#light" title="{{T .Loc "theme.light"}}"><i class="fa-fw fas fa-sun"></i></a>
-			<a class="btn btn-outline-primary active" href="#dark" title="{{T .Loc "theme.dark"}}"><i class="fa-fw fas fa-moon"></i></a>
+			<a class="btn btn-outline-primary" href="#dark" title="{{T .Loc "theme.dark"}}"><i class="fa-fw fas fa-moon"></i></a>
 		</div>
 	</div>
 	<div class="maindrop dropdown">

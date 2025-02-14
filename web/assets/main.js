@@ -553,6 +553,16 @@ var main = {
 			$(this).attr('title', $(this).next('span').text());
 		});
 
+		// header locale switch
+		$('#header .locale a').on('click', function() {
+			var $a = $(this), t = $a.attr('href').substring(1);
+
+			$.cookie('X_LOCALE', t, { path: main.base + '/' });
+
+			location.reload();
+			return false;
+		});
+
 		// header theme switch
 		$('#header .theme a').on('click', function() {
 			var $a = $(this), t = $a.attr('href').substring(1);

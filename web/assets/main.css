@@ -100,13 +100,19 @@ textarea.form-control {
 
 
 /** summernote-lite patch for bootstrap5 **/
+.note-editor {
+	background-color: var(--bs-body-bg, #fff);
+	color: var(--bs-body-color, #212529);
+}
 .note-editor .dropdown-toggle::after {
 	display: none;
 }
 .note-editor .note-dropdown-menu {
 	padding: 5px 0;
 }
-
+.note-toolbar {
+	background-color: var(--bs-tertiary-bg, #f8f9fa);
+}
 
 /** plugins ui customize **/
 /* fieldset */
@@ -201,6 +207,9 @@ blockquote {
 	#headnavi .maindrop {
 		display: flex;
 	}
+}
+#headnavi .locale {
+	font-family: var(--bs-font-monospace);
 }
 #headnavi .username {
 	border-radius: 24px;
