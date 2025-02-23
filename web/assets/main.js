@@ -198,12 +198,10 @@ var main = {
 	},
 	form_has_inputs: function($f) {
 		var f = function() {
-			var v = $(this).val();
-			return v && v.length > 0;
+			var $i = $(this), v = $i.val();
+			return $i.is(':checked') || (!$i.is(':checkbox') && !$i.is(':hidden') && v && v.length > 0);
 		};
-		return $f.find('input:checked').length
-			|| $f.find('select').filter(f).length
-			|| $f.find('input[type=text]').filter(f).length;
+		return $f.find('input, select').filter(f).length;
 	},
 	form_clear_invalid: function($f) {
 		$f.find('.is-invalid').removeClass('is-invalid').end().find('.verr').remove();
