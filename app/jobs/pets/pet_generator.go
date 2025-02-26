@@ -59,7 +59,7 @@ func (pg *PetGenerator) Create(logger log.Logger, db *sqlx.DB, js *jobs.JobState
 	pet := &models.Pet{
 		Name:        pg.cat + " " + str.PadLeft(num.Itoa(js.Step), 2, "0") + " " + pg.randText(5),
 		Gender:      pg.pgs[rand.Intn(len(pg.pgs))], //nolint: gosec
-		BornAt:      bd.AddDate(0, 0, 1),
+		BornAt:      bd.AddDate(0, 0, js.Step),
 		Origin:      pg.pos[rand.Intn(len(pg.pos))],                                                                      //nolint: gosec
 		Temper:      pg.pts[rand.Intn(len(pg.pts))],                                                                      //nolint: gosec
 		Habits:      hashset.NewHashSet[string](pg.phs[rand.Intn(len(pg.phs))], pg.phs[rand.Intn(len(pg.phs))]).Values(), //nolint: gosec

@@ -184,7 +184,6 @@ var main = {
 		}
 	},
 
-	// form input (not hidden) values
 	form_input_values: function($f) {
 		var vs = $f.formValues();
 
@@ -198,8 +197,15 @@ var main = {
 	},
 	form_has_inputs: function($f) {
 		var f = function() {
-			var $i = $(this), v = $i.val();
-			return $i.is(':checked') || (!$i.is(':checkbox') && !$i.is(':hidden') && v && v.length > 0);
+			var $i = $(this);
+			if ($i.hasClass('ignore') || $i.attr('type') == 'hidden') {
+				return false;
+			}
+			if ($i.is(':checkbox')) {
+				return $i.is(':checked');
+			}
+			var v = $i.val();
+			return v && v.length > 0;
 		};
 		return $f.find('input, select').filter(f).length;
 	},

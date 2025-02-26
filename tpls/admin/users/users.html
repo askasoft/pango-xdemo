@@ -54,19 +54,9 @@
 					<div class="col-md-4 col-xxl-5">
 						<input name="id" type="text" class="form-control" textclear value="{{if ne .Q.ID 0}}{{.Q.ID}}{{end}}"/>
 					</div>
-					<label class="col-md-2 col-xxl-1 col-form-label">{{T .Loc "user.name"}}</label>
+					<label class="col-md-2 col-xxl-1 col-form-label">{{T .Loc "user.status"}}</label>
 					<div class="col-md-4 col-xxl-5">
-						<input name="name" type="text" class="form-control" textclear value="{{.Q.Name}}"/>
-					</div>
-				</div>
-				<div class="row">
-					<label class="col-md-2 col-xxl-1 col-form-label">{{T .Loc "user.email"}}</label>
-					<div class="col-md-4 col-xxl-5">
-						<input name="email" type="text" class="form-control" textclear value="{{.Q.Email}}"/>
-					</div>
-					<label class="col-md-2 col-xxl-1 col-form-label">{{T .Loc "user.cidr"}}</label>
-					<div class="col-md-4 col-xxl-5">
-						<input name="cidr" type="text" class="form-control" textclear value="{{.Q.CIDR}}"/>
+						{{Checks "Name=" "status" "List=" .UserStatusMap "Values=" .Q.Status}}
 					</div>
 				</div>
 				<div class="row">
@@ -74,9 +64,19 @@
 					<div class="col-md-4 col-xxl-5">
 						{{Checks "Name=" "role" "List=" .UserRoleMap "Values=" .Q.Role}}
 					</div>
-					<label class="col-md-2 col-xxl-1 col-form-label">{{T .Loc "user.status"}}</label>
+					<label class="col-md-2 col-xxl-1 col-form-label">{{T .Loc "user.cidr"}}</label>
 					<div class="col-md-4 col-xxl-5">
-						{{Checks "Name=" "status" "List=" .UserStatusMap "Values=" .Q.Status}}
+						<input name="cidr" type="text" class="form-control" textclear value="{{.Q.CIDR}}"/>
+					</div>
+				</div>
+				<div class="row">
+					<label class="col-md-2 col-xxl-1 col-form-label">{{T .Loc "user.name"}}</label>
+					<div class="col-md-4 col-xxl-5">
+						<input name="name" type="text" class="form-control" textclear value="{{.Q.Name}}"/>
+					</div>
+					<label class="col-md-2 col-xxl-1 col-form-label">{{T .Loc "user.email"}}</label>
+					<div class="col-md-4 col-xxl-5">
+						<input name="email" type="text" class="form-control" textclear value="{{.Q.Email}}"/>
 					</div>
 				</div>
 				<div class="row pt-3 pb-2">

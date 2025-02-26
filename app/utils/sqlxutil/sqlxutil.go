@@ -36,10 +36,10 @@ func AddLikes(sqb *sqlx.Builder, column string, search string) {
 		sb.WriteByte('(')
 		for i, s := range ss {
 			if i > 0 {
-				sb.WriteString(" OR ")
+				sb.WriteString(" AND ")
 			}
 			sb.WriteString(column)
-			sb.WriteString(" LIKE ?")
+			sb.WriteString(" ILIKE ?")
 			args = append(args, sqx.StringLike(s))
 		}
 		sb.WriteByte(')')

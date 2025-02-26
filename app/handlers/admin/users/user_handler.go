@@ -10,7 +10,6 @@ import (
 	"github.com/askasoft/pango-xdemo/app/utils/argutil"
 	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
 	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
-	"github.com/askasoft/pango/sqx"
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/xin"
 )
@@ -53,24 +52,12 @@ func (uqa *UserQueryArg) AddWhere(c *xin.Context, sqb *sqlx.Builder) {
 	au := tenant.AuthUser(c)
 	sqb.Where("role >= ?", au.Role)
 
-	if uqa.ID != 0 {
-		sqb.Where("id = ?", uqa.ID)
-	}
-	if uqa.Name != "" {
-		sqb.Where("name LIKE ?", sqx.StringLike(uqa.Name))
-	}
-	if uqa.Email != "" {
-		sqb.Where("email LIKE ?", sqx.StringLike(uqa.Email))
-	}
-	if uqa.CIDR != "" {
-		sqb.Where("cidr LIKE ?", sqx.StringLike(uqa.CIDR))
-	}
-	if len(uqa.Role) > 0 {
-		sqb.In("role", uqa.Role)
-	}
-	if len(uqa.Status) > 0 {
-		sqb.In("status", uqa.Status)
-	}
+	uqa.AddID(sqb, "id", uqa.ID)
+	uqa.AddIn(sqb, "status", uqa.Status)
+	uqa.AddIn(sqb, "role", uqa.Role)
+	uqa.AddLikes(sqb, "name", uqa.Name)
+	uqa.AddLikes(sqb, "email", uqa.Email)
+	uqa.AddLikes(sqb, "cidr", uqa.CIDR)
 }
 
 func bindUserQueryArg(c *xin.Context) (uqa *UserQueryArg, err error) {

@@ -11,8 +11,6 @@ import (
 	"github.com/askasoft/pango-xdemo/app/utils/argutil"
 	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
 	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
-	"github.com/askasoft/pango/num"
-	"github.com/askasoft/pango/sqx"
 	"github.com/askasoft/pango/sqx/pqx"
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/xin"
@@ -72,39 +70,19 @@ func (pqa *PetQueryArg) HasFilter() bool {
 }
 
 func (pqa *PetQueryArg) AddWhere(sqb *sqlx.Builder) {
-	if pqa.ID != 0 {
-		sqb.Where("id = ?", pqa.ID)
-	}
-	if pqa.Name != "" {
-		sqb.Where("name LIKE ?", sqx.StringLike(pqa.Name))
-	}
-	if len(pqa.Gender) > 0 {
-		sqb.In("gender", pqa.Gender)
-	}
-	if len(pqa.Origin) > 0 {
-		sqb.In("origin", pqa.Origin)
-	}
-	if len(pqa.Temper) > 0 {
-		sqb.In("temper", pqa.Temper)
-	}
+	pqa.AddID(sqb, "id", pqa.ID)
+	pqa.AddIn(sqb, "gender", pqa.Gender)
+	pqa.AddIn(sqb, "origin", pqa.Origin)
+	pqa.AddIn(sqb, "temper", pqa.Temper)
+
 	if len(pqa.Habits) > 0 {
 		sqb.Where("habits @> ?", pqx.StringArray(pqa.Habits))
 	}
-	if pqa.AmountMin != "" {
-		sqb.Where("amount >= ?", num.Atoi(pqa.AmountMin))
-	}
-	if pqa.AmountMax != "" {
-		sqb.Where("amount <= ?", num.Atoi(pqa.AmountMax))
-	}
-	if pqa.PriceMin != "" {
-		sqb.Where("price >= ?", num.Atof(pqa.PriceMin))
-	}
-	if pqa.PriceMax != "" {
-		sqb.Where("price <= ?", num.Atof(pqa.PriceMax))
-	}
-	if pqa.ShopName != "" {
-		sqb.Where("shop_name LIKE ?", sqx.StringLike(pqa.ShopName))
-	}
+	pqa.AddRanget(sqb, "born_at", pqa.BornFrom, pqa.BornTo)
+	pqa.AddRangei(sqb, "amount", pqa.AmountMin, pqa.AmountMax)
+	pqa.AddRangef(sqb, "price", pqa.PriceMin, pqa.PriceMax)
+	pqa.AddLikes(sqb, "name", pqa.Name)
+	pqa.AddLikes(sqb, "shop_name", pqa.ShopName)
 }
 
 func bindPetQueryArg(c *xin.Context) (pqa *PetQueryArg, err error) {
