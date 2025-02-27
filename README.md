@@ -55,6 +55,11 @@ sudo systemctl enable xdemo
 sudo systemctl start xdemo
 ```
 
+### bind privileged port
+```sh
+sudo setcap 'cap_net_bind_service=+ep' /app/xdemo/xdemo
+```
+
 
 ## Windows
 
@@ -188,6 +193,16 @@ server {
 }
 ```
 
+
+## SSL
+```sh
+openssl genrsa -out xdemo.key 2048
+openssl req -new -x509 -sha256 -key xdemo.key -out xdemo.cer -days 3650
+
+openssl req -x509 -newkey rsa:2048 -keyout xdemo.key -out xdemo.cer -days 3650 -nodes -subj "/CN=*.xdemo.local"
+```
+
+
 ## OpenSearch
 
 ```
@@ -255,7 +270,3 @@ POST xdemo_access/_delete_by_query
 }
 ```
 
-## SAML
-```sh
-openssl req -x509 -newkey rsa:2048 -keyout xdemo.key -out xdemo.cer -days 36500 -nodes -subj "/CN=*.xdemo.local"
-```

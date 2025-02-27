@@ -12,6 +12,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"sync"
 	"time"
 
 	"github.com/askasoft/pango-xdemo/app"
@@ -90,9 +91,9 @@ func (s *service) Wait() {
 func Init() {
 	initLog()
 
-	initCertificate()
-
 	initConfigs()
+
+	initCertificate()
 
 	initCaches()
 
@@ -123,7 +124,7 @@ func Reload() {
 func Run() {
 	// Starting the server in a goroutine so that
 	// it won't block the graceful shutdown handling below
-	go start()
+	starts()
 
 	// Start jobs (Resume interrupted jobs)
 	if ini.GetBool("job", "startAtStartup") {
@@ -142,14 +143,14 @@ func Shutdown() {
 	// stop fs watch
 	fsw.Stop() //nolint: errcheck
 
-	// The context is used to inform the server it has 5 seconds to finish
-	// the request it is currently handling
-	ctx, cancel := context.WithTimeout(context.TODO(), ini.GetDuration("server", "shutdownTimeout", 5*time.Second))
-	defer cancel()
-
-	if err := app.HTTP.Shutdown(ctx); err != nil {
-		log.Errorf("Server failed to shutdown: %v", err)
+	// shutdown http servers
+	var wg sync.WaitGroup
+	for _, hsv := range app.HSVs {
+		wg.Add(1)
+		go shutdown(hsv, &wg)
 	}
+	wg.Wait()
+
 	log.Info("Server exit.")
 
 	// close log
@@ -176,22 +177,6 @@ func initLog() {
 	log.Infof("Directory: %s", dir)
 }
 
-func initCertificate() {
-	keyPair, err := tls.LoadX509KeyPair(app.SAMLCertificateFile, app.SAMLCertKeyFile)
-	if err != nil {
-		log.Errorf("Failed to load certificate file (%q, %q): %v", app.SAMLCertificateFile, app.SAMLCertKeyFile, err)
-		app.Exit(app.ExitErrCFG)
-	}
-
-	keyPair.Leaf, err = x509.ParseCertificate(keyPair.Certificate[0])
-	if err != nil {
-		log.Errorf("Failed to parse certificate: %v", err)
-		app.Exit(app.ExitErrCFG)
-	}
-
-	app.Certificate = &keyPair
-}
-
 func initConfigs() {
 	cfg, err := loadConfigs()
 	if err != nil {
@@ -211,12 +196,105 @@ func initAppCfg() {
 	app.Base = ini.GetString("server", "prefix")
 }
 
+func initCertificate() {
+	xcert, err := loadCertificate()
+	if err != nil {
+		log.Error(err)
+		app.Exit(app.ExitErrCFG)
+	}
+
+	app.Certificate = xcert
+}
+
 func initCaches() {
 	app.SCMAS = imc.New[bool](ini.GetDuration("cache", "schemaCacheExpires", time.Minute), time.Minute)
 	app.CONFS = imc.New[map[string]string](ini.GetDuration("cache", "configCacheExpires", time.Minute), time.Minute)
 	app.USERS = imc.New[*models.User](ini.GetDuration("cache", "userCacheExpires", time.Minute), time.Minute)
 	app.AFIPS = imc.New[int](ini.GetDuration("cache", "afipCacheExpires", time.Minute*30), time.Minute)
 }
+
+func initListener() {
+	listen := ini.GetString("server", "listen", ":6060")
+
+	for _, addr := range str.Fields(listen) {
+		log.Infof("Listening %s ...", addr)
+
+		ssl := str.EndsWithByte(addr, 's')
+		if ssl {
+			addr = addr[:len(addr)-1]
+		}
+
+		tcp, err := net.Listen("tcp", addr)
+		if err != nil {
+			log.Fatalf("Listen: %v", err) //nolint: all
+			app.Exit(app.ExitErrTCP)
+		}
+
+		tcpd := netutil.DumpListener(tcp, "logs")
+		tcpd.Disable(!ini.GetBool("server", "tcpDump"))
+
+		hsv := &http.Server{
+			Addr:              addr,
+			Handler:           app.XIN,
+			ReadHeaderTimeout: ini.GetDuration("server", "httpReadHeaderTimeout", 10*time.Second),
+			ReadTimeout:       ini.GetDuration("server", "httpReadTimeout", 120*time.Second),
+			WriteTimeout:      ini.GetDuration("server", "httpWriteTimeout", 300*time.Second),
+			IdleTimeout:       ini.GetDuration("server", "httpIdleTimeout", 30*time.Second),
+		}
+
+		if ssl {
+			hsv.TLSConfig = &tls.Config{
+				GetCertificate: getCertificate,
+			}
+		}
+		app.TCPs = append(app.TCPs, tcpd)
+		app.HSVs = append(app.HSVs, hsv)
+	}
+}
+
+func getCertificate(chi *tls.ClientHelloInfo) (*tls.Certificate, error) {
+	return app.Certificate, nil
+}
+
+func starts() {
+	for i, hsv := range app.HSVs {
+		tcp := app.TCPs[i]
+		go serve(hsv, tcp)
+		time.Sleep(time.Millisecond)
+	}
+}
+
+func serve(hsv *http.Server, tcp net.Listener) {
+	log.Infof("HTTP Serving %s ...", hsv.Addr)
+
+	if hsv.TLSConfig != nil {
+		tcp = tls.NewListener(tcp, hsv.TLSConfig)
+	}
+
+	if err := hsv.Serve(tcp); err != nil {
+		if errors.Is(err, http.ErrServerClosed) {
+			log.Infof("HTTP Server %s closed", hsv.Addr)
+		} else {
+			log.Errorf("HTTP.Serve(%s) failed: %v", hsv.Addr, err)
+			app.Exit(app.ExitErrHTTP)
+		}
+	}
+}
+
+func shutdown(hsv *http.Server, wg *sync.WaitGroup) {
+	defer wg.Done()
+
+	// The context is used to inform the server it has 5 seconds to finish
+	// the request it is currently handling
+	ctx, cancel := context.WithTimeout(context.TODO(), ini.GetDuration("server", "shutdownTimeout", 5*time.Second))
+	defer cancel()
+
+	if err := hsv.Shutdown(ctx); err != nil {
+		log.Errorf("Server %s failed to shutdown: %v", hsv.Addr, err)
+	}
+}
+
+// ------------------------------------------------------
 
 func loadConfigs() (*ini.Ini, error) {
 	c := ini.NewIni()
@@ -236,42 +314,32 @@ func loadConfigs() (*ini.Ini, error) {
 	return c, nil
 }
 
-func initListener() {
-	addr := ini.GetString("server", "listen", ":6060")
-	log.Infof("Listening %s ...", addr)
+func loadCertificate() (*tls.Certificate, error) {
+	certificate := ini.GetString("server", "certificate")
+	certkeyfile := ini.GetString("server", "certkeyfile")
 
-	tcp, err := net.Listen("tcp", addr)
+	xcert, err := tls.LoadX509KeyPair(certificate, certkeyfile)
 	if err != nil {
-		log.Fatalf("Listen: %v", err) //nolint: all
-		app.Exit(app.ExitErrTCP)
+		return nil, fmt.Errorf("Failed to load certificate (%q, %q): %w", certificate, certkeyfile, err)
 	}
 
-	app.TCP = netutil.DumpListener(tcp, "logs")
-	app.TCP.Disable(!ini.GetBool("server", "tcpDump"))
-
-	app.HTTP = &http.Server{
-		Addr:              addr,
-		Handler:           app.XIN,
-		ReadHeaderTimeout: ini.GetDuration("server", "httpReadHeaderTimeout", 10*time.Second),
-		ReadTimeout:       ini.GetDuration("server", "httpReadTimeout", 120*time.Second),
-		WriteTimeout:      ini.GetDuration("server", "httpWriteTimeout", 300*time.Second),
-		IdleTimeout:       ini.GetDuration("server", "httpIdleTimeout", 30*time.Second),
+	xcert.Leaf, err = x509.ParseCertificate(xcert.Certificate[0])
+	if err != nil {
+		return nil, fmt.Errorf("Failed to load certificate (%q, %q): %w", certificate, certkeyfile, err)
 	}
+
+	return &xcert, nil
 }
 
-func start() {
-	log.Info("HTTP Serving ...")
-	if err := app.HTTP.Serve(app.TCP); err != nil {
-		if errors.Is(err, http.ErrServerClosed) {
-			log.Info("HTTP Server closed")
-		} else {
-			log.Errorf("HTTP.Serve() failed: %v", err)
-			app.Exit(app.ExitErrHTTP)
-		}
+func reloadCertificate() {
+	xcert, err := loadCertificate()
+	if err != nil {
+		log.Error(err)
+		return
 	}
-}
 
-// ------------------------------------------------------
+	app.Certificate = xcert
+}
 
 func reloadLog(path string, op fsw.Op) {
 	log.Infof("Reloading log %v [%v]", path, op)
@@ -293,9 +361,14 @@ func reloadConfigs(path string, op fsw.Op) {
 	ini.SetDefault(cfg)
 
 	initAppCfg()
+
+	reloadCertificate()
+
 	initCaches()
 
-	app.TCP.Disable(!ini.GetBool("server", "tcpDump"))
+	for _, tcpd := range app.TCPs {
+		tcpd.Disable(!ini.GetBool("server", "tcpDump"))
+	}
 
 	if err := openDatabase(); err != nil {
 		log.Error(err)

@@ -29,12 +29,6 @@ const (
 
 	// Schema DDL sql file
 	SQLSchemaFile = "conf/schema.sql"
-
-	// SAML certificate file
-	SAMLCertificateFile = "conf/xdemo.cer"
-
-	// SAML cert key file
-	SAMLCertKeyFile = "conf/xdemo.key"
 )
 
 const (
@@ -138,11 +132,11 @@ var (
 	// XHT global xin html templates
 	XHT render.HTMLTemplates
 
-	// TCP listener dumper
-	TCP *netutil.ListenerDumper
+	// TCPs TCP listeners
+	TCPs []*netutil.ListenerDumper
 
-	// HTTP global http server
-	HTTP *http.Server
+	// HTTP http servers
+	HSVs []*http.Server
 
 	// DBS database settings
 	DBS map[string]string
