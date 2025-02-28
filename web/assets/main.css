@@ -144,6 +144,9 @@ textarea.form-control {
 
 
 /** layout **/
+:root {
+	--s-padded: 1rem;
+}
 * {
 	scrollbar-width: thin;
 }
@@ -411,7 +414,7 @@ form div.verr {
 
 /** sizeing **/
 .padded {
-	padding: 15px;
+	padding: var(--s-padded);
 }
 .onerow * {
 	margin-bottom: 0.25rem;
