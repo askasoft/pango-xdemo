@@ -39,28 +39,31 @@ func (qa *QueryArg) AddID(sqb *sqlx.Builder, column string, id int64) {
 }
 
 func (qa *QueryArg) AddRanget(sqb *sqlx.Builder, column string, tmin, tmax time.Time) {
-	if !tmin.IsZero() {
+	if !tmin.IsZero() && !tmax.IsZero() {
+		sqb.Where(column+" BETWEEN ? AND ?", tmin, tmax)
+	} else if !tmin.IsZero() {
 		sqb.Where(column+" >= ?", tmin)
-	}
-	if !tmax.IsZero() {
+	} else if !tmax.IsZero() {
 		sqb.Where(column+" <= ?", tmax)
 	}
 }
 
 func (qa *QueryArg) AddRangei(sqb *sqlx.Builder, column string, smin, smax string) {
-	if smin != "" {
+	if smin != "" && smax != "" {
+		sqb.Where(column+" BETWEEN ? AND ?", smin, smax)
+	} else if smin != "" {
 		sqb.Where(column+" >= ?", num.Atoi(smin))
-	}
-	if smax != "" {
+	} else if smax != "" {
 		sqb.Where(column+" <= ?", num.Atoi(smax))
 	}
 }
 
 func (qa *QueryArg) AddRangef(sqb *sqlx.Builder, column string, smin, smax string) {
-	if smin != "" {
+	if smin != "" && smax != "" {
+		sqb.Where(column+" BETWEEN ? AND ?", smin, smax)
+	} else if smin != "" {
 		sqb.Where(column+" >= ?", num.Atof(smin))
-	}
-	if smax != "" {
+	} else if smax != "" {
 		sqb.Where(column+" <= ?", num.Atof(smax))
 	}
 }
