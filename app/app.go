@@ -133,7 +133,7 @@ var (
 	XHT render.HTMLTemplates
 
 	// TCPs TCP listeners
-	TCPs []*netutil.ListenerDumper
+	TCPs []*netutil.DumpListener
 
 	// HTTP http servers
 	HSVs []*http.Server

@@ -2,16 +2,9 @@
 
 ## Linux
 
-### install golang (1.21)
 ```sh
-sudo yum -y install golang
-```
-
-or
-
-```sh
-wget https://go.dev/dl/go1.21.6.linux-amd64.tar.gz
-tar -xzvf go1.21.6.linux-amd64.tar.gz
+wget https://go.dev/dl/go1.23.7.linux-amd64.tar.gz
+tar -xzvf go1.23.7.linux-amd64.tar.gz
 sudo mv go /opt/
 sudo ln -s /opt/go/bin/go /usr/bin/go
 ```
@@ -63,8 +56,8 @@ sudo setcap 'cap_net_bind_service=+ep' /app/xdemo/xdemo
 
 ## Windows
 
-### install golang (1.21)
-download https://go.dev/dl/go1.21.6.windows-amd64.zip and extract it.
+### install golang (1.23)
+download https://go.dev/dl/go1.23.7.windows-amd64.zip and extract it.
 
 
 ### get goversioninfo

@@ -230,7 +230,7 @@ func initListener() {
 			app.Exit(app.ExitErrTCP)
 		}
 
-		tcpd := netutil.DumpListener(tcp, "logs")
+		tcpd := netutil.NewDumpListener(tcp, "logs")
 		tcpd.Disable(!ini.GetBool("server", "tcpDump"))
 
 		hsv := &http.Server{
