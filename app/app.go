@@ -33,16 +33,17 @@ const (
 
 const (
 	ExitOK int = iota
-	ExitErrLOG
 	ExitErrCFG
-	ExitErrTXT
-	ExitErrTPL
-	ExitErrDB
-	ExitErrTCP
-	ExitErrFSW
-	ExitErrSCH
-	ExitErrHTTP
 	ExitErrCMD
+	ExitErrDB
+	ExitErrFSW
+	ExitErrHTTP
+	ExitErrLOG
+	ExitErrSCH
+	ExitErrTCP
+	ExitErrTPL
+	ExitErrTXT
+	ExitErrXIN
 )
 
 var (

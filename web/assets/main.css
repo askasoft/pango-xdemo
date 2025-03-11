@@ -53,6 +53,11 @@
 **/
 
 /** bootstrap5 customize **/
+dl, ol, ul {
+	margin-top: 0;
+	margin-bottom: 0;
+}
+
 /* alert */
 .alert.alert-dismissible {
 	padding-right: 3em;

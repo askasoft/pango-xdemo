@@ -31,6 +31,13 @@ import (
 )
 
 func initRouter() {
+	defer func() {
+		if err := recover(); err != nil {
+			log.Fatal(err) //nolint: all
+			app.Exit(app.ExitErrXIN)
+		}
+	}()
+
 	app.XIN = xin.New()
 	app.VAD = app.XIN.Validator.Engine().(*vad.Validate)
 	app.VAD.RegisterValidation("ini", vadutil.ValidateINI)
