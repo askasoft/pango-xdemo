@@ -32,7 +32,9 @@ func init() {
 }
 
 type UserCsvImportArg struct {
-	Role string `json:"role,omitempty"`
+	jobs.ArgFile
+
+	Role string `json:"role,omitempty" form:"-"`
 }
 
 func NewUserCsvImportArg(role string) *UserCsvImportArg {
@@ -73,7 +75,7 @@ func (ucij *UserCsvImportJob) Run() {
 	}
 
 	tfs := ucij.Tenant.FS()
-	ucij.data, err = tfs.ReadFile(ucij.JobFile())
+	ucij.data, err = tfs.ReadFile(ucij.Arg.File)
 	if err != nil {
 		ucij.Done(err)
 		return
@@ -163,7 +165,7 @@ func (ucij *UserCsvImportJob) doReadCsv(ctx context.Context, callback func(rec *
 			return nil
 		}
 		if err != nil {
-			return tbs.Errorf(ucij.Locale(), "csv.error.read", err.Error())
+			return tbs.Errorf(ucij.Locale(), "csv.error.read", err)
 		}
 
 		if i == 1 {

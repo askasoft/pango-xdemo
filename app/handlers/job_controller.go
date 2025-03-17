@@ -1,39 +1,23 @@
 package handlers
 
 import (
-	"mime/multipart"
 	"net/http"
 	"time"
 
-	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/jobs"
-	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango/bol"
 	"github.com/askasoft/pango/ini"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/tbs"
-	"github.com/askasoft/pango/xfs"
 	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pango/xjm"
 )
 
 // JobArg job argument struct
 type JobArg struct {
-	File  string
 	Param string
-}
-
-func (ja *JobArg) SetFile(tt *tenant.Tenant, mfh *multipart.FileHeader) error {
-	fid := app.MakeFileID(models.PrefixJobFile, mfh.Filename)
-	tfs := tt.FS()
-	if _, err := xfs.SaveUploadedFile(tfs, fid, mfh); err != nil {
-		return err
-	}
-
-	ja.File = fid
-	return nil
 }
 
 func (ja *JobArg) SetParam(v any) {
@@ -190,7 +174,7 @@ func (jc *JobController) Start(c *xin.Context) {
 		}
 	}
 
-	jid, err := tjm.AppendJob(0, jc.Name, c.Locale, jc.File, jc.Param)
+	jid, err := tjm.AppendJob(0, jc.Name, c.Locale, jc.Param)
 	if err != nil {
 		log.Errorf("Failed to pending job %s: %v", jc.Name, err)
 		c.AddError(err)

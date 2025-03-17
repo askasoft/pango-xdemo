@@ -257,9 +257,9 @@
 	function job_copy_param() {
 		var $cf = $(this).closest('form');
 
-		$cf.find(':input').prop('disabled', false);
+		var $is = $cf.find(':input').not('button.copy').prop('disabled', false);
 		var vs = $cf.formValues();
-		$cf.find(':input').prop('disabled', true);
+		$is.prop('disabled', true);
 
 		$('#job_form').formValues(vs, true);
 		return false;
@@ -281,13 +281,6 @@
 		$cf.find(':input').prop('disabled', true);
 		$cf.formClear();
 
-		var $f = $cf.find('[type=file]').hide();
-		if (job.file) {
-			$('<a>', { 'class': 'btn btn-secondary', href: main.base + '/files' + job.file })
-				.append($('<i>', { 'class': 'fas fa-download' }))
-				.insertAfter($f);
-		}
-
 		if (job.param) {
 			var params = main.safe_parse_json(job.param);
 			for (var k in params) {
@@ -308,6 +301,15 @@
 			}
 			$cf.formValues(params);
 
+			$cf.find('[type=file]').each(function() {
+				var $f = $(this).hide(), v = params[$f.attr('name')];
+				if (v) {
+					$('<a>', { 'class': 'btn btn-secondary', href: main.base + '/files' + v })
+						.append($('<i>', { 'class': 'fas fa-download' }))
+						.insertAfter($f);
+				}
+			});
+	
 			var copy = $jf.data('copy');
 			if (copy) {
 				var $b = $('<button>', { 'class': 'btn btn-secondary copy' });

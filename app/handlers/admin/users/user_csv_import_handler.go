@@ -41,16 +41,17 @@ func (ucijc *UserCsvImportJobController) Start(c *xin.Context) {
 		return
 	}
 
+	au := tenant.AuthUser(c)
+	ucia := users.NewUserCsvImportArg(au.Role)
+
 	tt := tenant.FromCtx(c)
-	if err = ucijc.SetFile(tt, mfh); err != nil {
-		err = tbs.Errorf(c.Locale, "csv.error.read", err.Error())
+	if err = ucia.SetFile(tt, mfh); err != nil {
+		err = tbs.Errorf(c.Locale, "csv.error.read", err)
 		c.AddError(err)
-		c.JSON(http.StatusBadRequest, handlers.E(c))
+		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return
 	}
 
-	au := tenant.AuthUser(c)
-	ucia := users.NewUserCsvImportArg(au.Role)
 	ucijc.SetParam(ucia)
 	ucijc.JobController.Start(c)
 }

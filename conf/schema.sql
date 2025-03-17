@@ -16,7 +16,6 @@ CREATE TABLE "SCHEMA"."jobs" (
 	"name" varchar(250) NOT NULL,
 	"status" varchar(1) NOT NULL,
 	"locale" varchar(20) NOT NULL,
-	"file" text NOT NULL,
 	"param" text NOT NULL,
 	"state" text NOT NULL,
 	"result" text NOT NULL,

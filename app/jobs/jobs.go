@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/askasoft/pango-xdemo/app"
+	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango/asg"
 	"github.com/askasoft/pango/cog/treemap"
@@ -25,10 +26,6 @@ const (
 	JobNamePetCatCreate  = "PetCatCreate"
 	JobNamePetDogCreate  = "PetDogCreate"
 )
-
-var hasFileJobs = []string{
-	JobNameUserCsvImport,
-}
 
 //------------------------------------
 
@@ -265,37 +262,26 @@ func CleanOutdatedJobs() {
 		return app.SDB.Transaction(func(tx *sqlx.Tx) error {
 			logger := tt.Logger("JOB")
 
-			if len(hasFileJobs) > 0 {
-				sqa := tx.Builder()
-				sqa.Select("file").From(tt.TableJobs())
-				sqa.Where("updated_at < ?", before)
-				sqa.In("name", hasFileJobs)
-				sqa.In("status", xjm.JobDoneStatus)
-				sql, args := sqa.Build()
-
-				sqb := tx.Builder()
-				sqb.Delete(tt.TableFiles())
-				sqb.Where("id IN ("+sql+")", args...)
-				sql, args = sqb.Build()
-
-				r, err := tx.Exec(sql, args...)
-				if err != nil {
-					logger.Errorf("Failed to delete outdated job files: %v", err)
-					return err
-				}
-
-				cnt, _ := r.RowsAffected()
-				if cnt > 0 {
-					logger.Infof("Delete outdated job files: %d", cnt)
-				}
+			sfs := tt.SFS(tx)
+			cnt, err := sfs.DeletePrefixBefore(models.PrefixJobFile, before)
+			if err != nil {
+				logger.Errorf("Failed to delete outdated job files (%q): %v", before.Format(time.RFC3339), err)
+				return err
+			}
+			if cnt > 0 {
+				logger.Infof("Delete outdated job files (%q): %d", before.Format(time.RFC3339), cnt)
 			}
 
 			sjm := tt.SJM(tx)
-			_, _, err := sjm.CleanOutdatedJobs(before)
+			cnt, _, err = sjm.CleanOutdatedJobs(before)
 			if err != nil {
-				logger.Errorf("Failed to CleanOutdatedJobs(%q, %q): %v", string(tt.Schema), before.Format(time.RFC3339), err)
+				logger.Errorf("Failed to delete outdated jobs (%q, %q): %v", string(tt.Schema), before.Format(time.RFC3339), err)
 			}
-			return err
+			if cnt > 0 {
+				logger.Infof("Delete outdated jobs (%q, %q): %d", string(tt.Schema), before.Format(time.RFC3339), cnt)
+			}
+
+			return nil
 		})
 	})
 }

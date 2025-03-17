@@ -15,7 +15,6 @@ import (
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/str"
-	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pango/xjm"
 )
 
@@ -50,76 +49,6 @@ var jobRunCreators = map[string]JobRunCreator{}
 
 func RegisterJobRun(name string, jrc JobRunCreator) {
 	jobRunCreators[name] = jrc
-}
-
-type IArg interface {
-	Bind(c *xin.Context) error
-}
-
-type JobArgCreater func(*tenant.Tenant) IArg
-
-var jobArgCreators = map[string]JobArgCreater{}
-
-func RegisterJobArg(name string, jac JobArgCreater) {
-	jobArgCreators[name] = jac
-}
-
-type IArgChain interface {
-	GetChain() (int, bool)
-	SetChain(chainSeq int, chainData bool)
-}
-
-type ArgChain struct {
-	ChainSeq  int  `json:"chain_seq,omitempty" form:"-"`
-	ChainData bool `json:"chain_data,omitempty" form:"chain_data"`
-}
-
-func (ac *ArgChain) GetChain() (int, bool) {
-	return ac.ChainSeq, ac.ChainData
-}
-
-func (ac *ArgChain) SetChain(csq int, cdt bool) {
-	ac.ChainSeq = csq
-	ac.ChainData = cdt
-}
-
-func (ac *ArgChain) ShouldChainData() bool {
-	return ac.ChainData && ac.ChainSeq > 0
-}
-
-type ArgItems struct {
-	Items int `json:"items,omitempty" form:"items,strip" validate:"min=0"`
-}
-
-type ArgIDRange struct {
-	IdFrom int64 `json:"id_from,omitempty" form:"id_from,strip" validate:"min=0"`
-	IdTo   int64 `json:"id_to,omitempty" form:"id_to,strip" validate:"omitempty,min=0,gtefield=IdFrom"`
-}
-
-type iPeriod interface {
-	Period() *ArgPeriod
-}
-
-type ArgPeriod struct {
-	Start time.Time `json:"start,omitempty" form:"start"`
-	End   time.Time `json:"end,omitempty" form:"end" validate:"omitempty,gtefield=Start"`
-}
-
-func (ap *ArgPeriod) Period() *ArgPeriod {
-	return ap
-}
-
-func ArgBind(c *xin.Context, a any) error {
-	err := c.Bind(a)
-
-	if ip, ok := a.(iPeriod); ok {
-		ap := ip.Period()
-		if !ap.End.IsZero() {
-			ap.End = ap.End.Add(time.Hour*24 - time.Microsecond)
-		}
-	}
-
-	return err
 }
 
 type iState interface {

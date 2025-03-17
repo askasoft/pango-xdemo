@@ -18,6 +18,29 @@ const (
 	JobChainPetReset = "PetReset"
 )
 
+type IArgChain interface {
+	GetChain() (int, bool)
+	SetChain(chainSeq int, chainData bool)
+}
+
+type ArgChain struct {
+	ChainSeq  int  `json:"chain_seq,omitempty" form:"-"`
+	ChainData bool `json:"chain_data,omitempty" form:"chain_data"`
+}
+
+func (ac *ArgChain) GetChain() (int, bool) {
+	return ac.ChainSeq, ac.ChainData
+}
+
+func (ac *ArgChain) SetChain(csq int, cdt bool) {
+	ac.ChainSeq = csq
+	ac.ChainData = cdt
+}
+
+func (ac *ArgChain) ShouldChainData() bool {
+	return ac.ChainData && ac.ChainSeq > 0
+}
+
 type JobRunState struct {
 	JID    int64    `json:"jid"`
 	Name   string   `json:"name"`
@@ -44,7 +67,7 @@ func JobChainInitStates(jns ...string) []*JobRunState {
 	return states
 }
 
-func JobChainStart(tt *tenant.Tenant, chainName string, states []*JobRunState, jobName, jobLocale, jobFile string, jobParam IArgChain) (cid int64, err error) {
+func JobChainStart(tt *tenant.Tenant, chainName string, states []*JobRunState, jobName, jobLocale string, jobParam IArgChain) (cid int64, err error) {
 	state := JobChainEncodeStates(states)
 
 	err = app.SDB.Transaction(func(tx *sqlx.Tx) error {
@@ -59,7 +82,7 @@ func JobChainStart(tt *tenant.Tenant, chainName string, states []*JobRunState, j
 		jParam := xjm.MustEncode(jobParam)
 
 		sjm := tt.SJM(tx)
-		_, err = sjm.AppendJob(cid, jobName, jobLocale, jobFile, jParam)
+		_, err = sjm.AppendJob(cid, jobName, jobLocale, jParam)
 
 		return err
 	})
@@ -303,7 +326,7 @@ func JobChainAppendJob(tt *tenant.Tenant, name, locale string, cid int64, csq in
 	}
 
 	param := xjm.MustEncode(arg)
-	if _, err := tjm.AppendJob(cid, name, locale, "", param); err != nil {
+	if _, err := tjm.AppendJob(cid, name, locale, param); err != nil {
 		return err
 	}
 
