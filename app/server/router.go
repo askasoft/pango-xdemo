@@ -46,7 +46,7 @@ func initRouter() {
 	app.VAD.RegisterValidation("samlmeta", vadutil.ValidateSAMLMeta)
 
 	app.XAL = xmw.NewAccessLogger(nil)
-	app.XRL = xmw.NewRequestLimiter(0)
+	app.XSL = xmw.NewRequestSizeLimiter(0)
 	app.XRC = xmw.DefaultResponseCompressor()
 	app.XHD = xmw.NewHTTPDumper(app.XIN.Logger.GetOutputer("XHD", log.LevelTrace))
 	app.XSR = xmw.NewHTTPSRedirector()
@@ -71,9 +71,9 @@ func initRouter() {
 }
 
 func configMiddleware() {
-	app.XRL.DrainBody = ini.GetBool("server", "httpDrainRequestBody", false)
-	app.XRL.MaxBodySize = ini.GetSize("server", "httpMaxRequestBodySize", 8<<20)
-	app.XRL.BodyTooLarge = handlers.BodyTooLarge
+	app.XSL.DrainBody = ini.GetBool("server", "httpDrainRequestBody", false)
+	app.XSL.MaxBodySize = ini.GetSize("server", "httpMaxRequestBodySize", 8<<20)
+	app.XSL.BodyTooLarge = handlers.BodyTooLarge
 
 	app.XRC.Disable(!ini.GetBool("server", "httpGzip"))
 	app.XHD.Disable(!ini.GetBool("server", "httpDump"))
@@ -183,7 +183,7 @@ func initHandlers() {
 	r.Use(SetCtxLogProp) // Set TENANT logger prop
 	r.Use(app.XAL.Handler())
 	r.Use(app.XLL.Handler())
-	r.Use(app.XRL.Handler())
+	r.Use(app.XSL.Handler())
 	r.Use(app.XRC.Handler())
 	r.Use(app.XHD.Handler())
 	r.Use(app.XRH.Handler())

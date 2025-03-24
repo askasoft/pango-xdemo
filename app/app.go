@@ -94,8 +94,8 @@ var (
 	// XAL global xin access logger
 	XAL *xmw.AccessLogger
 
-	// XRL global xin request limiter
-	XRL *xmw.RequestLimiter
+	// XSL global xin request size limiter
+	XSL *xmw.RequestSizeLimiter
 
 	// XRC global xin response compressor
 	XRC *xmw.ResponseCompressor

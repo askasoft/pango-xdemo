@@ -8,7 +8,6 @@ import (
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango/ini"
-	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pango/xmw"
@@ -154,11 +153,7 @@ func AuthPassed(c *xin.Context) {
 
 func AuthFailed(c *xin.Context) {
 	cip := c.ClientIP()
-
-	err := app.AFIPS.Increment(cip, 1, 1)
-	if err != nil {
-		log.Errorf("Failed to increment AFIPS for '%s'", cip)
-	}
+	app.AFIPS.Increment(cip, 1)
 }
 
 //----------------------------------------------------

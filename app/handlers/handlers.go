@@ -38,7 +38,7 @@ func Forbidden(c *xin.Context) {
 }
 
 func BodyTooLarge(c *xin.Context) {
-	err := tbs.Format(c.Locale, "error.request.toolarge", num.HumanSize(float64(app.XRL.MaxBodySize)))
+	err := tbs.Format(c.Locale, "error.request.toolarge", num.HumanSize(float64(app.XSL.MaxBodySize)))
 
 	if IsAjax(c) {
 		c.JSON(http.StatusRequestEntityTooLarge, xin.H{"error": err})
