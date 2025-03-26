@@ -3,8 +3,8 @@
 ## Linux
 
 ```sh
-wget https://go.dev/dl/go1.23.7.linux-amd64.tar.gz
-tar -xzvf go1.23.7.linux-amd64.tar.gz
+wget https://go.dev/dl/go1.24.0.linux-amd64.tar.gz
+tar -xzvf go1.24.0.linux-amd64.tar.gz
 sudo mv go /opt/
 sudo ln -s /opt/go/bin/go /usr/bin/go
 ```
@@ -56,8 +56,8 @@ sudo setcap 'cap_net_bind_service=+ep' /app/xdemo/xdemo
 
 ## Windows
 
-### install golang (1.23)
-download https://go.dev/dl/go1.23.7.windows-amd64.zip and extract it.
+### install golang (1.24)
+download https://go.dev/dl/go1.24.0.windows-amd64.zip and extract it.
 
 
 ### get goversioninfo
@@ -130,8 +130,8 @@ xdemo.exe install
 	ProxyRequests     Off
 	ProxyPreserveHost On
 
-	ProxyPass         /         http://localhost:6060/ nocanon retry=0
-	ProxyPassReverse  /         http://localhost:6060/ nocanon
+	ProxyPass         /  http://localhost:6060/  nocanon retry=0 connectiontimeout=5
+	ProxyPassReverse  /  http://localhost:6060/
 </VirtualHost>
 ```
 
@@ -153,13 +153,18 @@ prefix = /xdemo
 	ProxyRequests     Off
 	ProxyPreserveHost On
 
-	ProxyPass         /xdemo   http://localhost:6060/xdemo  nocanon retry=0
-	ProxyPassReverse  /xdemo   http://localhost:6060/xdemo  nocanon
+	ProxyPass         /xdemo   http://localhost:6060/xdemo  nocanon retry=0 connectiontimeout=5
+	ProxyPassReverse  /xdemo   http://localhost:6060/xdemo
 ```
 
 
 ## nginx proxy setting
 ```xml
+upstream xdemo {
+	server    127.0.0.1:6060;
+	keepalive 600;
+}
+
 server {
 	listen       80;
 	listen       443 ssl;
@@ -170,7 +175,7 @@ server {
 	client_max_body_size 0;
 
 	location / {
-		proxy_pass              http://localhost:6060;
+		proxy_pass              http://xdemo;
 		proxy_http_version      1.1;
 		proxy_set_header        X-Real-IP $remote_addr;
 		proxy_set_header        X-Forwarded-Proto $scheme;
@@ -179,9 +184,9 @@ server {
 		proxy_set_header        Host $http_host;
 		proxy_request_buffering off;
 		proxy_buffering         off;
-		proxy_connect_timeout   10;
-		proxy_send_timeout      10;
-		proxy_read_timeout      600;
+		proxy_connect_timeout   5s;
+		proxy_send_timeout      60s;
+		proxy_read_timeout      600s;
 	}
 }
 ```
