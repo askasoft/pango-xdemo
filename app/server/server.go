@@ -216,6 +216,12 @@ func initCaches() {
 func initListener() {
 	listen := ini.GetString("server", "listen", ":6060")
 
+	var semaphore chan struct{}
+	maxcon := ini.GetInt("server", "maxConnections")
+	if maxcon > 0 {
+		semaphore = make(chan struct{}, maxcon)
+	}
+
 	for _, addr := range str.Fields(listen) {
 		log.Infof("Listening %s ...", addr)
 
@@ -230,16 +236,15 @@ func initListener() {
 			app.Exit(app.ExitErrTCP)
 		}
 
+		if maxcon > 0 {
+			tcp = netx.NewLimitListener(tcp, semaphore)
+		}
+
 		tcpd := netx.NewDumpListener(tcp, "logs")
-		tcpd.Disable(!ini.GetBool("server", "tcpDump"))
 
 		hsv := &http.Server{
-			Addr:              addr,
-			Handler:           app.XIN,
-			ReadHeaderTimeout: ini.GetDuration("server", "httpReadHeaderTimeout", 10*time.Second),
-			ReadTimeout:       ini.GetDuration("server", "httpReadTimeout", 120*time.Second),
-			WriteTimeout:      ini.GetDuration("server", "httpWriteTimeout", 300*time.Second),
-			IdleTimeout:       ini.GetDuration("server", "httpIdleTimeout", 30*time.Second),
+			Addr:    addr,
+			Handler: app.XIN,
 		}
 
 		if ssl {
@@ -249,6 +254,21 @@ func initListener() {
 		}
 		app.TCPs = append(app.TCPs, tcpd)
 		app.HSVs = append(app.HSVs, hsv)
+	}
+
+	configListener()
+}
+
+func configListener() {
+	for _, tcpd := range app.TCPs {
+		tcpd.Disable(!ini.GetBool("server", "tcpDump"))
+	}
+
+	for _, hsv := range app.HSVs {
+		hsv.ReadHeaderTimeout = ini.GetDuration("server", "httpReadHeaderTimeout", 10*time.Second)
+		hsv.ReadTimeout = ini.GetDuration("server", "httpReadTimeout", 120*time.Second)
+		hsv.WriteTimeout = ini.GetDuration("server", "httpWriteTimeout", 300*time.Second)
+		hsv.IdleTimeout = ini.GetDuration("server", "httpIdleTimeout", 30*time.Second)
 	}
 }
 
@@ -366,9 +386,7 @@ func reloadConfigs(path string, op fsw.Op) {
 
 	initCaches()
 
-	for _, tcpd := range app.TCPs {
-		tcpd.Disable(!ini.GetBool("server", "tcpDump"))
-	}
+	configListener()
 
 	if err := openDatabase(); err != nil {
 		log.Error(err)
