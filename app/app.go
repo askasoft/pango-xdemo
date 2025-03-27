@@ -12,7 +12,7 @@ import (
 	"github.com/askasoft/pango/imc"
 	"github.com/askasoft/pango/ini"
 	"github.com/askasoft/pango/log"
-	"github.com/askasoft/pango/net/netutil"
+	"github.com/askasoft/pango/net/netx"
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/vad"
 	"github.com/askasoft/pango/xin"
@@ -134,7 +134,7 @@ var (
 	XHT render.HTMLTemplates
 
 	// TCPs TCP listeners
-	TCPs []*netutil.DumpListener
+	TCPs []*netx.DumpListener
 
 	// HTTP http servers
 	HSVs []*http.Server

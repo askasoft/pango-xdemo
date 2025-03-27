@@ -3,10 +3,10 @@ package tenant
 import (
 	"net"
 
-	"github.com/askasoft/pango-xdemo/app/utils/netutil"
 	"github.com/askasoft/pango-xdemo/app/utils/pwdutil"
 	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
 	"github.com/askasoft/pango/cog/linkedhashmap"
+	"github.com/askasoft/pango/net/netx"
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/tbs"
@@ -26,7 +26,8 @@ func (tt *Tenant) ConfigValues(k string) []string {
 }
 
 func (tt *Tenant) GetCIDRs() []*net.IPNet {
-	return netutil.ParseCIDRs(tt.ConfigValue("secure_client_cidr"))
+	ipnets, _ := netx.ParseCIDRs(str.Fields(tt.ConfigValue("secure_client_cidr")))
+	return ipnets
 }
 
 type PasswordPolicy struct {

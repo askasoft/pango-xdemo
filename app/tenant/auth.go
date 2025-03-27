@@ -118,15 +118,15 @@ func CheckClientAndFindUser(c *xin.Context, username string) (xmw.AuthUser, erro
 }
 
 func CheckClientIP(c *xin.Context, u *models.User) bool {
+	ip := net.ParseIP(c.ClientIP())
+	if ip == nil {
+		return false
+	}
+
 	cidrs := u.CIDRs()
 	if len(cidrs) == 0 {
 		tt := FromCtx(c)
 		cidrs = tt.GetCIDRs()
-	}
-
-	ip := net.ParseIP(c.ClientIP())
-	if ip == nil {
-		return false
 	}
 
 	if len(cidrs) > 0 {

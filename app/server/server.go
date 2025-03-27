@@ -23,7 +23,7 @@ import (
 	"github.com/askasoft/pango/imc"
 	"github.com/askasoft/pango/ini"
 	"github.com/askasoft/pango/log"
-	"github.com/askasoft/pango/net/netutil"
+	"github.com/askasoft/pango/net/netx"
 	"github.com/askasoft/pango/sch"
 	"github.com/askasoft/pango/srv"
 	"github.com/askasoft/pango/str"
@@ -230,7 +230,7 @@ func initListener() {
 			app.Exit(app.ExitErrTCP)
 		}
 
-		tcpd := netutil.NewDumpListener(tcp, "logs")
+		tcpd := netx.NewDumpListener(tcp, "logs")
 		tcpd.Disable(!ini.GetBool("server", "tcpDump"))
 
 		hsv := &http.Server{
