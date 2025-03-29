@@ -626,3 +626,32 @@ form div.verr {
 	background-color: #393c3f;
 }
 
+
+/** Number **/
+.s-num {
+	font-size: 0.75em;
+	font-family: var(--bs-font-monospace);
+	margin-top: calc(var(--s-padded) * -1);
+	margin-left: calc(var(--s-padded) * -1);
+	padding: 0 0.25rem;
+	width: fit-content;
+}
+
+/** QA **/
+.qa-refers li {
+	position: relative;
+	padding: 0 1em 0 4em;
+	margin-bottom: 0.25em;
+}
+.qa-refers li > s {
+	background-color: #333;
+	color: #fff;
+	border-radius: 1em;
+	font-style: normal;
+	font-size: 0.75em;
+	text-decoration: none;
+	padding: 0 0.75em;
+	position: absolute;
+	left: 0;
+	top: 0.2em;
+}
