@@ -136,7 +136,7 @@ var main = {
 			};
 		}
 
-		err = (xhr.status ? xhr.status + ' ' : '') + (err || status || 'error') + '\n' + xhr.responseText;
+		err = (xhr.status ? xhr.status + ' ' : '') + (err || status || 'error');
 		if (xhr.responseJSON) {
 			err = xhr.responseJSON.error || JSON.stringify(xhr.responseJSON, null, 2) || err;
 		}
@@ -146,10 +146,8 @@ var main = {
 			$.each(err, function(i, e) {
 				if (e.param) {
 					main.form_add_invalid($f, e);
-					es.push(e.message);
-				} else {
-					es.push(e.message || e + "");
 				}
+				es.push(e.message || e + "");
 			});
 			err = es;
 		} else if (err.param && err.message) {
