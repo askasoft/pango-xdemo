@@ -11,7 +11,6 @@ import (
 	"github.com/askasoft/pango-xdemo/app/utils/argutil"
 	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
 	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
-	"github.com/askasoft/pango/sqx/pqx"
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/xin"
 )
@@ -74,10 +73,7 @@ func (pqa *PetQueryArg) AddWhere(sqb *sqlx.Builder) {
 	pqa.AddIn(sqb, "gender", pqa.Gender)
 	pqa.AddIn(sqb, "origin", pqa.Origin)
 	pqa.AddIn(sqb, "temper", pqa.Temper)
-
-	if len(pqa.Habits) > 0 {
-		sqb.Where("habits @> ?", pqx.StringArray(pqa.Habits))
-	}
+	pqa.AddOverlap(sqb, "habits", pqa.Habits)
 	pqa.AddRanget(sqb, "born_at", pqa.BornFrom, pqa.BornTo)
 	pqa.AddRangei(sqb, "amount", pqa.AmountMin, pqa.AmountMax)
 	pqa.AddRangef(sqb, "price", pqa.PriceMin, pqa.PriceMax)

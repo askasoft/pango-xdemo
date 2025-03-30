@@ -5,6 +5,7 @@ import (
 
 	"github.com/askasoft/pango-xdemo/app/utils/sqlxutil"
 	"github.com/askasoft/pango/num"
+	"github.com/askasoft/pango/sqx/pqx"
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/xvw/args"
 )
@@ -65,5 +66,11 @@ func (qa *QueryArg) AddRangef(sqb *sqlx.Builder, column string, smin, smax strin
 		sqb.Where(column+" >= ?", num.Atof(smin))
 	} else if smax != "" {
 		sqb.Where(column+" <= ?", num.Atof(smax))
+	}
+}
+
+func (qa *QueryArg) AddOverlap(sqb *sqlx.Builder, column string, values []string) {
+	if len(values) > 0 {
+		sqb.Where(column+" && ?", pqx.StringArray(values))
 	}
 }
