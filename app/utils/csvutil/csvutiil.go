@@ -1,8 +1,6 @@
 package csvutil
 
 import (
-	"unicode"
-
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/tbs"
 )
@@ -71,10 +69,4 @@ func GetStrings(row []string, idx int) []string {
 		ss[i] = str.Strip(ss[i])
 	}
 	return str.RemoveEmpties(ss)
-}
-
-func GetTags(row []string, idx int) []string {
-	return str.FieldsFunc(GetColumn(row, idx), func(r rune) bool {
-		return unicode.IsSpace(r) || r == ','
-	})
 }
