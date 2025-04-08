@@ -364,9 +364,9 @@
 			.submit();
 
 		$('#pets_export').on('click', pets_export);
-		$('#pets_new').on('click', pet_new);
 	
 		$('#pets_list')
+			.on('click', 'button.new', pet_new)
 			.on('click', 'button.view', pet_detail.callback('view'))
 			.on('click', 'button.edit', pet_detail.callback('edit'));
 

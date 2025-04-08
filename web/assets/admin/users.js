@@ -347,12 +347,12 @@
 			.on('submit', users_search)
 			.submit();
 
-		$('#users_new').on('click', user_new);
 		$('#users_export').on('click', users_export);
 		$('#users_editsel').on('click', main.bulkedit_editsel_popup.callback('users'));
 		$('#users_editall').on('click', main.bulkedit_editall_popup.callback('users'));
 
 		$('#users_list')
+			.on('click', 'button.new', user_new)
 			.on('click', 'button.view', user_detail.callback("view"))
 			.on('click', 'button.edit', user_detail.callback("edit"));
 

@@ -454,7 +454,9 @@ form div.verr {
 	width: 110px;
 	min-width: 110px;
 }
-
+.s-table th.actions {
+	text-align: center;
+}
 .s-table th.id, .s-table td.id,
 .s-table th.no, .s-table td.no,
 .s-table th.check, .s-table td.check,

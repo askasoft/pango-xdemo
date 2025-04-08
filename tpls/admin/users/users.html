@@ -7,6 +7,9 @@
 	<div class="s-section-head">
 		<h2>{{I "admin.users"}}<span>{{T .Loc "menu.admin.users"}}</span></h2>
 		<div class="ms-auto">
+			<a class="btn btn-sm btn-outline-primary" href="./import/">
+				{{I "upload"}} {{T .Loc "button.import"}}
+			</a>
 			<button class="btn btn-sm btn-outline-primary" id="users_export">
 				{{I "csv"}} {{T .Loc "button.csvexp"}}
 			</button>
@@ -23,20 +26,12 @@
 			<button class="btn btn-sm btn-outline-danger" popup-target="#users_deleteall_popup">
 				{{I "deleteall"}} {{T .Loc "button.deleteall"}}
 			</button>
-			<div class="me-auto"></div>
 			<button class="btn btn-sm btn-outline-primary" id="users_editsel" enableby="#users_list td.check input">
 				{{I "editsel"}} {{T .Loc "button.editsel"}}
 			</button>
 			<button class="btn btn-sm btn-outline-primary" id="users_editall">
 				{{I "editall"}} {{T .Loc "button.editall"}}
 			</button>
-			<div class="ms-auto"></div>
-			<button class="btn btn-sm btn-outline-primary" id="users_new">
-				{{I "new"}} {{T .Loc "button.new"}}
-			</button>
-			<a class="btn btn-sm btn-outline-primary" href="./import/">
-				{{I "upload"}} {{T .Loc "button.import"}}
-			</a>
 		</div>
 
 		<div id="users_alert">{{template "alerts" .}}</div>
