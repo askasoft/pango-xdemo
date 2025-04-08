@@ -25,7 +25,11 @@ func (tt *Tenant) ConfigValues(k string) []string {
 	return str.FieldsByte(val, '\t')
 }
 
-func (tt *Tenant) GetCIDRs() []*net.IPNet {
+func (tt *Tenant) MaxWorkers() int {
+	return num.Atoi(tt.ConfigValue("tenant_max_workers"))
+}
+
+func (tt *Tenant) SecureClientCIDRs() []*net.IPNet {
 	ipnets, _ := netx.ParseCIDRs(str.Fields(tt.ConfigValue("secure_client_cidr")))
 	return ipnets
 }

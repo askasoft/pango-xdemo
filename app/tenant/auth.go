@@ -126,7 +126,7 @@ func CheckClientIP(c *xin.Context, u *models.User) bool {
 	cidrs := u.CIDRs()
 	if len(cidrs) == 0 {
 		tt := FromCtx(c)
-		cidrs = tt.GetCIDRs()
+		cidrs = tt.SecureClientCIDRs()
 	}
 
 	if len(cidrs) > 0 {

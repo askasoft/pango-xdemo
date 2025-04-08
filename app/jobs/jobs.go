@@ -33,11 +33,6 @@ type tenantWorker struct {
 	RunningJobs []*xjm.Job
 }
 
-func newTenantWorker(_ *tenant.Tenant) *tenantWorker {
-	tj := &tenantWorker{}
-	return tj
-}
-
 func (tw *tenantWorker) Runnings() int {
 	return len(tw.RunningJobs)
 }
@@ -88,7 +83,7 @@ func (tws *tenantWorkers) Add(tt *tenant.Tenant, job *xjm.Job) {
 
 	tw, ok := tws.ws.Get(string(tt.Schema))
 	if !ok {
-		tw = newTenantWorker(tt)
+		tw = &tenantWorker{}
 		tws.ws.Set(string(tt.Schema), tw)
 	}
 

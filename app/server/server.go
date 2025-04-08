@@ -20,6 +20,7 @@ import (
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango/fsu"
 	"github.com/askasoft/pango/fsw"
+	"github.com/askasoft/pango/gwp"
 	"github.com/askasoft/pango/imc"
 	"github.com/askasoft/pango/ini"
 	"github.com/askasoft/pango/log"
@@ -209,6 +210,7 @@ func initCertificate() {
 func initCaches() {
 	app.SCMAS = imc.New[bool](ini.GetDuration("cache", "schemaCacheExpires", time.Minute), time.Minute)
 	app.CONFS = imc.New[map[string]string](ini.GetDuration("cache", "configCacheExpires", time.Minute), time.Minute)
+	app.WORKS = imc.New[*gwp.WorkerPool](ini.GetDuration("cache", "workerCacheExpires", time.Minute), time.Minute)
 	app.USERS = imc.New[*models.User](ini.GetDuration("cache", "userCacheExpires", time.Minute), time.Minute)
 	app.AFIPS = imc.New[int](ini.GetDuration("cache", "afipCacheExpires", time.Minute*30), time.Minute)
 }

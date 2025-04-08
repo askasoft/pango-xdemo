@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/askasoft/pango-xdemo/app/models"
+	"github.com/askasoft/pango/gwp"
 	"github.com/askasoft/pango/imc"
 	"github.com/askasoft/pango/ini"
 	"github.com/askasoft/pango/log"
@@ -153,6 +154,9 @@ var (
 
 	// CONFS tenant config map cache
 	CONFS *imc.Cache[map[string]string]
+
+	// WORKS tenant worker pool cache
+	WORKS *imc.Cache[*gwp.WorkerPool]
 
 	// USERS tenant user cache
 	USERS *imc.Cache[*models.User]
