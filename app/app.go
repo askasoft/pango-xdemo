@@ -150,19 +150,19 @@ var (
 	Certificate *tls.Certificate
 
 	// SCMAS schema cache
-	SCMAS *imc.Cache[bool]
+	SCMAS *imc.Cache[string, bool]
 
 	// CONFS tenant config map cache
-	CONFS *imc.Cache[map[string]string]
+	CONFS *imc.Cache[string, map[string]string]
 
 	// WORKS tenant worker pool cache
-	WORKS *imc.Cache[*gwp.WorkerPool]
+	WORKS *imc.Cache[string, *gwp.WorkerPool]
 
 	// USERS tenant user cache
-	USERS *imc.Cache[*models.User]
+	USERS *imc.Cache[string, *models.User]
 
 	// AFIPS authenticate failure ip cache
-	AFIPS *imc.Cache[int]
+	AFIPS *imc.Cache[string, int]
 )
 
 func Exit(code int) {

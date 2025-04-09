@@ -16,8 +16,12 @@ func (tt *Tenant) ConfigMap() map[string]string {
 	return tt.config
 }
 
-func (tt *Tenant) ConfigValue(k string) string {
-	return tt.config[k]
+func (tt *Tenant) ConfigValue(k string, defs ...string) string {
+	v := tt.config[k]
+	if v == "" && len(defs) > 0 {
+		return defs[0]
+	}
+	return v
 }
 
 func (tt *Tenant) ConfigValues(k string) []string {

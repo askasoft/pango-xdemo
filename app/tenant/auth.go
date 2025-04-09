@@ -61,7 +61,7 @@ func (tt *Tenant) FindUser(username string) (xmw.AuthUser, error) {
 func (tt *Tenant) RevokeUser(username string) {
 	k := string(tt.Schema) + "/" + username
 
-	app.USERS.Delete(k)
+	app.USERS.Remove(k)
 }
 
 func (tt *Tenant) CacheUser(u *models.User) {
@@ -148,7 +148,7 @@ func CheckClientIP(c *xin.Context, u *models.User) bool {
 
 func AuthPassed(c *xin.Context) {
 	cip := c.ClientIP()
-	app.AFIPS.Delete(cip)
+	app.AFIPS.Remove(cip)
 }
 
 func AuthFailed(c *xin.Context) {

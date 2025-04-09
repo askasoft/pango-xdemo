@@ -208,11 +208,11 @@ func initCertificate() {
 }
 
 func initCaches() {
-	app.SCMAS = imc.New[bool](ini.GetDuration("cache", "schemaCacheExpires", time.Minute), time.Minute)
-	app.CONFS = imc.New[map[string]string](ini.GetDuration("cache", "configCacheExpires", time.Minute), time.Minute)
-	app.WORKS = imc.New[*gwp.WorkerPool](ini.GetDuration("cache", "workerCacheExpires", time.Minute), time.Minute)
-	app.USERS = imc.New[*models.User](ini.GetDuration("cache", "userCacheExpires", time.Minute), time.Minute)
-	app.AFIPS = imc.New[int](ini.GetDuration("cache", "afipCacheExpires", time.Minute*30), time.Minute)
+	app.SCMAS = imc.New[string, bool](ini.GetDuration("cache", "schemaCacheExpires", time.Minute), time.Minute)
+	app.CONFS = imc.New[string, map[string]string](ini.GetDuration("cache", "configCacheExpires", time.Minute), time.Minute)
+	app.WORKS = imc.New[string, *gwp.WorkerPool](ini.GetDuration("cache", "workerCacheExpires", time.Minute), time.Minute)
+	app.USERS = imc.New[string, *models.User](ini.GetDuration("cache", "userCacheExpires", time.Minute), time.Minute)
+	app.AFIPS = imc.New[string, int](ini.GetDuration("cache", "afipCacheExpires", time.Minute*30), time.Minute)
 }
 
 func initListener() {

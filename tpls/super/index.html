@@ -9,10 +9,7 @@
 			{{if and .TT.IsDefault (eq .CFG.tenant.multiple "true")}}
 			<a class="s-menu-item" href="{{.Base}}/s/tenants/">{{I "super.tenants" "fa-4x"}}<div>{{T .Loc "menu.super.tenants"}}</div></a>
 			{{end}}
-			<a class="s-menu-item" href="{{.Base}}/s/job/">{{I "super.job" "fa-4x"}}<div>{{T .Loc "menu.super.job"}}</div></a>
-
-			<hr>
-
+			<a class="s-menu-item" href="{{.Base}}/s/apstats/">{{I "super.apstats" "fa-4x"}}<div>{{T .Loc "menu.super.apstats"}}</div></a>
 			<a class="s-menu-item" href="{{.Base}}/s/sql/">{{I "super.sql" "fa-4x"}}<div>{{T .Loc "menu.super.sql"}}</div></a>
 			<a class="s-menu-item" href="{{.Base}}/s/shell/">{{I "super.shell" "fa-4x"}}<div>{{T .Loc "menu.super.shell"}}</div></a>
 			<a class="s-menu-item" href="{{.Base}}/s/debug/">{{I "super.debug" "fa-4x"}}<div>{{T .Loc "menu.super.debug"}}</div></a>

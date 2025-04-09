@@ -60,11 +60,11 @@ func (pg *PetGenerator) Create(logger log.Logger, db *sqlx.DB, js *jobs.JobState
 		Name:        pg.cat + " " + str.PadLeft(num.Itoa(js.Step), 2, "0") + " " + pg.randText(5),
 		Gender:      pg.pgs[rand.Intn(len(pg.pgs))], //nolint: gosec
 		BornAt:      bd.AddDate(0, 0, js.Step),
-		Origin:      pg.pos[rand.Intn(len(pg.pos))],                                                                      //nolint: gosec
-		Temper:      pg.pts[rand.Intn(len(pg.pts))],                                                                      //nolint: gosec
-		Habits:      hashset.NewHashSet[string](pg.phs[rand.Intn(len(pg.phs))], pg.phs[rand.Intn(len(pg.phs))]).Values(), //nolint: gosec
-		Amount:      rand.Intn(100),                                                                                      //nolint: gosec
-		Price:       rand.Float64() * 10000,                                                                              //nolint: gosec
+		Origin:      pg.pos[rand.Intn(len(pg.pos))],                                                              //nolint: gosec
+		Temper:      pg.pts[rand.Intn(len(pg.pts))],                                                              //nolint: gosec
+		Habits:      hashset.NewHashSet(pg.phs[rand.Intn(len(pg.phs))], pg.phs[rand.Intn(len(pg.phs))]).Values(), //nolint: gosec
+		Amount:      rand.Intn(100),                                                                              //nolint: gosec
+		Price:       rand.Float64() * 10000,                                                                      //nolint: gosec
 		ShopName:    pg.randText(10),
 		Description: pg.randText(64),
 		CreatedAt:   time.Now(),

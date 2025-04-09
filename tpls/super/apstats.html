@@ -1,0 +1,35 @@
+{{MapSet .Ctx.Attrs "ascripts" (Array "super/apstats.js")}}
+
+{{template "main_header" .}}
+
+<div class="s-section">
+	<div class="s-section-head">
+		<h2>{{I "super.apstats"}}<span>{{T .Loc "menu.super.apstats"}}</span></h2>
+	</div>
+	<div class="s-section-body apstats">
+		<ul class="nav nav-tabs">
+			<li class="nav-item"><a class="nav-link active" href="#aps_jobstats" data-bs-toggle="tab">Job Stats</a></li>
+			{{range $c := .Caches}}
+			<li class="nav-item"><a class="nav-link" href="#aps_{{$c}}" data-bs-toggle="tab">{{T $.Loc (print "apstats." $c)}}</a></li>
+			{{end}}
+		</ul>
+		<div class="tab-content my-4">
+			<div id="aps_jobstats" class="tab-pane active" data-loaded="true">
+				<button class="reload btn btn-primary">{{I "refresh"}} Reload</button>
+				<pre class="stats mt-4">{{.JobStats}}</pre>
+			</div>
+			{{range $c := .Caches}}
+			<div id="aps_{{$c}}" class="tab-pane">
+				<button class="reload btn btn-primary">{{I "refresh"}} Reload</button>
+				<div class="mt-4 mb-1">Total: <span class="size"></span></div>
+				<table class="stats table table-bordered table-striped">
+					<thead><tr><td>#</td><td>Key</td><td>Value</td><td>TTL</td></tr></thead>
+					<tbody></tbody>
+				</table>
+			</div>
+			{{end}}
+		</div>
+	</div>
+</div>
+
+{{template "main_footer" .}}

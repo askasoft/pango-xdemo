@@ -15,7 +15,7 @@ var muCONFS sync.Mutex
 
 func (sm Schema) PurgeConfig() {
 	muCONFS.Lock()
-	app.CONFS.Delete(string(sm))
+	app.CONFS.Remove(string(sm))
 	muCONFS.Unlock()
 }
 
