@@ -82,6 +82,9 @@ dl, ol, ul {
 textarea.form-control {
 	min-height: auto;
 }
+input::placeholder, textarea::placeholder {
+	opacity: 0.7 !important;
+}
 
 /* nav */
 .nav-pills {
