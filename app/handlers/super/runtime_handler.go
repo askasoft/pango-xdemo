@@ -25,6 +25,36 @@ import (
 	"github.com/askasoft/pango/xin"
 )
 
+func RuntimeIndex(c *xin.Context) {
+	h := handlers.H(c)
+
+	h["Server"] = runtimeServer()
+	h["Process"] = runtimeProcess()
+	h["MemStats"] = runtimeMemStats()
+	h["Profiles"] = runtimeProfiles()
+	h["Traces"] = runtimeTrace()
+
+	c.HTML(http.StatusOK, "super/runtime", h)
+}
+
+func RuntimePprof(c *xin.Context) {
+	w, r := c.Writer, c.Request
+
+	p := c.Param("prof")
+	switch p {
+	case "profile":
+		hprof.Profile(w, r)
+	case "symbol":
+		hprof.Symbol(w, r)
+	case "trace":
+		hprof.Trace(w, r)
+	case "cmdline":
+		hprof.Cmdline(w, r)
+	default:
+		hprof.Handler(p).ServeHTTP(w, r)
+	}
+}
+
 var profileDescriptions = map[string]string{
 	"allocs":       "A sampling of all past memory allocations",
 	"block":        "Stack traces that led to blocking on synchronization primitives",
@@ -51,7 +81,7 @@ type trace struct {
 	Desc string
 }
 
-func debugServer() any {
+func runtimeServer() any {
 	stm := linkedhashmap.NewLinkedHashMap[string, string]()
 
 	// server
@@ -98,33 +128,14 @@ func debugServer() any {
 	}
 	stm.Set("Disk", val)
 
-	return stm
-}
-
-func debugRuntime() any {
-	// runtime
-	rtm := linkedhashmap.NewLinkedHashMap[string, string]()
-	rtm.Set("Goversion", runtime.Version())
-	rtm.Set("Gomaxprocs", num.Comma(runtime.GOMAXPROCS(0)))
-	rtm.Set("Goroutine", num.Comma(runtime.NumGoroutine()))
-	rtm.Set("Cmdline", str.Join(os.Args, " "))
-	rtm.Set("Startup", fmt.Sprintf("%s (%s)", app.StartupTime.Format(time.RFC3339), tmu.HumanDuration(time.Since(app.StartupTime))))
-	return rtm
-}
-
-func debugPerformance() any {
-	var val string
-
-	prm := linkedhashmap.NewLinkedHashMap[string, string]()
-
 	// loadavg
 	la, err := loadavg.GetLoadAvg()
 	if err != nil {
 		val = err.Error()
 	} else {
-		val = fmt.Sprintf("%.3f, %.3f, %.3f", la.Loadavg1, la.Loadavg5, la.Loadavg15)
+		val = fmt.Sprintf("%.3f/1m, %.3f/5m, %.3f/15m", la.Loadavg1, la.Loadavg5, la.Loadavg15)
 	}
-	prm.Set("Load Average (1,5,15)", val)
+	stm.Set("Load Average", val)
 
 	// cpu stats
 	if osm.Monitoring() {
@@ -146,12 +157,22 @@ func debugPerformance() any {
 			)
 		}
 	}
-	prm.Set("%Cpu(s)", val)
+	stm.Set("%Cpu(s)", val)
 
-	return prm
+	return stm
 }
 
-func debugMemStats() any {
+func runtimeProcess() any {
+	rtm := linkedhashmap.NewLinkedHashMap[string, string]()
+	rtm.Set("Goversion", runtime.Version())
+	rtm.Set("Gomaxprocs", num.Comma(runtime.GOMAXPROCS(0)))
+	rtm.Set("Goroutine", num.Comma(runtime.NumGoroutine()))
+	rtm.Set("Cmdline", str.Join(os.Args, " "))
+	rtm.Set("Startup", fmt.Sprintf("%s (%s)", app.StartupTime.Format(time.RFC3339), tmu.HumanDuration(time.Since(app.StartupTime))))
+	return rtm
+}
+
+func runtimeMemStats() any {
 	msm := linkedhashmap.NewLinkedHashMap[string, string]()
 
 	var ms runtime.MemStats
@@ -186,7 +207,7 @@ func debugMemStats() any {
 	return msm
 }
 
-func debugProfiles() any {
+func runtimeProfiles() any {
 	var pfs []*profile
 
 	for _, p := range pprof.Profiles() {
@@ -199,53 +220,11 @@ func debugProfiles() any {
 	return pfs
 }
 
-func debugTrace() any {
+func runtimeTrace() any {
 	trs := []*trace{
 		{"profile", traceDescriptions["profile"]},
 		{"symbol", traceDescriptions["symbol"]},
 		{"trace", traceDescriptions["trace"]},
 	}
 	return trs
-}
-
-func DebugIndex(c *xin.Context) {
-	h := handlers.H(c)
-
-	h["Server"] = debugServer()
-	h["Runtime"] = debugRuntime()
-	h["Performance"] = debugPerformance()
-	h["MemStats"] = debugMemStats()
-	h["Profiles"] = debugProfiles()
-	h["Traces"] = debugTrace()
-
-	c.HTML(http.StatusOK, "super/debug", h)
-}
-
-func DebugJSON(c *xin.Context) {
-	j := make(map[string]any)
-
-	j["server"] = debugServer()
-	j["runtime"] = debugRuntime()
-	j["performance"] = debugPerformance()
-	j["memstats"] = debugMemStats()
-
-	c.JSON(http.StatusOK, j)
-}
-
-func DebugPprof(c *xin.Context) {
-	w, r := c.Writer, c.Request
-
-	p := c.Param("prof")
-	switch p {
-	case "profile":
-		hprof.Profile(w, r)
-	case "symbol":
-		hprof.Symbol(w, r)
-	case "trace":
-		hprof.Trace(w, r)
-	case "cmdline":
-		hprof.Cmdline(w, r)
-	default:
-		hprof.Handler(p).ServeHTTP(w, r)
-	}
 }

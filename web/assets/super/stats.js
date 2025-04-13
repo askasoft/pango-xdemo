@@ -3,7 +3,7 @@
 		$d.find('.size').text(data.size);
 
 		var i = 0;
-		var $tb = $d.find('.stats > tbody').empty();
+		var $tb = $d.find('table > tbody').empty();
 		$.each(data.data, function(k, v) {
 			$tb.append($('<tr>').append(
 				$('<td>').text(++i),
@@ -41,8 +41,8 @@
 			stats_load($($(this).attr('href')));
 		});
 
-		$('.apstats button.reload').on('click', function() {
-			stats_load($(this).closest('.tab-pane'), true);
+		$('.s-stats button.reload').on('click', function() {
+			stats_load($(this).closest('.aps'), true);
 		});
 	}
 

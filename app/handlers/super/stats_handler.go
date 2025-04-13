@@ -19,15 +19,43 @@ import (
 	"github.com/askasoft/pango/xin"
 )
 
-func ApstatsIndex(c *xin.Context) {
+func StatsIndex(c *xin.Context) {
 	h := handlers.H(c)
-	h["JobStats"] = jobs.Stats()
+	h["Jobs"] = jobs.Stats()
 	h["Caches"] = []string{"configs", "schemas", "workers", "users", "afips"}
-	c.HTML(http.StatusOK, "super/apstats", h)
+	c.HTML(http.StatusOK, "super/stats", h)
 }
 
-func ApstatsJobs(c *xin.Context) {
+func StatsJobs(c *xin.Context) {
 	c.String(http.StatusOK, jobs.Stats())
+}
+
+func StatsCacheConfigs(c *xin.Context) {
+	statsCacheStats(c, app.CONFS, func(v map[string]string) string {
+		return num.Itoa(len(v))
+	})
+}
+
+func StatsCacheSchemas(c *xin.Context) {
+	statsCacheStats(c, app.SCMAS, bol.Btoa)
+}
+
+func StatsCacheWorkers(c *xin.Context) {
+	statsCacheStats(c, app.WORKS, func(v *gwp.WorkerPool) string {
+		return num.Itoa(v.CurWorks()) + "/" + num.Itoa(v.MaxWorks())
+	})
+}
+
+func StatsCacheUsers(c *xin.Context) {
+	statsCacheStats(c, app.USERS, func(v *models.User) string {
+		return v.Role + ": " + v.Name
+	})
+}
+
+func StatsCacheAfips(c *xin.Context) {
+	statsCacheStats(c, app.AFIPS, func(v int) string {
+		return num.Comma(v)
+	})
 }
 
 type CacheItem struct {
@@ -36,7 +64,7 @@ type CacheItem struct {
 	TTL string `json:"ttl,omitempty"`
 }
 
-func apCacheStats[K comparable, T any](c *xin.Context, ic *imc.Cache[K, T], fv func(T) string) {
+func statsCacheStats[K comparable, T any](c *xin.Context, ic *imc.Cache[K, T], fv func(T) string) {
 	limit := num.Atoi(c.Query("limit"), 1000)
 
 	now := time.Now()
@@ -53,32 +81,4 @@ func apCacheStats[K comparable, T any](c *xin.Context, ic *imc.Cache[K, T], fv f
 	})
 
 	c.JSON(http.StatusOK, xin.H{"size": cis.Len(), "data": cis})
-}
-
-func ApstatsConfigs(c *xin.Context) {
-	apCacheStats(c, app.CONFS, func(v map[string]string) string {
-		return num.Itoa(len(v))
-	})
-}
-
-func ApstatsSchemas(c *xin.Context) {
-	apCacheStats(c, app.SCMAS, bol.Btoa)
-}
-
-func ApstatsWorkers(c *xin.Context) {
-	apCacheStats(c, app.WORKS, func(v *gwp.WorkerPool) string {
-		return num.Itoa(v.CurWorks()) + "/" + num.Itoa(v.MaxWorks())
-	})
-}
-
-func ApstatsUsers(c *xin.Context) {
-	apCacheStats(c, app.USERS, func(v *models.User) string {
-		return v.Role + ": " + v.Name
-	})
-}
-
-func ApstatsAfips(c *xin.Context) {
-	apCacheStats(c, app.AFIPS, func(v int) string {
-		return num.Comma(v)
-	})
 }

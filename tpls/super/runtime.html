@@ -1,16 +1,16 @@
 {{template "main_header" .}}
 
 <style>
-.dbginfo .card {
-	min-width: 9rem;
-	max-width: 19rem;
-}
-.dbginfo .card .card-header {
-	white-space: nowrap;
-}
+	.runtime .card {
+		min-width: 9rem;
+		max-width: 19rem;
+	}
+	.runtime .card .card-header {
+		white-space: nowrap;
+	}
 </style>
 
-{{define "dbgcards"}}
+{{define "runcards"}}
 <div class="d-flex flex-row flex-wrap gap-3 p-2 mb-4">
 	{{range $e := .Entries}}
 	<div class="card">
@@ -23,20 +23,17 @@
 
 <div class="s-section">
 	<div class="s-section-head">
-		<h2>{{I "super.debug"}}<span>{{T .Loc "menu.super.debug"}}</span></h2>
+		<h2>{{I "super.runtime"}}<span>{{T .Loc "menu.super.runtime"}}</span></h2>
 	</div>
-	<div class="s-section-body dbginfo">
+	<div class="s-section-body runtime">
 		<h3><i class="fas fa-fw fa-server"></i> Server</h3>
-		{{template "dbgcards" .Server}}
+		{{template "runcards" .Server}}
 
-		<h3><i class="fab fa-fw fa-golang"></i> Runtime</h3>
-		{{template "dbgcards" .Runtime}}
-
-		<h3><i class="fas fa-fw fa-chart-area"></i> Performance</h3>
-		{{template "dbgcards" .Performance}}
+		<h3><i class="fab fa-fw fa-golang"></i> Process</h3>
+		{{template "runcards" .Process}}
 
 		<h3><i class="fas fa-fw fa-memory"></i> Memory</h3>
-		{{template "dbgcards" .MemStats}}
+		{{template "runcards" .MemStats}}
 
 		<h3><i class="fas fa-fw fa-bugs"></i> Profiles</h3>
 		<div class="d-flex flex-row flex-wrap gap-3 p-2 mb-4">

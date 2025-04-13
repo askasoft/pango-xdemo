@@ -42,10 +42,10 @@
 			{{if eq .CFG.tenant.multiple "true"}}
 			<li><a class="dropdown-item" href="{{.Base}}/s/tenants/">{{I "super.tenants"}}<span>{{T .Loc "menu.super.tenants"}}</span></a></li>
 			{{end}}
-			<li><a class="dropdown-item" href="{{.Base}}/s/apstats/">{{I "super.apstats"}}<span>{{T .Loc "menu.super.apstats"}}</span></a></li>
+			<li><a class="dropdown-item" href="{{.Base}}/s/stats/">{{I "super.stats"}}<span>{{T .Loc "menu.super.stats"}}</span></a></li>
 			<li><a class="dropdown-item" href="{{.Base}}/s/sql/">{{I "super.sql"}}<span>{{T .Loc "menu.super.sql"}}</span></a></li>
 			<li><a class="dropdown-item" href="{{.Base}}/s/shell/">{{I "super.shell"}}<span>{{T .Loc "menu.super.shell"}}</span></a></li>
-			<li><a class="dropdown-item" href="{{.Base}}/s/debug/">{{I "super.debug"}}<span>{{T .Loc "menu.super.debug"}}</span></a></li>
+			<li><a class="dropdown-item" href="{{.Base}}/s/runtime/">{{I "super.runtime"}}<span>{{T .Loc "menu.super.runtime"}}</span></a></li>
 			<li><hr class="dropdown-divider"></li>
 			{{end}}
 			{{if .AU.IsAdmin}}

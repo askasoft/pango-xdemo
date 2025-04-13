@@ -30,7 +30,7 @@
 						var $th = $sr.find('thead'), $tr = $('<tr>');
 						$tr.append($('<td>').text('##'));
 						$.each(d.columns, function(i, c) {
-							$tr.append($('<td>').text(c));
+							$tr.append($('<th>').text(c));
 						});
 						$th.append($tr);
 					}

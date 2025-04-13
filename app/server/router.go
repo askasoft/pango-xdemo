@@ -391,37 +391,11 @@ func addSuperHandlers(rg *xin.RouterGroup) {
 
 	rg.GET("/", super.Index)
 
-	addSuperDebugHandlers(rg.Group("/debug"))
-	addSuperShellHandlers(rg.Group("/shell"))
-	addSuperSqlHandlers(rg.Group("/sql"))
-	addSuperApstatsHandlers(rg.Group("/apstats"))
 	addSuperTenantHandlers(rg.Group("/tenants"))
-}
-
-func addSuperDebugHandlers(rg *xin.RouterGroup) {
-	rg.GET("/", super.DebugIndex)
-	rg.GET("/json", super.DebugJSON)
-	rg.GET("/pprof/:prof", super.DebugPprof)
-}
-
-func addSuperShellHandlers(rg *xin.RouterGroup) {
-	rg.GET("/", super.ShellIndex)
-	rg.POST("/exec", super.ShellExec)
-}
-
-func addSuperSqlHandlers(rg *xin.RouterGroup) {
-	rg.GET("/", super.SqlIndex)
-	rg.POST("/exec", super.SqlExec)
-}
-
-func addSuperApstatsHandlers(rg *xin.RouterGroup) {
-	rg.GET("/", super.ApstatsIndex)
-	rg.GET("/jobstats", super.ApstatsJobs)
-	rg.GET("/configs", super.ApstatsConfigs)
-	rg.GET("/schemas", super.ApstatsSchemas)
-	rg.GET("/workers", super.ApstatsWorkers)
-	rg.GET("/users", super.ApstatsUsers)
-	rg.GET("/afips", super.ApstatsAfips)
+	addSuperStatsHandlers(rg.Group("/stats"))
+	addSuperSqlHandlers(rg.Group("/sql"))
+	addSuperShellHandlers(rg.Group("/shell"))
+	addSuperRuntimeHandlers(rg.Group("/runtime"))
 }
 
 func addSuperTenantHandlers(rg *xin.RouterGroup) {
@@ -430,4 +404,29 @@ func addSuperTenantHandlers(rg *xin.RouterGroup) {
 	rg.POST("/create", super.TenantCreate)
 	rg.POST("/update", super.TenantUpdate)
 	rg.POST("/delete", super.TenantDelete)
+}
+
+func addSuperStatsHandlers(rg *xin.RouterGroup) {
+	rg.GET("/", super.StatsIndex)
+	rg.GET("/jobs", super.StatsJobs)
+	rg.GET("/configs", super.StatsCacheConfigs)
+	rg.GET("/schemas", super.StatsCacheSchemas)
+	rg.GET("/workers", super.StatsCacheWorkers)
+	rg.GET("/users", super.StatsCacheUsers)
+	rg.GET("/afips", super.StatsCacheAfips)
+}
+
+func addSuperSqlHandlers(rg *xin.RouterGroup) {
+	rg.GET("/", super.SqlIndex)
+	rg.POST("/exec", super.SqlExec)
+}
+
+func addSuperShellHandlers(rg *xin.RouterGroup) {
+	rg.GET("/", super.ShellIndex)
+	rg.POST("/exec", super.ShellExec)
+}
+
+func addSuperRuntimeHandlers(rg *xin.RouterGroup) {
+	rg.GET("/", super.RuntimeIndex)
+	rg.GET("/pprof/:prof", super.RuntimePprof)
 }
