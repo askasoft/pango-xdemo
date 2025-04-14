@@ -31,7 +31,7 @@ func AuditLogCsvExport(c *xin.Context) {
 	sqb.Select("audit_logs.*", "COALESCE(users.email, '') AS user")
 	sqb.From(tt.TableAuditLogs())
 	sqb.Join("LEFT JOIN " + tt.TableUsers() + " ON users.id = audit_logs.uid")
-	uqa.AddWhere(c, sqb)
+	uqa.AddFilters(c, sqb)
 	sqb.Order("id")
 	sql, args := sqb.Build()
 

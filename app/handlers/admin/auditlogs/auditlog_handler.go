@@ -19,7 +19,7 @@ import (
 type AuditLogQueryArg struct {
 	argutil.QueryArg
 
-	ID   int64    `json:"id" form:"id,strip"`
+	ID   string   `json:"id" form:"id,strip"`
 	User string   `json:"user" form:"user,strip"`
 	Func []string `json:"func" form:"func,strip"`
 }
@@ -35,14 +35,14 @@ func (alqa *AuditLogQueryArg) Normalize(c *xin.Context) {
 	alqa.Pager.Normalize(tbsutil.GetPagerLimits(c.Locale)...)
 }
 
-func (alqa *AuditLogQueryArg) HasFilter() bool {
-	return alqa.ID != 0 ||
+func (alqa *AuditLogQueryArg) HasFilters() bool {
+	return alqa.ID != "" ||
 		alqa.User != "" ||
 		len(alqa.Func) > 0
 }
 
-func (alqa *AuditLogQueryArg) AddWhere(c *xin.Context, sqb *sqlx.Builder) {
-	alqa.AddID(sqb, "audit_logs.id", alqa.ID)
+func (alqa *AuditLogQueryArg) AddFilters(c *xin.Context, sqb *sqlx.Builder) {
+	alqa.AddIDs(sqb, "audit_logs.id", alqa.ID)
 	alqa.AddIn(sqb, "audit_logs.func", alqa.Func)
 	alqa.AddLikes(sqb, "users.email", alqa.User)
 }
@@ -66,7 +66,7 @@ func countAuditLogs(c *xin.Context, alqa *AuditLogQueryArg) (total int, err erro
 	sqb.Count()
 	sqb.From(tt.TableAuditLogs())
 	sqb.Join("LEFT JOIN " + tt.TableUsers() + " ON users.id = audit_logs.uid")
-	alqa.AddWhere(c, sqb)
+	alqa.AddFilters(c, sqb)
 
 	sql, args := sqb.Build()
 
@@ -81,7 +81,7 @@ func findAuditLogs(c *xin.Context, alqa *AuditLogQueryArg) (alogs []*models.Audi
 	sqb.Select("audit_logs.*", "COALESCE(users.email, '') AS user")
 	sqb.From(tt.TableAuditLogs())
 	sqb.Join("LEFT JOIN " + tt.TableUsers() + " ON users.id = audit_logs.uid")
-	alqa.AddWhere(c, sqb)
+	alqa.AddFilters(c, sqb)
 	alqa.AddOrder(sqb, "id")
 	alqa.AddPager(sqb)
 	sql, args := sqb.Build()

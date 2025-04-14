@@ -179,7 +179,7 @@ func PetDeleteBatch(c *xin.Context) {
 		return
 	}
 
-	if !pqa.HasFilter() {
+	if !pqa.HasFilters() {
 		c.AddError(tbs.Error(c.Locale, "error.param.nofilter"))
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
@@ -191,7 +191,7 @@ func PetDeleteBatch(c *xin.Context) {
 	err = app.SDB.Transaction(func(tx *sqlx.Tx) (err error) {
 		sqb := tx.Builder()
 		sqb.Delete(tt.TablePets())
-		pqa.AddWhere(sqb)
+		pqa.AddFilters(sqb)
 		sql, args := sqb.Build()
 
 		r, err := tx.Exec(sql, args...)

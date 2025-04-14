@@ -29,7 +29,7 @@ func UserCsvExport(c *xin.Context) {
 	sqb := app.SDB.Builder()
 	sqb.Select()
 	sqb.From(tt.TableUsers())
-	uqa.AddWhere(c, sqb)
+	uqa.AddFilters(c, sqb)
 	sqb.Order("id")
 	sql, args := sqb.Build()
 

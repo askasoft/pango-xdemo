@@ -38,7 +38,7 @@
 				<div class="row">
 					<label class="col-md-2 col-xxl-1 col-form-label">{{T .Loc "auditlog.id"}}</label>
 					<div class="col-md-4 col-xxl-5">
-						<input name="id" type="text" class="form-control" textclear value="{{if ne .Q.ID 0}}{{.Q.ID}}{{end}}"/>
+						<input name="id" type="text" class="form-control" textclear value="{{.Q.ID}}"/>
 					</div>
 					<label class="col-md-2 col-xxl-1 col-form-label">{{T .Loc "auditlog.user"}}</label>
 					<div class="col-md-4 col-xxl-5">

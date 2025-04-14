@@ -30,7 +30,7 @@ func PetCsvExport(c *xin.Context) {
 	sqb := app.SDB.Builder()
 	sqb.Select()
 	sqb.From(tt.TablePets())
-	pq.AddWhere(sqb)
+	pq.AddFilters(sqb)
 	sqb.Order("id")
 	sql, args := sqb.Build()
 

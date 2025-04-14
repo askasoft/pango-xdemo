@@ -158,7 +158,7 @@ func UserDeleteBatch(c *xin.Context) {
 		return
 	}
 
-	if !uqa.HasFilter() {
+	if !uqa.HasFilters() {
 		c.AddError(tbs.Error(c.Locale, "error.param.nofilter"))
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
@@ -172,7 +172,7 @@ func UserDeleteBatch(c *xin.Context) {
 		sqb := tx.Builder()
 		sqb.Delete(tt.TableUsers())
 		sqb.Where("id <> ?", au.ID)
-		uqa.AddWhere(c, sqb)
+		uqa.AddFilters(c, sqb)
 		sql, args := sqb.Build()
 
 		r, err := tx.Exec(sql, args...)

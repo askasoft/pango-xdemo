@@ -18,19 +18,19 @@ import (
 type PetQueryArg struct {
 	argutil.QueryArg
 
-	ID        int64     `form:"id,strip" json:"id"`
-	Name      string    `form:"name,strip" json:"name"`
-	BornFrom  time.Time `form:"born_from,strip" json:"born_from"`
-	BornTo    time.Time `form:"born_to,strip" json:"born_to"`
-	Gender    []string  `form:"gender,strip" json:"gender"`
-	Origin    []string  `form:"origin,strip" json:"origin"`
-	Habits    []string  `form:"habits,strip" json:"habits"`
-	Temper    []string  `form:"temper,strip" json:"temper"`
-	AmountMin string    `form:"amount_min" json:"amount_min"`
-	AmountMax string    `form:"amount_max" json:"amount_max"`
-	PriceMin  string    `form:"price_min" json:"price_min"`
-	PriceMax  string    `form:"price_max" json:"price_max"`
-	ShopName  string    `form:"shop_name,strip" json:"shop_name"`
+	ID        string    `form:"id,strip"`
+	Name      string    `form:"name,strip"`
+	BornFrom  time.Time `form:"born_from,strip"`
+	BornTo    time.Time `form:"born_to,strip" validate:"omitempty,gtefield=BornFrom"`
+	Gender    []string  `form:"gender,strip"`
+	Origin    []string  `form:"origin,strip"`
+	Habits    []string  `form:"habits,strip"`
+	Temper    []string  `form:"temper,strip"`
+	AmountMin string    `form:"amount_min"`
+	AmountMax string    `form:"amount_max"`
+	PriceMin  string    `form:"price_min"`
+	PriceMax  string    `form:"price_max"`
+	ShopName  string    `form:"shop_name,strip"`
 }
 
 var petListColumns = []string{
@@ -54,8 +54,8 @@ func (pqa *PetQueryArg) Normalize(c *xin.Context) {
 	pqa.Pager.Normalize(tbsutil.GetPagerLimits(c.Locale)...)
 }
 
-func (pqa *PetQueryArg) HasFilter() bool {
-	return pqa.ID != 0 ||
+func (pqa *PetQueryArg) HasFilters() bool {
+	return pqa.ID != "" ||
 		pqa.Name != "" ||
 		len(pqa.Gender) > 0 ||
 		len(pqa.Origin) > 0 ||
@@ -68,8 +68,8 @@ func (pqa *PetQueryArg) HasFilter() bool {
 		pqa.ShopName != ""
 }
 
-func (pqa *PetQueryArg) AddWhere(sqb *sqlx.Builder) {
-	pqa.AddID(sqb, "id", pqa.ID)
+func (pqa *PetQueryArg) AddFilters(sqb *sqlx.Builder) {
+	pqa.AddIDs(sqb, "id", pqa.ID)
 	pqa.AddIn(sqb, "gender", pqa.Gender)
 	pqa.AddIn(sqb, "origin", pqa.Origin)
 	pqa.AddIn(sqb, "temper", pqa.Temper)
@@ -100,7 +100,7 @@ func countPets(tt *tenant.Tenant, pqa *PetQueryArg) (total int, err error) {
 	sqb := app.SDB.Builder()
 	sqb.Count()
 	sqb.From(tt.TablePets())
-	pqa.AddWhere(sqb)
+	pqa.AddFilters(sqb)
 	sql, args := sqb.Build()
 
 	err = app.SDB.Get(&total, sql, args...)
@@ -111,7 +111,7 @@ func findPets(tt *tenant.Tenant, pqa *PetQueryArg) (pets []*models.Pet, err erro
 	sqb := app.SDB.Builder()
 	sqb.Select(petListColumns...)
 	sqb.From(tt.TablePets())
-	pqa.AddWhere(sqb)
+	pqa.AddFilters(sqb)
 	pqa.AddOrder(sqb, "id")
 	pqa.AddPager(sqb)
 	sql, args := sqb.Build()

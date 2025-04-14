@@ -4,8 +4,6 @@ import (
 	"time"
 
 	"github.com/askasoft/pango-xdemo/app/utils/sqlxutil"
-	"github.com/askasoft/pango/num"
-	"github.com/askasoft/pango/sqx/pqx"
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/xvw/args"
 )
@@ -28,49 +26,25 @@ func (qa *QueryArg) AddLikes(sqb *sqlx.Builder, column string, search string) {
 }
 
 func (qa *QueryArg) AddIn(sqb *sqlx.Builder, column string, values []string) {
-	if len(values) > 0 {
-		sqb.In(column, values)
-	}
+	sqlxutil.AddIn(sqb, column, values)
 }
 
-func (qa *QueryArg) AddID(sqb *sqlx.Builder, column string, id int64) {
-	if id != 0 {
-		sqb.Where(column+" = ?", id)
-	}
+func (qa *QueryArg) AddIDs(sqb *sqlx.Builder, column string, id string) {
+	sqlxutil.AddIDs(sqb, column, id)
 }
 
 func (qa *QueryArg) AddRanget(sqb *sqlx.Builder, column string, tmin, tmax time.Time) {
-	if !tmin.IsZero() && !tmax.IsZero() {
-		sqb.Where(column+" BETWEEN ? AND ?", tmin, tmax)
-	} else if !tmin.IsZero() {
-		sqb.Where(column+" >= ?", tmin)
-	} else if !tmax.IsZero() {
-		sqb.Where(column+" <= ?", tmax)
-	}
+	sqlxutil.AddRanget(sqb, column, tmin, tmax)
 }
 
 func (qa *QueryArg) AddRangei(sqb *sqlx.Builder, column string, smin, smax string) {
-	if smin != "" && smax != "" {
-		sqb.Where(column+" BETWEEN ? AND ?", smin, smax)
-	} else if smin != "" {
-		sqb.Where(column+" >= ?", num.Atoi(smin))
-	} else if smax != "" {
-		sqb.Where(column+" <= ?", num.Atoi(smax))
-	}
+	sqlxutil.AddRangei(sqb, column, smin, smax)
 }
 
 func (qa *QueryArg) AddRangef(sqb *sqlx.Builder, column string, smin, smax string) {
-	if smin != "" && smax != "" {
-		sqb.Where(column+" BETWEEN ? AND ?", smin, smax)
-	} else if smin != "" {
-		sqb.Where(column+" >= ?", num.Atof(smin))
-	} else if smax != "" {
-		sqb.Where(column+" <= ?", num.Atof(smax))
-	}
+	sqlxutil.AddRangef(sqb, column, smin, smax)
 }
 
 func (qa *QueryArg) AddOverlap(sqb *sqlx.Builder, column string, values []string) {
-	if len(values) > 0 {
-		sqb.Where(column+" && ?", pqx.StringArray(values))
-	}
+	sqlxutil.AddOverlap(sqb, column, values)
 }

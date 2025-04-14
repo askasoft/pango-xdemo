@@ -17,12 +17,12 @@ import (
 type UserQueryArg struct {
 	argutil.QueryArg
 
-	ID     int64    `json:"id" form:"id,strip"`
-	Name   string   `json:"name" form:"name,strip"`
-	Email  string   `json:"email" form:"email,strip"`
-	Role   []string `json:"role" form:"role,strip"`
-	Status []string `json:"status" form:"status,strip"`
-	CIDR   string   `json:"cidr" form:"cidr,strip"`
+	ID     string   `form:"id,strip"`
+	Name   string   `form:"name,strip"`
+	Email  string   `form:"email,strip"`
+	Role   []string `form:"role,strip"`
+	Status []string `form:"status,strip"`
+	CIDR   string   `form:"cidr,strip"`
 }
 
 func (uqa *UserQueryArg) Normalize(c *xin.Context) {
@@ -39,8 +39,8 @@ func (uqa *UserQueryArg) Normalize(c *xin.Context) {
 	uqa.Pager.Normalize(tbsutil.GetPagerLimits(c.Locale)...)
 }
 
-func (uqa *UserQueryArg) HasFilter() bool {
-	return uqa.ID != 0 ||
+func (uqa *UserQueryArg) HasFilters() bool {
+	return uqa.ID != "" ||
 		uqa.Name != "" ||
 		uqa.Email != "" ||
 		len(uqa.Role) > 0 ||
@@ -48,11 +48,11 @@ func (uqa *UserQueryArg) HasFilter() bool {
 		uqa.CIDR != ""
 }
 
-func (uqa *UserQueryArg) AddWhere(c *xin.Context, sqb *sqlx.Builder) {
+func (uqa *UserQueryArg) AddFilters(c *xin.Context, sqb *sqlx.Builder) {
 	au := tenant.AuthUser(c)
 	sqb.Where("role >= ?", au.Role)
 
-	uqa.AddID(sqb, "id", uqa.ID)
+	uqa.AddIDs(sqb, "id", uqa.ID)
 	uqa.AddIn(sqb, "status", uqa.Status)
 	uqa.AddIn(sqb, "role", uqa.Role)
 	uqa.AddLikes(sqb, "name", uqa.Name)
@@ -80,7 +80,7 @@ func countUsers(c *xin.Context, uqa *UserQueryArg) (total int, err error) {
 	sqb := app.SDB.Builder()
 	sqb.Count()
 	sqb.From(tt.TableUsers())
-	uqa.AddWhere(c, sqb)
+	uqa.AddFilters(c, sqb)
 
 	sql, args := sqb.Build()
 
@@ -94,7 +94,7 @@ func findUsers(c *xin.Context, uqa *UserQueryArg) (usrs []*models.User, err erro
 	sqb := app.SDB.Builder()
 	sqb.Select()
 	sqb.From(tt.TableUsers())
-	uqa.AddWhere(c, sqb)
+	uqa.AddFilters(c, sqb)
 	uqa.AddOrder(sqb, "id")
 	uqa.AddPager(sqb)
 	sql, args := sqb.Build()

@@ -60,7 +60,7 @@ func AuditLogDeleteBatch(c *xin.Context) {
 		return
 	}
 
-	if !alqa.HasFilter() {
+	if !alqa.HasFilters() {
 		c.AddError(tbs.Error(c.Locale, "error.param.nofilter"))
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
@@ -74,7 +74,7 @@ func AuditLogDeleteBatch(c *xin.Context) {
 		sqa.Select("audit_logs.id")
 		sqa.From(tt.TableAuditLogs())
 		sqa.Join("LEFT JOIN " + tt.TableUsers() + " ON users.id = audit_logs.uid")
-		alqa.AddWhere(c, sqa)
+		alqa.AddFilters(c, sqa)
 
 		sqb := tx.Builder()
 		sqb.Delete(tt.TableAuditLogs())
