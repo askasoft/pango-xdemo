@@ -28,6 +28,7 @@ var tables = []any{
 	&xjm.JobChain{},
 	&models.User{},
 	&models.Config{},
+	&models.AuditLog{},
 	&models.Pet{},
 }
 

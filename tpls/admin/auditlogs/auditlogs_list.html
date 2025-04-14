@@ -1,0 +1,31 @@
+{{template "head_pager" .}}
+
+<form autocomplete="off" class="table-responsive">
+<table id="auditlogs_table" class="table ui-sortable s-table"
+	data-spy="sortable" data-sorted-col="{{.Q.Sorter.Col}}" data-sorted-dir="{{.Q.Sorter.Dir}}">
+	<thead>
+		<tr>
+			<th class="check"><input type="checkbox" checkall="#auditlogs_table td.check > input"/></th>
+			<th class="id sortable" data-sort-col="id">{{T .Loc "auditlog.id"}}</th>
+			<th class="date sortable" data-sort-col="date">{{T .Loc "auditlog.date"}}</th>
+			<th class="user sortable" data-sort-col="user">{{T .Loc "auditlog.user"}}</th>
+			<th class="funact sortable" data-sort-col="func,action">{{T .Loc "auditlog.func"}} / {{T .Loc "auditlog.action"}} </th>
+			<th class="detail">{{T .Loc "auditlog.detail"}}</th>
+		</tr>
+	</thead>
+	<tbody>
+		{{range $al := .AuditLogs}}
+		<tr id="al_{{$al.ID}}">
+			<td class="check"><input type="checkbox" value="{{$al.ID}}"/></td>
+			<td class="id">{{$al.ID}}</td>
+			<td class="date">{{TIME $al.Date}}</td>
+			<td class="user">{{$al.User}}</td>
+			<td class="funact">{{$.AuditLogFuncMap.SafeGet $al.Func $al.Func}} / {{$al.Action}}</td>
+			<td class="detail">{{$al.Detail}}</td>
+		</tr>
+		{{end}}
+	</tbody>
+</table>
+</form>
+
+{{template "foot_pager" .}}

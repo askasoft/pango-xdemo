@@ -1,9 +1,9 @@
 {{define "jobchain_jobarg"}}
 	{{if eq .JobName "PetClear"}}
 		{{template "pet_clear_params" .}}
-	{{else if eq .JobName "PetCatCreate"}}
+	{{else if eq .JobName "PetCatGen"}}
 		{{template "pet_create_params" .}}
-	{{else if eq .JobName "PetDogCreate"}}
+	{{else if eq .JobName "PetDogGen"}}
 		{{template "pet_create_params" .}}
 	{{end}}
 {{end}}

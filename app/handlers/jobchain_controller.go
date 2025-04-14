@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/jobs"
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango/asg"
@@ -167,6 +168,7 @@ func (jcc *JobChainController) Start(c *xin.Context) {
 
 func (jcc *JobChainController) StartJob(c *xin.Context) {
 	tt := tenant.FromCtx(c)
+	au := tenant.AuthUser(c)
 
 	tjc := tt.JC()
 	jc, err := tjc.FindJobChain(jcc.ChainName, false, xjm.JobUndoneStatus...)
@@ -190,6 +192,8 @@ func (jcc *JobChainController) StartJob(c *xin.Context) {
 		c.JSON(http.StatusInternalServerError, E(c))
 		return
 	}
+
+	_ = tt.AddAuditLog(app.SDB, au.ID, jobs.JobChainStartAuditLogs[jcc.ChainName])
 
 	c.JSON(http.StatusOK, xin.H{
 		"cid":     cid,

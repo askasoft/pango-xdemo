@@ -45,12 +45,16 @@ func (sm Schema) TableJobChains() string {
 	return sm.Table("job_chains")
 }
 
+func (sm Schema) TableUsers() string {
+	return sm.Table("users")
+}
+
 func (sm Schema) TableConfigs() string {
 	return sm.Table("configs")
 }
 
-func (sm Schema) TableUsers() string {
-	return sm.Table("users")
+func (sm Schema) TableAuditLogs() string {
+	return sm.Table("audit_logs")
 }
 
 func (sm Schema) TablePets() string {

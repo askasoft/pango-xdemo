@@ -18,7 +18,7 @@ func newPetResetJobChainController(c *xin.Context) handlers.JobChainCtrl {
 			Template:  "demos/pets/pet_reset_jobchain",
 		},
 	}
-	jcc.InitChainJobs(c, jobs.JobNamePetClear, jobs.JobNamePetCatCreate, jobs.JobNamePetDogCreate)
+	jcc.InitChainJobs(c, jobs.JobNamePetClear, jobs.JobNamePetCatGen, jobs.JobNamePetDogGen)
 	return jcc
 }
 

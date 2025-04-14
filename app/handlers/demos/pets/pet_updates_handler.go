@@ -10,155 +10,15 @@ import (
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango-xdemo/app/utils/argutil"
-	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
 	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
+	"github.com/askasoft/pango/asg"
+	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/sqx/pqx"
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/tbs"
 	"github.com/askasoft/pango/xin"
 )
-
-func petBind(c *xin.Context) *PetWithFile {
-	pet := &PetWithFile{}
-	if err := c.Bind(pet); err != nil {
-		vadutil.AddBindErrors(c, err, "pet.")
-	}
-
-	if pet.Gender != "" {
-		pgm := tbsutil.GetPetGenderMap(c.Locale)
-		if !pgm.Contains(pet.Gender) {
-			c.AddError(vadutil.ErrInvalidField(c, "pet.", "gender"))
-		}
-	}
-
-	if pet.Origin != "" {
-		pom := tbsutil.GetPetOriginMap(c.Locale)
-		if !pom.Contains(pet.Origin) {
-			c.AddError(vadutil.ErrInvalidField(c, "pet.", "origin"))
-		}
-	}
-
-	if pet.Temper != "" {
-		ptm := tbsutil.GetPetTemperMap(c.Locale)
-		if !ptm.Contains(pet.Temper) {
-			c.AddError(vadutil.ErrInvalidField(c, "pet.", "temper"))
-		}
-	}
-
-	if len(pet.Habits) > 0 {
-		phm := tbsutil.GetPetHabitsMap(c.Locale)
-		for _, h := range pet.Habits {
-			if !phm.Contains(h) {
-				c.AddError(vadutil.ErrInvalidField(c, "pet.", "habits"))
-				break
-			}
-		}
-	}
-
-	return pet
-}
-
-func PetCreate(c *xin.Context) {
-	pet := petBind(c)
-	if len(c.Errors) > 0 {
-		c.JSON(http.StatusBadRequest, handlers.E(c))
-		return
-	}
-
-	pet.ID = 0
-	pet.CreatedAt = time.Now()
-	pet.UpdatedAt = pet.CreatedAt
-
-	tt := tenant.FromCtx(c)
-
-	err := app.SDB.Transaction(func(tx *sqlx.Tx) error {
-		sqb := tx.Builder()
-		sqb.Insert(tt.TablePets())
-		sqb.StructNames(&pet.Pet, "id")
-		if !tx.SupportLastInsertID() {
-			sqb.Returns("id")
-		}
-		sql := sqb.SQL()
-
-		pid, err := tx.NamedCreate(sql, pet)
-		if err != nil {
-			return err
-		}
-
-		pet.ID = pid
-		if pet.File != "" {
-			fid := pet.PhotoPath()
-			sfs := tt.SFS(tx)
-			if err := sfs.DeleteFile(fid); err != nil {
-				return err
-			}
-			return sfs.MoveFile(pet.File, fid)
-		}
-		return nil
-	})
-	if err != nil {
-		c.AddError(err)
-		c.JSON(http.StatusInternalServerError, handlers.E(c))
-		return
-	}
-
-	c.JSON(http.StatusOK, xin.H{
-		"success": tbs.GetText(c.Locale, "success.created"),
-		"pet":     pet,
-	})
-}
-
-func PetUpdate(c *xin.Context) {
-	pet := petBind(c)
-	if pet.ID == 0 {
-		c.AddError(vadutil.ErrInvalidID(c))
-	}
-	if len(c.Errors) > 0 {
-		c.JSON(http.StatusBadRequest, handlers.E(c))
-		return
-	}
-
-	pet.UpdatedAt = time.Now()
-
-	tt := tenant.FromCtx(c)
-
-	var cnt int64
-	err := app.SDB.Transaction(func(tx *sqlx.Tx) error {
-		sqb := tx.Builder()
-		sqb.Update(tt.TablePets())
-		sqb.StructNames(&pet.Pet, "id", "created_at")
-		sqb.Where("id = :id")
-		sql := sqb.SQL()
-
-		r, err := tx.NamedExec(sql, pet)
-		if err != nil {
-			return err
-		}
-
-		cnt, _ = r.RowsAffected()
-
-		if pet.File != "" {
-			fid := pet.PhotoPath()
-			sfs := tt.SFS(tx)
-			if err := sfs.DeleteFile(fid); err != nil {
-				return err
-			}
-			return sfs.MoveFile(pet.File, fid)
-		}
-		return nil
-	})
-	if err != nil {
-		c.AddError(err)
-		c.JSON(http.StatusInternalServerError, handlers.E(c))
-		return
-	}
-
-	c.JSON(http.StatusOK, xin.H{
-		"success": tbs.Format(c.Locale, "pet.success.updates", cnt),
-		"pet":     pet,
-	})
-}
 
 type PetUpdatesArg struct {
 	ID     string     `json:"id,omitempty" form:"id,strip"`
@@ -202,40 +62,51 @@ func PetUpdates(c *xin.Context) {
 
 	tt := tenant.FromCtx(c)
 
-	sqb := app.SDB.Builder()
-	sqb.Update(tt.TablePets())
+	var cnt int64
+	err := app.SDB.Transaction(func(tx *sqlx.Tx) error {
+		sqb := tx.Builder()
+		sqb.Update(tt.TablePets())
 
-	if pua.Gender != "" {
-		sqb.Setc("gender", pua.Gender)
-	}
-	if pua.BornAt != nil {
-		sqb.Setc("born_at", *pua.BornAt)
-	}
-	if pua.Origin != "" {
-		sqb.Setc("origin", pua.Origin)
-	}
-	if pua.Temper != "" {
-		sqb.Setc("temper", pua.Temper)
-	}
-	if pua.Habits != nil {
-		sqb.Setc("habits", pqx.StringArray(str.Strips(*pua.Habits)))
-	}
-	sqb.Setc("updated_at", time.Now())
+		if pua.Gender != "" {
+			sqb.Setc("gender", pua.Gender)
+		}
+		if pua.BornAt != nil {
+			sqb.Setc("born_at", *pua.BornAt)
+		}
+		if pua.Origin != "" {
+			sqb.Setc("origin", pua.Origin)
+		}
+		if pua.Temper != "" {
+			sqb.Setc("temper", pua.Temper)
+		}
+		if pua.Habits != nil {
+			sqb.Setc("habits", pqx.StringArray(str.Strips(*pua.Habits)))
+		}
+		sqb.Setc("updated_at", time.Now())
 
-	if len(ids) > 0 {
-		sqb.In("id", ids)
-	}
+		if len(ids) > 0 {
+			sqb.In("id", ids)
+		}
 
-	sql, args := sqb.Build()
+		sql, args := sqb.Build()
 
-	r, err := app.SDB.Exec(sql, args...)
+		r, err := app.SDB.Exec(sql, args...)
+		if err != nil {
+			return err
+		}
+
+		cnt, _ = r.RowsAffected()
+		if cnt > 0 {
+			sql = tx.Binder().Explain(sql, args...)
+			return tt.AddAuditLog(tx, 0, models.AL_PETS_UPDATES, num.Ltoa(cnt), str.SubstrAfter(sql, "WHERE"))
+		}
+		return nil
+	})
 	if err != nil {
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return
 	}
-
-	cnt, _ := r.RowsAffected()
 
 	c.JSON(http.StatusOK, xin.H{
 		"success": tbs.Format(c.Locale, "pet.success.updates", cnt),
@@ -281,8 +152,13 @@ func PetDeletes(c *xin.Context) {
 		}
 
 		cnt, _ = r.RowsAffected()
-
-		return tt.ResetSequence(tx, "pets")
+		if cnt > 0 {
+			if err := tt.AddAuditLog(tx, 0, models.AL_PETS_DELETES, num.Ltoa(cnt), asg.Join(ids, ", ")); err != nil {
+				return err
+			}
+			return tt.ResetSequence(tx, "pets")
+		}
+		return nil
 	})
 	if err != nil {
 		c.AddError(err)
@@ -324,8 +200,14 @@ func PetDeleteBatch(c *xin.Context) {
 		}
 
 		cnt, _ = r.RowsAffected()
-
-		return tt.ResetSequence(tx, "pets")
+		if cnt > 0 {
+			sql = tx.Binder().Explain(sql, args...)
+			if err := tt.AddAuditLog(tx, 0, models.AL_PETS_DELETES, num.Ltoa(cnt), str.SubstrAfter(sql, "WHERE")); err != nil {
+				return err
+			}
+			return tt.ResetSequence(tx, "pets")
+		}
+		return nil
 	})
 	if err != nil {
 		c.AddError(err)

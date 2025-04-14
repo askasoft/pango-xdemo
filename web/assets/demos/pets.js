@@ -270,7 +270,7 @@
 	//----------------------------------------------------
 	// deletes (batch)
 	//
-	function pets_deletebat(all) {
+	function pets_deletebat() {
 		var $p = $('#pets_deletebat_popup').popup('update', { keyboard: false });
 
 		$.ajax({

@@ -26,8 +26,8 @@
 			<li><a class="dropdown-item" href="{{.Base}}/500/">{{I "error"}}<span>500</span></a></li>
 			<li><hr class="dropdown-divider"></li>
 			<li><a class="dropdown-item" href="{{.Base}}/demos/pets/">{{I "demos.pets.list"}}<span>{{T .Loc "menu.demos.pets.list"}}</span></a></li>
-			<li><a class="dropdown-item" href="{{.Base}}/demos/pets/jobs/catcreate/">{{I "demos.pets.create.cat"}}<span>{{T .Loc "menu.demos.pets.create.cat"}}</span></a></li>
-			<li><a class="dropdown-item" href="{{.Base}}/demos/pets/jobs/dogcreate/">{{I "demos.pets.create.dog"}}<span>{{T .Loc "menu.demos.pets.create.dog"}}</span></a></li>
+			<li><a class="dropdown-item" href="{{.Base}}/demos/pets/jobs/catgen/">{{I "demos.pets.create.cat"}}<span>{{T .Loc "menu.demos.pets.create.cat"}}</span></a></li>
+			<li><a class="dropdown-item" href="{{.Base}}/demos/pets/jobs/doggen/">{{I "demos.pets.create.dog"}}<span>{{T .Loc "menu.demos.pets.create.dog"}}</span></a></li>
 			<li><a class="dropdown-item" href="{{.Base}}/demos/pets/jobs/clear/">{{I "demos.pets.clear"}}<span>{{T .Loc "menu.demos.pets.clear"}}</span></a></li>
 			<li><a class="dropdown-item" href="{{.Base}}/demos/pets/jobs/reset/">{{I "demos.pets.reset"}}<span>{{T .Loc "menu.demos.pets.reset"}}</span></a></li>
 		</ul>
@@ -51,6 +51,7 @@
 			{{if .AU.IsAdmin}}
 			<li><a class="dropdown-item" href="{{.Base}}/a/users/">{{I "admin.users"}}<span>{{T .Loc "menu.admin.users"}}</span></a></li>
 			<li><a class="dropdown-item" href="{{.Base}}/a/configs/">{{I "admin.configs"}}<span>{{T .Loc "menu.admin.configs"}}</span></a></li>
+			<li><a class="dropdown-item" href="{{.Base}}/a/auditlogs/">{{I "admin.auditlogs"}}<span>{{T .Loc "menu.admin.auditlogs"}}</span></a></li>
 			<li><hr class="dropdown-divider"></li>
 			{{end}}
 			<li><a class="dropdown-item" href="{{.Base}}/u/pwdchg/">{{I "user.pwdchg"}}<span>{{T .Loc "menu.user.pwdchg"}}</span></a></li>

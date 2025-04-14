@@ -13,82 +13,82 @@ import (
 )
 
 func init() {
-	jobs.RegisterJobRun(jobs.JobNamePetCatCreate, NewPetCatCreateJob)
-	jobs.RegisterJobArg(jobs.JobNamePetCatCreate, NewPetCreateArg)
-	jobs.RegisterJobRun(jobs.JobNamePetDogCreate, NewPetDogCreateJob)
-	jobs.RegisterJobArg(jobs.JobNamePetDogCreate, NewPetCreateArg)
+	jobs.RegisterJobRun(jobs.JobNamePetCatGen, NewPetCatGenJob)
+	jobs.RegisterJobArg(jobs.JobNamePetCatGen, NewPetGenerateArg)
+	jobs.RegisterJobRun(jobs.JobNamePetDogGen, NewPetDogGenJob)
+	jobs.RegisterJobArg(jobs.JobNamePetDogGen, NewPetGenerateArg)
 }
 
-type PetCreateArg struct {
+type PetGenerateArg struct {
 	jobs.ArgChain
 
 	Items int `json:"items,omitempty" form:"items" validate:"min=1,max=1000"`
 	Delay int `json:"delay,omitempty" form:"delay" validate:"min=0,max=1000"`
 }
 
-func NewPetCreateArg(tt *tenant.Tenant) jobs.IArg {
-	pca := &PetCreateArg{}
-	pca.Items = 100
-	pca.Delay = 200
-	return pca
+func NewPetGenerateArg(tt *tenant.Tenant) jobs.IArg {
+	pga := &PetGenerateArg{}
+	pga.Items = 100
+	pga.Delay = 200
+	return pga
 }
 
-func (pca *PetCreateArg) Bind(c *xin.Context) error {
-	return c.Bind(pca)
+func (pga *PetGenerateArg) Bind(c *xin.Context) error {
+	return c.Bind(pga)
 }
 
-type PetCreateJob struct {
-	*jobs.JobRunner[PetCreateArg]
+type PetGenerateJob struct {
+	*jobs.JobRunner[PetGenerateArg]
 
 	jobs.JobState
 
 	gen *PetGenerator
 }
 
-func NewPetCatCreateJob(tt *tenant.Tenant, job *xjm.Job) jobs.IRun {
-	pcj := newPetCreateJob(tt, job)
-	pcj.gen = NewPetGenerator(pcj.Tenant, "cat")
-	return pcj
+func NewPetCatGenJob(tt *tenant.Tenant, job *xjm.Job) jobs.IRun {
+	pgj := newPetGenerateJob(tt, job)
+	pgj.gen = NewPetGenerator(pgj.Tenant, "cat")
+	return pgj
 }
 
-func NewPetDogCreateJob(tt *tenant.Tenant, job *xjm.Job) jobs.IRun {
-	pcj := newPetCreateJob(tt, job)
-	pcj.gen = NewPetGenerator(pcj.Tenant, "dog")
-	return pcj
+func NewPetDogGenJob(tt *tenant.Tenant, job *xjm.Job) jobs.IRun {
+	pgj := newPetGenerateJob(tt, job)
+	pgj.gen = NewPetGenerator(pgj.Tenant, "dog")
+	return pgj
 }
 
-func newPetCreateJob(tt *tenant.Tenant, job *xjm.Job) *PetCreateJob {
-	pcj := &PetCreateJob{}
+func newPetGenerateJob(tt *tenant.Tenant, job *xjm.Job) *PetGenerateJob {
+	pgj := &PetGenerateJob{}
 
-	pcj.JobRunner = jobs.NewJobRunner[PetCreateArg](tt, job)
+	pgj.JobRunner = jobs.NewJobRunner[PetGenerateArg](tt, job)
 
-	pcj.ArgChain = pcj.Arg.ArgChain
+	pgj.ArgChain = pgj.Arg.ArgChain
 
-	return pcj
+	return pgj
 }
 
-func (pcj *PetCreateJob) Run() {
-	if err := pcj.Checkout(); err != nil {
-		pcj.Done(err)
+func (pgj *PetGenerateJob) Run() {
+	if err := pgj.Checkout(); err != nil {
+		pgj.Done(err)
 		return
 	}
 
-	if pcj.Step == 0 {
-		pcj.Total = pcj.Arg.Items
+	if pgj.Step == 0 {
+		pgj.Total = pgj.Arg.Items
 	}
 
-	ctx, cancel := pcj.Running()
+	ctx, cancel := pgj.Running()
 	defer cancel(nil)
 
-	err := pcj.run(ctx)
+	err := pgj.run(ctx)
 	cancel(err)
 
 	err = errutil.ContextCause(ctx, err)
-	pcj.Done(err)
+	pgj.Done(err)
 }
 
-func (pcj *PetCreateJob) run(ctx context.Context) error {
-	delay := time.Millisecond * time.Duration(max(10, pcj.Arg.Delay))
+func (pgj *PetGenerateJob) run(ctx context.Context) error {
+	delay := time.Millisecond * time.Duration(max(10, pgj.Arg.Delay))
 	timer := time.NewTimer(delay)
 
 	for {
@@ -96,15 +96,15 @@ func (pcj *PetCreateJob) run(ctx context.Context) error {
 		case <-ctx.Done():
 			return ctx.Err()
 		case <-timer.C:
-			if pcj.Step >= pcj.Total {
+			if pgj.Step >= pgj.Total {
 				return xjm.ErrJobComplete
 			}
 
-			if err := pcj.gen.Create(pcj.Logger, app.SDB, &pcj.JobState); err != nil {
+			if err := pgj.gen.Create(pgj.Logger, app.SDB, &pgj.JobState); err != nil {
 				return err
 			}
 
-			if err := pcj.SetState(&pcj.JobState); err != nil {
+			if err := pgj.SetState(&pgj.JobState); err != nil {
 				return err
 			}
 

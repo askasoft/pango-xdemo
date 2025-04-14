@@ -47,6 +47,21 @@ CREATE TABLE "SCHEMA"."job_chains" (
 );
 CREATE INDEX IF NOT EXISTS "idx_job_chains_name" ON "SCHEMA"."job_chains" ("name");
 ---------------------------------;
+CREATE TABLE "SCHEMA"."users" (
+	"id" bigserial NOT NULL,
+	"name" varchar(100) NOT NULL,
+	"email" varchar(200) NOT NULL,
+	"password" varchar(200) NOT NULL,
+	"role" varchar(1) NOT NULL,
+	"status" varchar(1) NOT NULL,
+	"cidr" text NOT NULL,
+	"secret" bigint NOT NULL,
+	"created_at" timestamptz NOT NULL,
+	"updated_at" timestamptz NOT NULL,
+	PRIMARY KEY ("id")
+);
+CREATE UNIQUE INDEX IF NOT EXISTS "idx_users_email" ON "SCHEMA"."users" ("email");
+---------------------------------;
 CREATE TABLE "SCHEMA"."configs" (
 	"name" varchar(64) NOT NULL,
 	"value" text NOT NULL,
@@ -62,20 +77,15 @@ CREATE TABLE "SCHEMA"."configs" (
 	PRIMARY KEY ("name")
 );
 ---------------------------------;
-CREATE TABLE "SCHEMA"."users" (
+CREATE TABLE "SCHEMA"."audit_logs" (
 	"id" bigserial NOT NULL,
-	"name" varchar(100) NOT NULL,
-	"email" varchar(200) NOT NULL,
-	"password" varchar(200) NOT NULL,
-	"role" varchar(1) NOT NULL,
-	"status" varchar(1) NOT NULL,
-	"cidr" text NOT NULL,
-	"secret" bigint NOT NULL,
-	"created_at" timestamptz NOT NULL,
-	"updated_at" timestamptz NOT NULL,
+	"uid" bigint NOT NULL,
+	"date" timestamptz NOT NULL,
+	"func" varchar(32) NOT NULL,
+	"action" varchar(32) NOT NULL,
+	"params" text [],
 	PRIMARY KEY ("id")
 );
-CREATE UNIQUE INDEX IF NOT EXISTS "idx_users_email" ON "SCHEMA"."users" ("email");
 ---------------------------------;
 CREATE TABLE "SCHEMA"."pets" (
 	"id" bigserial NOT NULL,

@@ -8,22 +8,22 @@
 		<h2>{{I (printf "demos.pets.create.%s" .Kind)}}<span>{{T .Loc (printf "menu.demos.pets.create.%s" .Kind)}}</span></h2>
 	</div>
 	<div class="s-section-body">
-		<div class="well">{{T .Loc "pet.create.well.cat"}}</div>
+		<div class="well">{{T .Loc "pet.generate.well.cat"}}</div>
 
 		<form id="job_form" class="ui-form grey padded" autocomplete="off" data-form="{{T .Loc "job.label.parameter"}}" data-copy="{{T .Loc "button.copy"}}">
 {{define "pet_create_params"}}
 			<div class="row">
-				<label class="col-md-2 col-form-label">{{T .Loc "pet.create.items"}}</label>
+				<label class="col-md-2 col-form-label">{{T .Loc "pet.generate.items"}}</label>
 				<div class="col-md-10">
 					<input type="number" class="form-control" name="items" size="7" min="1" max="1000" value="{{.Arg.Items}}">
 				</div>
 			</div>
 			<div class="row">
-				<label class="col-md-2 col-form-label">{{T .Loc "pet.create.delay"}}</label>
+				<label class="col-md-2 col-form-label">{{T .Loc "pet.generate.delay"}}</label>
 				<div class="col-md-10">
 					<div class="input-group w-auto">
 						<input type="number" class="form-control" name="delay" size="7" min="0" max="1000" value="{{.Arg.Delay}}">
-						<span class="input-group-text">{{T .Loc "pet.create.millisecond"}}</span>
+						<span class="input-group-text">{{T .Loc "pet.generate.millisecond"}}</span>
 					</div>
 				</div>
 			</div>

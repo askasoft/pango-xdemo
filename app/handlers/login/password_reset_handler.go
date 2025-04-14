@@ -17,6 +17,7 @@ import (
 	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
 	"github.com/askasoft/pango/ini"
 	"github.com/askasoft/pango/num"
+	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/tbs"
 	"github.com/askasoft/pango/vad"
@@ -56,7 +57,9 @@ func PasswordResetSend(c *xin.Context) {
 		return
 	}
 
-	user, err := tenant.FindUser(c, email)
+	tt := tenant.FromCtx(c)
+
+	user, err := tt.FindUser(email)
 	if err != nil {
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
@@ -79,8 +82,8 @@ func PasswordResetSend(c *xin.Context) {
 
 	sr := strings.NewReplacer(
 		"{{SITE_NAME}}", tbs.GetText(c.Locale, "title"),
-		"{{USER_NAME}}", user.(*models.User).Name,
-		"{{USER_EMAIL}}", user.(*models.User).Email,
+		"{{USER_NAME}}", user.Name,
+		"{{USER_EMAIL}}", user.Email,
 		"{{REQUEST_DATE}}", app.FormatTime(time.Now()),
 		"{{RESET_URL}}", rsurl,
 		"{{EXPIRES}}", tkexp,
@@ -89,8 +92,8 @@ func PasswordResetSend(c *xin.Context) {
 
 	sr = strings.NewReplacer(
 		"{{SITE_NAME}}", html.EscapeString(tbs.GetText(c.Locale, "title")),
-		"{{USER_NAME}}", html.EscapeString(user.(*models.User).Name),
-		"{{USER_EMAIL}}", html.EscapeString(user.(*models.User).Email),
+		"{{USER_NAME}}", html.EscapeString(user.Name),
+		"{{USER_EMAIL}}", html.EscapeString(user.Email),
 		"{{REQUEST_DATE}}", html.EscapeString(app.FormatTime(time.Now())),
 		"{{RESET_URL}}", rsurl,
 		"{{EXPIRES}}", tkexp,
@@ -151,7 +154,9 @@ func PasswordResetExecute(c *xin.Context) {
 		return
 	}
 
-	user, err := tenant.FindUser(c, token.Email)
+	tt := tenant.FromCtx(c)
+
+	user, err := tt.FindUser(token.Email)
 	if err != nil {
 		c.AddError(err)
 		c.JSON(http.StatusBadRequest, handlers.E(c))
@@ -162,8 +167,6 @@ func PasswordResetExecute(c *xin.Context) {
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}
-
-	tt := tenant.FromCtx(c)
 
 	pra := &PwdRstArg{}
 	if err := c.Bind(pra); err != nil {
@@ -186,16 +189,22 @@ func PasswordResetExecute(c *xin.Context) {
 		return
 	}
 
-	mu := user.(*models.User)
-	mu.SetPassword(pra.Newpwd)
+	user.SetPassword(pra.Newpwd)
 
-	sqb := app.SDB.Builder()
-	sqb.Update(tt.TableUsers())
-	sqb.Setc("password", mu.Password)
-	sqb.Where("id = ?", mu.ID)
-	sql, args := sqb.Build()
+	err = app.SDB.Transaction(func(tx *sqlx.Tx) error {
+		sqb := tx.Builder()
+		sqb.Update(tt.TableUsers())
+		sqb.Setc("password", user.Password)
+		sqb.Where("id = ?", user.ID)
+		sql, args := sqb.Build()
 
-	if _, err := app.SDB.Exec(sql, args...); err != nil {
+		if _, err := app.SDB.Exec(sql, args...); err != nil {
+			return err
+		}
+
+		return tt.AddAuditLog(tx, user.ID, models.AL_LOGIN_PWDRST, user.Email)
+	})
+	if err != nil {
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return
@@ -203,16 +212,16 @@ func PasswordResetExecute(c *xin.Context) {
 
 	sr := strings.NewReplacer(
 		"{{SITE_NAME}}", tbs.GetText(c.Locale, "title"),
-		"{{USER_NAME}}", user.(*models.User).Name,
-		"{{USER_EMAIL}}", user.(*models.User).Email,
+		"{{USER_NAME}}", user.Name,
+		"{{USER_EMAIL}}", user.Email,
 		"{{RESET_DATE}}", app.FormatTime(time.Now()),
 	)
 	subject := sr.Replace(tbs.GetText(c.Locale, "pwdrst.email.reset.subject"))
 
 	sr = strings.NewReplacer(
 		"{{SITE_NAME}}", html.EscapeString(tbs.GetText(c.Locale, "title")),
-		"{{USER_NAME}}", html.EscapeString(user.(*models.User).Name),
-		"{{USER_EMAIL}}", html.EscapeString(user.(*models.User).Email),
+		"{{USER_NAME}}", html.EscapeString(user.Name),
+		"{{USER_EMAIL}}", html.EscapeString(user.Email),
 		"{{RESET_DATE}}", html.EscapeString(app.FormatTime(time.Now())),
 	)
 	message := sr.Replace(tbs.GetText(c.Locale, "pwdrst.email.reset.message"))

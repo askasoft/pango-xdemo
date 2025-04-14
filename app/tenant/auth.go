@@ -19,7 +19,7 @@ var noUser = &models.User{}
 // USERS write lock
 var muUSERS sync.Mutex
 
-func (tt *Tenant) FindUser(username string) (xmw.AuthUser, error) {
+func (tt *Tenant) FindUser(username string) (*models.User, error) {
 	k := string(tt.Schema) + "/" + username
 
 	if u, ok := app.USERS.Get(k); ok {
@@ -72,11 +72,6 @@ func (tt *Tenant) CacheUser(u *models.User) {
 
 //----------------------------------------------------
 
-func FindUser(c *xin.Context, username string) (xmw.AuthUser, error) {
-	tt := FromCtx(c)
-	return tt.FindUser(username)
-}
-
 func GetAuthUser(c *xin.Context) *models.User {
 	au, ok := c.Get(app.XCA.AuthUserKey)
 	if ok {
@@ -110,13 +105,6 @@ func IsClientBlocked(c *xin.Context) bool {
 	return false
 }
 
-func CheckClientAndFindUser(c *xin.Context, username string) (xmw.AuthUser, error) {
-	if IsClientBlocked(c) {
-		return nil, nil
-	}
-	return FindUser(c, username)
-}
-
 func CheckClientIP(c *xin.Context, u *models.User) bool {
 	ip := net.ParseIP(c.ClientIP())
 	if ip == nil {
@@ -141,6 +129,21 @@ func CheckClientIP(c *xin.Context, u *models.User) bool {
 	}
 
 	return true
+}
+
+//----------------------------------------------------
+// Auth
+
+func FindUser(c *xin.Context, username string) (xmw.AuthUser, error) {
+	tt := FromCtx(c)
+	return tt.FindUser(username)
+}
+
+func CheckClientAndFindUser(c *xin.Context, username string) (xmw.AuthUser, error) {
+	if IsClientBlocked(c) {
+		return nil, nil
+	}
+	return FindUser(c, username)
 }
 
 //----------------------------------------------------

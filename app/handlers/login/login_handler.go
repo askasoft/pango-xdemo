@@ -46,7 +46,7 @@ func Login(c *xin.Context) {
 	}
 
 	if loginMFACheck(c, au, up) {
-		loginPassed(c, up)
+		loginPassed(c, au)
 	}
 }
 
@@ -64,19 +64,21 @@ func loginFindUser(c *xin.Context) (up *UserPass, au *models.User, ok bool) {
 		return
 	}
 
-	fu, err := tenant.FindUser(c, up.Username)
+	tt := tenant.FromCtx(c)
+
+	mu, err := tt.FindUser(up.Username)
 	if err != nil {
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return
 	}
 
-	if fu == nil || up.Password != fu.GetPassword() {
+	if mu == nil || mu.GetPassword() != up.Password {
 		loginFailed(c, "login.failed.userpass")
 		return
 	}
 
-	au = fu.(*models.User)
+	au = mu
 	if !au.HasRole(models.RoleViewer) {
 		loginFailed(c, "login.failed.notallowed")
 		return
@@ -97,8 +99,14 @@ func loginFailed(c *xin.Context, reason string) {
 	c.JSON(http.StatusBadRequest, handlers.E(c))
 }
 
-func loginPassed(c *xin.Context, up *UserPass) {
-	if err := app.XCA.SaveUserPassToCookie(c, up.Username, up.Password); err != nil {
+func loginPassed(c *xin.Context, au *models.User) {
+	tt := tenant.FromCtx(c)
+	if err := tt.AddAuditLog(app.SDB, au.ID, models.AL_LOGIN_LOGIN, au.Email); err != nil {
+		c.AddError(err)
+		c.JSON(http.StatusInternalServerError, handlers.E(c))
+	}
+
+	if err := app.XCA.SaveUserPassToCookie(c, au.Email, au.GetPassword()); err != nil {
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return

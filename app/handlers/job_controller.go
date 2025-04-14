@@ -1,15 +1,18 @@
 package handlers
 
 import (
+	"errors"
 	"net/http"
 	"time"
 
+	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/jobs"
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango/bol"
 	"github.com/askasoft/pango/ini"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/num"
+	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/tbs"
 	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pango/xjm"
@@ -156,27 +159,41 @@ func (jc *JobController) Status(c *xin.Context) {
 
 func (jc *JobController) Start(c *xin.Context) {
 	tt := tenant.FromCtx(c)
-	tjm := tt.JM()
+	au := tenant.AuthUser(c)
 
-	if !jc.Multi {
-		job, err := tjm.FindJob(jc.Name, false, xjm.JobStatusPending, xjm.JobStatusRunning)
-		if err != nil {
-			log.Errorf("Failed to find job %s: %v", jc.Name, err)
-			c.AddError(err)
-			c.JSON(http.StatusInternalServerError, E(c))
-			return
+	var jid int64
+	err := app.SDB.Transaction(func(tx *sqlx.Tx) error {
+		sjm := tt.SJM(tx)
+
+		if !jc.Multi {
+			job, err := sjm.FindJob(jc.Name, false, xjm.JobStatusPending, xjm.JobStatusRunning)
+			if err != nil {
+				log.Errorf("Failed to find job %s: %v", jc.Name, err)
+				return err
+			}
+
+			if job != nil {
+				return xjm.ErrJobExisting
+			}
 		}
 
-		if job != nil {
+		id, err := sjm.AppendJob(0, jc.Name, c.Locale, jc.Param)
+		if err != nil {
+			log.Errorf("Failed to pending job %s: %v", jc.Name, err)
+			return err
+		}
+
+		jid = id
+
+		return tt.AddAuditLog(tx, au.ID, jobs.JobStartAuditLogs[jc.Name])
+	})
+	if err != nil {
+		if errors.Is(err, xjm.ErrJobExisting) {
 			c.AddError(tbs.Error(c.Locale, "job.error.existing"))
 			c.JSON(http.StatusBadRequest, E(c))
 			return
 		}
-	}
 
-	jid, err := tjm.AppendJob(0, jc.Name, c.Locale, jc.Param)
-	if err != nil {
-		log.Errorf("Failed to pending job %s: %v", jc.Name, err)
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, E(c))
 		return
@@ -199,45 +216,64 @@ func (jc *JobController) Cancel(c *xin.Context) {
 	}
 
 	tt := tenant.FromCtx(c)
-
-	tjm := tt.JM()
+	au := tenant.AuthUser(c)
 
 	reason := tbs.GetText(c.Locale, "job.error.usercancel", "User canceled.")
 
-	job, err := tjm.GetJob(jid)
+	var job *xjm.Job
+	err := app.SDB.Transaction(func(tx *sqlx.Tx) error {
+		sjm := tt.SJM(tx)
+
+		var err error
+		job, err = sjm.GetJob(jid)
+		if err != nil {
+			c.Logger.Errorf("Failed to get job #%d: %v", jid, err)
+			return err
+		}
+		if job == nil {
+			return xjm.ErrJobMissing
+		}
+		if job.IsDone() {
+			return xjm.ErrJobComplete
+		}
+
+		if err = sjm.CancelJob(jid, reason); err != nil {
+			c.Logger.Errorf("Failed to cancel job #%d: %v", jid, err)
+			return err
+		}
+
+		if err = sjm.AddJobLog(jid, time.Now(), xjm.JobLogLevelWarn, reason); err != nil {
+			return err
+		}
+
+		if err = tt.AddAuditLog(tx, au.ID, jobs.JobCancelAuditLogs[jc.Name]); err != nil {
+			return err
+		}
+
+		if job.CID != 0 {
+			sjc := tt.SJC(tx)
+			if err := jobs.JobFindAndCancelChain(sjc, job.CID, jid, reason); err != nil {
+				c.Logger.Errorf("Failed to cancel job chain for job #%d: %v", jid, err)
+				return err
+			}
+		}
+
+		return nil
+	})
 	if err != nil {
-		c.Logger.Errorf("Failed to get job #%d: %v", jid, err)
-		c.AddError(err)
-		c.JSON(http.StatusInternalServerError, E(c))
-		return
-	}
-	if job == nil {
-		c.AddError(tbs.Error(c.Locale, "job.error.notfound"))
-		c.JSON(http.StatusBadRequest, E(c))
-		return
-	}
-
-	if job.IsDone() {
-		c.JSON(http.StatusOK, xin.H{"warning": tbs.GetText(c.Locale, "job.status."+jobs.JobStatusText(job.Status))})
-		return
-	}
-
-	if err := tjm.CancelJob(jid, reason); err != nil {
-		c.Logger.Errorf("Failed to cancel job #%d: %v", jid, err)
-		c.AddError(err)
-		c.JSON(http.StatusInternalServerError, E(c))
-		return
-	}
-
-	_ = tjm.AddJobLog(jid, time.Now(), xjm.JobLogLevelWarn, reason)
-
-	if job.CID != 0 {
-		if err := jobs.JobFindAndCancelChain(tt, job.CID, jid, reason); err != nil {
-			c.Logger.Errorf("Failed to cancel job chain for job #%d: %v", jid, err)
-			c.AddError(err)
-			c.JSON(http.StatusInternalServerError, E(c))
+		if errors.Is(err, xjm.ErrJobMissing) {
+			c.AddError(tbs.Error(c.Locale, "job.error.notfound"))
+			c.JSON(http.StatusBadRequest, E(c))
 			return
 		}
+		if errors.Is(err, xjm.ErrJobComplete) {
+			c.JSON(http.StatusOK, xin.H{"warning": tbs.GetText(c.Locale, "job.status."+jobs.JobStatusText(job.Status))})
+			return
+		}
+
+		c.AddError(err)
+		c.JSON(http.StatusInternalServerError, E(c))
+		return
 	}
 
 	c.JSON(http.StatusOK, xin.H{"warning": tbs.GetText(c.Locale, "job.message.canceled")})

@@ -1,0 +1,126 @@
+{{MapSet .Ctx.Attrs "astyles" (Array "admin/auditlogs.css")}}
+{{MapSet .Ctx.Attrs "ascripts" (Array "admin/auditlogs.js")}}
+
+{{template "main_header" .}}
+
+<div class="s-section">
+	<div class="s-section-head">
+		<h2>{{I "admin.auditlogs"}}<span>{{T .Loc "menu.admin.auditlogs"}}</span></h2>
+		<div class="ms-auto">
+			<button class="btn btn-sm btn-outline-primary" id="auditlogs_export">
+				{{I "csv"}} {{T .Loc "button.csvexp"}}
+			</button>
+		</div>
+	</div>
+	<div class="s-section-body">
+		<div class="s-toolbar">
+			<button class="btn btn-sm btn-outline-danger" popup-target="#auditlogs_deletesel_popup" enableby="#auditlogs_list td.check input">
+				{{I "deletesel"}} {{T .Loc "button.deletesel"}}
+			</button>
+			<button class="btn btn-sm btn-outline-danger" popup-target="#auditlogs_deletebat_popup">
+				{{I "deletebat"}} {{T .Loc "button.deletebat"}}
+			</button>
+			<button class="btn btn-sm btn-outline-danger" popup-target="#auditlogs_deleteall_popup">
+				{{I "deleteall"}} {{T .Loc "button.deleteall"}}
+			</button>
+		</div>
+
+		<div id="auditlogs_alert">{{template "alerts" .}}</div>
+		
+		<fieldset id="auditlogs_listfset" class="ui-fieldset collapsed" data-spy="fieldset">
+			<legend class="circle">{{I "search"}}{{T .Loc "button.search"}}</legend>
+			<form id="auditlogs_listform" class="ui-form grey padded" method="POST">
+				<input type="hidden" name="p" value="{{.Q.Page}}"/>
+				<input type="hidden" name="l" value="{{.Q.Limit}}"/>
+				<input type="hidden" name="c" value="{{.Q.Col}}"/>
+				<input type="hidden" name="d" value="{{.Q.Dir}}"/>
+
+				<div class="row">
+					<label class="col-md-2 col-xxl-1 col-form-label">{{T .Loc "auditlog.id"}}</label>
+					<div class="col-md-4 col-xxl-5">
+						<input name="id" type="text" class="form-control" textclear value="{{if ne .Q.ID 0}}{{.Q.ID}}{{end}}"/>
+					</div>
+					<label class="col-md-2 col-xxl-1 col-form-label">{{T .Loc "auditlog.user"}}</label>
+					<div class="col-md-4 col-xxl-5">
+						<input name="user" type="text" class="form-control" textclear value="{{.Q.User}}"/>
+					</div>
+				</div>
+				<div class="row">
+					<label class="col-md-2 col-xxl-1 col-form-label">{{T .Loc "auditlog.func"}}</label>
+					<div class="col-md-10 col-xxl-11">
+						{{Checks "Name=" "func" "List=" .AuditLogFuncMap "Values=" .Q.Func}}
+					</div>
+				</div>
+				<div class="row pt-3 pb-2">
+					<div class="offset-md-2 offset-xxl-1 col">
+						<button type="submit" class="btn btn-primary">{{I "search"}} {{T .Loc "button.search"}}</button>
+						<button type="reset" class="btn btn-secondary">{{I "clear"}} {{T .Loc "button.clear"}}</button>
+					</div>
+				</div>
+			</form>
+		</fieldset>
+
+		<div id="auditlogs_list"></div>
+	</div>
+</div>
+
+<div id="auditlogs_deletesel_popup" class="ui-popup s-popup-confirm" data-spy="popup" tabindex="-1"
+	popup-mask="true" popup-scroll="false" popup-mouse="false">
+	<form>
+		<div class="ui-popup-body">
+			<i class="icon fas fa-3x fa-fw fa-triangle-exclamation text-danger"></i>
+			<div class="msg">{{T .Loc "auditlog.confirm.deletesel"}}</div>
+		</div>
+		<div class="ui-popup-footer">
+			<button type="submit" class="btn btn-danger">{{I "ok"}} {{T .Loc "button.ok"}}</button>
+			<button type="button" class="btn btn-secondary" popup-dismiss="true">{{I "cancel"}} {{T .Loc "button.cancel"}}</button>
+		</div>
+	</form>
+</div>
+
+<div id="auditlogs_deleteall_popup" class="ui-popup s-popup-confirm" data-spy="popup" tabindex="-1"
+	popup-mask="true" popup-scroll="false" popup-mouse="false">
+	<form>
+		<div class="ui-popup-body">
+			<i class="icon fas fa-3x fa-fw fa-triangle-exclamation text-danger"></i>
+			<div class="msg">{{T .Loc "auditlog.confirm.deleteall"}}</div>
+		</div>
+		<div class="ui-popup-footer">
+			<button type="submit" class="btn btn-danger">{{I "ok"}} {{T .Loc "button.ok"}}</button>
+			<button type="button" class="btn btn-secondary" popup-dismiss="true">{{I "cancel"}} {{T .Loc "button.cancel"}}</button>
+		</div>
+	</form>
+</div>
+
+<div id="auditlogs_deletebat_popup" class="ui-popup s-popup-detail" data-spy="popup" tabindex="-1"
+	popup-position="center" popup-mask="true" popup-scroll="false" popup-mouse="false" popup-closer="true"
+	popup-focus="[name=name]">
+	<div class="ui-popup-header">
+		<h4><span>{{I "deletebat"}} {{T .Loc "button.deletebat"}}</span></h4>
+	</div>
+	<div class="ui-popup-body grey">
+		<form class="ui-form lined">
+			<div class="well text-center">{{T .Loc "auditlog.deletebat.well"}}</div>
+
+			<div class="row">
+				<label class="col-md-2 col-form-label">{{T .Loc "auditlog.user"}}</label>
+				<div class="col-md-10">
+					<input name="user" type="text" class="form-control" textclear value="{{.Q.User}}"/>
+				</div>
+			</div>
+			<div class="row">
+				<label class="col-md-2 col-form-label">{{T .Loc "auditlog.func"}}</label>
+				<div class="col-md-10">
+					{{Checks "Name=" "func" "List=" .AuditLogFuncMap "Values=" .Q.Func}}
+				</div>
+			</div>
+			<button type="submit" class="hidden"></button>
+		</form>
+	</div>
+	<div class="ui-popup-footer">
+		<button type="submit" class="btn btn-danger">{{I "deletebat"}} {{T .Loc "button.deletebat"}}</button>
+		<button type="button" class="btn btn-secondary" popup-dismiss="true">{{I "cancel"}} {{T .Loc "button.cancel"}}</button>
+	</div>
+</div>
+
+{{template "main_footer" .}}

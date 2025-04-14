@@ -24,13 +24,27 @@
 			<div class="card-body">
 				<ul class="nav flex-column">
 					<li class="nav-item"><a class="nav-link" href="{{.Base}}/demos/pets/">{{I "demos.pets.list"}}<span>{{T .Loc "menu.demos.pets.list"}}</span></a></li>
-					<li class="nav-item"><a class="nav-link" href="{{.Base}}/demos/pets/jobs/catcreate/">{{I "demos.pets.create.cat"}}<span>{{T .Loc "menu.demos.pets.create.cat"}}</span></a></li>
-					<li class="nav-item"><a class="nav-link" href="{{.Base}}/demos/pets/jobs/dogcreate/">{{I "demos.pets.create.dog"}}<span>{{T .Loc "menu.demos.pets.create.dog"}}</span></a></li>
+					<li class="nav-item"><a class="nav-link" href="{{.Base}}/demos/pets/jobs/catgen/">{{I "demos.pets.create.cat"}}<span>{{T .Loc "menu.demos.pets.create.cat"}}</span></a></li>
+					<li class="nav-item"><a class="nav-link" href="{{.Base}}/demos/pets/jobs/doggen/">{{I "demos.pets.create.dog"}}<span>{{T .Loc "menu.demos.pets.create.dog"}}</span></a></li>
 					<li class="nav-item"><a class="nav-link" href="{{.Base}}/demos/pets/jobs/clear/">{{I "demos.pets.clear"}}<span>{{T .Loc "menu.demos.pets.clear"}}</span></a></li>
 					<li class="nav-item"><a class="nav-link" href="{{.Base}}/demos/pets/jobs/reset/">{{I "demos.pets.reset"}}<span>{{T .Loc "menu.demos.pets.reset"}}</span></a></li>
 				</ul>
 			</div>
 		</div>
+
+		{{if and .AU .AU.IsAdmin}}
+		<div id="navi_admin" class="card">
+			<div class="card-header">
+				<a href="{{.Base}}/a/">{{I "admin"}}<span>{{T .Loc "menu.admin"}}</span></a>
+			</div>
+			<div class="card-body">
+				<ul class="nav flex-column">
+					<li class="nav-item"><a class="nav-link" href="{{.Base}}/a/users/">{{I "admin.users"}}<span>{{T .Loc "menu.admin.users"}}</span></a></li>
+					<li class="nav-item"><a class="nav-link" href="{{.Base}}/a/auditlogs/">{{I "admin.auditlogs"}}<span>{{T .Loc "menu.admin.auditlogs"}}</span></a></li>
+				</ul>
+			</div>
+		</div>
+		{{end}}
 
 		{{if and .TT.IsDefault .AU .AU.IsSuper}}
 		<div id="navi_super" class="card">
@@ -54,13 +68,10 @@
 
 	{{if and .AU .AU.IsAdmin}}
 	<div class="footnavi ui-sidenavi minimal">
-		<div id="navi_admin" class="card">
-			<div class="card-header">
-				<a href="{{.Base}}/a/">{{I "admin"}}<span>{{T .Loc "menu.admin"}}</span></a>
-			</div>
+		<div class="card">
+			<div class="card-header"></div>
 			<div class="card-body">
 				<ul class="nav flex-column">
-					<li class="nav-item"><a class="nav-link" href="{{.Base}}/a/users/">{{I "admin.users"}}<span>{{T .Loc "menu.admin.users"}}</span></a></li>
 					<li class="nav-item"><a class="nav-link" href="{{.Base}}/a/configs/">{{I "admin.configs"}}<span>{{T .Loc "menu.admin.configs"}}</span></a></li>
 				</ul>
 			</div>

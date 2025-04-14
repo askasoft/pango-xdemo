@@ -141,7 +141,7 @@ func ConfigSave(c *xin.Context) {
 		return
 	}
 
-	saveConfigs(c, uconfigs)
+	saveConfigs(c, uconfigs, models.AL_CONFIG_UPDATE)
 	if len(c.Errors) > 0 {
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return
@@ -262,7 +262,7 @@ func checkPostConfigs(c *xin.Context, configs []*models.Config) (uconfigs []*mod
 	return
 }
 
-func saveConfigs(c *xin.Context, configs []*models.Config) {
+func saveConfigs(c *xin.Context, configs []*models.Config, action string) {
 	tt := tenant.FromCtx(c)
 	au := tenant.AuthUser(c)
 
@@ -308,6 +308,12 @@ func saveConfigs(c *xin.Context, configs []*models.Config) {
 
 	if len(c.Errors) > 0 {
 		_ = tx.Rollback()
+		return
+	}
+
+	err = tt.AddAuditLog(tx, au.ID, action)
+	if err != nil {
+		c.AddError(err)
 		return
 	}
 
@@ -391,7 +397,7 @@ func ConfigImport(c *xin.Context) {
 		return
 	}
 
-	saveConfigs(c, uconfigs)
+	saveConfigs(c, uconfigs, models.AL_CONFIG_IMPORT)
 	if len(c.Errors) > 0 {
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return

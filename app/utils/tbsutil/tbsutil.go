@@ -81,6 +81,10 @@ func GetUserRoleReverseMap() *hashmap.HashMap[string, string] {
 	return GetAllReverseMap("user.map.role")
 }
 
+func GetAudioLogFuncMap(locale string) *linkedhashmap.LinkedHashMap[string, string] {
+	return GetLinkedHashMap(locale, "auditlog.map.func")
+}
+
 func GetJobchainJobnamesMap(locale string) *linkedhashmap.LinkedHashMap[string, string] {
 	return GetLinkedHashMap(locale, "jobchain.jobnames")
 }

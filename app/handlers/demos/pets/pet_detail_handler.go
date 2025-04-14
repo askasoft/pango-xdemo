@@ -9,6 +9,7 @@ import (
 	"github.com/askasoft/pango-xdemo/app/handlers"
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/tenant"
+	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
 	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/sqx/sqlx"
@@ -76,4 +77,148 @@ func petDetail(c *xin.Context, action string) {
 	bindPetMaps(c, h)
 
 	c.HTML(http.StatusOK, "demos/pets/pet_detail_"+action, h)
+}
+
+func petBind(c *xin.Context) *PetWithFile {
+	pet := &PetWithFile{}
+	if err := c.Bind(pet); err != nil {
+		vadutil.AddBindErrors(c, err, "pet.")
+	}
+
+	if pet.Gender != "" {
+		pgm := tbsutil.GetPetGenderMap(c.Locale)
+		if !pgm.Contains(pet.Gender) {
+			c.AddError(vadutil.ErrInvalidField(c, "pet.", "gender"))
+		}
+	}
+
+	if pet.Origin != "" {
+		pom := tbsutil.GetPetOriginMap(c.Locale)
+		if !pom.Contains(pet.Origin) {
+			c.AddError(vadutil.ErrInvalidField(c, "pet.", "origin"))
+		}
+	}
+
+	if pet.Temper != "" {
+		ptm := tbsutil.GetPetTemperMap(c.Locale)
+		if !ptm.Contains(pet.Temper) {
+			c.AddError(vadutil.ErrInvalidField(c, "pet.", "temper"))
+		}
+	}
+
+	if len(pet.Habits) > 0 {
+		phm := tbsutil.GetPetHabitsMap(c.Locale)
+		for _, h := range pet.Habits {
+			if !phm.Contains(h) {
+				c.AddError(vadutil.ErrInvalidField(c, "pet.", "habits"))
+				break
+			}
+		}
+	}
+
+	return pet
+}
+
+func PetCreate(c *xin.Context) {
+	pet := petBind(c)
+	if len(c.Errors) > 0 {
+		c.JSON(http.StatusBadRequest, handlers.E(c))
+		return
+	}
+
+	pet.ID = 0
+	pet.CreatedAt = time.Now()
+	pet.UpdatedAt = pet.CreatedAt
+
+	tt := tenant.FromCtx(c)
+
+	err := app.SDB.Transaction(func(tx *sqlx.Tx) error {
+		sqb := tx.Builder()
+		sqb.Insert(tt.TablePets())
+		sqb.StructNames(&pet.Pet, "id")
+		if !tx.SupportLastInsertID() {
+			sqb.Returns("id")
+		}
+		sql := sqb.SQL()
+
+		pid, err := tx.NamedCreate(sql, pet)
+		if err != nil {
+			return err
+		}
+
+		pet.ID = pid
+		if pet.File != "" {
+			fid := pet.PhotoPath()
+			sfs := tt.SFS(tx)
+			if err := sfs.DeleteFile(fid); err != nil {
+				return err
+			}
+			return sfs.MoveFile(pet.File, fid)
+		}
+
+		return tt.AddAuditLog(tx, 0, models.AL_PETS_CREATE, num.Ltoa(pid), pet.Name)
+	})
+	if err != nil {
+		c.AddError(err)
+		c.JSON(http.StatusInternalServerError, handlers.E(c))
+		return
+	}
+
+	c.JSON(http.StatusOK, xin.H{
+		"success": tbs.GetText(c.Locale, "success.created"),
+		"pet":     pet,
+	})
+}
+
+func PetUpdate(c *xin.Context) {
+	pet := petBind(c)
+	if pet.ID == 0 {
+		c.AddError(vadutil.ErrInvalidID(c))
+	}
+	if len(c.Errors) > 0 {
+		c.JSON(http.StatusBadRequest, handlers.E(c))
+		return
+	}
+
+	pet.UpdatedAt = time.Now()
+
+	tt := tenant.FromCtx(c)
+
+	var cnt int64
+	err := app.SDB.Transaction(func(tx *sqlx.Tx) error {
+		sqb := tx.Builder()
+		sqb.Update(tt.TablePets())
+		sqb.StructNames(&pet.Pet, "id", "created_at")
+		sqb.Where("id = :id")
+		sql := sqb.SQL()
+
+		r, err := tx.NamedExec(sql, pet)
+		if err != nil {
+			return err
+		}
+
+		cnt, _ = r.RowsAffected()
+		if cnt > 0 {
+			if pet.File != "" {
+				fid := pet.PhotoPath()
+				sfs := tt.SFS(tx)
+				if err := sfs.DeleteFile(fid); err != nil {
+					return err
+				}
+				return sfs.MoveFile(pet.File, fid)
+			}
+			return tt.AddAuditLog(tx, 0, models.AL_PETS_UPDATES, num.Ltoa(cnt), "#"+num.Ltoa(pet.ID)+": <"+pet.Name+">")
+		}
+		return nil
+	})
+	if err != nil {
+		c.AddError(err)
+		c.JSON(http.StatusInternalServerError, handlers.E(c))
+		return
+	}
+
+	c.JSON(http.StatusOK, xin.H{
+		"success": tbs.Format(c.Locale, "pet.success.updates", cnt),
+		"pet":     pet,
+	})
 }

@@ -23,8 +23,24 @@ import (
 const (
 	JobNameUserCsvImport = "UserCsvImport"
 	JobNamePetClear      = "PetClear"
-	JobNamePetCatCreate  = "PetCatCreate"
-	JobNamePetDogCreate  = "PetDogCreate"
+	JobNamePetCatGen     = "PetCatGen"
+	JobNamePetDogGen     = "PetDogGen"
+)
+
+var (
+	JobStartAuditLogs = map[string]string{
+		JobNameUserCsvImport: models.AL_USERS_IMPORT_START,
+		JobNamePetClear:      models.AL_PETS_CLEAR_START,
+		JobNamePetCatGen:     models.AL_PETS_CAT_CREATE_START,
+		JobNamePetDogGen:     models.AL_PETS_DOG_CREATE_START,
+	}
+
+	JobCancelAuditLogs = map[string]string{
+		JobNameUserCsvImport: models.AL_USERS_IMPORT_CANCEL,
+		JobNamePetClear:      models.AL_PETS_CLEAR_CANCEL,
+		JobNamePetCatGen:     models.AL_PETS_CAT_CREATE_CANCEL,
+		JobNamePetDogGen:     models.AL_PETS_DOG_CREATE_CANCEL,
+	}
 )
 
 //------------------------------------

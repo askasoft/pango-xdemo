@@ -263,7 +263,7 @@
 	//----------------------------------------------------
 	// deletes (batch)
 	//
-	function users_deletebat(all) {
+	function users_deletebat() {
 		var $p = $('#users_deletebat_popup').popup('update', { keyboard: false });
 
 		$.ajax({
