@@ -10,9 +10,11 @@ import (
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango/fsu"
 	"github.com/askasoft/pango/log"
+	"github.com/askasoft/pango/log/sqlog/gormlog"
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/xfs"
 	"github.com/askasoft/pango/xjm"
+	"github.com/askasoft/pango/xsm/pgsm/pggormsm"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -24,11 +26,12 @@ var tables = []any{
 	&xjm.Job{},
 	&xjm.JobLog{},
 	&xjm.JobChain{},
-	&models.Config{},
 	&models.User{},
+	&models.Config{},
 	&models.Pet{},
 }
 
+// Generate Schema
 func GenerateSchema(outfile string) error {
 	ini, err := loadConfigs()
 	if err != nil {
@@ -117,4 +120,88 @@ func (gsp *GormSQLPrinter) Trace(ctx context.Context, begin time.Time, fc func()
 // Trace print sql message
 func (gsp *GormSQLPrinter) ParamsFilter(ctx context.Context, sql string, params ...any) (string, []any) {
 	return sql, params
+}
+
+// ------------------------------------------------
+
+// Migrate Schemas
+func MigrateSchemas(schemas ...string) error {
+	ini, err := loadConfigs()
+	if err != nil {
+		return err
+	}
+
+	dsn := ini.GetString("database", "dsn")
+
+	if !ini.GetBool("tenant", "multiple") {
+		schema := ini.GetString("database", "schema", "public")
+		return migrateSchema(dsn, schema)
+	}
+
+	if len(schemas) == 0 {
+		schemas, err = listSchemas(dsn)
+		if err != nil {
+			return err
+		}
+	}
+
+	for _, schema := range schemas {
+		if err := migrateSchema(dsn, schema); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func listSchemas(dsn string) ([]string, error) {
+	gdb, err := openDatabase(dsn)
+	if err != nil {
+		return nil, err
+	}
+
+	gsm := pggormsm.SM(gdb)
+	return gsm.ListSchemas()
+}
+
+func openDatabase(dsn string) (*gorm.DB, error) {
+	log.Infof("Connect Database: %s", dsn)
+
+	gdd := postgres.Open(dsn)
+
+	gdc := &gorm.Config{
+		Logger: gormlog.NewGormLogger(
+			log.GetLogger("SQL"),
+			time.Second,
+		),
+		SkipDefaultTransaction: true,
+	}
+
+	return gorm.Open(gdd, gdc)
+}
+
+func migrateSchema(dsn, schema string) error {
+	log.Infof("Migrate schema %q", schema)
+
+	dbc := &gorm.Config{
+		NamingStrategy: gormschema.NamingStrategy{TablePrefix: schema + "."},
+		Logger: gormlog.NewGormLogger(
+			log.GetLogger("SQL"),
+			time.Second,
+		),
+	}
+
+	gdd := postgres.Open(dsn)
+
+	gdb, err := gorm.Open(gdd, dbc)
+	if err != nil {
+		return err
+	}
+
+	err = gdb.AutoMigrate(tables...)
+
+	if db, err := gdb.DB(); err == nil {
+		db.Close()
+	}
+	return err
 }
