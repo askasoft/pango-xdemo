@@ -1,8 +1,12 @@
-#!/bin/sh -ex
+#!/bin/bash -ex
+
+BASEDIR=$(dirname $0)
+
+pushd $BASEDIR
 
 export EXE=xdemodb
 
 ../build.sh
 mv -f $EXE ../
 
-export EXE=xdemo
+export -n EXE

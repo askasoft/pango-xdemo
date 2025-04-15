@@ -10,7 +10,6 @@ import (
 	"github.com/askasoft/pango-xdemo/app/utils/errutil"
 	"github.com/askasoft/pango/asg"
 	"github.com/askasoft/pango/gwp"
-	"github.com/askasoft/pango/sqx"
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/xjm"
 )
@@ -51,9 +50,9 @@ func (jse *JobStateLixs) AddSkippedID(id int64) {
 	jse.LastIDs = asg.DeleteEqual(jse.LastIDs, id)
 }
 
-func (jse *JobStateLixs) AddIDFilter(sb *sqx.Builder, id string) {
+func (jse *JobStateLixs) AddIDFilter(sqb *sqlx.Builder, id string) {
 	if len(jse.LastIDs) > 0 {
-		sb.Where(id+" > ?", asg.Max(jse.LastIDs))
+		sqb.Where(id+" > ?", asg.Max(jse.LastIDs))
 	}
 }
 
