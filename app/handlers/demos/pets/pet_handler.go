@@ -61,6 +61,8 @@ func (pqa *PetQueryArg) HasFilters() bool {
 		len(pqa.Origin) > 0 ||
 		len(pqa.Temper) > 0 ||
 		len(pqa.Habits) > 0 ||
+		!pqa.BornFrom.IsZero() ||
+		!pqa.BornTo.IsZero() ||
 		pqa.AmountMin != "" ||
 		pqa.AmountMax != "" ||
 		pqa.PriceMin != "" ||
@@ -74,9 +76,9 @@ func (pqa *PetQueryArg) AddFilters(sqb *sqlx.Builder) {
 	pqa.AddIn(sqb, "origin", pqa.Origin)
 	pqa.AddIn(sqb, "temper", pqa.Temper)
 	pqa.AddOverlap(sqb, "habits", pqa.Habits)
-	pqa.AddRanget(sqb, "born_at", pqa.BornFrom, pqa.BornTo)
-	pqa.AddRangei(sqb, "amount", pqa.AmountMin, pqa.AmountMax)
-	pqa.AddRangef(sqb, "price", pqa.PriceMin, pqa.PriceMax)
+	pqa.AddTimes(sqb, "born_at", pqa.BornFrom, pqa.BornTo)
+	pqa.AddInts(sqb, "amount", pqa.AmountMin, pqa.AmountMax)
+	pqa.AddFloats(sqb, "price", pqa.PriceMin, pqa.PriceMax)
 	pqa.AddLikes(sqb, "name", pqa.Name)
 	pqa.AddLikes(sqb, "shop_name", pqa.ShopName)
 }

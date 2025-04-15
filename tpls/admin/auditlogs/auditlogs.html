@@ -40,14 +40,20 @@
 					<div class="col-md-4 col-xxl-5">
 						<input name="id" type="text" class="form-control" textclear value="{{.Q.ID}}"/>
 					</div>
+					<label class="col-md-2 col-xxl-1 col-form-label">{{T .Loc "auditlog.date"}}</label>
+					<div class="col-md-4 col-xxl-5">
+						<input type="date" class="form-control" name="date_from" value="{{if not .Q.DateFrom.IsZero}}{{DATE .Q.DateFrom}}{{end}}">
+						～
+						<input type="date" class="form-control" name="date_to" value="{{if not .Q.DateTo.IsZero}}{{DATE .Q.DateTo}}{{end}}">
+					</div>
+				</div>
+				<div class="row">
 					<label class="col-md-2 col-xxl-1 col-form-label">{{T .Loc "auditlog.user"}}</label>
 					<div class="col-md-4 col-xxl-5">
 						<input name="user" type="text" class="form-control" textclear value="{{.Q.User}}"/>
 					</div>
-				</div>
-				<div class="row">
 					<label class="col-md-2 col-xxl-1 col-form-label">{{T .Loc "auditlog.func"}}</label>
-					<div class="col-md-10 col-xxl-11">
+					<div class="col-md-4 col-xxl-5">
 						{{Checks "Name=" "func" "List=" .AuditLogFuncMap "Values=" .Q.Func}}
 					</div>
 				</div>

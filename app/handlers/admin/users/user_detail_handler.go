@@ -154,6 +154,7 @@ func UserCreate(c *xin.Context) {
 		if err != nil {
 			return err
 		}
+
 		user.ID = uid
 		user.Password = ""
 		user.Secret = 0

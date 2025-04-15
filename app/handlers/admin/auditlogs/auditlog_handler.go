@@ -2,6 +2,7 @@ package auditlogs
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/handlers"
@@ -19,9 +20,11 @@ import (
 type AuditLogQueryArg struct {
 	argutil.QueryArg
 
-	ID   string   `json:"id" form:"id,strip"`
-	User string   `json:"user" form:"user,strip"`
-	Func []string `json:"func" form:"func,strip"`
+	ID       string    `form:"id,strip"`
+	DateFrom time.Time `form:"date_from,strip"`
+	DateTo   time.Time `form:"date_to,strip" validate:"omitempty,gtefield=DateFrom"`
+	User     string    `form:"user,strip"`
+	Func     []string  `form:"func,strip"`
 }
 
 func (alqa *AuditLogQueryArg) Normalize(c *xin.Context) {
@@ -37,12 +40,15 @@ func (alqa *AuditLogQueryArg) Normalize(c *xin.Context) {
 
 func (alqa *AuditLogQueryArg) HasFilters() bool {
 	return alqa.ID != "" ||
+		!alqa.DateFrom.IsZero() ||
+		!alqa.DateTo.IsZero() ||
 		alqa.User != "" ||
 		len(alqa.Func) > 0
 }
 
 func (alqa *AuditLogQueryArg) AddFilters(c *xin.Context, sqb *sqlx.Builder) {
 	alqa.AddIDs(sqb, "audit_logs.id", alqa.ID)
+	alqa.AddTimes(sqb, "audit_logs.date", alqa.DateFrom, alqa.DateTo)
 	alqa.AddIn(sqb, "audit_logs.func", alqa.Func)
 	alqa.AddLikes(sqb, "users.email", alqa.User)
 }

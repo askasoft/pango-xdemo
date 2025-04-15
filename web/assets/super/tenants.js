@@ -18,7 +18,7 @@
 		$.ajax({
 			url: './list',
 			method: 'POST',
-			data: $f.serialize(),
+			data: $.param(vs, true),
 			beforeSend: function() {
 				main.form_clear_invalid($f);
 				main.loadmask();

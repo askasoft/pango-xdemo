@@ -54,9 +54,9 @@
 				<div class="row">
 					<label class="col-md-2 col-xxl-1 col-form-label">{{T .Loc "pet.born_at"}}</label>
 					<div class="col-md-4 col-xxl-5">
-						<input type="date" class="form-control" name="born_from">
+						<input type="date" class="form-control" name="born_from" value="{{if not .Q.BornFrom.IsZero}}{{DATE .Q.BornFrom}}{{end}}">
 						～
-						<input type="date" class="form-control" name="born_to">
+						<input type="date" class="form-control" name="born_to" value="{{if not .Q.BornTo.IsZero}}{{DATE .Q.BornTo}}{{end}}">
 					</div>
 					<label class="col-md-2 col-xxl-1 col-form-label">{{T .Loc "pet.origin"}}</label>
 					<div class="col-md-4 col-xxl-5">

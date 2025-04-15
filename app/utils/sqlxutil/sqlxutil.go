@@ -37,6 +37,12 @@ func AddIn(sqb *sqlx.Builder, column string, values []string) {
 	}
 }
 
+func AddLower(sqb *sqlx.Builder, column string, value string) {
+	if value != "" {
+		sqb.Where(column+" = ?", str.ToLower(value))
+	}
+}
+
 func AddIDs(sqb *sqlx.Builder, column string, id string) {
 	ss := str.FieldsByte(id, ',')
 	if len(ss) > 0 {
@@ -93,7 +99,7 @@ func AddLikes(sqb *sqlx.Builder, column string, search string) {
 	}
 }
 
-func AddRanget(sqb *sqlx.Builder, column string, tmin, tmax time.Time) {
+func AddTimes(sqb *sqlx.Builder, column string, tmin, tmax time.Time) {
 	if !tmin.IsZero() && !tmax.IsZero() {
 		sqb.Where(column+" BETWEEN ? AND ?", tmin, tmax)
 	} else if !tmin.IsZero() {
@@ -103,7 +109,17 @@ func AddRanget(sqb *sqlx.Builder, column string, tmin, tmax time.Time) {
 	}
 }
 
-func AddRangei(sqb *sqlx.Builder, column string, smin, smax string) {
+func AddTimePtrs(sqb *sqlx.Builder, column string, tmin, tmax *time.Time) {
+	if tmin != nil && tmax != nil {
+		sqb.Where(column+" BETWEEN ? AND ?", *tmin, *tmax)
+	} else if tmin != nil {
+		sqb.Where(column+" >= ?", *tmin)
+	} else if tmax != nil {
+		sqb.Where(column+" <= ?", *tmax)
+	}
+}
+
+func AddInts(sqb *sqlx.Builder, column string, smin, smax string) {
 	if smin != "" && smax != "" {
 		sqb.Where(column+" BETWEEN ? AND ?", smin, smax)
 	} else if smin != "" {
@@ -113,7 +129,7 @@ func AddRangei(sqb *sqlx.Builder, column string, smin, smax string) {
 	}
 }
 
-func AddRangef(sqb *sqlx.Builder, column string, smin, smax string) {
+func AddFloats(sqb *sqlx.Builder, column string, smin, smax string) {
 	if smin != "" && smax != "" {
 		sqb.Where(column+" BETWEEN ? AND ?", smin, smax)
 	} else if smin != "" {
