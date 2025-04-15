@@ -258,7 +258,7 @@ func (ucij *UserCsvImportJob) importRecord(rec *csvUserRecord) error {
 		sqb := tx.Builder()
 
 		if user.ID != 0 {
-			sqb.Select().From(ucij.Tenant.TableUsers()).Where("id = ?", user.ID)
+			sqb.Select().From(ucij.Tenant.TableUsers()).Eq("id", user.ID)
 			sql, args := sqb.Build()
 
 			eu := &models.User{}

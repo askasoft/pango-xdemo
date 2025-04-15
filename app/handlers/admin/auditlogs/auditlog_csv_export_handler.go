@@ -26,8 +26,9 @@ func AuditLogCsvExport(c *xin.Context) {
 	}
 
 	tt := tenant.FromCtx(c)
+	db := app.SDB
 
-	sqb := app.SDB.Builder()
+	sqb := db.Builder()
 	sqb.Select("audit_logs.*", "COALESCE(users.email, '') AS user")
 	sqb.From(tt.TableAuditLogs())
 	sqb.Join("LEFT JOIN " + tt.TableUsers() + " ON users.id = audit_logs.uid")
@@ -35,7 +36,7 @@ func AuditLogCsvExport(c *xin.Context) {
 	sqb.Order("id")
 	sql, args := sqb.Build()
 
-	rows, err := app.SDB.Queryx(sql, args...)
+	rows, err := db.Queryx(sql, args...)
 	if err != nil {
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))

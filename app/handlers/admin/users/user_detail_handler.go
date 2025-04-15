@@ -51,12 +51,13 @@ func userDetail(c *xin.Context, action string) {
 
 	tt := tenant.FromCtx(c)
 
-	sqb := app.SDB.Builder()
-	sqb.Select().From(tt.TableUsers()).Where("id = ?", uid)
+	db := app.SDB
+	sqb := db.Builder()
+	sqb.Select().From(tt.TableUsers()).Eq("id", uid)
 	sql, args := sqb.Build()
 
 	user := &models.User{}
-	err := app.SDB.Get(user, sql, args...)
+	err := db.Get(user, sql, args...)
 	if err != nil {
 		if errors.Is(err, sqlx.ErrNoRows) {
 			c.AddError(tbs.Errorf(c.Locale, "error.detail.notfound", uid))
@@ -198,7 +199,7 @@ func UserUpdate(c *xin.Context) {
 
 		if user.Password == "" {
 			sqb.Select("password").From(tt.TableUsers())
-			sqb.Where("id = ?", user.ID)
+			sqb.Eq("id", user.ID)
 			sql, args := sqb.Build()
 
 			eu := &models.User{}
@@ -224,8 +225,8 @@ func UserUpdate(c *xin.Context) {
 		sqb.Setc("status", user.Status)
 		sqb.Setc("cidr", user.CIDR)
 		sqb.Setc("updated_at", user.UpdatedAt)
-		sqb.Where("id = ?", user.ID)
-		sqb.Where("role >= ?", au.Role)
+		sqb.Eq("id", user.ID)
+		sqb.Gte("role", au.Role)
 		sql, args := sqb.Build()
 
 		r, err := tx.Exec(sql, args...)

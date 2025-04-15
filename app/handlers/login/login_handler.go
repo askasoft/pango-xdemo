@@ -205,14 +205,15 @@ func LoginMFAEnroll(c *xin.Context) {
 
 	tt := tenant.FromCtx(c)
 
-	sqb := app.SDB.Builder()
+	db := app.SDB
+	sqb := db.Builder()
 	sqb.Update(tt.TableUsers())
 	sqb.Setc("secret", au.Secret)
 	sqb.Setc("updated_at", time.Now())
-	sqb.Where("id = ?", au.ID)
+	sqb.Eq("id", au.ID)
 	sql, args := sqb.Build()
 
-	_, err := app.SDB.Exec(sql, args...)
+	_, err := db.Exec(sql, args...)
 	if err != nil {
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))

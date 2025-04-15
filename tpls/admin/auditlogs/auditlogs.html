@@ -42,9 +42,9 @@
 					</div>
 					<label class="col-md-2 col-xxl-1 col-form-label">{{T .Loc "auditlog.date"}}</label>
 					<div class="col-md-4 col-xxl-5">
-						<input type="date" class="form-control" name="date_from" value="{{if not .Q.DateFrom.IsZero}}{{DATE .Q.DateFrom}}{{end}}">
+						<input type="date" class="form-control" name="date_from" value="{{DATE .Q.DateFrom}}">
 						～
-						<input type="date" class="form-control" name="date_to" value="{{if not .Q.DateTo.IsZero}}{{DATE .Q.DateTo}}{{end}}">
+						<input type="date" class="form-control" name="date_to" value="{{DATE .Q.DateTo}}">
 					</div>
 				</div>
 				<div class="row">

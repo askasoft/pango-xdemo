@@ -72,7 +72,7 @@ func UserUpdates(c *xin.Context) {
 		sqb.Setc("updated_at", time.Now())
 
 		sqb.Where("id <> ?", au.ID)
-		sqb.Where("role >= ?", au.Role)
+		sqb.Gte("role", au.Role)
 		if len(ids) > 0 {
 			sqb.In("id", ids)
 		}
@@ -119,7 +119,7 @@ func UserDeletes(c *xin.Context) {
 		sqb := tx.Builder()
 		sqb.Delete(tt.TableUsers())
 		sqb.Where("id <> ?", au.ID)
-		sqb.Where("role >= ?", au.Role)
+		sqb.Gte("role", au.Role)
 		if len(ids) > 0 {
 			sqb.In("id", ids)
 		}

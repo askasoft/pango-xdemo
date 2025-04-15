@@ -195,10 +195,10 @@ func PasswordResetExecute(c *xin.Context) {
 		sqb := tx.Builder()
 		sqb.Update(tt.TableUsers())
 		sqb.Setc("password", user.Password)
-		sqb.Where("id = ?", user.ID)
+		sqb.Eq("id", user.ID)
 		sql, args := sqb.Build()
 
-		if _, err := app.SDB.Exec(sql, args...); err != nil {
+		if _, err := tx.Exec(sql, args...); err != nil {
 			return err
 		}
 

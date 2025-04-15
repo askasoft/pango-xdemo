@@ -50,7 +50,7 @@ func (uqa *UserQueryArg) HasFilters() bool {
 
 func (uqa *UserQueryArg) AddFilters(c *xin.Context, sqb *sqlx.Builder) {
 	au := tenant.AuthUser(c)
-	sqb.Where("role >= ?", au.Role)
+	sqb.Gte("role", au.Role)
 
 	uqa.AddIDs(sqb, "id", uqa.ID)
 	uqa.AddIn(sqb, "status", uqa.Status)
@@ -77,21 +77,22 @@ func bindUserMaps(c *xin.Context, h xin.H) {
 func countUsers(c *xin.Context, uqa *UserQueryArg) (total int, err error) {
 	tt := tenant.FromCtx(c)
 
-	sqb := app.SDB.Builder()
+	db := app.SDB
+	sqb := db.Builder()
 	sqb.Count()
 	sqb.From(tt.TableUsers())
 	uqa.AddFilters(c, sqb)
-
 	sql, args := sqb.Build()
 
-	err = app.SDB.Get(&total, sql, args...)
+	err = db.Get(&total, sql, args...)
 	return
 }
 
 func findUsers(c *xin.Context, uqa *UserQueryArg) (usrs []*models.User, err error) {
 	tt := tenant.FromCtx(c)
 
-	sqb := app.SDB.Builder()
+	db := app.SDB
+	sqb := db.Builder()
 	sqb.Select()
 	sqb.From(tt.TableUsers())
 	uqa.AddFilters(c, sqb)
@@ -99,7 +100,7 @@ func findUsers(c *xin.Context, uqa *UserQueryArg) (usrs []*models.User, err erro
 	uqa.AddPager(sqb)
 	sql, args := sqb.Build()
 
-	err = app.SDB.Select(&usrs, sql, args...)
+	err = db.Select(&usrs, sql, args...)
 	return
 }
 

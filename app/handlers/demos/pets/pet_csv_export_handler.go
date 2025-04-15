@@ -27,14 +27,15 @@ func PetCsvExport(c *xin.Context) {
 
 	tt := tenant.FromCtx(c)
 
-	sqb := app.SDB.Builder()
+	db := app.SDB
+	sqb := db.Builder()
 	sqb.Select()
 	sqb.From(tt.TablePets())
 	pq.AddFilters(sqb)
 	sqb.Order("id")
 	sql, args := sqb.Build()
 
-	rows, err := app.SDB.Queryx(sql, args...)
+	rows, err := db.Queryx(sql, args...)
 	if err != nil {
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))

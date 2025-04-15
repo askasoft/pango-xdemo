@@ -40,13 +40,16 @@ func (tt *Tenant) FindUser(username string) (*models.User, error) {
 		return u, nil
 	}
 
-	sqb := app.SDB.Builder()
+	db := app.SDB
+
+	sqb := db.Builder()
 	sqb.Select().From(tt.TableUsers())
-	sqb.Where("email = ? AND status = ?", username, models.UserActive)
+	sqb.Eq("email", username)
+	sqb.Eq("status", models.UserActive)
 	sql, args := sqb.Build()
 
 	u := &models.User{}
-	if err := app.SDB.Get(u, sql, args...); err != nil {
+	if err := db.Get(u, sql, args...); err != nil {
 		if errors.Is(err, sqlx.ErrNoRows) {
 			app.USERS.Set(k, noUser)
 			return nil, nil

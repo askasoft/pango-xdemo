@@ -31,15 +31,103 @@ func AddOrder(sqb *sqlx.Builder, st *args.Sorter, defcol string) {
 	}
 }
 
+func AddEq(sqb *sqlx.Builder, column string, value string) {
+	if value != "" {
+		sqb.Eq(column, value)
+	}
+}
+
+func AddNeq(sqb *sqlx.Builder, column string, value string) {
+	if value != "" {
+		sqb.Neq(column, value)
+	}
+}
+
 func AddIn(sqb *sqlx.Builder, column string, values []string) {
 	if len(values) > 0 {
 		sqb.In(column, values)
 	}
 }
 
-func AddLower(sqb *sqlx.Builder, column string, value string) {
+func AddStartsLike(sqb *sqlx.Builder, column string, value string) {
 	if value != "" {
-		sqb.Where(column+" = ?", str.ToLower(value))
+		sqb.Like(column, sqx.StartsLike(value))
+	}
+}
+
+func AddEndsLike(sqb *sqlx.Builder, column string, value string) {
+	if value != "" {
+		sqb.Like(column, sqx.EndsLike(value))
+	}
+}
+
+func AddLike(sqb *sqlx.Builder, column string, value string) {
+	if value != "" {
+		sqb.Like(column, sqx.StringLike(value))
+	}
+}
+
+func AddStartsILike(sqb *sqlx.Builder, column string, value string) {
+	if value != "" {
+		sqb.ILike(column, sqx.StartsLike(value))
+	}
+}
+
+func AddEndsILike(sqb *sqlx.Builder, column string, value string) {
+	if value != "" {
+		sqb.ILike(column, sqx.EndsLike(value))
+	}
+}
+
+func AddILike(sqb *sqlx.Builder, column string, value string) {
+	if value != "" {
+		sqb.ILike(column, sqx.StringLike(value))
+	}
+}
+
+func AddTimes(sqb *sqlx.Builder, column string, tmin, tmax time.Time) {
+	if !tmin.IsZero() && !tmax.IsZero() {
+		sqb.Btw(column, tmin, tmax)
+	} else if !tmin.IsZero() {
+		sqb.Gte(column, tmin)
+	} else if !tmax.IsZero() {
+		sqb.Lte(column, tmax)
+	}
+}
+
+func AddTimePtrs(sqb *sqlx.Builder, column string, tmin, tmax *time.Time) {
+	if tmin != nil && tmax != nil {
+		sqb.Btw(column, *tmin, *tmax)
+	} else if tmin != nil {
+		sqb.Gte(column, *tmin)
+	} else if tmax != nil {
+		sqb.Lte(column, *tmax)
+	}
+}
+
+func AddInts(sqb *sqlx.Builder, column string, smin, smax string) {
+	if smin != "" && smax != "" {
+		sqb.Btw(column, smin, smax)
+	} else if smin != "" {
+		sqb.Gte(column, num.Atoi(smin))
+	} else if smax != "" {
+		sqb.Lte(column, num.Atoi(smax))
+	}
+}
+
+func AddFloats(sqb *sqlx.Builder, column string, smin, smax string) {
+	if smin != "" && smax != "" {
+		sqb.Btw(column, smin, smax)
+	} else if smin != "" {
+		sqb.Gte(column, num.Atof(smin))
+	} else if smax != "" {
+		sqb.Lte(column, num.Atof(smax))
+	}
+}
+
+func AddOverlap(sqb *sqlx.Builder, column string, values []string) {
+	if len(values) > 0 {
+		sqb.Where(column+" && ?", pqx.StringArray(values))
 	}
 }
 
@@ -96,51 +184,5 @@ func AddLikes(sqb *sqlx.Builder, column string, search string) {
 		sb.WriteByte(')')
 
 		sqb.Where(sb.String(), args...)
-	}
-}
-
-func AddTimes(sqb *sqlx.Builder, column string, tmin, tmax time.Time) {
-	if !tmin.IsZero() && !tmax.IsZero() {
-		sqb.Where(column+" BETWEEN ? AND ?", tmin, tmax)
-	} else if !tmin.IsZero() {
-		sqb.Where(column+" >= ?", tmin)
-	} else if !tmax.IsZero() {
-		sqb.Where(column+" <= ?", tmax)
-	}
-}
-
-func AddTimePtrs(sqb *sqlx.Builder, column string, tmin, tmax *time.Time) {
-	if tmin != nil && tmax != nil {
-		sqb.Where(column+" BETWEEN ? AND ?", *tmin, *tmax)
-	} else if tmin != nil {
-		sqb.Where(column+" >= ?", *tmin)
-	} else if tmax != nil {
-		sqb.Where(column+" <= ?", *tmax)
-	}
-}
-
-func AddInts(sqb *sqlx.Builder, column string, smin, smax string) {
-	if smin != "" && smax != "" {
-		sqb.Where(column+" BETWEEN ? AND ?", smin, smax)
-	} else if smin != "" {
-		sqb.Where(column+" >= ?", num.Atoi(smin))
-	} else if smax != "" {
-		sqb.Where(column+" <= ?", num.Atoi(smax))
-	}
-}
-
-func AddFloats(sqb *sqlx.Builder, column string, smin, smax string) {
-	if smin != "" && smax != "" {
-		sqb.Where(column+" BETWEEN ? AND ?", smin, smax)
-	} else if smin != "" {
-		sqb.Where(column+" >= ?", num.Atof(smin))
-	} else if smax != "" {
-		sqb.Where(column+" <= ?", num.Atof(smax))
-	}
-}
-
-func AddOverlap(sqb *sqlx.Builder, column string, values []string) {
-	if len(values) > 0 {
-		sqb.Where(column+" && ?", pqx.StringArray(values))
 	}
 }

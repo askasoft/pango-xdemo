@@ -20,11 +20,11 @@ import (
 type AuditLogQueryArg struct {
 	argutil.QueryArg
 
-	ID       string    `form:"id,strip"`
-	DateFrom time.Time `form:"date_from,strip"`
-	DateTo   time.Time `form:"date_to,strip" validate:"omitempty,gtefield=DateFrom"`
-	User     string    `form:"user,strip"`
-	Func     []string  `form:"func,strip"`
+	ID       string     `form:"id,strip"`
+	DateFrom *time.Time `form:"date_from,strip"`
+	DateTo   *time.Time `form:"date_to,strip" validate:"omitempty,gtefield=DateFrom"`
+	User     string     `form:"user,strip"`
+	Func     []string   `form:"func,strip"`
 }
 
 func (alqa *AuditLogQueryArg) Normalize(c *xin.Context) {
@@ -40,15 +40,15 @@ func (alqa *AuditLogQueryArg) Normalize(c *xin.Context) {
 
 func (alqa *AuditLogQueryArg) HasFilters() bool {
 	return alqa.ID != "" ||
-		!alqa.DateFrom.IsZero() ||
-		!alqa.DateTo.IsZero() ||
+		alqa.DateFrom != nil ||
+		alqa.DateTo != nil ||
 		alqa.User != "" ||
 		len(alqa.Func) > 0
 }
 
 func (alqa *AuditLogQueryArg) AddFilters(c *xin.Context, sqb *sqlx.Builder) {
 	alqa.AddIDs(sqb, "audit_logs.id", alqa.ID)
-	alqa.AddTimes(sqb, "audit_logs.date", alqa.DateFrom, alqa.DateTo)
+	alqa.AddTimePtrs(sqb, "audit_logs.date", alqa.DateFrom, alqa.DateTo)
 	alqa.AddIn(sqb, "audit_logs.func", alqa.Func)
 	alqa.AddLikes(sqb, "users.email", alqa.User)
 }
@@ -68,22 +68,24 @@ func bindAuditLogMaps(c *xin.Context, h xin.H) {
 func countAuditLogs(c *xin.Context, alqa *AuditLogQueryArg) (total int, err error) {
 	tt := tenant.FromCtx(c)
 
-	sqb := app.SDB.Builder()
+	db := app.SDB
+	sqb := db.Builder()
 	sqb.Count()
 	sqb.From(tt.TableAuditLogs())
 	sqb.Join("LEFT JOIN " + tt.TableUsers() + " ON users.id = audit_logs.uid")
 	alqa.AddFilters(c, sqb)
-
 	sql, args := sqb.Build()
 
-	err = app.SDB.Get(&total, sql, args...)
+	err = db.Get(&total, sql, args...)
 	return
 }
 
 func findAuditLogs(c *xin.Context, alqa *AuditLogQueryArg) (alogs []*models.AuditLogEx, err error) {
 	tt := tenant.FromCtx(c)
 
-	sqb := app.SDB.Builder()
+	db := app.SDB
+
+	sqb := db.Builder()
 	sqb.Select("audit_logs.*", "COALESCE(users.email, '') AS user")
 	sqb.From(tt.TableAuditLogs())
 	sqb.Join("LEFT JOIN " + tt.TableUsers() + " ON users.id = audit_logs.uid")
@@ -92,7 +94,7 @@ func findAuditLogs(c *xin.Context, alqa *AuditLogQueryArg) (alogs []*models.Audi
 	alqa.AddPager(sqb)
 	sql, args := sqb.Build()
 
-	err = app.SDB.Select(&alogs, sql, args...)
+	err = db.Select(&alogs, sql, args...)
 	return
 }
 

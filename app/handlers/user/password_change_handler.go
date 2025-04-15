@@ -68,13 +68,14 @@ func PasswordChangeChange(c *xin.Context) {
 
 	tt := tenant.FromCtx(c)
 
-	sqb := app.SDB.Builder()
+	db := app.SDB
+	sqb := db.Builder()
 	sqb.Update(tt.TableUsers())
 	sqb.Setc("password", nu.Password)
-	sqb.Where("id = ?", au.ID)
+	sqb.Eq("id", au.ID)
 	sql, args := sqb.Build()
 
-	r, err := app.SDB.Exec(sql, args...)
+	r, err := db.Exec(sql, args...)
 	if err != nil {
 		c.AddError(err)
 		c.JSON(http.StatusBadRequest, handlers.E(c))

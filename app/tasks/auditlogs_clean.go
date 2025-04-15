@@ -12,12 +12,14 @@ func CleanOutdatedAuditLogs() {
 	before := time.Now().Add(-1 * ini.GetDuration("auditlog", "outdatedBefore", time.Hour*8760))
 
 	_ = tenant.Iterate(func(tt *tenant.Tenant) error {
-		sqb := app.SDB.Builder()
+		db := app.SDB
+
+		sqb := db.Builder()
 		sqb.Delete(tt.TableAuditLogs())
 		sqb.Where("date < ?", before)
 		sql, args := sqb.Build()
 
-		r, err := app.SDB.Exec(sql, args...)
+		r, err := db.Exec(sql, args...)
 		if err != nil {
 			return err
 		}

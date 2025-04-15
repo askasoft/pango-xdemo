@@ -35,15 +35,16 @@ func loadConfigList(c *xin.Context, role string) []*models.Config {
 	tt := tenant.FromCtx(c)
 	au := tenant.AuthUser(c)
 
-	sqb := app.SDB.Builder()
+	db := app.SDB
+	sqb := db.Builder()
 	sqb.Select().From(tt.TableConfigs())
-	sqb.Where(role+" >= ?", au.Role)
-	sqb.Order(app.SDB.Quote("order"))
-	sqb.Order(app.SDB.Quote("name"))
+	sqb.Gte(role, au.Role)
+	sqb.Order("order")
+	sqb.Order("name")
 	sql, args := sqb.Build()
 
 	configs := []*models.Config{}
-	if err := app.SDB.Select(&configs, sql, args...); err != nil {
+	if err := db.Select(&configs, sql, args...); err != nil {
 		panic(err)
 	}
 
@@ -277,11 +278,11 @@ func saveConfigs(c *xin.Context, configs []*models.Config, action string) {
 	sqb.Update(tt.TableConfigs())
 	sqb.Setc("value", "")
 	sqb.Setc("updated_at", "")
-	sqb.Where("name = ?", "")
-	sqb.Where("editor >= ?", "")
+	sqb.Eq("name", "")
+	sqb.Gte("editor", "")
 	sql := sqb.SQL()
 
-	stmt, err := app.SDB.Prepare(sql)
+	stmt, err := tx.Prepare(sql)
 	if err != nil {
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))

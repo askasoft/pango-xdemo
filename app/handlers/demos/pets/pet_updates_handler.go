@@ -90,7 +90,7 @@ func PetUpdates(c *xin.Context) {
 
 		sql, args := sqb.Build()
 
-		r, err := app.SDB.Exec(sql, args...)
+		r, err := tx.Exec(sql, args...)
 		if err != nil {
 			return err
 		}

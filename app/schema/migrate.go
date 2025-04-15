@@ -64,12 +64,14 @@ func (sm Schema) MigrateConfig(configs []*models.Config) error {
 
 	log.Infof("Migrate %q", tb)
 
-	sqb := app.SDB.Builder()
+	db := app.SDB
+	sqb := db.Builder()
+
 	sqb.Select().From(tb)
 	sql, args := sqb.Build()
 
 	oconfigs := make(map[string]*models.Config)
-	rows, err := app.SDB.Queryx(sql, args...)
+	rows, err := db.Queryx(sql, args...)
 	if err != nil {
 		return err
 	}
@@ -84,23 +86,23 @@ func (sm Schema) MigrateConfig(configs []*models.Config) error {
 	}
 	rows.Close()
 
-	sqbu := app.SDB.Builder()
+	sqbu := db.Builder()
 	sqbu.Update(tb)
 	sqbu.Names("style", "order", "required", "secret", "viewer", "editor", "validation")
 	sqbu.Where("name = :name")
 	sqlu := sqbu.SQL()
 
-	stmtu, err := app.SDB.PrepareNamed(sqlu)
+	stmtu, err := db.PrepareNamed(sqlu)
 	if err != nil {
 		return err
 	}
 	defer stmtu.Close()
 
-	sqbc := app.SDB.Builder()
+	sqbc := db.Builder()
 	sqbc.Insert(tb)
 	sqbc.StructNames(&models.Config{})
 	sqlc := sqbc.SQL()
-	stmtc, err := app.SDB.PrepareNamed(sqlc)
+	stmtc, err := db.PrepareNamed(sqlc)
 	if err != nil {
 		return err
 	}
@@ -141,12 +143,14 @@ func (sm Schema) MigrateSuper() error {
 
 	log.Infof("Migrate super %q: %s", sm, superEmail)
 
-	sqb := app.SDB.Builder()
-	sqb.Select().From(sm.TableUsers()).Where("email = ?", superEmail)
+	db := app.SDB
+
+	sqb := db.Builder()
+	sqb.Select().From(sm.TableUsers()).Eq("email", superEmail)
 	sql, args := sqb.Build()
 
 	user := &models.User{}
-	err := app.SDB.Get(user, sql, args...)
+	err := db.Get(user, sql, args...)
 	if err != nil {
 		if !errors.Is(err, sqlx.ErrNoRows) {
 			return err
@@ -168,12 +172,12 @@ func (sm Schema) MigrateSuper() error {
 		sqb.StructNames(user)
 		sql := sqb.SQL()
 
-		_, err = app.SDB.NamedExec(sql, user)
+		_, err = db.NamedExec(sql, user)
 		if err != nil {
 			return err
 		}
 
-		return sm.ResetSequence(app.SDB, "users", models.UserStartID)
+		return sm.ResetSequence(db, "users", models.UserStartID)
 	}
 
 	sqb.Reset()
@@ -181,6 +185,6 @@ func (sm Schema) MigrateSuper() error {
 	sqb.Setc("role", models.RoleSuper)
 	sqb.Setc("status", models.UserActive)
 	sql, args = sqb.Build()
-	_, err = app.SDB.Exec(sql, args...)
+	_, err = db.Exec(sql, args...)
 	return err
 }

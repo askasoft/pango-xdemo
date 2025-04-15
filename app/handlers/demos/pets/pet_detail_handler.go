@@ -54,13 +54,14 @@ func petDetail(c *xin.Context, action string) {
 
 	tt := tenant.FromCtx(c)
 
-	sqb := app.SDB.Builder()
+	db := app.SDB
+	sqb := db.Builder()
 	sqb.Select().From(tt.TablePets())
-	sqb.Where("id = ?", pid)
+	sqb.Eq("id", pid)
 	sql, args := sqb.Build()
 
 	pet := &models.Pet{}
-	err := app.SDB.Get(pet, sql, args...)
+	err := db.Get(pet, sql, args...)
 	if err != nil {
 		if errors.Is(err, sqlx.ErrNoRows) {
 			c.AddError(tbs.Errorf(c.Locale, "error.detail.notfound", pid))

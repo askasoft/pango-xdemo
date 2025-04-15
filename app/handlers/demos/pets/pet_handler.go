@@ -18,19 +18,19 @@ import (
 type PetQueryArg struct {
 	argutil.QueryArg
 
-	ID        string    `form:"id,strip"`
-	Name      string    `form:"name,strip"`
-	BornFrom  time.Time `form:"born_from,strip"`
-	BornTo    time.Time `form:"born_to,strip" validate:"omitempty,gtefield=BornFrom"`
-	Gender    []string  `form:"gender,strip"`
-	Origin    []string  `form:"origin,strip"`
-	Habits    []string  `form:"habits,strip"`
-	Temper    []string  `form:"temper,strip"`
-	AmountMin string    `form:"amount_min"`
-	AmountMax string    `form:"amount_max"`
-	PriceMin  string    `form:"price_min"`
-	PriceMax  string    `form:"price_max"`
-	ShopName  string    `form:"shop_name,strip"`
+	ID        string     `form:"id,strip"`
+	Name      string     `form:"name,strip"`
+	BornFrom  *time.Time `form:"born_from,strip"`
+	BornTo    *time.Time `form:"born_to,strip" validate:"omitempty,gtefield=BornFrom"`
+	Gender    []string   `form:"gender,strip"`
+	Origin    []string   `form:"origin,strip"`
+	Habits    []string   `form:"habits,strip"`
+	Temper    []string   `form:"temper,strip"`
+	AmountMin string     `form:"amount_min"`
+	AmountMax string     `form:"amount_max"`
+	PriceMin  string     `form:"price_min"`
+	PriceMax  string     `form:"price_max"`
+	ShopName  string     `form:"shop_name,strip"`
 }
 
 var petListColumns = []string{
@@ -61,8 +61,8 @@ func (pqa *PetQueryArg) HasFilters() bool {
 		len(pqa.Origin) > 0 ||
 		len(pqa.Temper) > 0 ||
 		len(pqa.Habits) > 0 ||
-		!pqa.BornFrom.IsZero() ||
-		!pqa.BornTo.IsZero() ||
+		pqa.BornFrom != nil ||
+		pqa.BornTo != nil ||
 		pqa.AmountMin != "" ||
 		pqa.AmountMax != "" ||
 		pqa.PriceMin != "" ||
@@ -76,7 +76,7 @@ func (pqa *PetQueryArg) AddFilters(sqb *sqlx.Builder) {
 	pqa.AddIn(sqb, "origin", pqa.Origin)
 	pqa.AddIn(sqb, "temper", pqa.Temper)
 	pqa.AddOverlap(sqb, "habits", pqa.Habits)
-	pqa.AddTimes(sqb, "born_at", pqa.BornFrom, pqa.BornTo)
+	pqa.AddTimePtrs(sqb, "born_at", pqa.BornFrom, pqa.BornTo)
 	pqa.AddInts(sqb, "amount", pqa.AmountMin, pqa.AmountMax)
 	pqa.AddFloats(sqb, "price", pqa.PriceMin, pqa.PriceMax)
 	pqa.AddLikes(sqb, "name", pqa.Name)
@@ -99,18 +99,20 @@ func bindPetMaps(c *xin.Context, h xin.H) {
 }
 
 func countPets(tt *tenant.Tenant, pqa *PetQueryArg) (total int, err error) {
-	sqb := app.SDB.Builder()
+	db := app.SDB
+	sqb := db.Builder()
 	sqb.Count()
 	sqb.From(tt.TablePets())
 	pqa.AddFilters(sqb)
 	sql, args := sqb.Build()
 
-	err = app.SDB.Get(&total, sql, args...)
+	err = db.Get(&total, sql, args...)
 	return
 }
 
 func findPets(tt *tenant.Tenant, pqa *PetQueryArg) (pets []*models.Pet, err error) {
-	sqb := app.SDB.Builder()
+	db := app.SDB
+	sqb := db.Builder()
 	sqb.Select(petListColumns...)
 	sqb.From(tt.TablePets())
 	pqa.AddFilters(sqb)
@@ -118,7 +120,7 @@ func findPets(tt *tenant.Tenant, pqa *PetQueryArg) (pets []*models.Pet, err erro
 	pqa.AddPager(sqb)
 	sql, args := sqb.Build()
 
-	err = app.SDB.Select(&pets, sql, args...)
+	err = db.Select(&pets, sql, args...)
 	return
 }
 
