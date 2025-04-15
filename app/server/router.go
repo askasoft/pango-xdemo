@@ -8,16 +8,14 @@ import (
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/handlers"
 	"github.com/askasoft/pango-xdemo/app/handlers/admin"
-	"github.com/askasoft/pango-xdemo/app/handlers/admin/auditlogs"
-	"github.com/askasoft/pango-xdemo/app/handlers/admin/configs"
-	"github.com/askasoft/pango-xdemo/app/handlers/admin/users"
 	"github.com/askasoft/pango-xdemo/app/handlers/api"
 	"github.com/askasoft/pango-xdemo/app/handlers/demos"
-	"github.com/askasoft/pango-xdemo/app/handlers/demos/pets"
 	"github.com/askasoft/pango-xdemo/app/handlers/files"
 	"github.com/askasoft/pango-xdemo/app/handlers/login"
+	"github.com/askasoft/pango-xdemo/app/handlers/saml"
 	"github.com/askasoft/pango-xdemo/app/handlers/super"
 	"github.com/askasoft/pango-xdemo/app/handlers/user"
+	"github.com/askasoft/pango-xdemo/app/middles"
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
 	"github.com/askasoft/pango-xdemo/web"
@@ -26,7 +24,6 @@ import (
 	"github.com/askasoft/pango/net/httpx"
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/vad"
-	"github.com/askasoft/pango/xfs"
 	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pango/xmw"
 )
@@ -181,7 +178,7 @@ func initHandlers() {
 	r.HTMLTemplates = app.XHT
 
 	r.Use(xin.Recovery())
-	r.Use(SetCtxLogProp) // Set TENANT logger prop
+	r.Use(middles.SetCtxLogProp) // Set TENANT logger prop
 	r.Use(app.XAL.Handler())
 	r.Use(app.XLL.Handler())
 	r.Use(app.XSL.Handler())
@@ -193,8 +190,8 @@ func initHandlers() {
 	rg.HEAD("/healthcheck", handlers.HealthCheck)
 	rg.GET("/healthcheck", handlers.HealthCheck)
 
-	rg.Use(app.XSR.Handler()) // https redirect
-	rg.Use(TenantProtect)     // schema protect
+	rg.Use(app.XSR.Handler())     // https redirect
+	rg.Use(middles.TenantProtect) // schema protect
 
 	rg.GET("/", app.XCN.Handler(), handlers.Index)
 	rg.GET("/403", app.XCN.Handler(), handlers.Forbidden)
@@ -204,16 +201,16 @@ func initHandlers() {
 
 	addStaticHandlers(rg)
 
-	addUserHandlers(rg.Group("/u"))
-	addAdminHandlers(rg.Group("/a"))
-	addSuperHandlers(rg.Group("/s"))
-	addSAMLHandlers(rg.Group("/saml"))
-	addLoginHandlers(rg.Group("/login"))
-	addFilesHandlers(rg.Group("/files"))
-	addDemosHandlers(rg.Group("/demos"))
-	addAPIHandlers(rg.Group("/api"))
+	api.Router(rg.Group("/api"))
+	saml.Router(rg.Group("/saml"))
+	login.Router(rg.Group("/login"))
+	files.Router(rg.Group("/files"))
+	demos.Router(rg.Group("/demos"))
+	admin.Router(rg.Group("/a"))
+	super.Router(rg.Group("/s"))
+	user.Router(rg.Group("/u"))
 
-	app.XIN.NoRoute(TenantProtect, app.XCN.Handler(), handlers.NotFound)
+	app.XIN.NoRoute(middles.TenantProtect, app.XCN.Handler(), handlers.NotFound)
 }
 
 func addStaticHandlers(rg *xin.RouterGroup) {
@@ -232,210 +229,4 @@ func addStaticHandlers(rg *xin.RouterGroup) {
 	xin.StaticFSFunc(rg, "/assets", wfsc, "/assets", xcch)
 	xin.StaticFSFuncFile(rg, "/favicon.ico", wfsc, "favicon.ico", xcch)
 	xin.StaticFSFuncFile(rg, "/robots.txt", wfsc, "robots.txt", xcch)
-}
-
-func addUserHandlers(rg *xin.RouterGroup) {
-	rg.Use(AppAuth)           // app auth
-	rg.Use(IPProtect)         // IP protect
-	rg.Use(app.XTP.Handler()) // token protect
-
-	addUserPwdchgHandlers(rg.Group("/pwdchg"))
-}
-
-func addUserPwdchgHandlers(rg *xin.RouterGroup) {
-	rg.GET("/", user.PasswordChangeIndex)
-	rg.POST("/change", user.PasswordChangeChange)
-}
-
-func addAdminHandlers(rg *xin.RouterGroup) {
-	rg.Use(AppAuth)           // app auth
-	rg.Use(IPProtect)         // IP protect
-	rg.Use(RoleAdminProtect)  // role protect
-	rg.Use(app.XTP.Handler()) // token protect
-
-	rg.GET("/", admin.Index)
-
-	addAdminUserHandlers(rg.Group("/users"))
-	addAdminConfigHandlers(rg.Group("/configs"))
-	addAdminAuditLogHandlers(rg.Group("/auditlogs"))
-}
-
-func addAdminUserHandlers(rg *xin.RouterGroup) {
-	rg.GET("/", users.UserIndex)
-	rg.GET("/new", users.UserNew)
-	rg.GET("/view", users.UserView)
-	rg.GET("/edit", users.UserEdit)
-	rg.POST("/list", users.UserList)
-	rg.POST("/create", users.UserCreate)
-	rg.POST("/update", users.UserUpdate)
-	rg.POST("/updates", users.UserUpdates)
-	rg.POST("/deletes", users.UserDeletes)
-	rg.POST("/deleteb", users.UserDeleteBatch)
-	rg.POST("/export/csv", users.UserCsvExport)
-
-	addAdminUserImportHandlers(rg.Group("/import"))
-}
-
-func addAdminUserImportHandlers(rg *xin.RouterGroup) {
-	rg.GET("/", xin.Redirector("./csv/"))
-
-	addAdminUserCsvImportHandlers(rg.Group("/csv"))
-}
-
-func addAdminUserCsvImportHandlers(rg *xin.RouterGroup) {
-	users.UserCsvImportJobHandler.Router(rg)
-	rg.GET("/sample", users.UserCsvImportSample)
-}
-
-func addAdminConfigHandlers(rg *xin.RouterGroup) {
-	rg.GET("/", configs.ConfigIndex)
-	rg.POST("/save", configs.ConfigSave)
-	rg.POST("/export", configs.ConfigExport)
-	rg.POST("/import", configs.ConfigImport)
-}
-
-func addAdminAuditLogHandlers(rg *xin.RouterGroup) {
-	rg.GET("/", auditlogs.AuditLogIndex)
-	rg.POST("/list", auditlogs.AuditLogList)
-	rg.POST("/deletes", auditlogs.AuditLogDeletes)
-	rg.POST("/export/csv", auditlogs.AuditLogCsvExport)
-}
-
-func addSuperHandlers(rg *xin.RouterGroup) {
-	rg.Use(AppAuth)           // app auth
-	rg.Use(IPProtect)         // IP protect
-	rg.Use(RoleRootProtect)   // role protect
-	rg.Use(app.XTP.Handler()) // token protect
-
-	rg.GET("/", super.Index)
-
-	addSuperTenantHandlers(rg.Group("/tenants"))
-	addSuperStatsHandlers(rg.Group("/stats"))
-	addSuperSqlHandlers(rg.Group("/sql"))
-	addSuperShellHandlers(rg.Group("/shell"))
-	addSuperRuntimeHandlers(rg.Group("/runtime"))
-}
-
-func addSuperTenantHandlers(rg *xin.RouterGroup) {
-	rg.GET("/", super.TenantIndex)
-	rg.POST("/list", super.TenantList)
-	rg.POST("/create", super.TenantCreate)
-	rg.POST("/update", super.TenantUpdate)
-	rg.POST("/delete", super.TenantDelete)
-}
-
-func addSuperStatsHandlers(rg *xin.RouterGroup) {
-	rg.GET("/", super.StatsIndex)
-	rg.GET("/jobs", super.StatsJobs)
-	rg.GET("/configs", super.StatsCacheConfigs)
-	rg.GET("/schemas", super.StatsCacheSchemas)
-	rg.GET("/workers", super.StatsCacheWorkers)
-	rg.GET("/users", super.StatsCacheUsers)
-	rg.GET("/afips", super.StatsCacheAfips)
-}
-
-func addSuperSqlHandlers(rg *xin.RouterGroup) {
-	rg.GET("/", super.SqlIndex)
-	rg.POST("/exec", super.SqlExec)
-}
-
-func addSuperShellHandlers(rg *xin.RouterGroup) {
-	rg.GET("/", super.ShellIndex)
-	rg.POST("/exec", super.ShellExec)
-}
-
-func addSuperRuntimeHandlers(rg *xin.RouterGroup) {
-	rg.GET("/", super.RuntimeIndex)
-	rg.GET("/pprof/:prof", super.RuntimePprof)
-}
-
-func addLoginHandlers(rg *xin.RouterGroup) {
-	rg.Use(app.XTP.Handler()) // token protect
-	rg.Use(app.XCN.Handler())
-
-	rg.GET("/", login.Index)
-	rg.POST("/login", login.Login)
-	rg.POST("/mfa_enroll", login.LoginMFAEnroll)
-	rg.GET("/logout", login.Logout)
-
-	addLoginPasswordResetHandlers(rg.Group("/pwdrst"))
-}
-
-func addLoginPasswordResetHandlers(rg *xin.RouterGroup) {
-	rg.GET("/", login.PasswordResetIndex)
-	rg.POST("/send", login.PasswordResetSend)
-	rg.GET("/reset/:token", login.PasswordResetConfirm)
-	rg.POST("/reset/:token", login.PasswordResetExecute)
-}
-
-func addFilesHandlers(rg *xin.RouterGroup) {
-	rg.POST("/upload", files.Upload)
-	rg.POST("/uploads", files.Uploads)
-
-	xcch := app.XCC.Handler()
-
-	xin.StaticFSFunc(rg, "/", func(c *xin.Context) http.FileSystem {
-		tt := tenant.FromCtx(c)
-		return xfs.HFS(tt.FS())
-	}, "", xcch)
-}
-
-func addDemosHandlers(rg *xin.RouterGroup) {
-	rg.Use(app.XTP.Handler()) // token protect
-	rg.Use(app.XCN.Handler())
-
-	addDemosPetsHandlers(rg.Group("/pets"))
-	addDemosChineseHandlers(rg.Group("/chiconv"))
-
-	rg.GET("/tags/", demos.TagsIndex)
-	rg.POST("/tags/", demos.TagsIndex)
-	rg.GET("/uploads/", demos.UploadsIndex)
-}
-
-func addDemosPetsHandlers(rg *xin.RouterGroup) {
-	rg.GET("/", pets.PetIndex)
-	rg.GET("/new", pets.PetNew)
-	rg.GET("/view", pets.PetView)
-	rg.GET("/edit", pets.PetEdit)
-	rg.POST("/list", pets.PetList)
-	rg.POST("/create", pets.PetCreate)
-	rg.POST("/update", pets.PetUpdate)
-	rg.POST("/updates", pets.PetUpdates)
-	rg.POST("/deletes", pets.PetDeletes)
-	rg.POST("/deleteb", pets.PetDeleteBatch)
-	rg.POST("/export/csv", pets.PetCsvExport)
-
-	addDemosPetJobsHandlers(rg.Group("/jobs"))
-}
-
-func addDemosPetJobsHandlers(rg *xin.RouterGroup) {
-	pets.PetClearJobHandler.Router(rg.Group("/clear"))
-	pets.PetCatGenJobHandler.Router(rg.Group("/catgen"))
-	pets.PetDogGenJobHandler.Router(rg.Group("/doggen"))
-	pets.PetResetJobChainHandler.Router(rg.Group("/reset"))
-}
-
-func addDemosChineseHandlers(rg *xin.RouterGroup) {
-	rg.GET("/", demos.ChiconvIndex)
-	rg.POST("/s2t", demos.ChiconvS2T)
-	rg.POST("/t2s", demos.ChiconvT2S)
-}
-
-func addAPIHandlers(rg *xin.RouterGroup) {
-	rg.Use(app.XAC.Handler()) // access control
-	rg.OPTIONS("/*path", xin.Next)
-
-	addMyApiHandlers(rg)
-
-	rgb := rg.Group("/basic")
-	rgb.Use(app.XBA.Handler()) // Basic auth
-	rgb.Use(api.IPProtect)     // IP protect
-	addMyApiHandlers(rgb)
-}
-
-func addMyApiHandlers(rg *xin.RouterGroup) {
-	rg.GET("/myip", api.MyIP)
-	rg.GET("/myheader", api.MyHeader)
-	rg.GET("/myget", api.MyGet)
-	rg.POST("/mypost", api.MyPost)
 }
