@@ -68,21 +68,13 @@ func PasswordChangeChange(c *xin.Context) {
 
 	tt := tenant.FromCtx(c)
 
-	db := app.SDB
-	sqb := db.Builder()
-	sqb.Update(tt.TableUsers())
-	sqb.Setc("password", nu.Password)
-	sqb.Eq("id", au.ID)
-	sql, args := sqb.Build()
-
-	r, err := db.Exec(sql, args...)
+	cnt, err := tt.UpdateUserPassword(app.SDB, au.ID, nu.Password)
 	if err != nil {
 		c.AddError(err)
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}
 
-	cnt, _ := r.RowsAffected()
 	if cnt != 1 {
 		c.AddError(tbs.Error(c.Locale, "error.update.notfound"))
 		c.JSON(http.StatusBadRequest, handlers.E(c))

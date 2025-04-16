@@ -3,39 +3,25 @@ package pets
 import (
 	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/handlers"
 	"github.com/askasoft/pango-xdemo/app/models"
+	"github.com/askasoft/pango-xdemo/app/schema"
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango-xdemo/app/utils/argutil"
 	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
 	"github.com/askasoft/pango/asg"
 	"github.com/askasoft/pango/num"
-	"github.com/askasoft/pango/sqx/pqx"
 	"github.com/askasoft/pango/sqx/sqlx"
-	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/tbs"
 	"github.com/askasoft/pango/xin"
 )
 
-type PetUpdatesArg struct {
-	ID     string     `json:"id,omitempty" form:"id,strip"`
-	Gender string     `json:"gender,omitempty" form:"gender,strip"`
-	BornAt *time.Time `json:"born_at,omitempty" form:"born_at"`
-	Origin string     `json:"origin,omitempty" form:"origin,strip"`
-	Temper string     `json:"temper,omitempty" form:"temper,strip"`
-	Habits *[]string  `json:"habits,omitempty" form:"habits,strip"`
-}
-
-func (pua *PetUpdatesArg) IsEmpty() bool {
-	return pua.Gender == "" && pua.BornAt == nil && pua.Origin == "" && pua.Temper == "" && pua.Habits == nil
-}
-
 func PetUpdates(c *xin.Context) {
-	pua := &PetUpdatesArg{}
-	if err := c.Bind(pua); err != nil {
+	pua := &schema.PetUpdatesArg{}
+	err := c.Bind(pua)
+	if err != nil {
 		vadutil.AddBindErrors(c, err, "pet.")
 	}
 	if pua.IsEmpty() {
@@ -53,52 +39,24 @@ func PetUpdates(c *xin.Context) {
 		return
 	}
 
-	ids, ida := argutil.SplitIDs(pua.ID)
-	if len(ids) == 0 && !ida {
+	if !pua.HasValidID() {
 		c.AddError(vadutil.ErrInvalidID(c))
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}
 
 	tt := tenant.FromCtx(c)
+	au := tenant.GetAuthUser(c)
 
 	var cnt int64
-	err := app.SDB.Transaction(func(tx *sqlx.Tx) error {
-		sqb := tx.Builder()
-		sqb.Update(tt.TablePets())
-
-		if pua.Gender != "" {
-			sqb.Setc("gender", pua.Gender)
-		}
-		if pua.BornAt != nil {
-			sqb.Setc("born_at", *pua.BornAt)
-		}
-		if pua.Origin != "" {
-			sqb.Setc("origin", pua.Origin)
-		}
-		if pua.Temper != "" {
-			sqb.Setc("temper", pua.Temper)
-		}
-		if pua.Habits != nil {
-			sqb.Setc("habits", pqx.StringArray(str.Strips(*pua.Habits)))
-		}
-		sqb.Setc("updated_at", time.Now())
-
-		if len(ids) > 0 {
-			sqb.In("id", ids)
-		}
-
-		sql, args := sqb.Build()
-
-		r, err := tx.Exec(sql, args...)
+	err = app.SDB.Transaction(func(tx *sqlx.Tx) error {
+		cnt, err = tt.UpdatePets(tx, pua)
 		if err != nil {
 			return err
 		}
 
-		cnt, _ = r.RowsAffected()
 		if cnt > 0 {
-			sql = tx.Binder().Explain(sql, args...)
-			return tt.AddAuditLog(tx, 0, models.AL_PETS_UPDATES, num.Ltoa(cnt), str.SubstrAfter(sql, "WHERE"))
+			return tt.AddAuditLog(tx, au, models.AL_PETS_UPDATES, num.Ltoa(cnt), pua.String())
 		}
 		return nil
 	})
@@ -123,6 +81,7 @@ func PetDeletes(c *xin.Context) {
 	}
 
 	tt := tenant.FromCtx(c)
+	au := tenant.GetAuthUser(c)
 
 	var cnt int64
 	err := app.SDB.Transaction(func(tx *sqlx.Tx) error {
@@ -139,21 +98,13 @@ func PetDeletes(c *xin.Context) {
 			}
 		}
 
-		sqb := tx.Builder()
-		sqb.Delete(tt.TablePets())
-		if len(ids) > 0 {
-			sqb.In("id", ids)
-		}
-		sql, args := sqb.Build()
-
-		r, err := tx.Exec(sql, args...)
+		cnt, err := tt.DeletePets(tx, ids...)
 		if err != nil {
 			return err
 		}
 
-		cnt, _ = r.RowsAffected()
 		if cnt > 0 {
-			if err := tt.AddAuditLog(tx, 0, models.AL_PETS_DELETES, num.Ltoa(cnt), asg.Join(ids, ", ")); err != nil {
+			if err := tt.AddAuditLog(tx, au, models.AL_PETS_DELETES, num.Ltoa(cnt), asg.Join(ids, ", ")); err != nil {
 				return err
 			}
 			return tt.ResetSequence(tx, "pets")
@@ -186,23 +137,17 @@ func PetDeleteBatch(c *xin.Context) {
 	}
 
 	tt := tenant.FromCtx(c)
+	au := tenant.GetAuthUser(c)
 
 	var cnt int64
 	err = app.SDB.Transaction(func(tx *sqlx.Tx) (err error) {
-		sqb := tx.Builder()
-		sqb.Delete(tt.TablePets())
-		pqa.AddFilters(sqb)
-		sql, args := sqb.Build()
-
-		r, err := tx.Exec(sql, args...)
+		cnt, err = tt.DeletePetsQuery(tx, pqa)
 		if err != nil {
 			return
 		}
 
-		cnt, _ = r.RowsAffected()
 		if cnt > 0 {
-			sql = tx.Binder().Explain(sql, args...)
-			if err := tt.AddAuditLog(tx, 0, models.AL_PETS_DELETES, num.Ltoa(cnt), str.SubstrAfter(sql, "WHERE")); err != nil {
+			if err := tt.AddAuditLog(tx, au, models.AL_PETS_DELETES, num.Ltoa(cnt), pqa.String()); err != nil {
 				return err
 			}
 			return tt.ResetSequence(tx, "pets")
@@ -211,7 +156,7 @@ func PetDeleteBatch(c *xin.Context) {
 	})
 	if err != nil {
 		c.AddError(err)
-		c.JSON(http.StatusBadRequest, handlers.E(c))
+		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return
 	}
 

@@ -87,11 +87,12 @@
 	//
 	function auditlogs_deletebat() {
 		var $p = $('#auditlogs_deletebat_popup').popup('update', { keyboard: false });
+		var vs = main.form_input_values($p.find('form'));
 
 		$.ajax({
 			url: './deleteb',
 			method: 'POST',
-			data: $p.find('form').serialize(),
+			data: $.param(vs, true),
 			dataType: 'json',
 			beforeSend: main.form_ajax_start($p),
 			success: function(data) {

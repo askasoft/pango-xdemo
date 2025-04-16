@@ -70,28 +70,18 @@ func AuditLogDeleteBatch(c *xin.Context) {
 
 	var cnt int64
 	err = app.SDB.Transaction(func(tx *sqlx.Tx) error {
-		sqa := tx.Builder()
-		sqa.Select("audit_logs.id")
-		sqa.From(tt.TableAuditLogs())
-		sqa.Join("LEFT JOIN " + tt.TableUsers() + " ON users.id = audit_logs.uid")
-		alqa.AddFilters(c, sqa)
-
-		sqb := tx.Builder()
-		sqb.Delete(tt.TableAuditLogs())
-		sqb.Where("id IN ("+sqa.SQL()+")", sqa.Params()...)
-		sql, args := sqb.Build()
-
-		r, err := tx.Exec(sql, args...)
+		cnt, err = tt.DeleteAuditLogs(tx, alqa)
 		if err != nil {
 			return err
 		}
-
-		cnt, _ = r.RowsAffected()
-		return tt.ResetSequence(tx, "audit_logs")
+		if cnt > 0 {
+			return tt.ResetSequence(tx, "audit_logs")
+		}
+		return nil
 	})
 	if err != nil {
 		c.AddError(err)
-		c.JSON(http.StatusBadRequest, handlers.E(c))
+		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return
 	}
 

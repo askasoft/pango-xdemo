@@ -254,15 +254,11 @@ func (ucij *UserCsvImportJob) importRecord(rec *csvUserRecord) error {
 		UpdatedAt: time.Now(),
 	}
 
+	tt := ucij.Tenant
 	err := app.SDB.Transaction(func(tx *sqlx.Tx) error {
-		sqb := tx.Builder()
-
+		uid := user.ID
 		if user.ID != 0 {
-			sqb.Select().From(ucij.Tenant.TableUsers()).Eq("id", user.ID)
-			sql, args := sqb.Build()
-
-			eu := &models.User{}
-			err := tx.Get(eu, sql, args...)
+			eu, err := tt.GetUser(tx, user.ID)
 			if err == nil {
 				if rec.Password == "" {
 					// NOTE: we need re-encrypt password, because password is encrypted by email
@@ -271,13 +267,7 @@ func (ucij *UserCsvImportJob) importRecord(rec *csvUserRecord) error {
 					user.SetPassword(rec.Password)
 				}
 
-				sqb.Reset()
-				sqb.Update(ucij.Tenant.TableUsers())
-				sqb.StructNames(user, "id", "secret", "created_at")
-				sqb.Where("id = :id")
-				sql = sqb.SQL()
-
-				r, err := tx.NamedExec(sql, user)
+				cnt, err := tt.UpdateUser(tx, ucij.Arg.Role, user)
 				if err != nil {
 					if pgutil.IsUniqueViolationError(err) {
 						ucij.IncFailure()
@@ -287,7 +277,7 @@ func (ucij *UserCsvImportJob) importRecord(rec *csvUserRecord) error {
 					return err
 				}
 
-				if cnt, _ := r.RowsAffected(); cnt > 0 {
+				if cnt > 0 {
 					ucij.IncSuccess()
 					ucij.Logger.Infof(tbs.GetText(ucij.Locale(), "user.import.csv.step.updated"), ucij.Progress(), user.ID, user.Name, user.Email)
 				} else {
@@ -309,19 +299,7 @@ func (ucij *UserCsvImportJob) importRecord(rec *csvUserRecord) error {
 		user.SetPassword(pwd)
 		user.Secret = ran.RandInt63()
 
-		sqb.Reset()
-		sqb.Insert(ucij.Tenant.TableUsers())
-		if user.ID == 0 {
-			sqb.StructNames(user, "id")
-		} else {
-			sqb.StructNames(user)
-		}
-		if !tx.SupportLastInsertID() {
-			sqb.Returns("id")
-		}
-		sql := sqb.SQL()
-
-		uid, err := tx.NamedCreate(sql, user)
+		err := tt.CreateUser(tx, user)
 		if err != nil {
 			if pgutil.IsUniqueViolationError(err) {
 				ucij.IncFailure()
@@ -332,9 +310,9 @@ func (ucij *UserCsvImportJob) importRecord(rec *csvUserRecord) error {
 		}
 
 		ucij.IncSuccess()
-		ucij.Logger.Infof(tbs.GetText(ucij.Locale(), "user.import.csv.step.created"), ucij.Progress(), uid, user.Name, user.Email)
+		ucij.Logger.Infof(tbs.GetText(ucij.Locale(), "user.import.csv.step.created"), ucij.Progress(), user.ID, user.Name, user.Email)
 
-		if user.ID != 0 {
+		if uid != 0 {
 			// reset sequence if create with ID
 			if err := ucij.Tenant.ResetSequence(tx, "users", models.UserStartID); err != nil {
 				return err

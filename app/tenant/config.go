@@ -2,7 +2,9 @@ package tenant
 
 import (
 	"net"
+	"sync"
 
+	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/utils/pwdutil"
 	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
 	"github.com/askasoft/pango/cog/linkedhashmap"
@@ -11,6 +13,37 @@ import (
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/tbs"
 )
+
+// CONFS write lock
+var muCONFS sync.Mutex
+
+func (tt *Tenant) PurgeConfig() {
+	muCONFS.Lock()
+	app.CONFS.Remove(string(tt.Schema))
+	muCONFS.Unlock()
+}
+
+func (tt *Tenant) getConfigMap() map[string]string {
+	if dcm, ok := app.CONFS.Get(string(tt.Schema)); ok {
+		return dcm
+	}
+
+	muCONFS.Lock()
+	defer muCONFS.Unlock()
+
+	// get again to prevent duplicated load
+	if dcm, ok := app.CONFS.Get(string(tt.Schema)); ok {
+		return dcm
+	}
+
+	dcm, err := tt.LoadConfigMap(app.SDB)
+	if err != nil {
+		panic(err)
+	}
+
+	app.CONFS.Set(string(tt.Schema), dcm)
+	return dcm
+}
 
 func (tt *Tenant) ConfigMap() map[string]string {
 	return tt.config

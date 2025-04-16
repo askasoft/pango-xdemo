@@ -51,13 +51,7 @@ func userDetail(c *xin.Context, action string) {
 
 	tt := tenant.FromCtx(c)
 
-	db := app.SDB
-	sqb := db.Builder()
-	sqb.Select().From(tt.TableUsers()).Eq("id", uid)
-	sql, args := sqb.Build()
-
-	user := &models.User{}
-	err := db.Get(user, sql, args...)
+	user, err := tt.GetUser(app.SDB, uid)
 	if err != nil {
 		if errors.Is(err, sqlx.ErrNoRows) {
 			c.AddError(tbs.Errorf(c.Locale, "error.detail.notfound", uid))
@@ -143,24 +137,14 @@ func UserCreate(c *xin.Context) {
 	user.UpdatedAt = user.CreatedAt
 
 	err := app.SDB.Transaction(func(tx *sqlx.Tx) error {
-		sqb := tx.Builder()
-		sqb.Insert(tt.TableUsers())
-		sqb.StructNames(user, "id")
-		if !tx.SupportLastInsertID() {
-			sqb.Returns("id")
-		}
-		sql := sqb.SQL()
-
-		uid, err := tx.NamedCreate(sql, user)
-		if err != nil {
+		if err := tt.CreateUser(tx, user); err != nil {
 			return err
 		}
 
-		user.ID = uid
 		user.Password = ""
 		user.Secret = 0
 
-		return tt.AddAuditLog(tx, au.ID, models.AL_USERS_CREATE, num.Ltoa(uid), user.Email)
+		return tt.AddAuditLog(tx, au, models.AL_USERS_CREATE, num.Ltoa(user.ID), user.Email)
 	})
 	if err != nil {
 		if pgutil.IsUniqueViolationError(err) {
@@ -195,15 +179,8 @@ func UserUpdate(c *xin.Context) {
 
 	var cnt int64
 	err := app.SDB.Transaction(func(tx *sqlx.Tx) error {
-		sqb := tx.Builder()
-
 		if user.Password == "" {
-			sqb.Select("password").From(tt.TableUsers())
-			sqb.Eq("id", user.ID)
-			sql, args := sqb.Build()
-
-			eu := &models.User{}
-			err := tx.Get(eu, sql, args...)
+			eu, err := tt.GetUser(tx, user.ID)
 			if err != nil {
 				return err
 			}
@@ -216,29 +193,16 @@ func UserUpdate(c *xin.Context) {
 
 		user.UpdatedAt = time.Now()
 
-		sqb.Reset()
-		sqb.Update(tt.TableUsers())
-		sqb.Setc("name", user.Name)
-		sqb.Setc("email", user.Email)
-		sqb.Setc("password", user.Password)
-		sqb.Setc("role", user.Role)
-		sqb.Setc("status", user.Status)
-		sqb.Setc("cidr", user.CIDR)
-		sqb.Setc("updated_at", user.UpdatedAt)
-		sqb.Eq("id", user.ID)
-		sqb.Gte("role", au.Role)
-		sql, args := sqb.Build()
-
-		r, err := tx.Exec(sql, args...)
+		var err error
+		cnt, err = tt.UpdateUser(tx, au.Role, user)
 		if err != nil {
 			return err
 		}
 
 		user.Password = ""
 
-		cnt, _ = r.RowsAffected()
 		if cnt > 0 {
-			return tt.AddAuditLog(tx, au.ID, models.AL_USERS_UPDATES, num.Ltoa(cnt), "#"+num.Ltoa(user.ID)+": <"+user.Email+">")
+			return tt.AddAuditLog(tx, au, models.AL_USERS_UPDATES, num.Ltoa(cnt), "#"+num.Ltoa(user.ID)+": <"+user.Email+">")
 		}
 		return nil
 	})

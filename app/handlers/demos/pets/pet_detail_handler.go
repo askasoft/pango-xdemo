@@ -54,14 +54,7 @@ func petDetail(c *xin.Context, action string) {
 
 	tt := tenant.FromCtx(c)
 
-	db := app.SDB
-	sqb := db.Builder()
-	sqb.Select().From(tt.TablePets())
-	sqb.Eq("id", pid)
-	sql, args := sqb.Build()
-
-	pet := &models.Pet{}
-	err := db.Get(pet, sql, args...)
+	pet, err := tt.GetPet(app.SDB, pid)
 	if err != nil {
 		if errors.Is(err, sqlx.ErrNoRows) {
 			c.AddError(tbs.Errorf(c.Locale, "error.detail.notfound", pid))
@@ -132,22 +125,14 @@ func PetCreate(c *xin.Context) {
 	pet.UpdatedAt = pet.CreatedAt
 
 	tt := tenant.FromCtx(c)
+	au := tenant.GetAuthUser(c)
 
 	err := app.SDB.Transaction(func(tx *sqlx.Tx) error {
-		sqb := tx.Builder()
-		sqb.Insert(tt.TablePets())
-		sqb.StructNames(&pet.Pet, "id")
-		if !tx.SupportLastInsertID() {
-			sqb.Returns("id")
-		}
-		sql := sqb.SQL()
-
-		pid, err := tx.NamedCreate(sql, pet)
+		err := tt.CreatePet(tx, &pet.Pet)
 		if err != nil {
 			return err
 		}
 
-		pet.ID = pid
 		if pet.File != "" {
 			fid := pet.PhotoPath()
 			sfs := tt.SFS(tx)
@@ -157,7 +142,7 @@ func PetCreate(c *xin.Context) {
 			return sfs.MoveFile(pet.File, fid)
 		}
 
-		return tt.AddAuditLog(tx, 0, models.AL_PETS_CREATE, num.Ltoa(pid), pet.Name)
+		return tt.AddAuditLog(tx, au, models.AL_PETS_CREATE, num.Ltoa(pet.ID), pet.Name)
 	})
 	if err != nil {
 		c.AddError(err)
@@ -184,31 +169,25 @@ func PetUpdate(c *xin.Context) {
 	pet.UpdatedAt = time.Now()
 
 	tt := tenant.FromCtx(c)
+	au := tenant.GetAuthUser(c)
 
 	var cnt int64
-	err := app.SDB.Transaction(func(tx *sqlx.Tx) error {
-		sqb := tx.Builder()
-		sqb.Update(tt.TablePets())
-		sqb.StructNames(&pet.Pet, "id", "created_at")
-		sqb.Where("id = :id")
-		sql := sqb.SQL()
-
-		r, err := tx.NamedExec(sql, pet)
+	var err error
+	err = app.SDB.Transaction(func(tx *sqlx.Tx) error {
+		cnt, err = tt.UpdatePet(tx, &pet.Pet)
 		if err != nil {
 			return err
 		}
-
-		cnt, _ = r.RowsAffected()
 		if cnt > 0 {
 			if pet.File != "" {
 				fid := pet.PhotoPath()
 				sfs := tt.SFS(tx)
-				if err := sfs.DeleteFile(fid); err != nil {
+				if err = sfs.DeleteFile(fid); err != nil {
 					return err
 				}
 				return sfs.MoveFile(pet.File, fid)
 			}
-			return tt.AddAuditLog(tx, 0, models.AL_PETS_UPDATES, num.Ltoa(cnt), "#"+num.Ltoa(pet.ID)+": <"+pet.Name+">")
+			return tt.AddAuditLog(tx, au, models.AL_PETS_UPDATES, num.Ltoa(cnt), "#"+num.Ltoa(pet.ID)+": <"+pet.Name+">")
 		}
 		return nil
 	})

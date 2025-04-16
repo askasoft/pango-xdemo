@@ -225,17 +225,19 @@
 		<form class="ui-form lined" autocomplete="off">
 			<input type="hidden" name="id"/>
 			<div class="row">
-				<label class="col-md-2 col-form-label required">{{T .Loc "pet.gender"}} <input type="checkbox"></label>
-				<div class="col-md-4">
+				<label class="col-md-2 col-form-label">{{T .Loc "pet.gender"}} <input type="checkbox"></label>
+				<div class="col-md-10">
 					{{Radios "Name=" "gender" "List=" .PetGenderMap "Value=" "M" "Disabled=" true}}
 				</div>
-				<label class="col-md-2 col-form-label required">{{T .Loc "pet.born_at"}} <input type="checkbox"></label>
-				<div class="col-md-4">
+			</div>
+			<div class="row">
+				<label class="col-md-2 col-form-label">{{T .Loc "pet.born_at"}} <input type="checkbox"></label>
+				<div class="col-md-10">
 					<input name="born_at" type="date" class="form-control" disabled>
 				</div>
 			</div>
 			<div class="row">
-				<label class="col-md-2 col-form-label required">{{T .Loc "pet.origin"}} <input type="checkbox"></label>
+				<label class="col-md-2 col-form-label">{{T .Loc "pet.origin"}} <input type="checkbox"></label>
 				<div class="col-md-10">
 					{{Select "Name=" "origin" "List=" .PetOriginMap "class=" "form-select" "Disabled=" true}}
 				</div>

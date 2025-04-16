@@ -1,47 +1,16 @@
 package schema
 
 import (
-	"sync"
+	"time"
 
-	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango/ini"
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/str"
+	"github.com/askasoft/pango/tbs"
 )
 
-// CONFS write lock
-var muCONFS sync.Mutex
-
-func (sm Schema) PurgeConfig() {
-	muCONFS.Lock()
-	app.CONFS.Remove(string(sm))
-	muCONFS.Unlock()
-}
-
-func (sm Schema) GetConfigMap() map[string]string {
-	if dcm, ok := app.CONFS.Get(string(sm)); ok {
-		return dcm
-	}
-
-	muCONFS.Lock()
-	defer muCONFS.Unlock()
-
-	// get again to prevent duplicated load
-	if dcm, ok := app.CONFS.Get(string(sm)); ok {
-		return dcm
-	}
-
-	dcm, err := sm.loadConfigMap(app.SDB)
-	if err != nil {
-		panic(err)
-	}
-
-	app.CONFS.Set(string(sm), dcm)
-	return dcm
-}
-
-func (sm Schema) loadConfigMap(db *sqlx.DB) (map[string]string, error) {
+func (sm Schema) LoadConfigMap(db sqlx.Sqlx) (map[string]string, error) {
 	sqb := db.Builder()
 	sqb.Select().From(sm.TableConfigs())
 	sql, args := sqb.Build()
@@ -77,4 +46,66 @@ func (sm Schema) loadConfigMap(db *sqlx.DB) (map[string]string, error) {
 	}
 
 	return cm, nil
+}
+
+func (sm Schema) ListConfigs(tx sqlx.Sqlx, actor, role string) (configs []*models.Config, err error) {
+	sqb := tx.Builder()
+	sqb.Select().From(sm.TableConfigs())
+	sqb.Gte(actor, role)
+	sqb.Order("order")
+	sqb.Order("name")
+	sql, args := sqb.Build()
+
+	err = tx.Select(&configs, sql, args...)
+	return
+}
+
+type UnsavedConfigItemsError struct {
+	Locale string
+	Items  []string
+}
+
+func (ucie *UnsavedConfigItemsError) Error() string {
+	nms := make([]string, 0, len(ucie.Items))
+	for _, it := range ucie.Items {
+		nms = append(nms, tbs.GetText(ucie.Locale, "config."+it, it))
+	}
+	return tbs.Format(ucie.Locale, "config.error.unsaved", str.Join(nms, ", "))
+}
+
+func (sm Schema) SaveConfigs(tx sqlx.Sqlx, au *models.User, configs []*models.Config, locale, action string) error {
+	sqb := tx.Builder()
+	sqb.Update(sm.TableConfigs())
+	sqb.Setc("value", "")
+	sqb.Setc("updated_at", "")
+	sqb.Eq("name", "")
+	sqb.Gte("editor", "")
+	sql := sqb.SQL()
+
+	stmt, err := tx.Prepare(sql)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	var eits []string
+
+	now := time.Now()
+	for _, cfg := range configs {
+		r, err := stmt.Exec(cfg.Value, now, cfg.Name, au.Role)
+		if err != nil {
+			return err
+		}
+
+		cnt, _ := r.RowsAffected()
+		if cnt != 1 {
+			eits = append(eits, cfg.Name)
+		}
+	}
+
+	if len(eits) > 0 {
+		return &UnsavedConfigItemsError{locale, eits}
+	}
+
+	return sm.AddAuditLog(tx, au, action)
 }

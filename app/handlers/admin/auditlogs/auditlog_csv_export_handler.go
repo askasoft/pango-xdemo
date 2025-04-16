@@ -18,7 +18,7 @@ import (
 )
 
 func AuditLogCsvExport(c *xin.Context) {
-	uqa, err := bindAuditLogQueryArg(c)
+	alqa, err := bindAuditLogQueryArg(c)
 	if err != nil {
 		vadutil.AddBindErrors(c, err, "user.")
 		c.JSON(http.StatusBadRequest, handlers.E(c))
@@ -26,67 +26,51 @@ func AuditLogCsvExport(c *xin.Context) {
 	}
 
 	tt := tenant.FromCtx(c)
-	db := app.SDB
-
-	sqb := db.Builder()
-	sqb.Select("audit_logs.*", "COALESCE(users.email, '') AS user")
-	sqb.From(tt.TableAuditLogs())
-	sqb.Join("LEFT JOIN " + tt.TableUsers() + " ON users.id = audit_logs.uid")
-	uqa.AddFilters(c, sqb)
-	sqb.Order("id")
-	sql, args := sqb.Build()
-
-	rows, err := db.Queryx(sql, args...)
-	if err != nil {
-		c.AddError(err)
-		c.JSON(http.StatusInternalServerError, handlers.E(c))
-		return
-	}
-	defer rows.Close()
-
-	c.SetAttachmentHeader("auditlogs.csv")
-	_, _ = c.Writer.WriteString(string(iox.BOM))
 
 	cw := csv.NewWriter(c.Writer)
 	cw.UseCRLF = true
 	defer cw.Flush()
 
-	cols := []string{
-		tbs.GetText(c.Locale, "auditlog.id"),
-		tbs.GetText(c.Locale, "auditlog.date"),
-		tbs.GetText(c.Locale, "auditlog.user"),
-		tbs.GetText(c.Locale, "auditlog.func"),
-		tbs.GetText(c.Locale, "auditlog.action"),
-		tbs.GetText(c.Locale, "auditlog.message"),
-	}
-	if err = cw.Write(cols); err != nil {
-		c.Logger.Error(err)
-		return
-	}
-
 	fm := tbsutil.GetAudioLogFuncMap(c.Locale)
-	for rows.Next() {
-		var al models.AuditLogEx
-		if err = rows.StructScan(&al); err != nil {
-			c.Logger.Error(err)
-			_ = cw.Write([]string{err.Error()})
-			return
+
+	var cols []string
+	err = tt.IterAuditLogs(app.SDB, alqa, func(al *models.AuditLogEx) error {
+		if len(cols) == 0 {
+			c.SetAttachmentHeader("auditlogs.csv")
+			_, _ = c.Writer.WriteString(string(iox.BOM))
+
+			cols = append(cols,
+				tbs.GetText(c.Locale, "auditlog.id"),
+				tbs.GetText(c.Locale, "auditlog.date"),
+				tbs.GetText(c.Locale, "auditlog.user"),
+				tbs.GetText(c.Locale, "auditlog.func"),
+				tbs.GetText(c.Locale, "auditlog.action"),
+				tbs.GetText(c.Locale, "auditlog.message"),
+			)
+			if err := cw.Write(cols); err != nil {
+				return err
+			}
 		}
 
 		if len(al.Params) > 0 {
 			al.Detail = tbs.Format(c.Locale, "auditlog.detail."+al.Func+"."+al.Action, asg.Anys(al.Params)...)
 		}
-		cols = []string{
+
+		cols = cols[:0]
+		cols = append(cols,
 			num.Ltoa(al.ID),
 			app.FormatTime(al.Date),
 			al.User,
 			fm.SafeGet(al.Func, al.Func),
 			tbs.Format(c.Locale, "auditlog.action."+al.Func+"."+al.Action),
 			al.Detail,
-		}
-		if err = cw.Write(cols); err != nil {
-			c.Logger.Error(err)
-			return
-		}
+		)
+		return cw.Write(cols)
+	})
+	if err != nil {
+		c.Logger.Error(err)
+		c.AddError(err)
+		c.JSON(http.StatusInternalServerError, handlers.E(c))
+		return
 	}
 }

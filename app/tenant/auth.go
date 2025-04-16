@@ -19,7 +19,7 @@ var noUser = &models.User{}
 // USERS write lock
 var muUSERS sync.Mutex
 
-func (tt *Tenant) FindUser(username string) (*models.User, error) {
+func (tt *Tenant) FindAuthUser(username string) (*models.User, error) {
 	k := string(tt.Schema) + "/" + username
 
 	if u, ok := app.USERS.Get(k); ok {
@@ -40,16 +40,8 @@ func (tt *Tenant) FindUser(username string) (*models.User, error) {
 		return u, nil
 	}
 
-	db := app.SDB
-
-	sqb := db.Builder()
-	sqb.Select().From(tt.TableUsers())
-	sqb.Eq("email", username)
-	sqb.Eq("status", models.UserActive)
-	sql, args := sqb.Build()
-
-	u := &models.User{}
-	if err := db.Get(u, sql, args...); err != nil {
+	u, err := tt.GetActiveUserByEmail(app.SDB, username)
+	if err != nil {
 		if errors.Is(err, sqlx.ErrNoRows) {
 			app.USERS.Set(k, noUser)
 			return nil, nil
@@ -137,16 +129,16 @@ func CheckClientIP(c *xin.Context, u *models.User) bool {
 //----------------------------------------------------
 // Auth
 
-func FindUser(c *xin.Context, username string) (xmw.AuthUser, error) {
+func FindAuthUser(c *xin.Context, username string) (xmw.AuthUser, error) {
 	tt := FromCtx(c)
-	return tt.FindUser(username)
+	return tt.FindAuthUser(username)
 }
 
-func CheckClientAndFindUser(c *xin.Context, username string) (xmw.AuthUser, error) {
+func CheckClientAndFindAuthUser(c *xin.Context, username string) (xmw.AuthUser, error) {
 	if IsClientBlocked(c) {
 		return nil, nil
 	}
-	return FindUser(c, username)
+	return FindAuthUser(c, username)
 }
 
 //----------------------------------------------------

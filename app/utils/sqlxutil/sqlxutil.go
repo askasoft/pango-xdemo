@@ -96,11 +96,11 @@ func AddTimes(sqb *sqlx.Builder, column string, tmin, tmax time.Time) {
 }
 
 func AddTimePtrs(sqb *sqlx.Builder, column string, tmin, tmax *time.Time) {
-	if tmin != nil && tmax != nil {
+	if tmin != nil && !tmin.IsZero() && tmax != nil && !tmax.IsZero() {
 		sqb.Btw(column, *tmin, *tmax)
-	} else if tmin != nil {
+	} else if tmin != nil && !tmin.IsZero() {
 		sqb.Gte(column, *tmin)
-	} else if tmax != nil {
+	} else if tmax != nil && !tmax.IsZero() {
 		sqb.Lte(column, *tmax)
 	}
 }
@@ -167,11 +167,22 @@ func AddIDs(sqb *sqlx.Builder, column string, id string) {
 }
 
 func AddLikes(sqb *sqlx.Builder, column string, search string) {
+	addLikes(sqb, column, search, false)
+}
+
+func AddLikesEx(sqb *sqlx.Builder, column string, search string, not bool) {
+	addLikes(sqb, column, search, not)
+}
+
+func addLikes(sqb *sqlx.Builder, column string, search string, not bool) {
 	ss := str.Fields(search)
 	if len(ss) > 0 {
 		var sb str.Builder
 		var args []any
 
+		if not {
+			sb.WriteString("NOT ")
+		}
 		sb.WriteByte('(')
 		for i, s := range ss {
 			if i > 0 {

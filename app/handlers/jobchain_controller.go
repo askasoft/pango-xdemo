@@ -193,7 +193,7 @@ func (jcc *JobChainController) StartJob(c *xin.Context) {
 		return
 	}
 
-	_ = tt.AddAuditLog(app.SDB, au.ID, jobs.JobChainStartAuditLogs[jcc.ChainName])
+	_ = tt.AddAuditLog(app.SDB, au, jobs.JobChainStartAuditLogs[jcc.ChainName])
 
 	c.JSON(http.StatusOK, xin.H{
 		"cid":     cid,

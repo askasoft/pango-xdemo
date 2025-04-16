@@ -9,8 +9,8 @@ import (
 )
 
 type QueryArg struct {
-	args.Pager
-	args.Sorter
+	args.Pager  `json:"-"`
+	args.Sorter `json:"-"`
 }
 
 func (qa *QueryArg) AddPager(sqb *sqlx.Builder) {
@@ -83,4 +83,8 @@ func (qa *QueryArg) AddIDs(sqb *sqlx.Builder, column string, id string) {
 
 func (qa *QueryArg) AddLikes(sqb *sqlx.Builder, column string, search string) {
 	sqlxutil.AddLikes(sqb, column, search)
+}
+
+func (qa *QueryArg) AddLikesEx(sqb *sqlx.Builder, column string, search string, not bool) {
+	sqlxutil.AddLikesEx(sqb, column, search, not)
 }

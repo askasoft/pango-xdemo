@@ -159,7 +159,7 @@ func (jc *JobController) Status(c *xin.Context) {
 
 func (jc *JobController) Start(c *xin.Context) {
 	tt := tenant.FromCtx(c)
-	au := tenant.AuthUser(c)
+	au := tenant.GetAuthUser(c)
 
 	var jid int64
 	err := app.SDB.Transaction(func(tx *sqlx.Tx) error {
@@ -185,7 +185,7 @@ func (jc *JobController) Start(c *xin.Context) {
 
 		jid = id
 
-		return tt.AddAuditLog(tx, au.ID, jobs.JobStartAuditLogs[jc.Name])
+		return tt.AddAuditLog(tx, au, jobs.JobStartAuditLogs[jc.Name])
 	})
 	if err != nil {
 		if errors.Is(err, xjm.ErrJobExisting) {
@@ -246,7 +246,7 @@ func (jc *JobController) Cancel(c *xin.Context) {
 			return err
 		}
 
-		if err = tt.AddAuditLog(tx, au.ID, jobs.JobCancelAuditLogs[jc.Name]); err != nil {
+		if err = tt.AddAuditLog(tx, au, jobs.JobCancelAuditLogs[jc.Name]); err != nil {
 			return err
 		}
 

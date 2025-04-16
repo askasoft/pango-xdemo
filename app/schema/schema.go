@@ -1,8 +1,6 @@
 package schema
 
 import (
-	"sync"
-
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango/ini"
 	"github.com/askasoft/pango/log"
@@ -122,28 +120,4 @@ func Iterate(itf func(sm Schema) error) error {
 		}
 	}
 	return nil
-}
-
-var muSCMAS sync.Mutex
-
-func CheckSchema(name string) (bool, error) {
-	if v, ok := app.SCMAS.Get(name); ok {
-		return v, nil
-	}
-
-	muSCMAS.Lock()
-	defer muSCMAS.Unlock()
-
-	// get again to prevent duplicated load
-	if v, ok := app.SCMAS.Get(name); ok {
-		return v, nil
-	}
-
-	exists, err := ExistsSchema(name)
-	if err != nil {
-		return false, err
-	}
-
-	app.SCMAS.Set(name, exists)
-	return exists, nil
 }

@@ -3,6 +3,7 @@ package tenant
 import (
 	"errors"
 	"fmt"
+	"sync"
 
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/schema"
@@ -30,7 +31,7 @@ type Tenant struct {
 
 func NewTenant(name string) *Tenant {
 	tt := &Tenant{Schema: schema.Schema(name)}
-	tt.config = tt.GetConfigMap()
+	tt.config = tt.getConfigMap()
 	return tt
 }
 
@@ -82,7 +83,7 @@ func FindAndSetTenant(c *xin.Context) (*Tenant, error) {
 	}
 
 	if IsMultiTenant() {
-		ok, err := schema.CheckSchema(s)
+		ok, err := CheckSchema(s)
 		if err != nil {
 			return nil, err
 		}
@@ -114,4 +115,29 @@ func Create(name string, comment string) error {
 	}
 
 	return nil
+}
+
+// ---------------------------
+var muSCMAS sync.Mutex
+
+func CheckSchema(name string) (bool, error) {
+	if v, ok := app.SCMAS.Get(name); ok {
+		return v, nil
+	}
+
+	muSCMAS.Lock()
+	defer muSCMAS.Unlock()
+
+	// get again to prevent duplicated load
+	if v, ok := app.SCMAS.Get(name); ok {
+		return v, nil
+	}
+
+	exists, err := schema.ExistsSchema(name)
+	if err != nil {
+		return false, err
+	}
+
+	app.SCMAS.Set(name, exists)
+	return exists, nil
 }

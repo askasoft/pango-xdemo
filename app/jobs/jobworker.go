@@ -50,9 +50,9 @@ func (jse *JobStateLixs) AddSkippedID(id int64) {
 	jse.LastIDs = asg.DeleteEqual(jse.LastIDs, id)
 }
 
-func (jse *JobStateLixs) AddIDFilter(sqb *sqlx.Builder, id string) {
+func (jse *JobStateLixs) AddIDFilter(sqb *sqlx.Builder, col string) {
 	if len(jse.LastIDs) > 0 {
-		sqb.Where(id+" > ?", asg.Max(jse.LastIDs))
+		sqb.Gt(col, asg.Max(jse.LastIDs))
 	}
 }
 

@@ -51,7 +51,7 @@ func SAMLProtect(c *xin.Context) {
 
 		tt := tenant.FromCtx(c)
 
-		au, err := tt.FindUser(email)
+		au, err := tt.FindAuthUser(email)
 		if err != nil {
 			c.Logger.Errorf("SAML Auth: %v", err)
 			c.AddError(err)
@@ -72,25 +72,13 @@ func SAMLProtect(c *xin.Context) {
 				mu.SetPassword(pwdutil.RandomPassword())
 				mu.UpdatedAt = mu.CreatedAt
 
-				db := app.SDB
-
-				sqb := db.Builder()
-				sqb.Insert(tt.TableUsers())
-				sqb.StructNames(mu, "id")
-
-				if !db.SupportLastInsertID() {
-					sqb.Returns("id")
-				}
-				sql := sqb.SQL()
-
-				uid, err := db.NamedCreate(sql, mu)
+				err := tt.CreateUser(app.SDB, mu)
 				if err != nil {
 					c.Logger.Errorf("SAML Auth: %v", err)
 					c.AddError(err)
 					handlers.InternalServerError(c)
 					return
 				}
-				mu.ID = uid
 
 				au = mu
 				tt.CacheUser(mu)

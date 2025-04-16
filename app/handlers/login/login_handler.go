@@ -52,7 +52,8 @@ func Login(c *xin.Context) {
 
 func loginFindUser(c *xin.Context) (up *UserPass, au *models.User, ok bool) {
 	up = &UserPass{}
-	if err := c.Bind(up); err != nil {
+	err := c.Bind(up)
+	if err != nil {
 		vadutil.AddBindErrors(c, err, "login.")
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
@@ -66,19 +67,18 @@ func loginFindUser(c *xin.Context) (up *UserPass, au *models.User, ok bool) {
 
 	tt := tenant.FromCtx(c)
 
-	mu, err := tt.FindUser(up.Username)
+	au, err = tt.FindAuthUser(up.Username)
 	if err != nil {
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return
 	}
 
-	if mu == nil || mu.GetPassword() != up.Password {
+	if au == nil || au.GetPassword() != up.Password {
 		loginFailed(c, "login.failed.userpass")
 		return
 	}
 
-	au = mu
 	if !au.HasRole(models.RoleViewer) {
 		loginFailed(c, "login.failed.notallowed")
 		return
@@ -101,7 +101,7 @@ func loginFailed(c *xin.Context, reason string) {
 
 func loginPassed(c *xin.Context, au *models.User) {
 	tt := tenant.FromCtx(c)
-	if err := tt.AddAuditLog(app.SDB, au.ID, models.AL_LOGIN_LOGIN, au.Email); err != nil {
+	if err := tt.AddAuditLog(app.SDB, au, models.AL_LOGIN_LOGIN, au.Email); err != nil {
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
 	}
@@ -205,15 +205,7 @@ func LoginMFAEnroll(c *xin.Context) {
 
 	tt := tenant.FromCtx(c)
 
-	db := app.SDB
-	sqb := db.Builder()
-	sqb.Update(tt.TableUsers())
-	sqb.Setc("secret", au.Secret)
-	sqb.Setc("updated_at", time.Now())
-	sqb.Eq("id", au.ID)
-	sql, args := sqb.Build()
-
-	_, err := db.Exec(sql, args...)
+	_, err := tt.UpdateUserSecret(app.SDB, au.ID, au.Secret)
 	if err != nil {
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))

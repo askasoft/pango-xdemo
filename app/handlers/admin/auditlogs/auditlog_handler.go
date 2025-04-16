@@ -2,59 +2,20 @@ package auditlogs
 
 import (
 	"net/http"
-	"time"
 
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/handlers"
-	"github.com/askasoft/pango-xdemo/app/models"
+	"github.com/askasoft/pango-xdemo/app/schema"
 	"github.com/askasoft/pango-xdemo/app/tenant"
-	"github.com/askasoft/pango-xdemo/app/utils/argutil"
 	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
 	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
 	"github.com/askasoft/pango/asg"
-	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/tbs"
 	"github.com/askasoft/pango/xin"
 )
 
-type AuditLogQueryArg struct {
-	argutil.QueryArg
-
-	ID       string     `form:"id,strip"`
-	DateFrom *time.Time `form:"date_from,strip"`
-	DateTo   *time.Time `form:"date_to,strip" validate:"omitempty,gtefield=DateFrom"`
-	User     string     `form:"user,strip"`
-	Func     []string   `form:"func,strip"`
-}
-
-func (alqa *AuditLogQueryArg) Normalize(c *xin.Context) {
-	alqa.Sorter.Normalize(
-		"id",
-		"date",
-		"user",
-		"func,action",
-	)
-
-	alqa.Pager.Normalize(tbsutil.GetPagerLimits(c.Locale)...)
-}
-
-func (alqa *AuditLogQueryArg) HasFilters() bool {
-	return alqa.ID != "" ||
-		alqa.DateFrom != nil ||
-		alqa.DateTo != nil ||
-		alqa.User != "" ||
-		len(alqa.Func) > 0
-}
-
-func (alqa *AuditLogQueryArg) AddFilters(c *xin.Context, sqb *sqlx.Builder) {
-	alqa.AddIDs(sqb, "audit_logs.id", alqa.ID)
-	alqa.AddTimePtrs(sqb, "audit_logs.date", alqa.DateFrom, alqa.DateTo)
-	alqa.AddIn(sqb, "audit_logs.func", alqa.Func)
-	alqa.AddLikes(sqb, "users.email", alqa.User)
-}
-
-func bindAuditLogQueryArg(c *xin.Context) (alqa *AuditLogQueryArg, err error) {
-	alqa = &AuditLogQueryArg{}
+func bindAuditLogQueryArg(c *xin.Context) (alqa *schema.AuditLogQueryArg, err error) {
+	alqa = &schema.AuditLogQueryArg{}
 	alqa.Col, alqa.Dir = "id", "desc"
 
 	err = c.Bind(alqa)
@@ -63,39 +24,6 @@ func bindAuditLogQueryArg(c *xin.Context) (alqa *AuditLogQueryArg, err error) {
 
 func bindAuditLogMaps(c *xin.Context, h xin.H) {
 	h["AuditLogFuncMap"] = tbsutil.GetAudioLogFuncMap(c.Locale)
-}
-
-func countAuditLogs(c *xin.Context, alqa *AuditLogQueryArg) (total int, err error) {
-	tt := tenant.FromCtx(c)
-
-	db := app.SDB
-	sqb := db.Builder()
-	sqb.Count()
-	sqb.From(tt.TableAuditLogs())
-	sqb.Join("LEFT JOIN " + tt.TableUsers() + " ON users.id = audit_logs.uid")
-	alqa.AddFilters(c, sqb)
-	sql, args := sqb.Build()
-
-	err = db.Get(&total, sql, args...)
-	return
-}
-
-func findAuditLogs(c *xin.Context, alqa *AuditLogQueryArg) (alogs []*models.AuditLogEx, err error) {
-	tt := tenant.FromCtx(c)
-
-	db := app.SDB
-
-	sqb := db.Builder()
-	sqb.Select("audit_logs.*", "COALESCE(users.email, '') AS user")
-	sqb.From(tt.TableAuditLogs())
-	sqb.Join("LEFT JOIN " + tt.TableUsers() + " ON users.id = audit_logs.uid")
-	alqa.AddFilters(c, sqb)
-	alqa.AddOrder(sqb, "id")
-	alqa.AddPager(sqb)
-	sql, args := sqb.Build()
-
-	err = db.Select(&alogs, sql, args...)
-	return
 }
 
 func AuditLogIndex(c *xin.Context) {
@@ -119,22 +47,24 @@ func AuditLogList(c *xin.Context) {
 		return
 	}
 
-	alqa.Total, err = countAuditLogs(c, alqa)
-	alqa.Normalize(c)
+	tt := tenant.FromCtx(c)
 
+	alqa.Total, err = tt.CountAuditLogs(app.SDB, alqa)
 	if err != nil {
 		c.AddError(err)
-		c.JSON(http.StatusBadRequest, handlers.E(c))
+		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return
 	}
 
 	h := handlers.H(c)
 
+	alqa.Normalize(c)
+
 	if alqa.Total > 0 {
-		results, err := findAuditLogs(c, alqa)
+		results, err := tt.FindAuditLogs(app.SDB, alqa)
 		if err != nil {
 			c.AddError(err)
-			c.JSON(http.StatusBadRequest, handlers.E(c))
+			c.JSON(http.StatusInternalServerError, handlers.E(c))
 			return
 		}
 

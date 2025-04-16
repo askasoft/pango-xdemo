@@ -5,6 +5,20 @@ import (
 	"github.com/askasoft/pango/str"
 )
 
+type IDArg struct {
+	ID string `json:"id,omitempty" form:"id,strip"`
+}
+
+func (ida *IDArg) IDs() []int64 {
+	ids, _ := SplitIDs(ida.ID)
+	return ids
+}
+
+func (ida *IDArg) HasValidID() bool {
+	ids, all := SplitIDs(ida.ID)
+	return len(ids) > 0 || all
+}
+
 func SplitIDs(id string) ([]int64, bool) {
 	if id == "" {
 		return nil, false

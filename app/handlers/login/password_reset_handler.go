@@ -59,7 +59,7 @@ func PasswordResetSend(c *xin.Context) {
 
 	tt := tenant.FromCtx(c)
 
-	user, err := tt.FindUser(email)
+	user, err := tt.FindAuthUser(email)
 	if err != nil {
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
@@ -156,7 +156,7 @@ func PasswordResetExecute(c *xin.Context) {
 
 	tt := tenant.FromCtx(c)
 
-	user, err := tt.FindUser(token.Email)
+	user, err := tt.FindAuthUser(token.Email)
 	if err != nil {
 		c.AddError(err)
 		c.JSON(http.StatusBadRequest, handlers.E(c))
@@ -192,17 +192,11 @@ func PasswordResetExecute(c *xin.Context) {
 	user.SetPassword(pra.Newpwd)
 
 	err = app.SDB.Transaction(func(tx *sqlx.Tx) error {
-		sqb := tx.Builder()
-		sqb.Update(tt.TableUsers())
-		sqb.Setc("password", user.Password)
-		sqb.Eq("id", user.ID)
-		sql, args := sqb.Build()
-
-		if _, err := tx.Exec(sql, args...); err != nil {
+		if _, err := tt.UpdateUserPassword(tx, user.ID, user.Password); err != nil {
 			return err
 		}
 
-		return tt.AddAuditLog(tx, user.ID, models.AL_LOGIN_PWDRST, user.Email)
+		return tt.AddAuditLog(tx, user, models.AL_LOGIN_PWDRST, user.Email)
 	})
 	if err != nil {
 		c.AddError(err)

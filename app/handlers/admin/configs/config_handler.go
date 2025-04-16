@@ -5,17 +5,19 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/handlers"
 	"github.com/askasoft/pango-xdemo/app/models"
+	"github.com/askasoft/pango-xdemo/app/schema"
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
 	"github.com/askasoft/pango/cog/linkedhashmap"
 	"github.com/askasoft/pango/doc/csvx"
+	"github.com/askasoft/pango/gog"
 	"github.com/askasoft/pango/iox"
 	"github.com/askasoft/pango/num"
+	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/tbs"
 	"github.com/askasoft/pango/xin"
@@ -31,20 +33,12 @@ type ConfigCategory struct {
 	Groups []*ConfigGroup `json:"groups"`
 }
 
-func loadConfigList(c *xin.Context, role string) []*models.Config {
+func loadConfigList(c *xin.Context, actor string) []*models.Config {
 	tt := tenant.FromCtx(c)
 	au := tenant.AuthUser(c)
 
-	db := app.SDB
-	sqb := db.Builder()
-	sqb.Select().From(tt.TableConfigs())
-	sqb.Gte(role, au.Role)
-	sqb.Order("order")
-	sqb.Order("name")
-	sql, args := sqb.Build()
-
-	configs := []*models.Config{}
-	if err := db.Select(&configs, sql, args...); err != nil {
+	configs, err := tt.ListConfigs(app.SDB, actor, au.Role)
+	if err != nil {
 		panic(err)
 	}
 
@@ -142,15 +136,10 @@ func ConfigSave(c *xin.Context) {
 		return
 	}
 
-	saveConfigs(c, uconfigs, models.AL_CONFIG_UPDATE)
-	if len(c.Errors) > 0 {
-		c.JSON(http.StatusInternalServerError, handlers.E(c))
-		return
+	if saveConfigs(c, uconfigs, models.AL_CONFIG_UPDATE) {
+		tt.PurgeConfig()
+		c.JSON(http.StatusOK, xin.H{"success": tbs.GetText(c.Locale, "success.saved")})
 	}
-
-	tt.PurgeConfig()
-
-	c.JSON(http.StatusOK, xin.H{"success": tbs.GetText(c.Locale, "success.saved")})
 }
 
 func validateConfig(c *xin.Context, cfg *models.Config, v *string) bool {
@@ -263,64 +252,23 @@ func checkPostConfigs(c *xin.Context, configs []*models.Config) (uconfigs []*mod
 	return
 }
 
-func saveConfigs(c *xin.Context, configs []*models.Config, action string) {
+func saveConfigs(c *xin.Context, configs []*models.Config, action string) bool {
 	tt := tenant.FromCtx(c)
 	au := tenant.AuthUser(c)
 
-	tx, err := app.SDB.Beginx()
-	if err != nil {
-		c.AddError(err)
-		c.JSON(http.StatusBadRequest, handlers.E(c))
-		return
+	err := app.SDB.Transaction(func(tx *sqlx.Tx) error {
+		return tt.SaveConfigs(tx, au, configs, c.Locale, action)
+	})
+	if err == nil {
+		return true
 	}
 
-	sqb := tx.Builder()
-	sqb.Update(tt.TableConfigs())
-	sqb.Setc("value", "")
-	sqb.Setc("updated_at", "")
-	sqb.Eq("name", "")
-	sqb.Gte("editor", "")
-	sql := sqb.SQL()
+	c.AddError(err)
 
-	stmt, err := tx.Prepare(sql)
-	if err != nil {
-		c.AddError(err)
-		c.JSON(http.StatusInternalServerError, handlers.E(c))
-		return
-	}
-	defer stmt.Close()
-
-	now := time.Now()
-	for _, cfg := range configs {
-		r, err := stmt.Exec(cfg.Value, now, cfg.Name, au.Role)
-		if err != nil {
-			c.SetError(err)
-			_ = tx.Rollback()
-			return
-		}
-
-		cnt, _ := r.RowsAffected()
-		if cnt != 1 {
-			msg := tbs.Format(c.Locale, "config.error.unsaved", tbs.GetText(c.Locale, "config."+cfg.Name, cfg.Name))
-			c.Logger.Warn(msg)
-			c.AddError(&vadutil.ParamError{Param: cfg.Name, Message: msg})
-		}
-	}
-
-	if len(c.Errors) > 0 {
-		_ = tx.Rollback()
-		return
-	}
-
-	err = tt.AddAuditLog(tx, au.ID, action)
-	if err != nil {
-		c.AddError(err)
-		return
-	}
-
-	if err := tx.Commit(); err != nil {
-		c.AddError(err)
-	}
+	var ucie *schema.UnsavedConfigItemsError
+	sc := gog.If(errors.As(err, &ucie), http.StatusBadRequest, http.StatusInternalServerError)
+	c.JSON(sc, handlers.E(c))
+	return false
 }
 
 func ConfigExport(c *xin.Context) {
@@ -398,15 +346,10 @@ func ConfigImport(c *xin.Context) {
 		return
 	}
 
-	saveConfigs(c, uconfigs, models.AL_CONFIG_IMPORT)
-	if len(c.Errors) > 0 {
-		c.JSON(http.StatusInternalServerError, handlers.E(c))
-		return
+	if saveConfigs(c, uconfigs, models.AL_CONFIG_IMPORT) {
+		tt.PurgeConfig()
+		c.JSON(http.StatusOK, xin.H{"success": tbs.GetText(c.Locale, "success.imported")})
 	}
-
-	tt.PurgeConfig()
-
-	c.JSON(http.StatusOK, xin.H{"success": tbs.GetText(c.Locale, "success.imported")})
 }
 
 func checkCsvConfigs(c *xin.Context, configs []*models.Config, csvcfgs []*ConfigCsvRecord) (uconfigs []*models.Config) {

@@ -18,7 +18,7 @@ import (
 )
 
 func PetCsvExport(c *xin.Context) {
-	pq, err := bindPetQueryArg(c)
+	pqa, err := bindPetQueryArg(c)
 	if err != nil {
 		vadutil.AddBindErrors(c, err, "pet.")
 		c.JSON(http.StatusBadRequest, handlers.E(c))
@@ -27,62 +27,42 @@ func PetCsvExport(c *xin.Context) {
 
 	tt := tenant.FromCtx(c)
 
-	db := app.SDB
-	sqb := db.Builder()
-	sqb.Select()
-	sqb.From(tt.TablePets())
-	pq.AddFilters(sqb)
-	sqb.Order("id")
-	sql, args := sqb.Build()
-
-	rows, err := db.Queryx(sql, args...)
-	if err != nil {
-		c.AddError(err)
-		c.JSON(http.StatusInternalServerError, handlers.E(c))
-		return
-	}
-	defer rows.Close()
-
-	c.SetAttachmentHeader("pets.csv")
-	_, _ = c.Writer.WriteString(string(iox.BOM))
-
 	cw := csv.NewWriter(c.Writer)
 	cw.UseCRLF = true
 	defer cw.Flush()
-
-	cols := []string{
-		tbs.GetText(c.Locale, "pet.id"),
-		tbs.GetText(c.Locale, "pet.name"),
-		tbs.GetText(c.Locale, "pet.gender"),
-		tbs.GetText(c.Locale, "pet.born_at"),
-		tbs.GetText(c.Locale, "pet.origin"),
-		tbs.GetText(c.Locale, "pet.temper"),
-		tbs.GetText(c.Locale, "pet.habits"),
-		tbs.GetText(c.Locale, "pet.amount"),
-		tbs.GetText(c.Locale, "pet.price"),
-		tbs.GetText(c.Locale, "pet.shop_name"),
-		tbs.GetText(c.Locale, "pet.shop_address"),
-		tbs.GetText(c.Locale, "pet.shop_telephone"),
-		tbs.GetText(c.Locale, "pet.shop_link"),
-		tbs.GetText(c.Locale, "pet.description"),
-		tbs.GetText(c.Locale, "pet.created_at"),
-		tbs.GetText(c.Locale, "pet.updated_at"),
-	}
-	if err = cw.Write(cols); err != nil {
-		c.Logger.Error(err)
-		return
-	}
 
 	pgm := tbsutil.GetPetGenderMap(c.Locale)
 	pom := tbsutil.GetPetOriginMap(c.Locale)
 	ptm := tbsutil.GetPetTemperMap(c.Locale)
 	phm := tbsutil.GetPetHabitsMap(c.Locale)
 
-	for rows.Next() {
-		var pet models.Pet
-		if err = rows.StructScan(&pet); err != nil {
-			_ = cw.Write([]string{err.Error()})
-			return
+	var cols []string
+	err = tt.IterPets(app.SDB, pqa, func(pet *models.Pet) error {
+		if len(cols) == 0 {
+			c.SetAttachmentHeader("pets.csv")
+			_, _ = c.Writer.WriteString(string(iox.BOM))
+
+			cols = append(cols,
+				tbs.GetText(c.Locale, "pet.id"),
+				tbs.GetText(c.Locale, "pet.name"),
+				tbs.GetText(c.Locale, "pet.gender"),
+				tbs.GetText(c.Locale, "pet.born_at"),
+				tbs.GetText(c.Locale, "pet.origin"),
+				tbs.GetText(c.Locale, "pet.temper"),
+				tbs.GetText(c.Locale, "pet.habits"),
+				tbs.GetText(c.Locale, "pet.amount"),
+				tbs.GetText(c.Locale, "pet.price"),
+				tbs.GetText(c.Locale, "pet.shop_name"),
+				tbs.GetText(c.Locale, "pet.shop_address"),
+				tbs.GetText(c.Locale, "pet.shop_telephone"),
+				tbs.GetText(c.Locale, "pet.shop_link"),
+				tbs.GetText(c.Locale, "pet.description"),
+				tbs.GetText(c.Locale, "pet.created_at"),
+				tbs.GetText(c.Locale, "pet.updated_at"),
+			)
+			if err := cw.Write(cols); err != nil {
+				return err
+			}
 		}
 
 		habits := []string{}
@@ -90,7 +70,8 @@ func PetCsvExport(c *xin.Context) {
 			habits = append(habits, phm.SafeGet(h, h))
 		}
 
-		cols = []string{
+		cols = cols[:0]
+		cols = append(cols,
 			num.Ltoa(pet.ID),
 			pet.Name,
 			pgm.SafeGet(pet.Gender, pet.Gender),
@@ -106,10 +87,12 @@ func PetCsvExport(c *xin.Context) {
 			pet.ShopLink,
 			app.FormatTime(pet.CreatedAt),
 			app.FormatTime(pet.UpdatedAt),
-		}
-		if err = cw.Write(cols); err != nil {
-			c.Logger.Error(err)
-			return
-		}
+		)
+		return cw.Write(cols)
+	})
+	if err != nil {
+		c.AddError(err)
+		c.JSON(http.StatusInternalServerError, handlers.E(c))
+		return
 	}
 }

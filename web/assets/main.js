@@ -184,8 +184,6 @@ var main = {
 
 	form_input_values: function($f) {
 		var vs = $f.formValues();
-
-		delete vs._token_;
 		for (var k in vs) {
 			if (!vs[k]) {
 				delete vs[k];
