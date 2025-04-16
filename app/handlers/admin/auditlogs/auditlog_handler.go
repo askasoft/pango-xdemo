@@ -19,6 +19,13 @@ func bindAuditLogQueryArg(c *xin.Context) (alqa *schema.AuditLogQueryArg, err er
 	alqa.Col, alqa.Dir = "id", "desc"
 
 	err = c.Bind(alqa)
+
+	alqa.Sorter.Normalize(
+		"id",
+		"date",
+		"user",
+		"func,action",
+	)
 	return
 }
 
@@ -30,7 +37,6 @@ func AuditLogIndex(c *xin.Context) {
 	h := handlers.H(c)
 
 	alqa, _ := bindAuditLogQueryArg(c)
-	alqa.Normalize(c)
 
 	h["Q"] = alqa
 
@@ -58,7 +64,7 @@ func AuditLogList(c *xin.Context) {
 
 	h := handlers.H(c)
 
-	alqa.Normalize(c)
+	alqa.Pager.Normalize(tbsutil.GetPagerLimits(c.Locale)...)
 
 	if alqa.Total > 0 {
 		results, err := tt.FindAuditLogs(app.SDB, alqa)

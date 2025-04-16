@@ -6,10 +6,12 @@ import (
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/utils/argutil"
 	"github.com/askasoft/pango-xdemo/app/utils/strutil"
-	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
 	"github.com/askasoft/pango/sqx/sqlx"
-	"github.com/askasoft/pango/xin"
 )
+
+func (sm Schema) ResetUsersSequence(tx sqlx.Sqlx) error {
+	return sm.ResetSequence(tx, sm.TableUsers(), models.UserStartID)
+}
 
 type UserQueryArg struct {
 	argutil.QueryArg
@@ -24,20 +26,6 @@ type UserQueryArg struct {
 
 func (uqa *UserQueryArg) String() string {
 	return strutil.JSONString(uqa)
-}
-
-func (uqa *UserQueryArg) Normalize(c *xin.Context) {
-	uqa.Sorter.Normalize(
-		"id",
-		"name",
-		"email",
-		"role",
-		"status",
-		"created_at",
-		"updated_at",
-	)
-
-	uqa.Pager.Normalize(tbsutil.GetPagerLimits(c.Locale)...)
 }
 
 func (uqa *UserQueryArg) HasFilters() bool {
@@ -58,7 +46,7 @@ func (uqa *UserQueryArg) AddFilters(sqb *sqlx.Builder) {
 	uqa.AddLikes(sqb, "cidr", uqa.CIDR)
 }
 
-func (sm Schema) CountUsers(tx sqlx.Sqlx, role string, uqa *UserQueryArg) (total int, err error) {
+func (sm Schema) CountUsers(tx sqlx.Sqlx, role string, uqa *UserQueryArg) (cnt int, err error) {
 	sqb := tx.Builder()
 
 	sqb.Count()
@@ -67,14 +55,14 @@ func (sm Schema) CountUsers(tx sqlx.Sqlx, role string, uqa *UserQueryArg) (total
 	uqa.AddFilters(sqb)
 	sql, args := sqb.Build()
 
-	err = tx.Get(&total, sql, args...)
+	err = tx.Get(&cnt, sql, args...)
 	return
 }
 
-func (sm Schema) FindUsers(tx sqlx.Sqlx, role string, uqa *UserQueryArg) (users []*models.User, err error) {
+func (sm Schema) FindUsers(tx sqlx.Sqlx, role string, uqa *UserQueryArg, cols ...string) (users []*models.User, err error) {
 	sqb := tx.Builder()
 
-	sqb.Select()
+	sqb.Select(cols...)
 	sqb.From(sm.TableUsers())
 	sqb.Gte("role", role)
 	uqa.AddFilters(sqb)

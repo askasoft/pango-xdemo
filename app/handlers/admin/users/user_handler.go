@@ -17,6 +17,16 @@ func bindUserQueryArg(c *xin.Context) (uqa *schema.UserQueryArg, err error) {
 	uqa.Col, uqa.Dir = "id", "asc"
 
 	err = c.Bind(uqa)
+
+	uqa.Sorter.Normalize(
+		"id",
+		"name",
+		"email",
+		"role",
+		"status",
+		"created_at",
+		"updated_at",
+	)
 	return
 }
 
@@ -30,7 +40,6 @@ func UserIndex(c *xin.Context) {
 	h := handlers.H(c)
 
 	uqa, _ := bindUserQueryArg(c)
-	uqa.Normalize(c)
 
 	h["Q"] = uqa
 
@@ -59,7 +68,7 @@ func UserList(c *xin.Context) {
 
 	h := handlers.H(c)
 
-	uqa.Normalize(c)
+	uqa.Pager.Normalize(tbsutil.GetPagerLimits(c.Locale)...)
 
 	if uqa.Total > 0 {
 		results, err := tt.FindUsers(app.SDB, au.Role, uqa)

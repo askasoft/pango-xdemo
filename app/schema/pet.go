@@ -6,26 +6,13 @@ import (
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/utils/argutil"
 	"github.com/askasoft/pango-xdemo/app/utils/strutil"
-	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
 	"github.com/askasoft/pango/sqx/pqx"
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/str"
-	"github.com/askasoft/pango/xin"
 )
 
-var petListColumns = []string{
-	"id",
-	"name",
-	"gender",
-	"born_at",
-	"origin",
-	"temper",
-	"habits",
-	"amount",
-	"price",
-	"shop_name",
-	"created_at",
-	"updated_at",
+func (sm Schema) ResetPetsSequence(tx sqlx.Sqlx) error {
+	return sm.ResetSequence(tx, sm.TablePets())
 }
 
 type PetQueryArg struct {
@@ -48,12 +35,6 @@ type PetQueryArg struct {
 
 func (pqa *PetQueryArg) String() string {
 	return strutil.JSONString(pqa)
-}
-
-func (pqa *PetQueryArg) Normalize(c *xin.Context) {
-	pqa.Sorter.Normalize(petListColumns...)
-
-	pqa.Pager.Normalize(tbsutil.GetPagerLimits(c.Locale)...)
 }
 
 func (pqa *PetQueryArg) HasFilters() bool {
@@ -85,7 +66,7 @@ func (pqa *PetQueryArg) AddFilters(sqb *sqlx.Builder) {
 	pqa.AddLikes(sqb, "shop_name", pqa.ShopName)
 }
 
-func (sm Schema) CountPets(tx sqlx.Sqlx, pqa *PetQueryArg) (total int, err error) {
+func (sm Schema) CountPets(tx sqlx.Sqlx, pqa *PetQueryArg) (cnt int, err error) {
 	sqb := tx.Builder()
 
 	sqb.Count()
@@ -93,14 +74,14 @@ func (sm Schema) CountPets(tx sqlx.Sqlx, pqa *PetQueryArg) (total int, err error
 	pqa.AddFilters(sqb)
 	sql, args := sqb.Build()
 
-	err = tx.Get(&total, sql, args...)
+	err = tx.Get(&cnt, sql, args...)
 	return
 }
 
-func (sm Schema) FindPets(tx sqlx.Sqlx, pqa *PetQueryArg) (pets []*models.Pet, err error) {
+func (sm Schema) FindPets(tx sqlx.Sqlx, pqa *PetQueryArg, cols ...string) (pets []*models.Pet, err error) {
 	sqb := tx.Builder()
 
-	sqb.Select(petListColumns...)
+	sqb.Select(cols...)
 	sqb.From(sm.TablePets())
 	pqa.AddFilters(sqb)
 	pqa.AddOrder(sqb, "id")
@@ -111,10 +92,10 @@ func (sm Schema) FindPets(tx sqlx.Sqlx, pqa *PetQueryArg) (pets []*models.Pet, e
 	return
 }
 
-func (sm Schema) IterPets(tx sqlx.Sqlx, pqa *PetQueryArg, fit func(*models.Pet) error) error {
+func (sm Schema) IterPets(tx sqlx.Sqlx, pqa *PetQueryArg, fit func(*models.Pet) error, cols ...string) error {
 	sqb := tx.Builder()
 
-	sqb.Select(petListColumns...)
+	sqb.Select(cols...)
 	sqb.From(sm.TablePets())
 	pqa.AddFilters(sqb)
 	pqa.AddOrder(sqb, "id")
@@ -200,20 +181,7 @@ func (sm Schema) UpdatePet(tx sqlx.Sqlx, pet *models.Pet) (int64, error) {
 }
 
 func (sm Schema) DeletePets(tx sqlx.Sqlx, ids ...int64) (int64, error) {
-	sqb := tx.Builder()
-
-	sqb.Delete(sm.TablePets())
-	if len(ids) > 0 {
-		sqb.In("id", ids)
-	}
-	sql, args := sqb.Build()
-
-	r, err := tx.Exec(sql, args...)
-	if err != nil {
-		return 0, err
-	}
-
-	return r.RowsAffected()
+	return sm.DeleteRecordsByID(tx, sm.TablePets(), ids...)
 }
 
 type PetUpdatesArg struct {

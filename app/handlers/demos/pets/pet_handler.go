@@ -12,11 +12,27 @@ import (
 	"github.com/askasoft/pango/xin"
 )
 
+var petListColumns = []string{
+	"id",
+	"name",
+	"gender",
+	"born_at",
+	"origin",
+	"temper",
+	"habits",
+	"amount",
+	"price",
+	"shop_name",
+	"created_at",
+	"updated_at",
+}
+
 func bindPetQueryArg(c *xin.Context) (pqa *schema.PetQueryArg, err error) {
 	pqa = &schema.PetQueryArg{}
 	pqa.Col, pqa.Dir = "id", "desc"
 
 	err = c.Bind(pqa)
+	pqa.Sorter.Normalize(petListColumns...)
 	return
 }
 
@@ -58,7 +74,7 @@ func PetList(c *xin.Context) {
 
 	h := handlers.H(c)
 
-	pqa.Normalize(c)
+	pqa.Pager.Normalize(tbsutil.GetPagerLimits(c.Locale)...)
 
 	if pqa.Total > 0 {
 		results, err := tt.FindPets(app.SDB, pqa)

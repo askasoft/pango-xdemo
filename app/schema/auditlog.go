@@ -5,11 +5,13 @@ import (
 
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/utils/argutil"
-	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/str"
-	"github.com/askasoft/pango/xin"
 )
+
+func (sm Schema) ResetAuditLogsSequence(tx sqlx.Sqlx) error {
+	return sm.ResetSequence(tx, sm.TableAuditLogs())
+}
 
 type AuditLogQueryArg struct {
 	argutil.QueryArg
@@ -19,17 +21,6 @@ type AuditLogQueryArg struct {
 	DateTo   *time.Time `form:"date_to,strip" validate:"omitempty,gtefield=DateFrom"`
 	User     string     `form:"user,strip"`
 	Func     []string   `form:"func,strip"`
-}
-
-func (alqa *AuditLogQueryArg) Normalize(c *xin.Context) {
-	alqa.Sorter.Normalize(
-		"id",
-		"date",
-		"user",
-		"func,action",
-	)
-
-	alqa.Pager.Normalize(tbsutil.GetPagerLimits(c.Locale)...)
 }
 
 func (alqa *AuditLogQueryArg) HasFilters() bool {
@@ -47,7 +38,7 @@ func (alqa *AuditLogQueryArg) AddFilters(sqb *sqlx.Builder) {
 	alqa.AddLikes(sqb, "users.email", alqa.User)
 }
 
-func (sm Schema) CountAuditLogs(tx sqlx.Sqlx, alqa *AuditLogQueryArg) (total int, err error) {
+func (sm Schema) CountAuditLogs(tx sqlx.Sqlx, alqa *AuditLogQueryArg) (cnt int, err error) {
 	sqb := tx.Builder()
 
 	sqb.Count()
@@ -56,7 +47,7 @@ func (sm Schema) CountAuditLogs(tx sqlx.Sqlx, alqa *AuditLogQueryArg) (total int
 	alqa.AddFilters(sqb)
 	sql, args := sqb.Build()
 
-	err = tx.Get(&total, sql, args...)
+	err = tx.Get(&cnt, sql, args...)
 	return
 }
 
@@ -104,7 +95,7 @@ func (sm Schema) IterAuditLogs(tx sqlx.Sqlx, alqa *AuditLogQueryArg, fit func(*m
 	return nil
 }
 
-func (sm Schema) DeleteAuditLogs(tx sqlx.Sqlx, alqa *AuditLogQueryArg) (int64, error) {
+func (sm Schema) DeleteAuditLogsQuery(tx sqlx.Sqlx, alqa *AuditLogQueryArg) (int64, error) {
 	sqa := tx.Builder()
 	sqa.Select("audit_logs.id")
 	sqa.From(sm.TableAuditLogs())
@@ -122,6 +113,10 @@ func (sm Schema) DeleteAuditLogs(tx sqlx.Sqlx, alqa *AuditLogQueryArg) (int64, e
 	}
 
 	return r.RowsAffected()
+}
+
+func (sm Schema) DeleteAuditLogs(tx sqlx.Sqlx, ids ...int64) (int64, error) {
+	return sm.DeleteRecordsByID(tx, sm.TableAuditLogs(), ids...)
 }
 
 func (sm Schema) DeleteAuditLogsBefore(tx sqlx.Sqlx, before time.Time) (int64, error) {

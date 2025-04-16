@@ -178,7 +178,7 @@ func UserUpdate(c *xin.Context) {
 	au := tenant.AuthUser(c)
 
 	var cnt int64
-	err := app.SDB.Transaction(func(tx *sqlx.Tx) error {
+	err := app.SDB.Transaction(func(tx *sqlx.Tx) (err error) {
 		if user.Password == "" {
 			eu, err := tt.GetUser(tx, user.ID)
 			if err != nil {
@@ -193,10 +193,9 @@ func UserUpdate(c *xin.Context) {
 
 		user.UpdatedAt = time.Now()
 
-		var err error
 		cnt, err = tt.UpdateUser(tx, au.Role, user)
 		if err != nil {
-			return err
+			return
 		}
 
 		user.Password = ""
@@ -204,7 +203,7 @@ func UserUpdate(c *xin.Context) {
 		if cnt > 0 {
 			return tt.AddAuditLog(tx, au, models.AL_USERS_UPDATES, num.Ltoa(cnt), "#"+num.Ltoa(user.ID)+": <"+user.Email+">")
 		}
-		return nil
+		return
 	})
 	if err != nil {
 		c.AddError(err)

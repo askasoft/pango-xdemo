@@ -96,7 +96,7 @@ func DeleteSchema(name string) error {
 	return SM().DeleteSchema(name)
 }
 
-func CountSchemas(sq *xsm.SchemaQuery) (total int, err error) {
+func CountSchemas(sq *xsm.SchemaQuery) (int, error) {
 	return SM().CountSchemas(sq)
 }
 

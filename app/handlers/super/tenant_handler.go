@@ -27,6 +27,12 @@ func bindTenantQueryArg(c *xin.Context) (tqa *TenantQueryArg, err error) {
 	tqa.Col, tqa.Dir = "name", "asc"
 
 	err = c.Bind(tqa)
+
+	tqa.Sorter.Normalize(
+		"name",
+		"size",
+		"comment",
+	)
 	return
 }
 
@@ -34,7 +40,6 @@ func TenantIndex(c *xin.Context) {
 	h := handlers.H(c)
 
 	tqa, _ := bindTenantQueryArg(c)
-	tqa.Normalize(tbsutil.GetPagerLimits(c.Locale))
 
 	h["Q"] = tqa
 	c.HTML(http.StatusOK, "super/tenants", h)
@@ -49,21 +54,21 @@ func TenantList(c *xin.Context) {
 	}
 
 	tqa.Total, err = schema.CountSchemas(&tqa.SchemaQuery)
-	tqa.Normalize(tbsutil.GetPagerLimits(c.Locale))
-
 	if err != nil {
 		c.AddError(err)
-		c.JSON(http.StatusBadRequest, handlers.E(c))
+		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return
 	}
 
 	h := handlers.H(c)
 
+	tqa.Pager.Normalize(tbsutil.GetPagerLimits(c.Locale)...)
+
 	if tqa.Total > 0 {
 		schemas, err := schema.FindSchemas(&tqa.SchemaQuery)
 		if err != nil {
 			c.AddError(err)
-			c.JSON(http.StatusBadRequest, handlers.E(c))
+			c.JSON(http.StatusInternalServerError, handlers.E(c))
 			return
 		}
 

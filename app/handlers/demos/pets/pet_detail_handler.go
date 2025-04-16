@@ -172,24 +172,24 @@ func PetUpdate(c *xin.Context) {
 	au := tenant.GetAuthUser(c)
 
 	var cnt int64
-	var err error
-	err = app.SDB.Transaction(func(tx *sqlx.Tx) error {
+	err := app.SDB.Transaction(func(tx *sqlx.Tx) (err error) {
 		cnt, err = tt.UpdatePet(tx, &pet.Pet)
 		if err != nil {
-			return err
+			return
 		}
+
 		if cnt > 0 {
 			if pet.File != "" {
 				fid := pet.PhotoPath()
 				sfs := tt.SFS(tx)
 				if err = sfs.DeleteFile(fid); err != nil {
-					return err
+					return
 				}
 				return sfs.MoveFile(pet.File, fid)
 			}
 			return tt.AddAuditLog(tx, au, models.AL_PETS_UPDATES, num.Ltoa(cnt), "#"+num.Ltoa(pet.ID)+": <"+pet.Name+">")
 		}
-		return nil
+		return
 	})
 	if err != nil {
 		c.AddError(err)
