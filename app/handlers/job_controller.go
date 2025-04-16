@@ -216,19 +216,18 @@ func (jc *JobController) Cancel(c *xin.Context) {
 	}
 
 	tt := tenant.FromCtx(c)
-	au := tenant.AuthUser(c)
+	au := tenant.GetAuthUser(c)
 
 	reason := tbs.GetText(c.Locale, "job.error.usercancel", "User canceled.")
 
 	var job *xjm.Job
-	err := app.SDB.Transaction(func(tx *sqlx.Tx) error {
+	err := app.SDB.Transaction(func(tx *sqlx.Tx) (err error) {
 		sjm := tt.SJM(tx)
 
-		var err error
 		job, err = sjm.GetJob(jid)
 		if err != nil {
 			c.Logger.Errorf("Failed to get job #%d: %v", jid, err)
-			return err
+			return
 		}
 		if job == nil {
 			return xjm.ErrJobMissing
@@ -239,26 +238,26 @@ func (jc *JobController) Cancel(c *xin.Context) {
 
 		if err = sjm.CancelJob(jid, reason); err != nil {
 			c.Logger.Errorf("Failed to cancel job #%d: %v", jid, err)
-			return err
+			return
 		}
 
 		if err = sjm.AddJobLog(jid, time.Now(), xjm.JobLogLevelWarn, reason); err != nil {
-			return err
+			return
 		}
 
 		if err = tt.AddAuditLog(tx, au, jobs.JobCancelAuditLogs[jc.Name]); err != nil {
-			return err
+			return
 		}
 
 		if job.CID != 0 {
 			sjc := tt.SJC(tx)
-			if err := jobs.JobFindAndCancelChain(sjc, job.CID, jid, reason); err != nil {
+			if err = jobs.JobFindAndCancelChain(sjc, job.CID, jid, reason); err != nil {
 				c.Logger.Errorf("Failed to cancel job chain for job #%d: %v", jid, err)
-				return err
+				return
 			}
 		}
 
-		return nil
+		return
 	})
 	if err != nil {
 		if errors.Is(err, xjm.ErrJobMissing) {
