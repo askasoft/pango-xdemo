@@ -24,22 +24,16 @@ func AuditLogDeletes(c *xin.Context) {
 	tt := tenant.FromCtx(c)
 
 	var cnt int64
-	err := app.SDB.Transaction(func(tx *sqlx.Tx) error {
-		sqb := tx.Builder()
-		sqb.Delete(tt.TableAuditLogs())
-		if len(ids) > 0 {
-			sqb.In("id", ids)
-		}
-		sql, args := sqb.Build()
-
-		r, err := tx.Exec(sql, args...)
+	err := app.SDB.Transaction(func(tx *sqlx.Tx) (err error) {
+		cnt, err = tt.DeleteAuditLogs(tx, ids...)
 		if err != nil {
-			return err
+			return
 		}
 
-		cnt, _ = r.RowsAffected()
-
-		return tt.ResetSequence(tx, "audit_logs")
+		if cnt > 0 {
+			return tt.ResetAuditLogsSequence(tx)
+		}
+		return
 	})
 	if err != nil {
 		c.AddError(err)
@@ -70,12 +64,12 @@ func AuditLogDeleteBatch(c *xin.Context) {
 
 	var cnt int64
 	err = app.SDB.Transaction(func(tx *sqlx.Tx) error {
-		cnt, err = tt.DeleteAuditLogs(tx, alqa)
+		cnt, err = tt.DeleteAuditLogsQuery(tx, alqa)
 		if err != nil {
 			return err
 		}
 		if cnt > 0 {
-			return tt.ResetSequence(tx, "audit_logs")
+			return tt.ResetAuditLogsSequence(tx)
 		}
 		return nil
 	})

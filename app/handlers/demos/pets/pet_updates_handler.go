@@ -84,32 +84,32 @@ func PetDeletes(c *xin.Context) {
 	au := tenant.GetAuthUser(c)
 
 	var cnt int64
-	err := app.SDB.Transaction(func(tx *sqlx.Tx) error {
+	err := app.SDB.Transaction(func(tx *sqlx.Tx) (err error) {
 		sfs := tt.SFS(tx)
 		if len(ids) > 0 {
 			for _, id := range ids {
-				if _, err := sfs.DeletePrefix(fmt.Sprintf("/%s/%d/", models.PrefixPetFile, id)); err != nil {
-					return err
+				if _, err = sfs.DeletePrefix(fmt.Sprintf("/%s/%d/", models.PrefixPetFile, id)); err != nil {
+					return
 				}
 			}
 		} else {
-			if _, err := sfs.DeletePrefix("/" + models.PrefixPetFile + "/"); err != nil {
-				return err
+			if _, err = sfs.DeletePrefix("/" + models.PrefixPetFile + "/"); err != nil {
+				return
 			}
 		}
 
-		cnt, err := tt.DeletePets(tx, ids...)
+		cnt, err = tt.DeletePets(tx, ids...)
 		if err != nil {
-			return err
+			return
 		}
 
 		if cnt > 0 {
-			if err := tt.AddAuditLog(tx, au, models.AL_PETS_DELETES, num.Ltoa(cnt), asg.Join(ids, ", ")); err != nil {
-				return err
+			if err = tt.AddAuditLog(tx, au, models.AL_PETS_DELETES, num.Ltoa(cnt), asg.Join(ids, ", ")); err != nil {
+				return
 			}
-			return tt.ResetSequence(tx, "pets")
+			return tt.ResetPetsSequence(tx)
 		}
-		return nil
+		return
 	})
 	if err != nil {
 		c.AddError(err)
@@ -150,7 +150,7 @@ func PetDeleteBatch(c *xin.Context) {
 			if err := tt.AddAuditLog(tx, au, models.AL_PETS_DELETES, num.Ltoa(cnt), pqa.String()); err != nil {
 				return err
 			}
-			return tt.ResetSequence(tx, "pets")
+			return tt.ResetPetsSequence(tx)
 		}
 		return nil
 	})

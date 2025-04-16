@@ -6,16 +6,35 @@ import (
 	"github.com/askasoft/pango/sqx/sqlx"
 )
 
-func (sm Schema) ResetSequence(db sqlx.Sqlx, table string, starts ...int64) error {
-	stn := sm.Table(table)
-
+func (sm Schema) ResetSequence(tx sqlx.Sqlx, table string, starts ...int64) error {
 	switch app.DBS["type"] {
 	case "mysql":
 		return nil
 	default:
-		_, err := db.Exec(pgutil.ResetSequenceSQL(stn, starts...))
+		_, err := tx.Exec(pgutil.ResetSequenceSQL(table, starts...))
 		return err
 	}
+}
+
+func (sm Schema) DeleteRecordsByID(tx sqlx.Sqlx, table string, ids ...int64) (int64, error) {
+	return sm.DeleteRecordsByKey(tx, table, "id", ids...)
+}
+
+func (sm Schema) DeleteRecordsByKey(tx sqlx.Sqlx, table, key string, vals ...int64) (int64, error) {
+	sqb := tx.Builder()
+
+	sqb.Delete(table)
+	if len(vals) > 0 {
+		sqb.In(key, vals)
+	}
+	sql, args := sqb.Build()
+
+	r, err := tx.Exec(sql, args...)
+	if err != nil {
+		return 0, err
+	}
+
+	return r.RowsAffected()
 }
 
 func (sm Schema) Prefix() string {

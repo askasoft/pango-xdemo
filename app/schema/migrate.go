@@ -177,7 +177,7 @@ func (sm Schema) MigrateSuper() error {
 			return err
 		}
 
-		return sm.ResetSequence(db, "users", models.UserStartID)
+		return sm.ResetUsersSequence(db)
 	}
 
 	sqb.Reset()

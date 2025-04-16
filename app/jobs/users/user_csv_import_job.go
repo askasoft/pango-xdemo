@@ -185,12 +185,12 @@ func (ucij *UserCsvImportJob) doReadCsv(ctx context.Context, callback func(rec *
 	}
 }
 
-func (ucij *UserCsvImportJob) doCheckCsv() (total int, err error) {
+func (ucij *UserCsvImportJob) doCheckCsv() (cnt int, err error) {
 	ucij.Logger.Info(tbs.GetText(ucij.Locale(), "csv.info.checking"))
 
 	valid := true
 	err = ucij.doReadCsv(context.TODO(), func(rec *csvUserRecord) error {
-		total++
+		cnt++
 		err := ucij.checkRecord(rec)
 		if err != nil {
 			valid = false
@@ -314,7 +314,7 @@ func (ucij *UserCsvImportJob) importRecord(rec *csvUserRecord) error {
 
 		if uid != 0 {
 			// reset sequence if create with ID
-			if err := ucij.Tenant.ResetSequence(tx, "users", models.UserStartID); err != nil {
+			if err := ucij.Tenant.ResetUsersSequence(tx); err != nil {
 				return err
 			}
 		}
