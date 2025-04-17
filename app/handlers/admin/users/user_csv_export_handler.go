@@ -27,12 +27,12 @@ func UserCsvExport(c *xin.Context) {
 	tt := tenant.FromCtx(c)
 	au := tenant.AuthUser(c)
 
+	sm := tbsutil.GetUserStatusMap(c.Locale)
+	rm := tbsutil.GetUserRoleMap(c.Locale, au.Role)
+
 	cw := csv.NewWriter(c.Writer)
 	cw.UseCRLF = true
 	defer cw.Flush()
-
-	sm := tbsutil.GetUserStatusMap(c.Locale)
-	rm := tbsutil.GetUserRoleMap(c.Locale, au.Role)
 
 	var cols []string
 	err = tt.IterUsers(app.SDB, au.Role, uqa, func(user *models.User) error {

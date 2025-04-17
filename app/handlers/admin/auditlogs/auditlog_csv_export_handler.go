@@ -27,11 +27,11 @@ func AuditLogCsvExport(c *xin.Context) {
 
 	tt := tenant.FromCtx(c)
 
+	fm := tbsutil.GetAudioLogFuncMap(c.Locale)
+
 	cw := csv.NewWriter(c.Writer)
 	cw.UseCRLF = true
 	defer cw.Flush()
-
-	fm := tbsutil.GetAudioLogFuncMap(c.Locale)
 
 	var cols []string
 	err = tt.IterAuditLogs(app.SDB, alqa, func(al *models.AuditLogEx) error {

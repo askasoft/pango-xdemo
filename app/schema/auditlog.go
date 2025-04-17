@@ -73,7 +73,7 @@ func (sm Schema) IterAuditLogs(tx sqlx.Sqlx, alqa *AuditLogQueryArg, fit func(*m
 	sqb.From(sm.TableAuditLogs())
 	sqb.Join("LEFT JOIN " + sm.TableUsers() + " ON users.id = audit_logs.uid")
 	alqa.AddFilters(sqb)
-	sqb.Order("id")
+	alqa.AddOrder(sqb, "id")
 	sql, args := sqb.Build()
 
 	rows, err := tx.Queryx(sql, args...)

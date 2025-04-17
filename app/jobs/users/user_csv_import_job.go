@@ -251,8 +251,9 @@ func (ucij *UserCsvImportJob) importRecord(rec *csvUserRecord) error {
 		Role:      ucij.roleRevMap.SafeGet(rec.Role, models.RoleViewer),
 		Status:    ucij.statusRevMap.SafeGet(rec.Status, models.UserActive),
 		CIDR:      rec.CIDR,
-		UpdatedAt: time.Now(),
+		CreatedAt: time.Now(),
 	}
+	user.UpdatedAt = user.CreatedAt
 
 	tt := ucij.Tenant
 	err := app.SDB.Transaction(func(tx *sqlx.Tx) error {

@@ -27,14 +27,14 @@ func PetCsvExport(c *xin.Context) {
 
 	tt := tenant.FromCtx(c)
 
-	cw := csv.NewWriter(c.Writer)
-	cw.UseCRLF = true
-	defer cw.Flush()
-
 	pgm := tbsutil.GetPetGenderMap(c.Locale)
 	pom := tbsutil.GetPetOriginMap(c.Locale)
 	ptm := tbsutil.GetPetTemperMap(c.Locale)
 	phm := tbsutil.GetPetHabitsMap(c.Locale)
+
+	cw := csv.NewWriter(c.Writer)
+	cw.UseCRLF = true
+	defer cw.Flush()
 
 	var cols []string
 	err = tt.IterPets(app.SDB, pqa, func(pet *models.Pet) error {

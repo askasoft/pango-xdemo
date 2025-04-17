@@ -75,14 +75,14 @@ func (sm Schema) FindUsers(tx sqlx.Sqlx, role string, uqa *UserQueryArg, cols ..
 	return
 }
 
-func (sm Schema) IterUsers(tx sqlx.Sqlx, role string, uqa *UserQueryArg, fit func(*models.User) error) error {
+func (sm Schema) IterUsers(tx sqlx.Sqlx, role string, uqa *UserQueryArg, fit func(*models.User) error, cols ...string) error {
 	sqb := tx.Builder()
 
-	sqb.Select()
+	sqb.Select(cols...)
 	sqb.From(sm.TableUsers())
 	sqb.Gte("role", role)
 	uqa.AddFilters(sqb)
-	sqb.Order("id")
+	uqa.AddOrder(sqb, "id")
 	sql, args := sqb.Build()
 
 	rows, err := tx.Queryx(sql, args...)
