@@ -7,8 +7,8 @@ import (
 )
 
 func Router(rg *xin.RouterGroup) {
-	rg.Use(app.XTP.Handler()) // token protect
-	rg.Use(app.XCN.Handler())
+	rg.Use(app.XTP.Handle) // token protect
+	rg.Use(app.XCN.Handle)
 
 	rg.GET("/tags/", TagsIndex)
 	rg.POST("/tags/", TagsIndex)

@@ -6,14 +6,14 @@ import (
 )
 
 func Router(rg *xin.RouterGroup) {
-	rg.Use(app.XAC.Handler()) // access control
+	rg.Use(app.XAC.Handle) // access control
 	rg.OPTIONS("/*path", xin.Next)
 
 	addMyApiHandlers(rg)
 
 	rgb := rg.Group("/basic")
-	rgb.Use(app.XBA.Handler()) // Basic auth
-	rgb.Use(IPProtect)         // IP protect
+	rgb.Use(app.XBA.Handle) // Basic auth
+	rgb.Use(IPProtect)      // IP protect
 	addMyApiHandlers(rgb)
 }
 

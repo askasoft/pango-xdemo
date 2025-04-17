@@ -49,6 +49,8 @@
 			<li><hr class="dropdown-divider"></li>
 			{{end}}
 			{{if .AU.IsAdmin}}
+			<li><a class="dropdown-item" href="{{.Base}}/tests/">{{I "tests"}}<span>{{T .Loc "menu.tests"}}</span></a></li>
+			<li><hr class="dropdown-divider"></li>
 			<li><a class="dropdown-item" href="{{.Base}}/a/users/">{{I "admin.users"}}<span>{{T .Loc "menu.admin.users"}}</span></a></li>
 			<li><a class="dropdown-item" href="{{.Base}}/a/configs/">{{I "admin.configs"}}<span>{{T .Loc "menu.admin.configs"}}</span></a></li>
 			<li><a class="dropdown-item" href="{{.Base}}/a/auditlogs/">{{I "admin.auditlogs"}}<span>{{T .Loc "menu.admin.auditlogs"}}</span></a></li>

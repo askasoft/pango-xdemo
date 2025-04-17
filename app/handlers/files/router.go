@@ -13,7 +13,7 @@ func Router(rg *xin.RouterGroup) {
 	rg.POST("/upload", Upload)
 	rg.POST("/uploads", Uploads)
 
-	xcch := app.XCC.Handler()
+	xcch := app.XCC.Handle
 
 	xin.StaticFSFunc(rg, "/", func(c *xin.Context) http.FileSystem {
 		tt := tenant.FromCtx(c)

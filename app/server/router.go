@@ -14,6 +14,7 @@ import (
 	"github.com/askasoft/pango-xdemo/app/handlers/login"
 	"github.com/askasoft/pango-xdemo/app/handlers/saml"
 	"github.com/askasoft/pango-xdemo/app/handlers/super"
+	"github.com/askasoft/pango-xdemo/app/handlers/tests"
 	"github.com/askasoft/pango-xdemo/app/handlers/user"
 	"github.com/askasoft/pango-xdemo/app/middles"
 	"github.com/askasoft/pango-xdemo/app/tenant"
@@ -179,44 +180,49 @@ func initHandlers() {
 
 	r.Use(xin.Recovery())
 	r.Use(middles.SetCtxLogProp) // Set TENANT logger prop
-	r.Use(app.XAL.Handler())
-	r.Use(app.XLL.Handler())
-	r.Use(app.XSL.Handler())
-	r.Use(app.XRC.Handler())
-	r.Use(app.XHD.Handler())
-	r.Use(app.XRH.Handler())
+	r.Use(app.XAL.Handle)
+	r.Use(app.XLL.Handle)
+	r.Use(app.XSL.Handle)
+	r.Use(app.XRC.Handle)
+	r.Use(app.XHD.Handle)
+	r.Use(app.XRH.Handle)
 
 	rg := r.Group(app.Base)
 	rg.HEAD("/healthcheck", handlers.HealthCheck)
 	rg.GET("/healthcheck", handlers.HealthCheck)
 
-	rg.Use(app.XSR.Handler())     // https redirect
+	rg.Use(app.XSR.Handle)        // https redirect
 	rg.Use(middles.TenantProtect) // schema protect
 
-	rg.GET("/", app.XCN.Handler(), handlers.Index)
-	rg.GET("/403", app.XCN.Handler(), handlers.Forbidden)
-	rg.GET("/404", app.XCN.Handler(), handlers.NotFound)
-	rg.GET("/500", app.XCN.Handler(), handlers.InternalServerError)
-	rg.GET("/panic", handlers.Panic)
-
-	addStaticHandlers(rg)
+	addRootHandlers(rg.Group(""))
+	addStaticHandlers(rg.Group(""))
 
 	api.Router(rg.Group("/api"))
 	saml.Router(rg.Group("/saml"))
 	login.Router(rg.Group("/login"))
 	files.Router(rg.Group("/files"))
 	demos.Router(rg.Group("/demos"))
+	tests.Router(rg.Group("/tests"))
 	admin.Router(rg.Group("/a"))
 	super.Router(rg.Group("/s"))
 	user.Router(rg.Group("/u"))
 
-	app.XIN.NoRoute(middles.TenantProtect, app.XCN.Handler(), handlers.NotFound)
+	app.XIN.NoRoute(middles.TenantProtect, app.XCN.Handle, handlers.NotFound)
+}
+
+func addRootHandlers(rg *xin.RouterGroup) {
+	rg.Use(app.XCN.Handle)
+
+	rg.GET("/", handlers.Index)
+	rg.GET("/403", handlers.Forbidden)
+	rg.GET("/404", handlers.NotFound)
+	rg.GET("/500", handlers.InternalServerError)
 }
 
 func addStaticHandlers(rg *xin.RouterGroup) {
 	mt := app.BuildTime
 
-	xcch := app.XCC.Handler()
+	xcch := app.XCC.Handle
 
 	for path, fs := range web.Statics {
 		xin.StaticFS(rg, "/static/"+path, xin.FixedModTimeFS(xin.FS(fs), mt), "", xcch)

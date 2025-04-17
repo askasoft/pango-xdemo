@@ -1,10 +1,7 @@
-package admin
+package tests
 
 import (
 	"github.com/askasoft/pango-xdemo/app"
-	"github.com/askasoft/pango-xdemo/app/handlers/admin/auditlogs"
-	"github.com/askasoft/pango-xdemo/app/handlers/admin/configs"
-	"github.com/askasoft/pango-xdemo/app/handlers/admin/users"
 	"github.com/askasoft/pango-xdemo/app/middles"
 	"github.com/askasoft/pango/xin"
 )
@@ -16,8 +13,8 @@ func Router(rg *xin.RouterGroup) {
 	rg.Use(app.XTP.Handle)           // token protect
 
 	rg.GET("/", Index)
-
-	users.Router(rg.Group("/users"))
-	configs.Router(rg.Group("/configs"))
-	auditlogs.Router(rg.Group("/auditlogs"))
+	rg.POST("/crash", Crash)
+	rg.POST("/panic", Panic)
+	rg.POST("/outofmemory", OutOfMemory)
+	rg.POST("/stackoverflow", StackOverflow)
 }

@@ -33,6 +33,11 @@
 		</div>
 
 		{{if and .AU .AU.IsAdmin}}
+		<div id="navi_tests" class="card">
+			<div class="card-header">
+				<a href="{{.Base}}/tests/">{{I "tests"}}<span>{{T .Loc "menu.tests"}}</span></a>
+			</div>
+		</div>
 		<div id="navi_admin" class="card">
 			<div class="card-header">
 				<a href="{{.Base}}/a/">{{I "admin"}}<span>{{T .Loc "menu.admin"}}</span></a>

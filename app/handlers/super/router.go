@@ -10,7 +10,7 @@ func Router(rg *xin.RouterGroup) {
 	rg.Use(middles.AppAuth)         // app auth
 	rg.Use(middles.IPProtect)       // IP protect
 	rg.Use(middles.RoleRootProtect) // role protect
-	rg.Use(app.XTP.Handler())       // token protect
+	rg.Use(app.XTP.Handle)          // token protect
 
 	rg.GET("/", Index)
 
