@@ -16,11 +16,11 @@ func (sm Schema) ResetSequence(tx sqlx.Sqlx, table string, starts ...int64) erro
 	}
 }
 
-func (sm Schema) DeleteRecordsByID(tx sqlx.Sqlx, table string, ids ...int64) (int64, error) {
-	return sm.DeleteRecordsByKey(tx, table, "id", ids...)
+func (sm Schema) DeleteByID(tx sqlx.Sqlx, table string, ids ...int64) (int64, error) {
+	return sm.DeleteByKey(tx, table, "id", ids...)
 }
 
-func (sm Schema) DeleteRecordsByKey(tx sqlx.Sqlx, table, key string, vals ...int64) (int64, error) {
+func (sm Schema) DeleteByKey(tx sqlx.Sqlx, table, key string, vals ...int64) (int64, error) {
 	sqb := tx.Builder()
 
 	sqb.Delete(table)

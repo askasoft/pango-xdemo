@@ -182,7 +182,7 @@ func (sm Schema) UpdatePet(tx sqlx.Sqlx, pet *models.Pet) (int64, error) {
 }
 
 func (sm Schema) DeletePets(tx sqlx.Sqlx, ids ...int64) (int64, error) {
-	return sm.DeleteRecordsByID(tx, sm.TablePets(), ids...)
+	return sm.DeleteByID(tx, sm.TablePets(), ids...)
 }
 
 type PetUpdatesArg struct {
