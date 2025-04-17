@@ -246,9 +246,10 @@ func (sm Schema) DeleteUsers(tx sqlx.Sqlx, au *models.User, ids ...int64) (int64
 type UserUpdatesArg struct {
 	argutil.IDArg
 
-	Role   string  `json:"role,omitempty" form:"role,strip"`
-	Status string  `json:"status,omitempty" form:"status,strip"`
-	CIDR   *string `json:"cidr,omitempty" form:"cidr,strip" validate:"omitempty,cidrs"`
+	Role      string    `json:"role,omitempty" form:"role,strip"`
+	Status    string    `json:"status,omitempty" form:"status,strip"`
+	CIDR      *string   `json:"cidr,omitempty" form:"cidr,strip" validate:"omitempty,cidrs"`
+	UpdatedAt time.Time `json:"updated_at" form:"-"`
 }
 
 func (uua *UserUpdatesArg) String() string {
@@ -273,7 +274,9 @@ func (sm Schema) UpdateUsers(tx sqlx.Sqlx, au *models.User, uua *UserUpdatesArg)
 	if uua.CIDR != nil {
 		sqb.Setc("cidr", *uua.CIDR)
 	}
-	sqb.Setc("updated_at", time.Now())
+
+	uua.UpdatedAt = time.Now()
+	sqb.Setc("updated_at", uua.UpdatedAt)
 
 	sqb.Neq("id", au.ID)
 	sqb.Gte("role", au.Role)

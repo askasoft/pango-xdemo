@@ -342,6 +342,9 @@
 					})
 					$trs.find('td.habits').empty().append(hs);
 				}
+				if (us.updated_at) {
+					$trs.find('td.updated_at').text(main.format_time(us.updated_at));
+				}
 				main.blink($trs);
 			},
 			error: main.form_ajax_error($p),

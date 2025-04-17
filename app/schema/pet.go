@@ -188,11 +188,12 @@ func (sm Schema) DeletePets(tx sqlx.Sqlx, ids ...int64) (int64, error) {
 type PetUpdatesArg struct {
 	argutil.IDArg
 
-	Gender string     `json:"gender,omitempty" form:"gender,strip"`
-	BornAt *time.Time `json:"born_at,omitempty" form:"born_at"`
-	Origin string     `json:"origin,omitempty" form:"origin,strip"`
-	Temper string     `json:"temper,omitempty" form:"temper,strip"`
-	Habits *[]string  `json:"habits,omitempty" form:"habits,strip"`
+	Gender    string     `json:"gender,omitempty" form:"gender,strip"`
+	BornAt    *time.Time `json:"born_at,omitempty" form:"born_at"`
+	Origin    string     `json:"origin,omitempty" form:"origin,strip"`
+	Temper    string     `json:"temper,omitempty" form:"temper,strip"`
+	Habits    *[]string  `json:"habits,omitempty" form:"habits,strip"`
+	UpdatedAt time.Time  `json:"updated_at" form:"-"`
 }
 
 func (pua *PetUpdatesArg) String() string {
@@ -223,7 +224,9 @@ func (sm Schema) UpdatePets(tx sqlx.Sqlx, pua *PetUpdatesArg) (int64, error) {
 	if pua.Habits != nil {
 		sqb.Setc("habits", pqx.StringArray(str.Strips(*pua.Habits)))
 	}
-	sqb.Setc("updated_at", time.Now())
+
+	pua.UpdatedAt = time.Now()
+	sqb.Setc("updated_at", pua.UpdatedAt)
 
 	sqlxutil.AddIn(sqb, "id", pua.IDs())
 
