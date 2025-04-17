@@ -43,7 +43,7 @@ func AddNeq(sqb *sqlx.Builder, column string, value string) {
 	}
 }
 
-func AddIn(sqb *sqlx.Builder, column string, values []string) {
+func AddIn[T any](sqb *sqlx.Builder, column string, values []T) {
 	if len(values) > 0 {
 		sqb.In(column, values)
 	}

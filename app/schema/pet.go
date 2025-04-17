@@ -5,6 +5,7 @@ import (
 
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/utils/argutil"
+	"github.com/askasoft/pango-xdemo/app/utils/sqlxutil"
 	"github.com/askasoft/pango-xdemo/app/utils/strutil"
 	"github.com/askasoft/pango/sqx/pqx"
 	"github.com/askasoft/pango/sqx/sqlx"
@@ -224,10 +225,7 @@ func (sm Schema) UpdatePets(tx sqlx.Sqlx, pua *PetUpdatesArg) (int64, error) {
 	}
 	sqb.Setc("updated_at", time.Now())
 
-	ids := pua.IDs()
-	if len(ids) > 0 {
-		sqb.In("id", ids)
-	}
+	sqlxutil.AddIn(sqb, "id", pua.IDs())
 
 	sql, args := sqb.Build()
 

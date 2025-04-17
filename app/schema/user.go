@@ -5,6 +5,7 @@ import (
 
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/utils/argutil"
+	"github.com/askasoft/pango-xdemo/app/utils/sqlxutil"
 	"github.com/askasoft/pango-xdemo/app/utils/strutil"
 	"github.com/askasoft/pango/sqx/sqlx"
 )
@@ -231,9 +232,7 @@ func (sm Schema) DeleteUsers(tx sqlx.Sqlx, au *models.User, ids ...int64) (int64
 	sqb.Delete(sm.TableUsers())
 	sqb.Neq("id", au.ID)
 	sqb.Gte("role", au.Role)
-	if len(ids) > 0 {
-		sqb.In("id", ids)
-	}
+	sqlxutil.AddIn(sqb, "id", ids)
 	sql, args := sqb.Build()
 
 	r, err := tx.Exec(sql, args...)
@@ -278,11 +277,7 @@ func (sm Schema) UpdateUsers(tx sqlx.Sqlx, au *models.User, uua *UserUpdatesArg)
 
 	sqb.Neq("id", au.ID)
 	sqb.Gte("role", au.Role)
-
-	ids := uua.IDs()
-	if len(ids) > 0 {
-		sqb.In("id", ids)
-	}
+	sqlxutil.AddIn(sqb, "id", uua.IDs())
 
 	sql, args := sqb.Build()
 
