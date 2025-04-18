@@ -1,11 +1,11 @@
 {{define "scripts"}}
 {{if eq .CFG.app.debug "true"}}
-<script type="text/javascript" src="{{.Base}}/static/jquery/jquery-3.7.1.js?r={{.REV}}"></script>
+<script type="text/javascript" src="{{.Base}}/static/jquery3/jquery-3.7.1.js?r={{.REV}}"></script>
 <script type="text/javascript" src="{{.Base}}/static/bootstrap5/js/bootstrap.bundle.js?r={{.REV}}"></script>
 <script type="text/javascript" src="{{.Base}}/static/corejs/corejs.js?r={{.REV}}"></script>
 <script type="text/javascript" src="{{.Base}}/static/plugins/js/plugins.js?r={{.REV}}"></script>
 {{else}}
-<script type="text/javascript" src="{{.Base}}/static/jquery/jquery-3.7.1.min.js?r={{.REV}}"></script>
+<script type="text/javascript" src="{{.Base}}/static/jquery3/jquery-3.7.1.min.js?r={{.REV}}"></script>
 <script type="text/javascript" src="{{.Base}}/static/bootstrap5/js/bootstrap.bundle.min.js?r={{.REV}}"></script>
 <script type="text/javascript" src="{{.Base}}/static/corejs/corejs.min.js?r={{.REV}}"></script>
 <script type="text/javascript" src="{{.Base}}/static/plugins/js/plugins.min.js?r={{.REV}}"></script>

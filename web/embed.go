@@ -9,7 +9,7 @@ import (
 	"github.com/askasoft/pango-assets/html/bootswatch5/pulse"
 	"github.com/askasoft/pango-assets/html/corejs"
 	"github.com/askasoft/pango-assets/html/fontawesome6"
-	"github.com/askasoft/pango-assets/html/jquery"
+	"github.com/askasoft/pango-assets/html/jquery3"
 	"github.com/askasoft/pango-assets/html/plugins"
 	"github.com/askasoft/pango-assets/html/summernote"
 )
@@ -22,7 +22,7 @@ var Statics = map[string]embed.FS{
 	"bootswatch5/pulse":  pulse.FS,
 	"fontawesome6":       fontawesome6.FS,
 	"corejs":             corejs.FS,
-	"jquery":             jquery.FS,
+	"jquery3":            jquery3.FS,
 	"plugins":            plugins.FS,
 	"summernote":         summernote.FS,
 }
