@@ -1,22 +1,6 @@
 {{define "sidenavi"}}
 <div id="sidenavi">
 	<div class="mainnavi ui-sidenavi minimal">
-		<div id="navi_demos" class="card">
-			<div class="card-header">
-				<div>{{I "demos"}}<span>{{T .Loc "menu.demos"}}</span></div>
-			</div>
-			<div class="card-body">
-				<ul class="nav flex-column">
-					<li class="nav-item"><a class="nav-link" href="{{.Base}}/demos/tags/">{{I "demos.tags"}}<span>{{T .Loc "menu.demos.tags"}}</span></a></li>
-					<li class="nav-item"><a class="nav-link" href="{{.Base}}/demos/uploads/">{{I "demos.uploads"}}<span>{{T .Loc "menu.demos.uploads"}}</span></a></li>
-					<li class="nav-item"><a class="nav-link" href="{{.Base}}/demos/chiconv/">{{I "demos.chiconv"}}<span>{{T .Loc "menu.demos.chiconv"}}</span></a></li>
-					<li class="nav-item"><a class="nav-link" href="{{.Base}}/403/">{{I "ban"}}<span>403</span></a></li>
-					<li class="nav-item"><a class="nav-link" href="{{.Base}}/404/">{{I "compass"}}<span>404</span></a></li>
-					<li class="nav-item"><a class="nav-link" href="{{.Base}}/500/">{{I "error"}}<span>500</span></a></li>
-				</ul>
-			</div>
-		</div>
-
 		<div id="navi_demos_pets" class="card">
 			<div class="card-header">
 				<div>{{I "demos.pets"}}<span>{{T .Loc "menu.demos.pets"}}</span></div>
@@ -28,6 +12,22 @@
 					<li class="nav-item"><a class="nav-link" href="{{.Base}}/demos/pets/jobs/doggen/">{{I "demos.pets.create.dog"}}<span>{{T .Loc "menu.demos.pets.create.dog"}}</span></a></li>
 					<li class="nav-item"><a class="nav-link" href="{{.Base}}/demos/pets/jobs/clear/">{{I "demos.pets.clear"}}<span>{{T .Loc "menu.demos.pets.clear"}}</span></a></li>
 					<li class="nav-item"><a class="nav-link" href="{{.Base}}/demos/pets/jobs/reset/">{{I "demos.pets.reset"}}<span>{{T .Loc "menu.demos.pets.reset"}}</span></a></li>
+				</ul>
+			</div>
+		</div>
+
+		<div id="navi_demos_samples" class="card">
+			<div class="card-header">
+				<div>{{I "demos"}}<span>{{T .Loc "menu.demos"}}</span></div>
+			</div>
+			<div class="card-body">
+				<ul class="nav flex-column">
+					<li class="nav-item"><a class="nav-link" href="{{.Base}}/demos/tags/">{{I "demos.tags"}}<span>{{T .Loc "menu.demos.tags"}}</span></a></li>
+					<li class="nav-item"><a class="nav-link" href="{{.Base}}/demos/uploads/">{{I "demos.uploads"}}<span>{{T .Loc "menu.demos.uploads"}}</span></a></li>
+					<li class="nav-item"><a class="nav-link" href="{{.Base}}/demos/chiconv/">{{I "demos.chiconv"}}<span>{{T .Loc "menu.demos.chiconv"}}</span></a></li>
+					<li class="nav-item"><a class="nav-link" href="{{.Base}}/403/">{{I "ban"}}<span>403</span></a></li>
+					<li class="nav-item"><a class="nav-link" href="{{.Base}}/404/">{{I "compass"}}<span>404</span></a></li>
+					<li class="nav-item"><a class="nav-link" href="{{.Base}}/500/">{{I "error"}}<span>500</span></a></li>
 				</ul>
 			</div>
 		</div>
