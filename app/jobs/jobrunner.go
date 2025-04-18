@@ -10,7 +10,6 @@ import (
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango-xdemo/app/utils/errutil"
-	"github.com/askasoft/pango/gog"
 	"github.com/askasoft/pango/ini"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/num"
@@ -104,78 +103,6 @@ func (js *JobState) Counts() string {
 
 func (js *JobState) State() JobState {
 	return *js
-}
-
-type JobStateLx struct {
-	JobState
-	Limit int `json:"limit,omitempty"`
-}
-
-func (js *JobStateLx) SetTotalLimit(total, limit int) {
-	js.Total = total
-	js.Limit = gog.If(total > 0 && limit > total, total, limit)
-}
-
-func (js *JobStateLx) IsStepLimited() bool {
-	return js.Limit > 0 && js.Step >= js.Limit
-}
-
-func (js *JobStateLx) Progress() string {
-	if js.Limit > 0 {
-		return fmt.Sprintf("[%d/%d]", js.Count, js.Limit)
-	}
-	return js.JobState.Progress()
-}
-
-func (js *JobStateLx) Counts() string {
-	return fmt.Sprintf("[%d/%d/%d] (-%d|+%d|!%d)", js.Step, js.Limit, js.Total, js.Skipped, js.Success, js.Failure)
-}
-
-type JobStateSx struct {
-	JobStateLx
-}
-
-func (js *JobStateSx) IsSuccessLimited() bool {
-	return js.Limit > 0 && js.Success >= js.Limit
-}
-
-func (js *JobStateSx) IncSkipped() {
-	js.Skipped++
-}
-
-func (js *JobStateSx) IncSuccess() {
-	js.Count++
-	js.Success++
-}
-
-func (js *JobStateSx) IncFailure() {
-	js.Failure++
-}
-
-func (js *JobStateSx) Progress() string {
-	if js.Limit > 0 {
-		return fmt.Sprintf("[%d/%d]", js.Success, js.Limit)
-	}
-	if js.Total > 0 {
-		return fmt.Sprintf("[%d/%d]", js.Success, js.Total)
-	}
-	if js.Success > 0 {
-		return fmt.Sprintf("[%d/%d]", js.Success, js.Step)
-	}
-	if js.Step > 0 {
-		return fmt.Sprintf("[%d]", js.Step)
-	}
-	return ""
-}
-
-type JobStateLix struct {
-	JobStateLx
-	LastID int64 `json:"last_id,omitempty"`
-}
-
-type JobStateSix struct {
-	JobStateSx
-	LastID int64 `json:"last_id,omitempty"`
 }
 
 type FailedItem struct {

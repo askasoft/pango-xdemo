@@ -10,54 +10,11 @@ import (
 
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango-xdemo/app/utils/errutil"
-	"github.com/askasoft/pango/asg"
 	"github.com/askasoft/pango/gwp"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/xjm"
 )
-
-type JobStateLixs struct {
-	JobStateLx
-	LastIDs []int64 `json:"last_ids,omitempty"`
-}
-
-// InitLastID remain minimum id only
-func (jse *JobStateLixs) InitLastID() {
-	if len(jse.LastIDs) > 0 {
-		jse.LastIDs[0] = asg.Min(jse.LastIDs)
-		jse.LastIDs = jse.LastIDs[:1]
-	}
-}
-
-func (jse *JobStateLixs) AddLastID(id int64) {
-	jse.Step++
-	jse.LastIDs = append(jse.LastIDs, id)
-}
-
-func (jse *JobStateLixs) AddFailureID(id int64) {
-	jse.Count++
-	jse.Failure++
-	jse.LastIDs = asg.DeleteEqual(jse.LastIDs, id)
-}
-
-func (jse *JobStateLixs) AddSuccessID(id int64) {
-	jse.Count++
-	jse.Success++
-	jse.LastIDs = asg.DeleteEqual(jse.LastIDs, id)
-}
-
-func (jse *JobStateLixs) AddSkippedID(id int64) {
-	jse.Count++
-	jse.Skipped++
-	jse.LastIDs = asg.DeleteEqual(jse.LastIDs, id)
-}
-
-func (jse *JobStateLixs) AddIDFilter(sqb *sqlx.Builder, col string) {
-	if len(jse.LastIDs) > 0 {
-		sqb.Gt(col, asg.Max(jse.LastIDs))
-	}
-}
 
 type JobWorker[R any] struct {
 	workerPool *gwp.WorkerPool

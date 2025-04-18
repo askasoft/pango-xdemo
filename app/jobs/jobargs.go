@@ -7,6 +7,8 @@ import (
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/tenant"
+	"github.com/askasoft/pango-xdemo/app/utils/sqlxutil"
+	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/xfs"
 	"github.com/askasoft/pango/xin"
 )
@@ -55,6 +57,16 @@ type ArgIDRange struct {
 	IdTo   int64 `json:"id_to,omitempty" form:"id_to,strip" validate:"omitempty,min=0,gtefield=IdFrom"`
 }
 
+func (ai *ArgIDRange) AddIDRangeFilter(sqb *sqlx.Builder, col string) {
+	if ai.IdFrom > 0 && ai.IdTo > 0 {
+		sqb.Btw(col, ai.IdFrom, ai.IdTo)
+	} else if ai.IdFrom > 0 {
+		sqb.Gte(col, ai.IdFrom)
+	} else if ai.IdTo > 0 {
+		sqb.Gte(col, ai.IdTo)
+	}
+}
+
 type iPeriod interface {
 	Period() *ArgPeriod
 }
@@ -66,6 +78,10 @@ type ArgPeriod struct {
 
 func (ap *ArgPeriod) Period() *ArgPeriod {
 	return ap
+}
+
+func (ap *ArgPeriod) AddPeriodFilter(sqb *sqlx.Builder, col string) {
+	sqlxutil.AddTimes(sqb, col, ap.Start, ap.End)
 }
 
 func ArgBind(c *xin.Context, a any) error {
