@@ -2,17 +2,20 @@ package super
 
 import (
 	"fmt"
+	"net"
 	"net/http"
 	hprof "net/http/pprof"
 	"os"
 	"runtime"
 	"runtime/pprof"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/handlers"
 	"github.com/askasoft/pango/cog/linkedhashmap"
+	"github.com/askasoft/pango/gog"
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/oss/cpu"
 	"github.com/askasoft/pango/oss/disk"
@@ -159,16 +162,48 @@ func runtimeServer() any {
 	}
 	stm.Set("%Cpu(s)", val)
 
+	// network
+	ifaces, err := net.Interfaces()
+	if err == nil {
+		var sb strings.Builder
+		for _, i := range ifaces {
+			if i.Flags&net.FlagLoopback != 0 || i.Flags&net.FlagRunning == 0 {
+				continue
+			}
+
+			addrs, err := i.Addrs()
+			if err != nil {
+				continue
+			}
+
+			sb.Reset()
+			for _, addr := range addrs {
+				if ipnet, ok := addr.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
+					sb.WriteString(addr.String())
+					sb.WriteRune('\n')
+				}
+			}
+			if sb.Len() > 0 {
+				name := "Network #" + num.Itoa(i.Index) + " " + i.Name
+				stm.Set(name, sb.String())
+			}
+		}
+	}
+
 	return stm
 }
 
 func runtimeProcess() any {
 	rtm := linkedhashmap.NewLinkedHashMap[string, string]()
+
+	rtm.Set("UID/PID/PPID", fmt.Sprintf("%d %d %d", os.Getuid(), os.Getpid(), os.Getppid()))
+	rtm.Set("Directory", gog.First(os.Getwd()))
+	rtm.Set("Cmdline", str.Join(os.Args, " "))
+	rtm.Set("Startup", fmt.Sprintf("%s (%s)", app.StartupTime.Format(time.RFC3339), tmu.HumanDuration(time.Since(app.StartupTime))))
 	rtm.Set("Goversion", runtime.Version())
 	rtm.Set("Gomaxprocs", num.Comma(runtime.GOMAXPROCS(0)))
 	rtm.Set("Goroutine", num.Comma(runtime.NumGoroutine()))
-	rtm.Set("Cmdline", str.Join(os.Args, " "))
-	rtm.Set("Startup", fmt.Sprintf("%s (%s)", app.StartupTime.Format(time.RFC3339), tmu.HumanDuration(time.Since(app.StartupTime))))
+
 	return rtm
 }
 

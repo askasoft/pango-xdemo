@@ -143,7 +143,7 @@ var (
 	// DBS database settings
 	DBS map[string]string
 
-	// SDB sqx database instance
+	// SDB database instance
 	SDB *sqlx.DB
 
 	// Certificate X509 KeyPair
