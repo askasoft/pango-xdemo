@@ -4,16 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"math"
 	"time"
 
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango-xdemo/app/utils/errutil"
-	"github.com/askasoft/pango/ini"
 	"github.com/askasoft/pango/log"
-	"github.com/askasoft/pango/num"
-	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/xjm"
 )
 
@@ -129,13 +125,7 @@ type JobRunner[T any] struct {
 }
 
 func NewJobRunner[T any](tt *tenant.Tenant, job *xjm.Job) *JobRunner[T] {
-	rid := time.Now().UnixMilli()
-	rsx := ini.GetString("job", "ridSuffix")
-	if rsx != "" {
-		sx := int64(math.Pow10(len(rsx)))
-		rid = rid*sx + num.Atol(str.TrimLeft(rsx, "0"))
-	}
-	job.RID = rid
+	job.RID = app.Sequencer.NextID().Int64()
 
 	jr := &JobRunner[T]{
 		JobRunner: xjm.NewJobRunner(job, tt.JM(), tt.Logger("JOB")),

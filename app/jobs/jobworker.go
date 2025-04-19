@@ -3,8 +3,6 @@ package jobs
 import (
 	"context"
 	"errors"
-	"reflect"
-	"runtime"
 	"sync/atomic"
 	"time"
 
@@ -12,6 +10,7 @@ import (
 	"github.com/askasoft/pango-xdemo/app/utils/errutil"
 	"github.com/askasoft/pango/gwp"
 	"github.com/askasoft/pango/log"
+	"github.com/askasoft/pango/ref"
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/xjm"
 )
@@ -51,7 +50,7 @@ func (jw *JobWorker[R]) SubmitWork(ctx context.Context, w func()) {
 		defer func() {
 			jw.workerWait.Add(-1)
 			if err := recover(); err != nil {
-				log.Errorf("Panic in JobWorker (%s): %v", runtime.FuncForPC(reflect.ValueOf(w).Pointer()).Name(), err)
+				log.Errorf("Panic in JobWorker (%s): %v", ref.NameOfFunc(w), err)
 			}
 		}()
 

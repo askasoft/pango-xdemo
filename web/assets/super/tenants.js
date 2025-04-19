@@ -11,9 +11,10 @@
 	}
 
 	function tenants_search() {
-		var $f = $('#tenants_listform');
+		var $f = $('#tenants_listform'), vs = main.form_input_values($f);
 
-		main.sssave(sskey, main.form_input_values($f));
+		main.sssave(sskey, vs);
+		main.location_replace_search(vs);
 
 		$.ajax({
 			url: './list',

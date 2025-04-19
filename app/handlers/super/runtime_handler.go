@@ -197,8 +197,7 @@ func runtimeProcess() any {
 	rtm := linkedhashmap.NewLinkedHashMap[string, string]()
 
 	rtm.Set("UID/PID/PPID", fmt.Sprintf("%d %d %d", os.Getuid(), os.Getpid(), os.Getppid()))
-	rtm.Set("Directory", gog.First(os.Getwd()))
-	rtm.Set("Cmdline", str.Join(os.Args, " "))
+	rtm.Set("Command", gog.First(os.Getwd())+"> "+str.Join(os.Args, " "))
 	rtm.Set("Startup", fmt.Sprintf("%s (%s)", app.StartupTime.Format(time.RFC3339), tmu.HumanDuration(time.Since(app.StartupTime))))
 	rtm.Set("Goversion", runtime.Version())
 	rtm.Set("Gomaxprocs", num.Comma(runtime.GOMAXPROCS(0)))

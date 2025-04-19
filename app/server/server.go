@@ -172,10 +172,11 @@ func initLog() {
 
 	dir, _ := filepath.Abs(".")
 	log.Info("Initializing ...")
-	log.Infof("Version:   %s.%s", app.Version, app.Revision)
-	log.Infof("BuildTime: %s", app.BuildTime.Local())
-	log.Infof("Runtime:   %s %s/%s", runtime.Version(), runtime.GOOS, runtime.GOARCH)
-	log.Infof("Directory: %s", dir)
+	log.Infof("Version:    %s.%s", app.Version, app.Revision)
+	log.Infof("BuildTime:  %s", app.BuildTime.Local())
+	log.Infof("Runtime:    %s %s/%s", runtime.Version(), runtime.GOOS, runtime.GOARCH)
+	log.Infof("Directory:  %s", dir)
+	log.Infof("InstanceID: 0x%x", app.InstanceID)
 }
 
 func initConfigs() {

@@ -133,7 +133,9 @@ func (tws *tenantWorkers) Stats() string {
 	tws.mu.Lock()
 	defer tws.mu.Unlock()
 
-	total, stats, detail := 0, "JOB RUNNING: 0", ""
+	total := 0
+	detail := ""
+	stats := fmt.Sprintf("INSTANCE ID: 0x%x, JOB RUNNING: ", app.InstanceID)
 
 	if tws.ws.Len() > 0 {
 		sb := &str.Builder{}
@@ -154,9 +156,11 @@ func (tws *tenantWorkers) Stats() string {
 		detail = sb.String()
 	}
 
-	if total > 0 {
+	if total == 0 {
+		stats += "0"
+	} else {
 		sep := str.RepeatByte('-', 80)
-		stats = "JOB RUNNING: " + num.Itoa(total) + "\n" + sep + "\n" + detail + sep
+		stats += num.Itoa(total) + "\n" + sep + "\n" + detail + sep
 	}
 
 	return stats

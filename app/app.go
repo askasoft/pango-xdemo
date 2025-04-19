@@ -10,6 +10,8 @@ import (
 
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango/gwp"
+	"github.com/askasoft/pango/ids/npid"
+	"github.com/askasoft/pango/ids/snowflake"
 	"github.com/askasoft/pango/imc"
 	"github.com/askasoft/pango/ini"
 	"github.com/askasoft/pango/log"
@@ -62,12 +64,20 @@ var (
 
 	// buildTime app build time
 	buildTime string
+)
 
+var (
 	// BuildTime app build time
 	BuildTime, _ = time.ParseInLocation("2006-01-02T15:04:05Z", buildTime, time.UTC)
 
 	// StartupTime app start time
 	StartupTime = time.Now()
+
+	// InstanceID app instance ID
+	InstanceID = npid.New(10, 0)
+
+	// Sequencer app snowflake ID generator
+	Sequencer = snowflake.NewNode(InstanceID)
 )
 
 var (
