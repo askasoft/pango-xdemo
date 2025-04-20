@@ -185,6 +185,7 @@ func (sm Schema) MigrateSuper() error {
 	sqb.Setc("role", models.RoleSuper)
 	sqb.Setc("status", models.UserActive)
 	sql, args = sqb.Build()
+
 	_, err = db.Exec(sql, args...)
 	return err
 }

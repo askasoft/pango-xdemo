@@ -136,14 +136,8 @@ func (sm Schema) DeletePetsQuery(tx sqlx.Sqlx, pqa *PetQueryArg) (int64, error) 
 	return r.RowsAffected()
 }
 
-func (sm Schema) GetPet(tx sqlx.Sqlx, pid int64) (pet *models.Pet, err error) {
-	sqb := tx.Builder()
-	sqb.Select().From(sm.TablePets()).Eq("id", pid)
-	sql, args := sqb.Build()
-
-	pet = &models.Pet{}
-	err = tx.Get(pet, sql, args...)
-	return
+func (sm Schema) GetPet(tx sqlx.Sqlx, pid int64) (*models.Pet, error) {
+	return GetByKey(tx, &models.Pet{}, sm.TablePets(), "id", pid)
 }
 
 func (sm Schema) CreatePet(tx sqlx.Sqlx, pet *models.Pet) error {

@@ -40,6 +40,8 @@ func (s *service) Usage() {
 	fmt.Println("    execsql <file> [schema]...")
 	fmt.Println("      <file>            execute sql file.")
 	fmt.Println("      [schema]...       specify schemas to execute sql.")
+	fmt.Println("    smcheck [schema]...")
+	fmt.Println("      [schema]...       specify schemas to check.")
 	fmt.Println("    exectask <task>     execute task [ " + str.Join(schedules.Keys(), ", ") + " ]")
 	fmt.Println("    encrypt [key] <str> encrypt string.")
 	fmt.Println("    decrypt [key] <str> decrypt string.")
@@ -64,6 +66,8 @@ func (s *service) Exec(cmd string) {
 		doMigrate()
 	case "execsql":
 		doExecSQL()
+	case "smcheck":
+		doSchemaCheck()
 	case "exectask":
 		doExecTask()
 	case "encrypt":
@@ -122,6 +126,20 @@ func doExecSQL() {
 	initDatabase()
 
 	if err := dbExecSQL(file, args...); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		app.Exit(app.ExitErrDB)
+	}
+
+	log.Info("DONE.")
+}
+
+func doSchemaCheck() {
+	args := flag.Args()[1:]
+
+	initConfigs()
+	initDatabase()
+
+	if err := dbSchemaCheck(args...); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		app.Exit(app.ExitErrDB)
 	}

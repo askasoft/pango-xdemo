@@ -1,40 +1,23 @@
 package schema
 
 import (
-	"github.com/askasoft/pango-xdemo/app"
-	"github.com/askasoft/pango-xdemo/app/utils/pgutil"
-	"github.com/askasoft/pango/sqx/sqlx"
+	"github.com/askasoft/pango-xdemo/app/models"
+	"github.com/askasoft/pango/cog/linkedhashmap"
+	"github.com/askasoft/pango/xfs"
+	"github.com/askasoft/pango/xjm"
 )
 
-func (sm Schema) ResetSequence(tx sqlx.Sqlx, table string, starts ...int64) error {
-	switch app.DBS["type"] {
-	case "mysql":
-		return nil
-	default:
-		_, err := tx.Exec(pgutil.ResetSequenceSQL(table, starts...))
-		return err
-	}
-}
+var tables = linkedhashmap.NewLinkedHashMap[string, any]()
 
-func (sm Schema) DeleteByID(tx sqlx.Sqlx, table string, ids ...int64) (int64, error) {
-	return sm.DeleteByKey(tx, table, "id", ids...)
-}
-
-func (sm Schema) DeleteByKey(tx sqlx.Sqlx, table, key string, vals ...int64) (int64, error) {
-	sqb := tx.Builder()
-
-	sqb.Delete(table)
-	if len(vals) > 0 {
-		sqb.In(key, vals)
-	}
-	sql, args := sqb.Build()
-
-	r, err := tx.Exec(sql, args...)
-	if err != nil {
-		return 0, err
-	}
-
-	return r.RowsAffected()
+func init() {
+	tables.Set("files", &xfs.File{})
+	tables.Set("jobs", &xjm.Job{})
+	tables.Set("job_logs", &xjm.JobLog{})
+	tables.Set("job_chains", &xjm.JobChain{})
+	tables.Set("users", &models.User{})
+	tables.Set("configs", &models.Config{})
+	tables.Set("audit_logs", &models.AuditLog{})
+	tables.Set("pets", &models.Pet{})
 }
 
 func (sm Schema) Prefix() string {

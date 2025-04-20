@@ -31,107 +31,101 @@ func AddOrder(sqb *sqlx.Builder, st *args.Sorter, defcol string) {
 	}
 }
 
-func AddEq(sqb *sqlx.Builder, column string, value string) {
-	if value != "" {
-		sqb.Eq(column, value)
+func AddEq(sqb *sqlx.Builder, col string, val string) {
+	if val != "" {
+		sqb.Eq(col, val)
 	}
 }
 
-func AddNeq(sqb *sqlx.Builder, column string, value string) {
-	if value != "" {
-		sqb.Neq(column, value)
+func AddNeq(sqb *sqlx.Builder, col string, val string) {
+	if val != "" {
+		sqb.Neq(col, val)
 	}
 }
 
-func AddIn[T any](sqb *sqlx.Builder, column string, values []T) {
-	if len(values) > 0 {
-		sqb.In(column, values)
+func AddIn[T any](sqb *sqlx.Builder, col string, vals []T) {
+	if len(vals) > 0 {
+		sqb.In(col, vals)
 	}
 }
 
-func AddStartsLike(sqb *sqlx.Builder, column string, value string) {
-	if value != "" {
-		sqb.Like(column, sqx.StartsLike(value))
+func AddStartsLike(sqb *sqlx.Builder, col string, val string) {
+	if val != "" {
+		sqb.Like(col, sqx.StartsLike(val))
 	}
 }
 
-func AddEndsLike(sqb *sqlx.Builder, column string, value string) {
-	if value != "" {
-		sqb.Like(column, sqx.EndsLike(value))
+func AddEndsLike(sqb *sqlx.Builder, col string, val string) {
+	if val != "" {
+		sqb.Like(col, sqx.EndsLike(val))
 	}
 }
 
-func AddLike(sqb *sqlx.Builder, column string, value string) {
-	if value != "" {
-		sqb.Like(column, sqx.StringLike(value))
+func AddLike(sqb *sqlx.Builder, col string, val string) {
+	if val != "" {
+		sqb.Like(col, sqx.StringLike(val))
 	}
 }
 
-func AddStartsILike(sqb *sqlx.Builder, column string, value string) {
-	if value != "" {
-		sqb.ILike(column, sqx.StartsLike(value))
+func AddStartsILike(sqb *sqlx.Builder, col string, val string) {
+	if val != "" {
+		sqb.ILike(col, sqx.StartsLike(val))
 	}
 }
 
-func AddEndsILike(sqb *sqlx.Builder, column string, value string) {
-	if value != "" {
-		sqb.ILike(column, sqx.EndsLike(value))
+func AddEndsILike(sqb *sqlx.Builder, col string, val string) {
+	if val != "" {
+		sqb.ILike(col, sqx.EndsLike(val))
 	}
 }
 
-func AddILike(sqb *sqlx.Builder, column string, value string) {
-	if value != "" {
-		sqb.ILike(column, sqx.StringLike(value))
+func AddILike(sqb *sqlx.Builder, col string, val string) {
+	if val != "" {
+		sqb.ILike(col, sqx.StringLike(val))
 	}
 }
 
-func AddTimes(sqb *sqlx.Builder, column string, tmin, tmax time.Time) {
+func AddTimes(sqb *sqlx.Builder, col string, tmin, tmax time.Time) {
 	if !tmin.IsZero() && !tmax.IsZero() {
-		sqb.Btw(column, tmin, tmax)
+		sqb.Btw(col, tmin, tmax)
 	} else if !tmin.IsZero() {
-		sqb.Gte(column, tmin)
+		sqb.Gte(col, tmin)
 	} else if !tmax.IsZero() {
-		sqb.Lte(column, tmax)
+		sqb.Lte(col, tmax)
 	}
 }
 
-func AddTimePtrs(sqb *sqlx.Builder, column string, tmin, tmax *time.Time) {
+func AddTimePtrs(sqb *sqlx.Builder, col string, tmin, tmax *time.Time) {
 	if tmin != nil && !tmin.IsZero() && tmax != nil && !tmax.IsZero() {
-		sqb.Btw(column, *tmin, *tmax)
+		sqb.Btw(col, *tmin, *tmax)
 	} else if tmin != nil && !tmin.IsZero() {
-		sqb.Gte(column, *tmin)
+		sqb.Gte(col, *tmin)
 	} else if tmax != nil && !tmax.IsZero() {
-		sqb.Lte(column, *tmax)
+		sqb.Lte(col, *tmax)
 	}
 }
 
-func AddInts(sqb *sqlx.Builder, column string, smin, smax string) {
+func AddInts(sqb *sqlx.Builder, col string, smin, smax string) {
 	if smin != "" && smax != "" {
-		sqb.Btw(column, smin, smax)
+		sqb.Btw(col, num.Atoi(smin), num.Atoi(smax))
 	} else if smin != "" {
-		sqb.Gte(column, num.Atoi(smin))
+		sqb.Gte(col, num.Atoi(smin))
 	} else if smax != "" {
-		sqb.Lte(column, num.Atoi(smax))
+		sqb.Lte(col, num.Atoi(smax))
 	}
 }
 
-func AddFloats(sqb *sqlx.Builder, column string, smin, smax string) {
+func AddFloats(sqb *sqlx.Builder, col string, smin, smax string) {
 	if smin != "" && smax != "" {
-		sqb.Btw(column, smin, smax)
+		sqb.Btw(col, num.Atof(smin), num.Atof(smax))
 	} else if smin != "" {
-		sqb.Gte(column, num.Atof(smin))
+		sqb.Gte(col, num.Atof(smin))
 	} else if smax != "" {
-		sqb.Lte(column, num.Atof(smax))
+		sqb.Lte(col, num.Atof(smax))
 	}
 }
 
-func AddOverlap(sqb *sqlx.Builder, column string, values []string) {
-	if len(values) > 0 {
-		sqb.Where(column+" && ?", pqx.StringArray(values))
-	}
-}
-
-func AddIDs(sqb *sqlx.Builder, column string, id string) {
+func AddIDs(sqb *sqlx.Builder, col string, id string) {
 	ss := str.FieldsByte(id, ',')
 	if len(ss) > 0 {
 		var sb str.Builder
@@ -147,7 +141,7 @@ func AddIDs(sqb *sqlx.Builder, column string, id string) {
 			if sb.Len() > 1 {
 				sb.WriteString(" OR ")
 			}
-			sb.WriteString(column)
+			sb.WriteString(col)
 
 			smin, smax, ok := str.CutByte(s, '-')
 			if ok {
@@ -166,16 +160,16 @@ func AddIDs(sqb *sqlx.Builder, column string, id string) {
 	}
 }
 
-func AddLikes(sqb *sqlx.Builder, column string, search string) {
-	addLikes(sqb, column, search, false)
+func AddLikes(sqb *sqlx.Builder, col string, val string) {
+	addLikes(sqb, col, val, false)
 }
 
-func AddLikesEx(sqb *sqlx.Builder, column string, search string, not bool) {
-	addLikes(sqb, column, search, not)
+func AddLikesEx(sqb *sqlx.Builder, col string, val string, not bool) {
+	addLikes(sqb, col, val, not)
 }
 
-func addLikes(sqb *sqlx.Builder, column string, search string, not bool) {
-	ss := str.Fields(search)
+func addLikes(sqb *sqlx.Builder, col string, val string, not bool) {
+	ss := str.Fields(val)
 	if len(ss) > 0 {
 		var sb str.Builder
 		var args []any
@@ -188,12 +182,18 @@ func addLikes(sqb *sqlx.Builder, column string, search string, not bool) {
 			if i > 0 {
 				sb.WriteString(" OR ")
 			}
-			sb.WriteString(column)
+			sb.WriteString(col)
 			sb.WriteString(" ILIKE ?")
 			args = append(args, sqx.StringLike(s))
 		}
 		sb.WriteByte(')')
 
 		sqb.Where(sb.String(), args...)
+	}
+}
+
+func AddOverlap(sqb *sqlx.Builder, col string, vals []string) {
+	if len(vals) > 0 {
+		sqb.Where(col+" && ?", pqx.StringArray(vals))
 	}
 }
