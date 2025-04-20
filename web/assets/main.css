@@ -452,6 +452,7 @@ form div.verr {
 	background-color: var(--bs-tertiary-bg);
 	vertical-align: middle;
 }
+.s-table th.datetime, .s-table td.datetime,
 .s-table th.created_at, .s-table td.created_at,
 .s-table th.updated_at, .s-table td.updated_at {
 	width: 110px;

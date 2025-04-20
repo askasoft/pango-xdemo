@@ -168,7 +168,6 @@ func (jcc *JobChainController) Start(c *xin.Context) {
 
 func (jcc *JobChainController) StartJob(c *xin.Context) {
 	tt := tenant.FromCtx(c)
-	au := tenant.AuthUser(c)
 
 	tjc := tt.JC()
 	jc, err := tjc.FindJobChain(jcc.ChainName, false, xjm.JobUndoneStatus...)
@@ -193,7 +192,7 @@ func (jcc *JobChainController) StartJob(c *xin.Context) {
 		return
 	}
 
-	_ = tt.AddAuditLog(app.SDB, au, jobs.JobChainStartAuditLogs[jcc.ChainName])
+	_ = tt.AddAuditLog(app.SDB, c, jobs.JobChainStartAuditLogs[jcc.ChainName])
 
 	c.JSON(http.StatusOK, xin.H{
 		"cid":     cid,

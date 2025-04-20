@@ -46,7 +46,6 @@ func PetUpdates(c *xin.Context) {
 	}
 
 	tt := tenant.FromCtx(c)
-	au := tenant.GetAuthUser(c)
 
 	var cnt int64
 	err = app.SDB.Transaction(func(tx *sqlx.Tx) error {
@@ -56,7 +55,7 @@ func PetUpdates(c *xin.Context) {
 		}
 
 		if cnt > 0 {
-			return tt.AddAuditLog(tx, au, models.AL_PETS_UPDATES, num.Ltoa(cnt), pua.String())
+			return tt.AddAuditLog(tx, c, models.AL_PETS_UPDATES, num.Ltoa(cnt), pua.String())
 		}
 		return nil
 	})
@@ -81,7 +80,6 @@ func PetDeletes(c *xin.Context) {
 	}
 
 	tt := tenant.FromCtx(c)
-	au := tenant.GetAuthUser(c)
 
 	var cnt int64
 	err := app.SDB.Transaction(func(tx *sqlx.Tx) (err error) {
@@ -104,7 +102,7 @@ func PetDeletes(c *xin.Context) {
 		}
 
 		if cnt > 0 {
-			if err = tt.AddAuditLog(tx, au, models.AL_PETS_DELETES, num.Ltoa(cnt), asg.Join(ids, ", ")); err != nil {
+			if err = tt.AddAuditLog(tx, c, models.AL_PETS_DELETES, num.Ltoa(cnt), asg.Join(ids, ", ")); err != nil {
 				return
 			}
 			return tt.ResetPetsSequence(tx)
@@ -137,7 +135,6 @@ func PetDeleteBatch(c *xin.Context) {
 	}
 
 	tt := tenant.FromCtx(c)
-	au := tenant.GetAuthUser(c)
 
 	var cnt int64
 	err = app.SDB.Transaction(func(tx *sqlx.Tx) (err error) {
@@ -147,7 +144,7 @@ func PetDeleteBatch(c *xin.Context) {
 		}
 
 		if cnt > 0 {
-			if err := tt.AddAuditLog(tx, au, models.AL_PETS_DELETES, num.Ltoa(cnt), pqa.String()); err != nil {
+			if err := tt.AddAuditLog(tx, c, models.AL_PETS_DELETES, num.Ltoa(cnt), pqa.String()); err != nil {
 				return err
 			}
 			return tt.ResetPetsSequence(tx)

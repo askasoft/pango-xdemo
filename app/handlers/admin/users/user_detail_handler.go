@@ -125,7 +125,6 @@ func UserCreate(c *xin.Context) {
 	}
 
 	tt := tenant.FromCtx(c)
-	au := tenant.AuthUser(c)
 
 	user.ID = 0
 	if user.Password == "" {
@@ -144,7 +143,7 @@ func UserCreate(c *xin.Context) {
 		user.Password = ""
 		user.Secret = 0
 
-		return tt.AddAuditLog(tx, au, models.AL_USERS_CREATE, num.Ltoa(user.ID), user.Email)
+		return tt.AddAuditLog(tx, c, models.AL_USERS_CREATE, num.Ltoa(user.ID), user.Email)
 	})
 	if err != nil {
 		if pgutil.IsUniqueViolationError(err) {
@@ -201,7 +200,7 @@ func UserUpdate(c *xin.Context) {
 		user.Password = ""
 
 		if cnt > 0 {
-			return tt.AddAuditLog(tx, au, models.AL_USERS_UPDATES, num.Ltoa(cnt), "#"+num.Ltoa(user.ID)+": <"+user.Email+">")
+			return tt.AddAuditLog(tx, c, models.AL_USERS_UPDATES, num.Ltoa(cnt), "#"+num.Ltoa(user.ID)+": <"+user.Email+">")
 		}
 		return
 	})

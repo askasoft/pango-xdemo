@@ -125,7 +125,6 @@ func PetCreate(c *xin.Context) {
 	pet.UpdatedAt = pet.CreatedAt
 
 	tt := tenant.FromCtx(c)
-	au := tenant.GetAuthUser(c)
 
 	err := app.SDB.Transaction(func(tx *sqlx.Tx) error {
 		err := tt.CreatePet(tx, &pet.Pet)
@@ -142,7 +141,7 @@ func PetCreate(c *xin.Context) {
 			return sfs.MoveFile(pet.File, fid)
 		}
 
-		return tt.AddAuditLog(tx, au, models.AL_PETS_CREATE, num.Ltoa(pet.ID), pet.Name)
+		return tt.AddAuditLog(tx, c, models.AL_PETS_CREATE, num.Ltoa(pet.ID), pet.Name)
 	})
 	if err != nil {
 		c.AddError(err)
@@ -169,7 +168,6 @@ func PetUpdate(c *xin.Context) {
 	pet.UpdatedAt = time.Now()
 
 	tt := tenant.FromCtx(c)
-	au := tenant.GetAuthUser(c)
 
 	var cnt int64
 	err := app.SDB.Transaction(func(tx *sqlx.Tx) (err error) {
@@ -187,7 +185,7 @@ func PetUpdate(c *xin.Context) {
 				}
 				return sfs.MoveFile(pet.File, fid)
 			}
-			return tt.AddAuditLog(tx, au, models.AL_PETS_UPDATES, num.Ltoa(cnt), "#"+num.Ltoa(pet.ID)+": <"+pet.Name+">")
+			return tt.AddAuditLog(tx, c, models.AL_PETS_UPDATES, num.Ltoa(cnt), "#"+num.Ltoa(pet.ID)+": <"+pet.Name+">")
 		}
 		return
 	})

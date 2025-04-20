@@ -79,8 +79,9 @@ CREATE TABLE "SCHEMA"."configs" (
 ---------------------------------;
 CREATE TABLE "SCHEMA"."audit_logs" (
 	"id" bigserial NOT NULL,
-	"uid" bigint NOT NULL,
 	"date" timestamptz NOT NULL,
+	"uid" bigint NOT NULL,
+	"cip" varchar(40) NOT NULL,
 	"func" varchar(32) NOT NULL,
 	"action" varchar(32) NOT NULL,
 	"params" text [],

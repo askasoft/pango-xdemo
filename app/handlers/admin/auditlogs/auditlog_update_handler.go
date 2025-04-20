@@ -64,7 +64,7 @@ func AuditLogDeleteBatch(c *xin.Context) {
 
 	var cnt int64
 	err = app.SDB.Transaction(func(tx *sqlx.Tx) error {
-		cnt, err = tt.DeleteAuditLogsQuery(tx, alqa)
+		cnt, err = tt.DeleteAuditLogsQuery(tx, alqa, c.Locale)
 		if err != nil {
 			return err
 		}

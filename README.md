@@ -22,25 +22,41 @@ export LOG_SLACK_WEBHOOK=https://hooks.slack.com/services/...
 ```
 
 ### install as system service
+@see https://www.freedesktop.org/software/systemd/man/latest/systemd.unit.html
+
 ```sh
 sudo useradd xdemo
 
 echo '
 [Unit]
-Description=Pango Xdemo
-After=syslog.target network.target local-fs.target
+Description = slack alert for %I
+After = network.target
 
 [Service]
-Type=simple
-WorkingDirectory=/app/xdemo
-ExecStart=/app/xdemo/xdemo
-ExecReload=/bin/kill -HUP $MAINPID
-Restart=on-failure
-User=xdemo
-Group=xdemo
+Type = oneshot
+Environment = WEBHOOK=https://hooks.slack.com/services/...
+ExecStart = /usr/bin/curl -X POST -H "Content-Type: application/json" -d '"'"'{"icon_emoji": ":boom:", "text": "[%H] %i failure alert"}'"'"' $WEBHOOK
+User = nobody
+Group = systemd-journal
+' | sudo tee /etc/systemd/system/slack-alert@.service
+
+echo '
+[Unit]
+Description = Pango Xdemo
+After = syslog.target network.target local-fs.target
+OnFailure = slack-alert@%n.service
+
+[Service]
+Type = simple
+WorkingDirectory = /app/xdemo
+ExecStart = /app/xdemo/xdemo
+ExecReload = /bin/kill -HUP $MAINPID
+Restart = on-failure
+User = xdemo
+Group = xdemo
 
 [Install]
-WantedBy=multi-user.target
+WantedBy = multi-user.target
 ' | sudo tee /usr/lib/systemd/system/xdemo.service
 
 sudo systemctl daemon-reload
@@ -48,7 +64,12 @@ sudo systemctl enable xdemo
 sudo systemctl start xdemo
 ```
 
-### bind privileged port
+### test slack notify
+```sh
+sudo systemctl start slack-alert@xdemo.service.service
+```
+
+### bind privileged port (optional)
 ```sh
 sudo setcap 'cap_net_bind_service=+ep' /app/xdemo/xdemo
 ```

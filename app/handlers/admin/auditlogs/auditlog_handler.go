@@ -24,6 +24,7 @@ func bindAuditLogQueryArg(c *xin.Context) (alqa *schema.AuditLogQueryArg, err er
 		"id",
 		"date",
 		"user",
+		"cip",
 		"func,action",
 	)
 	return
@@ -55,7 +56,7 @@ func AuditLogList(c *xin.Context) {
 
 	tt := tenant.FromCtx(c)
 
-	alqa.Total, err = tt.CountAuditLogs(app.SDB, alqa)
+	alqa.Total, err = tt.CountAuditLogs(app.SDB, alqa, c.Locale)
 	if err != nil {
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
@@ -67,7 +68,7 @@ func AuditLogList(c *xin.Context) {
 	alqa.Pager.Normalize(tbsutil.GetPagerLimits(c.Locale)...)
 
 	if alqa.Total > 0 {
-		results, err := tt.FindAuditLogs(app.SDB, alqa)
+		results, err := tt.FindAuditLogs(app.SDB, alqa, c.Locale)
 		if err != nil {
 			c.AddError(err)
 			c.JSON(http.StatusInternalServerError, handlers.E(c))

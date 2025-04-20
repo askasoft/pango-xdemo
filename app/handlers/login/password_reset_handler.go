@@ -196,7 +196,7 @@ func PasswordResetExecute(c *xin.Context) {
 			return err
 		}
 
-		return tt.AddAuditLog(tx, user, models.AL_LOGIN_PWDRST, user.Email)
+		return tt.Schema.AddAuditLog(tx, user.ID, c.ClientIP(), models.AL_LOGIN_PWDRST, user.Email)
 	})
 	if err != nil {
 		c.AddError(err)

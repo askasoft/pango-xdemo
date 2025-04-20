@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/askasoft/pango-xdemo/app"
+	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango/cog/hashmap"
 	"github.com/askasoft/pango/cog/linkedhashmap"
 	"github.com/askasoft/pango/num"
@@ -83,6 +84,14 @@ func GetUserRoleReverseMap() *hashmap.HashMap[string, string] {
 
 func GetAudioLogFuncMap(locale string) *linkedhashmap.LinkedHashMap[string, string] {
 	return GetLinkedHashMap(locale, "auditlog.map.func")
+}
+
+func GetAudioLogFunactMap(locale string) map[string]string {
+	fam := make(map[string]string, len(models.AL_FUNACTS))
+	for _, k := range models.AL_FUNACTS {
+		fam[k] = tbs.GetText(locale, "auditlog.action."+k)
+	}
+	return fam
 }
 
 func GetJobchainJobnamesMap(locale string) *linkedhashmap.LinkedHashMap[string, string] {

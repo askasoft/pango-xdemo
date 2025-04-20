@@ -34,7 +34,7 @@ func AuditLogCsvExport(c *xin.Context) {
 	defer cw.Flush()
 
 	var cols []string
-	err = tt.IterAuditLogs(app.SDB, alqa, func(al *models.AuditLogEx) error {
+	err = tt.IterAuditLogs(app.SDB, alqa, c.Locale, func(al *models.AuditLogEx) error {
 		if len(cols) == 0 {
 			c.SetAttachmentHeader("auditlogs.csv")
 			_, _ = c.Writer.WriteString(string(iox.BOM))
@@ -43,6 +43,7 @@ func AuditLogCsvExport(c *xin.Context) {
 				tbs.GetText(c.Locale, "auditlog.id"),
 				tbs.GetText(c.Locale, "auditlog.date"),
 				tbs.GetText(c.Locale, "auditlog.user"),
+				tbs.GetText(c.Locale, "auditlog.cip"),
 				tbs.GetText(c.Locale, "auditlog.func"),
 				tbs.GetText(c.Locale, "auditlog.action"),
 				tbs.GetText(c.Locale, "auditlog.message"),
@@ -61,6 +62,7 @@ func AuditLogCsvExport(c *xin.Context) {
 			num.Ltoa(al.ID),
 			app.FormatTime(al.Date),
 			al.User,
+			al.CIP,
 			fm.SafeGet(al.Func, al.Func),
 			tbs.Format(c.Locale, "auditlog.action."+al.Func+"."+al.Action),
 			al.Detail,

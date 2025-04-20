@@ -51,7 +51,7 @@ func UserUpdates(c *xin.Context) {
 		}
 
 		if cnt > 0 {
-			return tt.AddAuditLog(tx, au, models.AL_USERS_UPDATES, num.Ltoa(cnt), uua.String())
+			return tt.AddAuditLog(tx, c, models.AL_USERS_UPDATES, num.Ltoa(cnt), uua.String())
 		}
 		return nil
 	})
@@ -86,7 +86,7 @@ func UserDeletes(c *xin.Context) {
 		}
 
 		if cnt > 0 {
-			if err = tt.AddAuditLog(tx, au, models.AL_USERS_DELETES, num.Ltoa(cnt), asg.Join(ids, ", ")); err != nil {
+			if err = tt.AddAuditLog(tx, c, models.AL_USERS_DELETES, num.Ltoa(cnt), asg.Join(ids, ", ")); err != nil {
 				return
 			}
 			return tt.ResetUsersSequence(tx)
@@ -129,7 +129,7 @@ func UserDeleteBatch(c *xin.Context) {
 		}
 
 		if cnt > 0 {
-			if err := tt.AddAuditLog(tx, au, models.AL_USERS_DELETES, num.Ltoa(cnt), uqa.String()); err != nil {
+			if err := tt.AddAuditLog(tx, c, models.AL_USERS_DELETES, num.Ltoa(cnt), uqa.String()); err != nil {
 				return err
 			}
 			return tt.ResetUsersSequence(tx)

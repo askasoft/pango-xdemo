@@ -257,7 +257,10 @@ func saveConfigs(c *xin.Context, configs []*models.Config, action string) bool {
 	au := tenant.AuthUser(c)
 
 	err := app.SDB.Transaction(func(tx *sqlx.Tx) error {
-		return tt.SaveConfigs(tx, au, configs, c.Locale, action)
+		if err := tt.SaveConfigs(tx, au, configs, c.Locale); err != nil {
+			return err
+		}
+		return tt.AddAuditLog(tx, c, action)
 	})
 	if err == nil {
 		return true

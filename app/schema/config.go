@@ -73,7 +73,7 @@ func (ucie *UnsavedConfigItemsError) Error() string {
 	return tbs.Format(ucie.Locale, "config.error.unsaved", str.Join(nms, ", "))
 }
 
-func (sm Schema) SaveConfigs(tx sqlx.Sqlx, au *models.User, configs []*models.Config, locale, action string) error {
+func (sm Schema) SaveConfigs(tx sqlx.Sqlx, au *models.User, configs []*models.Config, locale string) error {
 	sqb := tx.Builder()
 	sqb.Update(sm.TableConfigs())
 	sqb.Setc("value", "")
@@ -107,5 +107,5 @@ func (sm Schema) SaveConfigs(tx sqlx.Sqlx, au *models.User, configs []*models.Co
 		return &UnsavedConfigItemsError{locale, eits}
 	}
 
-	return sm.AddAuditLog(tx, au, action)
+	return nil
 }

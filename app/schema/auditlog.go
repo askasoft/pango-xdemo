@@ -5,6 +5,8 @@ import (
 
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/utils/argutil"
+	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
+	"github.com/askasoft/pango/cog/hashset"
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/str"
 )
@@ -16,11 +18,13 @@ func (sm Schema) ResetAuditLogsSequence(tx sqlx.Sqlx) error {
 type AuditLogQueryArg struct {
 	argutil.QueryArg
 
-	ID       string     `form:"id,strip"`
-	DateFrom *time.Time `form:"date_from,strip"`
-	DateTo   *time.Time `form:"date_to,strip" validate:"omitempty,gtefield=DateFrom"`
-	User     string     `form:"user,strip"`
-	Func     []string   `form:"func,strip"`
+	ID       string     `json:"id,omitempty" form:"id,strip"`
+	DateFrom *time.Time `json:"date_from,omitempty" form:"date_from,strip"`
+	DateTo   *time.Time `json:"date_to,omitempty" form:"date_to,strip" validate:"omitempty,gtefield=DateFrom"`
+	User     string     `json:"user,omitempty" form:"user,strip"`
+	CIP      string     `json:"cip,omitempty" form:"cip,strip"`
+	Func     []string   `json:"func,omitempty" form:"func,strip"`
+	Action   string     `json:"action,omitempty" form:"action,strip"`
 }
 
 func (alqa *AuditLogQueryArg) HasFilters() bool {
@@ -28,36 +32,54 @@ func (alqa *AuditLogQueryArg) HasFilters() bool {
 		alqa.DateFrom != nil ||
 		alqa.DateTo != nil ||
 		alqa.User != "" ||
-		len(alqa.Func) > 0
+		alqa.CIP != "" ||
+		len(alqa.Func) > 0 ||
+		alqa.Action != ""
 }
 
-func (alqa *AuditLogQueryArg) AddFilters(sqb *sqlx.Builder) {
+func (alqa *AuditLogQueryArg) AddFilters(sqb *sqlx.Builder, locale string) {
 	alqa.AddIDs(sqb, "audit_logs.id", alqa.ID)
 	alqa.AddTimePtrs(sqb, "audit_logs.date", alqa.DateFrom, alqa.DateTo)
-	alqa.AddIn(sqb, "audit_logs.func", alqa.Func)
 	alqa.AddLikes(sqb, "users.email", alqa.User)
+	alqa.AddLikes(sqb, "audit_logs.cip", alqa.CIP)
+	alqa.AddIn(sqb, "audit_logs.func", alqa.Func)
+
+	if alqa.Action != "" {
+		ass := str.Fields(alqa.Action)
+		fam := tbsutil.GetAudioLogFunactMap(locale)
+
+		ahs := hashset.NewHashSet[string]()
+		for _, a := range ass {
+			for k, v := range fam {
+				if str.ContainsFold(v, a) {
+					ahs.Add(str.SubstrAfter(k, "."))
+				}
+			}
+		}
+		alqa.AddIn(sqb, "audit_logs.action", ahs.Values())
+	}
 }
 
-func (sm Schema) CountAuditLogs(tx sqlx.Sqlx, alqa *AuditLogQueryArg) (cnt int, err error) {
+func (sm Schema) CountAuditLogs(tx sqlx.Sqlx, alqa *AuditLogQueryArg, locale string) (cnt int, err error) {
 	sqb := tx.Builder()
 
 	sqb.Count()
 	sqb.From(sm.TableAuditLogs())
 	sqb.Join("LEFT JOIN " + sm.TableUsers() + " ON users.id = audit_logs.uid")
-	alqa.AddFilters(sqb)
+	alqa.AddFilters(sqb, locale)
 	sql, args := sqb.Build()
 
 	err = tx.Get(&cnt, sql, args...)
 	return
 }
 
-func (sm Schema) FindAuditLogs(tx sqlx.Sqlx, alqa *AuditLogQueryArg) (alogs []*models.AuditLogEx, err error) {
+func (sm Schema) FindAuditLogs(tx sqlx.Sqlx, alqa *AuditLogQueryArg, locale string) (alogs []*models.AuditLogEx, err error) {
 	sqb := tx.Builder()
 
 	sqb.Select("audit_logs.*", "COALESCE(users.email, '') AS user")
 	sqb.From(sm.TableAuditLogs())
 	sqb.Join("LEFT JOIN " + sm.TableUsers() + " ON users.id = audit_logs.uid")
-	alqa.AddFilters(sqb)
+	alqa.AddFilters(sqb, locale)
 	alqa.AddOrder(sqb, "id")
 	alqa.AddPager(sqb)
 	sql, args := sqb.Build()
@@ -66,13 +88,13 @@ func (sm Schema) FindAuditLogs(tx sqlx.Sqlx, alqa *AuditLogQueryArg) (alogs []*m
 	return
 }
 
-func (sm Schema) IterAuditLogs(tx sqlx.Sqlx, alqa *AuditLogQueryArg, fit func(*models.AuditLogEx) error) error {
+func (sm Schema) IterAuditLogs(tx sqlx.Sqlx, alqa *AuditLogQueryArg, locale string, fit func(*models.AuditLogEx) error) error {
 	sqb := tx.Builder()
 
 	sqb.Select("audit_logs.*", "COALESCE(users.email, '') AS user")
 	sqb.From(sm.TableAuditLogs())
 	sqb.Join("LEFT JOIN " + sm.TableUsers() + " ON users.id = audit_logs.uid")
-	alqa.AddFilters(sqb)
+	alqa.AddFilters(sqb, locale)
 	alqa.AddOrder(sqb, "id")
 	sql, args := sqb.Build()
 
@@ -95,12 +117,12 @@ func (sm Schema) IterAuditLogs(tx sqlx.Sqlx, alqa *AuditLogQueryArg, fit func(*m
 	return nil
 }
 
-func (sm Schema) DeleteAuditLogsQuery(tx sqlx.Sqlx, alqa *AuditLogQueryArg) (int64, error) {
+func (sm Schema) DeleteAuditLogsQuery(tx sqlx.Sqlx, alqa *AuditLogQueryArg, locale string) (int64, error) {
 	sqa := tx.Builder()
 	sqa.Select("audit_logs.id")
 	sqa.From(sm.TableAuditLogs())
 	sqa.Join("LEFT JOIN " + sm.TableUsers() + " ON users.id = audit_logs.uid")
-	alqa.AddFilters(sqa)
+	alqa.AddFilters(sqa, locale)
 
 	sqb := tx.Builder()
 	sqb.Delete(sm.TableAuditLogs())
@@ -134,13 +156,11 @@ func (sm Schema) DeleteAuditLogsBefore(tx sqlx.Sqlx, before time.Time) (int64, e
 	return r.RowsAffected()
 }
 
-func (sm Schema) AddAuditLog(tx sqlx.Sqlx, au *models.User, funact string, params ...string) error {
+func (sm Schema) AddAuditLog(tx sqlx.Sqlx, uid int64, cip string, funact string, params ...string) error {
 	al := &models.AuditLog{
 		Date:   time.Now(),
 		Params: params,
-	}
-	if au != nil {
-		al.UID = au.ID
+		CIP:    cip,
 	}
 	al.Func, al.Action, _ = str.Cut(funact, ".")
 

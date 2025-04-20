@@ -1,5 +1,3 @@
-#auditlogs_table th.func, #auditlogs_table td.func {
+#auditlogs_table th {
 	white-space: nowrap;
-	width: 1%;
 }
-

@@ -13,6 +13,7 @@
 		</div>
 	</div>
 	<div class="s-section-body">
+		{{if .AU.IsSuper}}
 		<div class="s-toolbar">
 			<button class="btn btn-sm btn-outline-danger" popup-target="#auditlogs_deletesel_popup" enableby="#auditlogs_list td.check input">
 				{{I "deletesel"}} {{T .Loc "button.deletesel"}}
@@ -24,6 +25,7 @@
 				{{I "deleteall"}} {{T .Loc "button.deleteall"}}
 			</button>
 		</div>
+		{{end}}
 
 		<div id="auditlogs_alert">{{template "alerts" .}}</div>
 		
@@ -52,9 +54,19 @@
 					<div class="col-md-4 col-xxl-5">
 						<input name="user" type="text" class="form-control" textclear value="{{.Q.User}}"/>
 					</div>
-					<label class="col-md-2 col-xxl-1 col-form-label">{{T .Loc "auditlog.func"}}</label>
+					<label class="col-md-2 col-xxl-1 col-form-label">{{T .Loc "auditlog.cip"}}</label>
 					<div class="col-md-4 col-xxl-5">
+						<input name="cip" type="text" class="form-control" textclear value="{{.Q.CIP}}"/>
+					</div>
+				</div>
+				<div class="row">
+					<label class="col-md-2 col-xxl-1 col-form-label">{{T .Loc "auditlog.func"}}</label>
+					<div class="col">
 						{{Checks "Name=" "func" "List=" .AuditLogFuncMap "Values=" .Q.Func}}
+					</div>
+					<label class="col-md-2 col-xxl-1 col-form-label">{{T .Loc "auditlog.action"}}</label>
+					<div class="col-md-4 col-xxl-5">
+						<input name="action" type="text" class="form-control" textclear value="{{.Q.Action}}"/>
 					</div>
 				</div>
 				<div class="row pt-3 pb-2">
@@ -70,6 +82,7 @@
 	</div>
 </div>
 
+{{if .AU.IsSuper}}
 <div id="auditlogs_deletesel_popup" class="ui-popup s-popup-confirm" data-spy="popup" tabindex="-1"
 	popup-mask="true" popup-scroll="false" popup-mouse="false">
 	<form>
@@ -113,11 +126,19 @@
 				<div class="col-md-10">
 					<input name="user" type="text" class="form-control" textclear value="{{.Q.User}}"/>
 				</div>
+				<label class="col-md-2 col-xxl-1 col-form-label">{{T .Loc "auditlog.cip"}}</label>
+				<div class="col-md-4 col-xxl-5">
+					<input name="cip" type="text" class="form-control" textclear value="{{.Q.CIP}}"/>
+				</div>
 			</div>
 			<div class="row">
 				<label class="col-md-2 col-form-label">{{T .Loc "auditlog.func"}}</label>
 				<div class="col-md-10">
 					{{Checks "Name=" "func" "List=" .AuditLogFuncMap "Values=" .Q.Func}}
+				</div>
+				<label class="col-md-2 col-xxl-1 col-form-label">{{T .Loc "auditlog.action"}}</label>
+				<div class="col-md-4 col-xxl-5">
+					<input name="action" type="text" class="form-control" textclear value="{{.Q.Action}}"/>
 				</div>
 			</div>
 			<button type="submit" class="hidden"></button>
@@ -128,5 +149,6 @@
 		<button type="button" class="btn btn-secondary" popup-dismiss="true">{{I "cancel"}} {{T .Loc "button.cancel"}}</button>
 	</div>
 </div>
+{{end}}
 
 {{template "main_footer" .}}
