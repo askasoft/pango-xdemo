@@ -10,13 +10,13 @@ import (
 	"github.com/askasoft/pango/tbs"
 )
 
-func (sm Schema) LoadConfigMap(db sqlx.Sqlx) (map[string]string, error) {
-	sqb := db.Builder()
+func (sm Schema) LoadConfigMap(tx sqlx.Sqlx) (map[string]string, error) {
+	sqb := tx.Builder()
 	sqb.Select().From(sm.TableConfigs())
 	sql, args := sqb.Build()
 
 	configs := []*models.Config{}
-	if err := db.Select(&configs, sql, args...); err != nil {
+	if err := tx.Select(&configs, sql, args...); err != nil {
 		return nil, err
 	}
 
@@ -80,7 +80,7 @@ func (sm Schema) SaveConfigs(tx sqlx.Sqlx, au *models.User, configs []*models.Co
 	sqb.Setc("updated_at", "")
 	sqb.Eq("name", "")
 	sqb.Gte("editor", "")
-	sql := sqb.SQL()
+	sql := tx.Rebind(sqb.SQL())
 
 	stmt, err := tx.Prepare(sql)
 	if err != nil {

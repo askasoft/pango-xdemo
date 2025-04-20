@@ -2,6 +2,37 @@
 
 ## Linux
 
+### install postgresql server
+```sh
+sudo apt update
+sudo apt install postgresql postgresql-contrib libpq-dev
+
+sudo cp /etc/postgresql/14/main/postgresql.conf /tmp/
+sudo sed -i -e "s/#listen_addresses.*/listen_addresses = '*'/" /etc/postgresql/14/main/postgresql.conf
+
+sudo cp /etc/postgresql/14/main/pg_hba.conf /tmp/
+sudo sed -i -e 's,127.0.0.1/32,0.0.0.0/0,' -e 's,::1/128,::/0,' /etc/postgresql/14/main/pg_hba.conf
+
+sudo systemctl enable postgresql
+sudo systemctl start  postgresql
+```
+
+#### change password to 'xxxx'
+```sh
+sudo -u postgres psql
+psql> \password
+psql> \q
+```
+
+### create postgresql database
+```sql
+CREATE USER xdemo PASSWORD 'xdemo';
+CREATE DATABASE xdemo WITH OWNER=xdemo ENCODING='UTF-8';
+GRANT ALL ON DATABASE xdemo TO xdemo;
+```
+
+
+### install golang (1.24)
 ```sh
 wget https://go.dev/dl/go1.24.0.linux-amd64.tar.gz
 tar -xzvf go1.24.0.linux-amd64.tar.gz
@@ -96,20 +127,6 @@ build.bat
 SET LOG_SLACK_WEBHOOK=https://hooks.slack.com/services/...
 
 deploy.bat
-```
-
-### create mysql database (not supported yet)
-```sql
-CREATE USER 'xdemo'@'%' IDENTIFIED BY 'xdemo';
-CREATE DATABASE xdemo CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-GRANT ALL PRIVILEGES ON xdemo.* TO 'xdemo'@'%';
-```
-
-### create postgresql database
-```sql
-CREATE USER xdemo PASSWORD 'xdemo';
-CREATE DATABASE xdemo WITH OWNER=xdemo ENCODING='UTF-8';
-GRANT ALL ON DATABASE xdemo TO xdemo;
 ```
 
 ### init database

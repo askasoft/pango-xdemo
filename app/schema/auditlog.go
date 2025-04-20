@@ -159,8 +159,9 @@ func (sm Schema) DeleteAuditLogsBefore(tx sqlx.Sqlx, before time.Time) (int64, e
 func (sm Schema) AddAuditLog(tx sqlx.Sqlx, uid int64, cip string, funact string, params ...string) error {
 	al := &models.AuditLog{
 		Date:   time.Now(),
-		Params: params,
+		UID:    uid,
 		CIP:    cip,
+		Params: params,
 	}
 	al.Func, al.Action, _ = str.Cut(funact, ".")
 

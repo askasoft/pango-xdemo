@@ -10,6 +10,7 @@ const (
 	AL_LOGIN_LOGIN            = "login.login"
 	AL_LOGIN_PWDRST           = "login.password-reset"
 	AL_USERS_CREATE           = "users.create"
+	AL_USERS_UPDATE           = "users.update"
 	AL_USERS_UPDATES          = "users.updates"
 	AL_USERS_DELETES          = "users.deletes"
 	AL_USERS_IMPORT_START     = "users.import-start"
@@ -17,6 +18,7 @@ const (
 	AL_CONFIG_UPDATE          = "config.update"
 	AL_CONFIG_IMPORT          = "config.import"
 	AL_PETS_CREATE            = "pets.create"
+	AL_PETS_UPDATE            = "pets.update"
 	AL_PETS_UPDATES           = "pets.updates"
 	AL_PETS_DELETES           = "pets.deletes"
 	AL_PETS_RESET_START       = "pets.reset-start"
@@ -33,6 +35,7 @@ var AL_FUNACTS = []string{
 	AL_LOGIN_LOGIN,
 	AL_LOGIN_PWDRST,
 	AL_USERS_CREATE,
+	AL_USERS_UPDATE,
 	AL_USERS_UPDATES,
 	AL_USERS_DELETES,
 	AL_USERS_IMPORT_START,
@@ -40,6 +43,7 @@ var AL_FUNACTS = []string{
 	AL_CONFIG_UPDATE,
 	AL_CONFIG_IMPORT,
 	AL_PETS_CREATE,
+	AL_PETS_UPDATE,
 	AL_PETS_UPDATES,
 	AL_PETS_DELETES,
 	AL_PETS_RESET_START,

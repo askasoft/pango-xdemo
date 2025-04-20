@@ -200,7 +200,7 @@ func UserUpdate(c *xin.Context) {
 		user.Password = ""
 
 		if cnt > 0 {
-			return tt.AddAuditLog(tx, c, models.AL_USERS_UPDATES, num.Ltoa(cnt), "#"+num.Ltoa(user.ID)+": <"+user.Email+">")
+			err = tt.AddAuditLog(tx, c, models.AL_USERS_UPDATE, num.Ltoa(user.ID), user.Email)
 		}
 		return
 	})

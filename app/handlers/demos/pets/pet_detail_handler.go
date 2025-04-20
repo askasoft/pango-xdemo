@@ -185,7 +185,7 @@ func PetUpdate(c *xin.Context) {
 				}
 				return sfs.MoveFile(pet.File, fid)
 			}
-			return tt.AddAuditLog(tx, c, models.AL_PETS_UPDATES, num.Ltoa(cnt), "#"+num.Ltoa(pet.ID)+": <"+pet.Name+">")
+			return tt.AddAuditLog(tx, c, models.AL_PETS_UPDATE, num.Ltoa(pet.ID), pet.Name)
 		}
 		return
 	})

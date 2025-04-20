@@ -65,8 +65,8 @@ func (sm Schema) MigrateConfig(configs []*models.Config) error {
 	log.Infof("Migrate %q", tb)
 
 	db := app.SDB
-	sqb := db.Builder()
 
+	sqb := db.Builder()
 	sqb.Select().From(tb)
 	sql, args := sqb.Build()
 
