@@ -18,19 +18,19 @@ func (sm Schema) ResetAuditLogsSequence(tx sqlx.Sqlx) error {
 type AuditLogQueryArg struct {
 	argutil.QueryArg
 
-	ID       string     `json:"id,omitempty" form:"id,strip"`
-	DateFrom *time.Time `json:"date_from,omitempty" form:"date_from,strip"`
-	DateTo   *time.Time `json:"date_to,omitempty" form:"date_to,strip" validate:"omitempty,gtefield=DateFrom"`
-	User     string     `json:"user,omitempty" form:"user,strip"`
-	CIP      string     `json:"cip,omitempty" form:"cip,strip"`
-	Func     []string   `json:"func,omitempty" form:"func,strip"`
-	Action   string     `json:"action,omitempty" form:"action,strip"`
+	ID       string    `json:"id,omitempty" form:"id,strip"`
+	DateFrom time.Time `json:"date_from,omitempty" form:"date_from,strip"`
+	DateTo   time.Time `json:"date_to,omitempty" form:"date_to,strip" validate:"omitempty,gtefield=DateFrom"`
+	User     string    `json:"user,omitempty" form:"user,strip"`
+	CIP      string    `json:"cip,omitempty" form:"cip,strip"`
+	Func     []string  `json:"func,omitempty" form:"func,strip"`
+	Action   string    `json:"action,omitempty" form:"action,strip"`
 }
 
 func (alqa *AuditLogQueryArg) HasFilters() bool {
 	return alqa.ID != "" ||
-		alqa.DateFrom != nil ||
-		alqa.DateTo != nil ||
+		!alqa.DateFrom.IsZero() ||
+		!alqa.DateTo.IsZero() ||
 		alqa.User != "" ||
 		alqa.CIP != "" ||
 		len(alqa.Func) > 0 ||
@@ -39,7 +39,7 @@ func (alqa *AuditLogQueryArg) HasFilters() bool {
 
 func (alqa *AuditLogQueryArg) AddFilters(sqb *sqlx.Builder, locale string) {
 	alqa.AddIDs(sqb, "audit_logs.id", alqa.ID)
-	alqa.AddTimePtrs(sqb, "audit_logs.date", alqa.DateFrom, alqa.DateTo)
+	alqa.AddDates(sqb, "audit_logs.date", alqa.DateFrom, alqa.DateTo)
 	alqa.AddLikes(sqb, "users.email", alqa.User)
 	alqa.AddLikes(sqb, "audit_logs.cip", alqa.CIP)
 	alqa.AddIn(sqb, "audit_logs.func", alqa.Func)

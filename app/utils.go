@@ -16,9 +16,11 @@ const (
 func FormatDate(a any) string {
 	switch t := a.(type) {
 	case time.Time:
-		return t.Local().Format(DateFormat)
+		if !t.IsZero() {
+			return t.Local().Format(DateFormat)
+		}
 	case *time.Time:
-		if t != nil {
+		if t != nil && !t.IsZero() {
 			return t.Local().Format(DateFormat)
 		}
 	}
@@ -28,9 +30,11 @@ func FormatDate(a any) string {
 func FormatTime(a any) string {
 	switch t := a.(type) {
 	case time.Time:
-		return t.Local().Format(TimeFormat)
+		if !t.IsZero() {
+			return t.Local().Format(TimeFormat)
+		}
 	case *time.Time:
-		if t != nil {
+		if t != nil && !t.IsZero() {
 			return t.Local().Format(TimeFormat)
 		}
 	}

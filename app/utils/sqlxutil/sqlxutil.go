@@ -8,6 +8,7 @@ import (
 	"github.com/askasoft/pango/sqx/pqx"
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/str"
+	"github.com/askasoft/pango/tmu"
 	"github.com/askasoft/pango/xvw/args"
 )
 
@@ -85,23 +86,23 @@ func AddILike(sqb *sqlx.Builder, col string, val string) {
 	}
 }
 
-func AddTimes(sqb *sqlx.Builder, col string, tmin, tmax time.Time) {
-	if !tmin.IsZero() && !tmax.IsZero() {
-		sqb.Btw(col, tmin, tmax)
-	} else if !tmin.IsZero() {
+func AddDates(sqb *sqlx.Builder, col string, tmin, tmax time.Time) {
+	if !tmin.IsZero() {
+		tmin = tmu.TruncateHours(tmin)
 		sqb.Gte(col, tmin)
-	} else if !tmax.IsZero() {
-		sqb.Lte(col, tmax)
+	}
+	if !tmax.IsZero() {
+		tmax = tmu.TruncateHours(tmax).Add(time.Hour * 24)
+		sqb.Lt(col, tmax)
 	}
 }
 
-func AddTimePtrs(sqb *sqlx.Builder, col string, tmin, tmax *time.Time) {
-	if tmin != nil && !tmin.IsZero() && tmax != nil && !tmax.IsZero() {
-		sqb.Btw(col, *tmin, *tmax)
-	} else if tmin != nil && !tmin.IsZero() {
-		sqb.Gte(col, *tmin)
-	} else if tmax != nil && !tmax.IsZero() {
-		sqb.Lte(col, *tmax)
+func AddTimes(sqb *sqlx.Builder, col string, tmin, tmax time.Time) {
+	if !tmin.IsZero() {
+		sqb.Gte(col, tmin)
+	}
+	if !tmax.IsZero() {
+		sqb.Lte(col, tmax)
 	}
 }
 
@@ -196,4 +197,12 @@ func AddOverlap(sqb *sqlx.Builder, col string, vals []string) {
 	if len(vals) > 0 {
 		sqb.Where(col+" && ?", pqx.StringArray(vals))
 	}
+}
+
+func ArrayContains(sqb *sqlx.Builder, col string, vals ...string) {
+	sqb.Where(col+" @> ?", pqx.StringArray(vals))
+}
+
+func ArrayNotContains(sqb *sqlx.Builder, col string, vals ...string) {
+	sqb.Where("NOT "+col+" @> ?", pqx.StringArray(vals))
 }

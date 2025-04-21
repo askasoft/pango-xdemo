@@ -9,6 +9,7 @@ import (
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango-xdemo/app/utils/sqlxutil"
 	"github.com/askasoft/pango/sqx/sqlx"
+	"github.com/askasoft/pango/tmu"
 	"github.com/askasoft/pango/xfs"
 	"github.com/askasoft/pango/xin"
 )
@@ -81,7 +82,7 @@ func (ap *ArgPeriod) Period() *ArgPeriod {
 }
 
 func (ap *ArgPeriod) AddPeriodFilter(sqb *sqlx.Builder, col string) {
-	sqlxutil.AddTimes(sqb, col, ap.Start, ap.End)
+	sqlxutil.AddDates(sqb, col, ap.Start, ap.End)
 }
 
 func ArgBind(c *xin.Context, a any) error {
@@ -90,7 +91,7 @@ func ArgBind(c *xin.Context, a any) error {
 	if ip, ok := a.(iPeriod); ok {
 		ap := ip.Period()
 		if !ap.End.IsZero() {
-			ap.End = ap.End.Add(time.Hour*24 - time.Microsecond)
+			ap.End = tmu.TruncateHours(ap.End).Add(time.Hour*24 - time.Microsecond)
 		}
 	}
 

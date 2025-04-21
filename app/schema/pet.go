@@ -19,19 +19,19 @@ func (sm Schema) ResetPetsSequence(tx sqlx.Sqlx) error {
 type PetQueryArg struct {
 	argutil.QueryArg
 
-	ID        string     `json:"id,omitempty" form:"id,strip"`
-	Name      string     `json:"name,omitempty" form:"name,strip"`
-	BornFrom  *time.Time `json:"born_from,omitempty" form:"born_from,strip"`
-	BornTo    *time.Time `json:"born_to,omitempty" form:"born_to,strip" validate:"omitempty,gtefield=BornFrom"`
-	Gender    []string   `json:"gender,omitempty" form:"gender,strip"`
-	Origin    []string   `json:"origin,omitempty" form:"origin,strip"`
-	Habits    []string   `json:"habits,omitempty" form:"habits,strip"`
-	Temper    []string   `json:"temper,omitempty" form:"temper,strip"`
-	AmountMin string     `json:"amount_min,omitempty" form:"amount_min"`
-	AmountMax string     `json:"amount_max,omitempty" form:"amount_max"`
-	PriceMin  string     `json:"price_min,omitempty" form:"price_min"`
-	PriceMax  string     `json:"price_max,omitempty" form:"price_max"`
-	ShopName  string     `json:"shop_name,omitempty" form:"shop_name,strip"`
+	ID        string    `json:"id,omitempty" form:"id,strip"`
+	Name      string    `json:"name,omitempty" form:"name,strip"`
+	BornFrom  time.Time `json:"born_from,omitempty" form:"born_from,strip"`
+	BornTo    time.Time `json:"born_to,omitempty" form:"born_to,strip" validate:"omitempty,gtefield=BornFrom"`
+	Gender    []string  `json:"gender,omitempty" form:"gender,strip"`
+	Origin    []string  `json:"origin,omitempty" form:"origin,strip"`
+	Habits    []string  `json:"habits,omitempty" form:"habits,strip"`
+	Temper    []string  `json:"temper,omitempty" form:"temper,strip"`
+	AmountMin string    `json:"amount_min,omitempty" form:"amount_min"`
+	AmountMax string    `json:"amount_max,omitempty" form:"amount_max"`
+	PriceMin  string    `json:"price_min,omitempty" form:"price_min"`
+	PriceMax  string    `json:"price_max,omitempty" form:"price_max"`
+	ShopName  string    `json:"shop_name,omitempty" form:"shop_name,strip"`
 }
 
 func (pqa *PetQueryArg) String() string {
@@ -45,8 +45,8 @@ func (pqa *PetQueryArg) HasFilters() bool {
 		len(pqa.Origin) > 0 ||
 		len(pqa.Temper) > 0 ||
 		len(pqa.Habits) > 0 ||
-		pqa.BornFrom != nil ||
-		pqa.BornTo != nil ||
+		!pqa.BornFrom.IsZero() ||
+		!pqa.BornTo.IsZero() ||
 		pqa.AmountMin != "" ||
 		pqa.AmountMax != "" ||
 		pqa.PriceMin != "" ||
@@ -60,7 +60,7 @@ func (pqa *PetQueryArg) AddFilters(sqb *sqlx.Builder) {
 	pqa.AddIn(sqb, "origin", pqa.Origin)
 	pqa.AddIn(sqb, "temper", pqa.Temper)
 	pqa.AddOverlap(sqb, "habits", pqa.Habits)
-	pqa.AddTimePtrs(sqb, "born_at", pqa.BornFrom, pqa.BornTo)
+	pqa.AddTimes(sqb, "born_at", pqa.BornFrom, pqa.BornTo)
 	pqa.AddInts(sqb, "amount", pqa.AmountMin, pqa.AmountMax)
 	pqa.AddFloats(sqb, "price", pqa.PriceMin, pqa.PriceMax)
 	pqa.AddLikes(sqb, "name", pqa.Name)

@@ -57,12 +57,12 @@ func (qa *QueryArg) AddILike(sqb *sqlx.Builder, col string, val string) {
 	sqlxutil.AddILike(sqb, col, val)
 }
 
-func (qa *QueryArg) AddTimes(sqb *sqlx.Builder, col string, tmin, tmax time.Time) {
-	sqlxutil.AddTimes(sqb, col, tmin, tmax)
+func (qa *QueryArg) AddDates(sqb *sqlx.Builder, col string, tmin, tmax time.Time) {
+	sqlxutil.AddDates(sqb, col, tmin, tmax)
 }
 
-func (qa *QueryArg) AddTimePtrs(sqb *sqlx.Builder, col string, tmin, tmax *time.Time) {
-	sqlxutil.AddTimePtrs(sqb, col, tmin, tmax)
+func (qa *QueryArg) AddTimes(sqb *sqlx.Builder, col string, tmin, tmax time.Time) {
+	sqlxutil.AddTimes(sqb, col, tmin, tmax)
 }
 
 func (qa *QueryArg) AddInts(sqb *sqlx.Builder, col string, smin, smax string) {
