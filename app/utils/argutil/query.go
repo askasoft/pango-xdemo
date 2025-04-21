@@ -8,17 +8,25 @@ import (
 	"github.com/askasoft/pango/xvw/args"
 )
 
+type PagerArg struct {
+	args.Pager
+}
+
+func (pa *PagerArg) AddPager(sqb *sqlx.Builder) {
+	sqlxutil.AddPager(sqb, &pa.Pager)
+}
+
+type SorterArg struct {
+	args.Sorter
+}
+
+func (sa *SorterArg) AddOrder(sqb *sqlx.Builder, defcol string) {
+	sqlxutil.AddOrder(sqb, &sa.Sorter, defcol)
+}
+
 type QueryArg struct {
-	args.Pager  `json:"-"`
-	args.Sorter `json:"-"`
-}
-
-func (qa *QueryArg) AddPager(sqb *sqlx.Builder) {
-	sqlxutil.AddPager(sqb, &qa.Pager)
-}
-
-func (qa *QueryArg) AddOrder(sqb *sqlx.Builder, defcol string) {
-	sqlxutil.AddOrder(sqb, &qa.Sorter, defcol)
+	PagerArg  `json:"-"`
+	SorterArg `json:"-"`
 }
 
 func (qa *QueryArg) AddEq(sqb *sqlx.Builder, col string, val string) {

@@ -60,7 +60,7 @@ func (pgjc *PetGenerateJobController) Index(c *xin.Context) {
 	c.HTML(http.StatusOK, pgjc.Template, h)
 }
 
-func bindPetGenerateJobArg(c *xin.Context) (jobs.IArgChain, bool) {
+func bindPetGenerateJobArg(c *xin.Context) (jobs.IChainArg, bool) {
 	pga := &pets.PetGenerateArg{}
 
 	if err := pga.Bind(c); err != nil {

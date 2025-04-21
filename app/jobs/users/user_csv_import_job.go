@@ -32,7 +32,7 @@ func init() {
 }
 
 type UserCsvImportArg struct {
-	jobs.ArgFile
+	jobs.FileArg
 
 	Role string `json:"role,omitempty" form:"-"`
 }

@@ -15,7 +15,7 @@ func init() {
 }
 
 type PetClearArg struct {
-	jobs.ArgChain
+	jobs.ChainArg
 
 	ResetSequence bool `json:"reset_sequence" form:"reset_sequence"`
 }
@@ -41,7 +41,7 @@ func NewPetClearJob(tt *tenant.Tenant, job *xjm.Job) jobs.IRun {
 
 	pc.JobRunner = jobs.NewJobRunner[PetClearArg](tt, job)
 
-	pc.ArgChain = pc.Arg.ArgChain
+	pc.ChainArg = pc.Arg.ChainArg
 	return pc
 }
 

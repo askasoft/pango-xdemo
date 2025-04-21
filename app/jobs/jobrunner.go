@@ -4,18 +4,53 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"mime/multipart"
 	"time"
 
 	"github.com/askasoft/pango-xdemo/app"
+	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango-xdemo/app/utils/errutil"
 	"github.com/askasoft/pango/log"
+	"github.com/askasoft/pango/xfs"
+	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pango/xjm"
 )
 
 var (
 	ErrItemSkip = errors.New("item skip")
 )
+
+type IArg interface {
+	Bind(c *xin.Context) error
+}
+
+type JobArgCreater func(*tenant.Tenant) IArg
+
+var jobArgCreators = map[string]JobArgCreater{}
+
+func RegisterJobArg(name string, jac JobArgCreater) {
+	jobArgCreators[name] = jac
+}
+
+type FileArg struct {
+	File string `json:"file,omitempty" form:"-"`
+}
+
+func (fa *FileArg) GetFile() string {
+	return fa.File
+}
+
+func (fa *FileArg) SetFile(tt *tenant.Tenant, mfh *multipart.FileHeader) error {
+	fid := app.MakeFileID(models.PrefixJobFile, mfh.Filename)
+	tfs := tt.FS()
+	if _, err := xfs.SaveUploadedFile(tfs, fid, mfh); err != nil {
+		return err
+	}
+
+	fa.File = fid
+	return nil
+}
 
 func JobStatusText(js string) string {
 	switch js {
@@ -117,7 +152,7 @@ func (si *FailedItem) String() string {
 
 type JobRunner[T any] struct {
 	*xjm.JobRunner
-	ArgChain
+	ChainArg
 
 	Tenant *tenant.Tenant
 	Logger log.Logger

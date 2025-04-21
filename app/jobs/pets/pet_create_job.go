@@ -20,7 +20,7 @@ func init() {
 }
 
 type PetGenerateArg struct {
-	jobs.ArgChain
+	jobs.ChainArg
 
 	Items int `json:"items,omitempty" form:"items" validate:"min=1,max=1000"`
 	Delay int `json:"delay,omitempty" form:"delay" validate:"min=0,max=1000"`
@@ -62,7 +62,7 @@ func newPetGenerateJob(tt *tenant.Tenant, job *xjm.Job) *PetGenerateJob {
 
 	pgj.JobRunner = jobs.NewJobRunner[PetGenerateArg](tt, job)
 
-	pgj.ArgChain = pgj.Arg.ArgChain
+	pgj.ChainArg = pgj.Arg.ChainArg
 
 	return pgj
 }

@@ -29,27 +29,27 @@ var (
 	}
 )
 
-type IArgChain interface {
+type IChainArg interface {
 	GetChain() (int, bool)
 	SetChain(chainSeq int, chainData bool)
 }
 
-type ArgChain struct {
+type ChainArg struct {
 	ChainSeq  int  `json:"chain_seq,omitempty" form:"-"`
 	ChainData bool `json:"chain_data,omitempty" form:"chain_data"`
 }
 
-func (ac *ArgChain) GetChain() (int, bool) {
-	return ac.ChainSeq, ac.ChainData
+func (ca *ChainArg) GetChain() (int, bool) {
+	return ca.ChainSeq, ca.ChainData
 }
 
-func (ac *ArgChain) SetChain(csq int, cdt bool) {
-	ac.ChainSeq = csq
-	ac.ChainData = cdt
+func (ca *ChainArg) SetChain(csq int, cdt bool) {
+	ca.ChainSeq = csq
+	ca.ChainData = cdt
 }
 
-func (ac *ArgChain) ShouldChainData() bool {
-	return ac.ChainData && ac.ChainSeq > 0
+func (ca *ChainArg) ShouldChainData() bool {
+	return ca.ChainData && ca.ChainSeq > 0
 }
 
 type JobRunState struct {
@@ -78,7 +78,7 @@ func JobChainInitStates(jns ...string) []*JobRunState {
 	return states
 }
 
-func JobChainStart(tt *tenant.Tenant, chainName string, states []*JobRunState, jobName, jobLocale string, jobParam IArgChain) (cid int64, err error) {
+func JobChainStart(tt *tenant.Tenant, chainName string, states []*JobRunState, jobName, jobLocale string, jobParam IChainArg) (cid int64, err error) {
 	state := JobChainEncodeStates(states)
 
 	err = app.SDB.Transaction(func(tx *sqlx.Tx) error {
@@ -328,7 +328,7 @@ func JobChainAppendJob(tt *tenant.Tenant, name, locale string, cid int64, csq in
 		return fmt.Errorf("Invalid chain job %q", name)
 	}
 
-	if isc, ok := arg.(IArgChain); ok {
+	if isc, ok := arg.(IChainArg); ok {
 		isc.SetChain(csq, cdt)
 	} else {
 		return fmt.Errorf("Invalid chain job %q", name)

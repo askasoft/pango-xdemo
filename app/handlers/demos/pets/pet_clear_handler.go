@@ -48,7 +48,7 @@ func (pcjc *PetClearJobController) Index(c *xin.Context) {
 	c.HTML(http.StatusOK, pcjc.Template, h)
 }
 
-func bindPetClearJobArg(c *xin.Context) (jobs.IArgChain, bool) {
+func bindPetClearJobArg(c *xin.Context) (jobs.IChainArg, bool) {
 	pca := &pets.PetClearArg{}
 
 	if err := pca.Bind(c); err != nil {

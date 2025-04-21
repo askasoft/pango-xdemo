@@ -25,7 +25,7 @@ func RegisterJobCtxbinder(name string, jcr JobCtxbinder) {
 	JobCtxbinders[name] = jcr
 }
 
-type JobArgbinder func(c *xin.Context) (jobs.IArgChain, bool)
+type JobArgbinder func(c *xin.Context) (jobs.IChainArg, bool)
 
 var jobArgbinders = map[string]JobArgbinder{}
 
@@ -58,7 +58,7 @@ func NewJobChainInfo(locale string, jc *xjm.JobChain) *JobChainInfo {
 type JobChainController struct {
 	ChainName string
 	ChainJobs []string
-	JobParam  jobs.IArgChain
+	JobParam  jobs.IChainArg
 	Template  string
 }
 
@@ -143,7 +143,7 @@ func (jcc *JobChainController) BindJobCtx(c *xin.Context, h xin.H) bool {
 	return true
 }
 
-func (jcc *JobChainController) BindJobArg(c *xin.Context, jn string) (jobs.IArgChain, bool) {
+func (jcc *JobChainController) BindJobArg(c *xin.Context, jn string) (jobs.IChainArg, bool) {
 	if jba, ok := jobArgbinders[jn]; ok {
 		return jba(c)
 	}
