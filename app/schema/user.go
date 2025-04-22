@@ -11,7 +11,7 @@ import (
 )
 
 func (sm Schema) ResetUsersSequence(tx sqlx.Sqlx) error {
-	return sm.ResetSequence(tx, sm.TableUsers(), models.UserStartID)
+	return ResetSequence(tx, sm.TableUsers(), models.UserStartID)
 }
 
 type UserQueryArg struct {

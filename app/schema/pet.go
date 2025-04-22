@@ -13,7 +13,7 @@ import (
 )
 
 func (sm Schema) ResetPetsSequence(tx sqlx.Sqlx) error {
-	return sm.ResetSequence(tx, sm.TablePets())
+	return ResetSequence(tx, sm.TablePets())
 }
 
 type PetQueryArg struct {

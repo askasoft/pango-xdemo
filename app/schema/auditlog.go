@@ -12,7 +12,7 @@ import (
 )
 
 func (sm Schema) ResetAuditLogsSequence(tx sqlx.Sqlx) error {
-	return sm.ResetSequence(tx, sm.TableAuditLogs())
+	return ResetSequence(tx, sm.TableAuditLogs())
 }
 
 type AuditLogQueryArg struct {
