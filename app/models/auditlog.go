@@ -9,6 +9,7 @@ import (
 const (
 	AL_LOGIN_LOGIN            = "login.login"
 	AL_LOGIN_PWDRST           = "login.password-reset"
+	AL_LOGIN_PWDCHG           = "login.password-change"
 	AL_USERS_CREATE           = "users.create"
 	AL_USERS_UPDATE           = "users.update"
 	AL_USERS_UPDATES          = "users.updates"
@@ -34,6 +35,7 @@ const (
 var AL_FUNACTS = []string{
 	AL_LOGIN_LOGIN,
 	AL_LOGIN_PWDRST,
+	AL_LOGIN_PWDCHG,
 	AL_USERS_CREATE,
 	AL_USERS_UPDATE,
 	AL_USERS_UPDATES,

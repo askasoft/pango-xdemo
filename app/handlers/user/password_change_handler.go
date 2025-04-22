@@ -8,6 +8,7 @@ import (
 	"github.com/askasoft/pango-xdemo/app/handlers"
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/tenant"
+	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/tbs"
 	"github.com/askasoft/pango/xin"
 )
@@ -68,15 +69,25 @@ func PasswordChangeChange(c *xin.Context) {
 
 	tt := tenant.FromCtx(c)
 
-	cnt, err := tt.UpdateUserPassword(app.SDB, au.ID, nu.Password)
+	var cnt int64
+	err := app.SDB.Transaction(func(tx *sqlx.Tx) (err error) {
+		cnt, err = tt.UpdateUserPassword(app.SDB, au.ID, nu.Password)
+		if err != nil {
+			return
+		}
+		if cnt > 0 {
+			err = tt.AddAuditLog(tx, c, models.AL_LOGIN_PWDCHG, au.Email)
+		}
+		return
+	})
 	if err != nil {
 		c.AddError(err)
-		c.JSON(http.StatusBadRequest, handlers.E(c))
+		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return
 	}
 
-	if cnt != 1 {
-		c.AddError(tbs.Error(c.Locale, "error.update.notfound"))
+	if cnt == 0 {
+		c.AddError(tbs.Errorf(c.Locale, "error.update.notfound", au.ID))
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}

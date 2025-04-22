@@ -172,7 +172,6 @@ func PasswordResetExecute(c *xin.Context) {
 	if err := c.Bind(pra); err != nil {
 		args.AddBindErrors(c, err, "pwdrst.")
 	}
-
 	if pra.Newpwd != "" {
 		if vs := tt.ValidatePassword(c.Locale, pra.Newpwd); len(vs) > 0 {
 			for _, v := range vs {
@@ -183,7 +182,6 @@ func PasswordResetExecute(c *xin.Context) {
 			}
 		}
 	}
-
 	if len(c.Errors) > 0 {
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
@@ -192,11 +190,15 @@ func PasswordResetExecute(c *xin.Context) {
 	user.SetPassword(pra.Newpwd)
 
 	err = app.SDB.Transaction(func(tx *sqlx.Tx) error {
-		if _, err := tt.UpdateUserPassword(tx, user.ID, user.Password); err != nil {
+		cnt, err := tt.UpdateUserPassword(tx, user.ID, user.Password)
+		if err != nil {
 			return err
 		}
 
-		return tt.Schema.AddAuditLog(tx, user.ID, c.ClientIP(), models.AL_LOGIN_PWDRST, user.Email)
+		if cnt > 0 {
+			return tt.Schema.AddAuditLog(tx, user.ID, c.ClientIP(), models.AL_LOGIN_PWDRST, user.Email)
+		}
+		return nil
 	})
 	if err != nil {
 		c.AddError(err)
