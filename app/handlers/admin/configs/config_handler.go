@@ -7,11 +7,11 @@ import (
 	"net/http"
 
 	"github.com/askasoft/pango-xdemo/app"
+	"github.com/askasoft/pango-xdemo/app/args"
 	"github.com/askasoft/pango-xdemo/app/handlers"
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/schema"
 	"github.com/askasoft/pango-xdemo/app/tenant"
-	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
 	"github.com/askasoft/pango/cog/linkedhashmap"
 	"github.com/askasoft/pango/doc/csvx"
 	"github.com/askasoft/pango/gog"
@@ -147,7 +147,7 @@ func validateConfig(c *xin.Context, cfg *models.Config, v *string) bool {
 	case models.ConfigStyleNumeric:
 		*v = str.RemoveByte(*v, ',')
 		if *v != "" && !str.IsNumeric(*v) {
-			c.AddError(&vadutil.ParamError{
+			c.AddError(&args.ParamError{
 				Param:   cfg.Name,
 				Message: tbs.Format(c.Locale, "error.param.numeric", tbs.GetText(c.Locale, "config."+cfg.Name, cfg.Name)),
 			})
@@ -156,7 +156,7 @@ func validateConfig(c *xin.Context, cfg *models.Config, v *string) bool {
 	case models.ConfigStyleDecimal:
 		*v = str.RemoveByte(*v, ',')
 		if *v != "" && !str.IsDecimal(*v) {
-			c.AddError(&vadutil.ParamError{
+			c.AddError(&args.ParamError{
 				Param:   cfg.Name,
 				Message: tbs.Format(c.Locale, "error.param.decimal", tbs.GetText(c.Locale, "config."+cfg.Name, cfg.Name)),
 			})
@@ -183,7 +183,7 @@ func validateConfig(c *xin.Context, cfg *models.Config, v *string) bool {
 		}
 
 		if err := app.VAD.Field(cfg.Name, vv, validation); err != nil {
-			vadutil.AddBindErrors(c, err, "config.")
+			args.AddBindErrors(c, err, "config.")
 			return false
 		}
 	}
@@ -202,7 +202,7 @@ func validateConfig(c *xin.Context, cfg *models.Config, v *string) bool {
 			}
 
 			if !ok {
-				c.AddError(&vadutil.ParamError{
+				c.AddError(&args.ParamError{
 					Param:   cfg.Name,
 					Message: tbs.Format(c.Locale, "error.param.invalid", tbs.GetText(c.Locale, "config."+cfg.Name, cfg.Name)),
 				})

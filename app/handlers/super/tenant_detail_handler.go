@@ -3,10 +3,10 @@ package super
 import (
 	"net/http"
 
+	"github.com/askasoft/pango-xdemo/app/args"
 	"github.com/askasoft/pango-xdemo/app/handlers"
 	"github.com/askasoft/pango-xdemo/app/schema"
 	"github.com/askasoft/pango-xdemo/app/tenant"
-	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
 	"github.com/askasoft/pango/tbs"
 	"github.com/askasoft/pango/xin"
 )
@@ -14,7 +14,7 @@ import (
 func TenantCreate(c *xin.Context) {
 	ti := &TenantInfo{}
 	if err := c.Bind(ti); err != nil {
-		vadutil.AddBindErrors(c, err, "tenant.")
+		args.AddBindErrors(c, err, "tenant.")
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}
@@ -49,7 +49,7 @@ type TenantEdit struct {
 func TenantUpdate(c *xin.Context) {
 	te := &TenantEdit{}
 	if err := c.Bind(te); err != nil {
-		vadutil.AddBindErrors(c, err, "tenant.")
+		args.AddBindErrors(c, err, "tenant.")
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}
@@ -104,7 +104,7 @@ func TenantUpdate(c *xin.Context) {
 func TenantDelete(c *xin.Context) {
 	ti := &TenantInfo{}
 	if err := c.Bind(ti); err != nil {
-		vadutil.AddBindErrors(c, err, "tenant.")
+		args.AddBindErrors(c, err, "tenant.")
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}

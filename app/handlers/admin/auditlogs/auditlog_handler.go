@@ -4,18 +4,17 @@ import (
 	"net/http"
 
 	"github.com/askasoft/pango-xdemo/app"
+	"github.com/askasoft/pango-xdemo/app/args"
 	"github.com/askasoft/pango-xdemo/app/handlers"
-	"github.com/askasoft/pango-xdemo/app/schema"
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
-	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
 	"github.com/askasoft/pango/asg"
 	"github.com/askasoft/pango/tbs"
 	"github.com/askasoft/pango/xin"
 )
 
-func bindAuditLogQueryArg(c *xin.Context) (alqa *schema.AuditLogQueryArg, err error) {
-	alqa = &schema.AuditLogQueryArg{}
+func bindAuditLogQueryArg(c *xin.Context) (alqa *args.AuditLogQueryArg, err error) {
+	alqa = &args.AuditLogQueryArg{}
 	alqa.Col, alqa.Dir = "id", "desc"
 
 	err = c.Bind(alqa)
@@ -49,7 +48,7 @@ func AuditLogIndex(c *xin.Context) {
 func AuditLogList(c *xin.Context) {
 	alqa, err := bindAuditLogQueryArg(c)
 	if err != nil {
-		vadutil.AddBindErrors(c, err, "auditlog.")
+		args.AddBindErrors(c, err, "auditlog.")
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}

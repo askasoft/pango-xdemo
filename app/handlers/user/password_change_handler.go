@@ -4,10 +4,10 @@ import (
 	"net/http"
 
 	"github.com/askasoft/pango-xdemo/app"
+	"github.com/askasoft/pango-xdemo/app/args"
 	"github.com/askasoft/pango-xdemo/app/handlers"
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/tenant"
-	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
 	"github.com/askasoft/pango/tbs"
 	"github.com/askasoft/pango/xin"
 )
@@ -30,7 +30,7 @@ func pwdchgValidatePassword(c *xin.Context, password string) {
 
 		if vs := tt.ValidatePassword(c.Locale, password); len(vs) > 0 {
 			for _, v := range vs {
-				c.AddError(&vadutil.ParamError{
+				c.AddError(&args.ParamError{
 					Param:   "newpwd",
 					Message: v,
 				})
@@ -43,7 +43,7 @@ func PasswordChangeChange(c *xin.Context) {
 	pca := &PwdChgArg{}
 
 	if err := c.Bind(pca); err != nil {
-		vadutil.AddBindErrors(c, err, "pwdchg.")
+		args.AddBindErrors(c, err, "pwdchg.")
 	}
 
 	pwdchgValidatePassword(c, pca.Newpwd)

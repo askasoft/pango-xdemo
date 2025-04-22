@@ -3,10 +3,9 @@ package schema
 import (
 	"time"
 
+	"github.com/askasoft/pango-xdemo/app/args"
 	"github.com/askasoft/pango-xdemo/app/models"
-	"github.com/askasoft/pango-xdemo/app/utils/argutil"
 	"github.com/askasoft/pango-xdemo/app/utils/sqlxutil"
-	"github.com/askasoft/pango-xdemo/app/utils/strutil"
 	"github.com/askasoft/pango/sqx/sqlx"
 )
 
@@ -14,40 +13,7 @@ func (sm Schema) ResetUsersSequence(tx sqlx.Sqlx) error {
 	return ResetSequence(tx, sm.TableUsers(), models.UserStartID)
 }
 
-type UserQueryArg struct {
-	argutil.QueryArg
-
-	ID     string   `json:"id,omitempty" form:"id,strip"`
-	Name   string   `json:"name,omitempty" form:"name,strip"`
-	Email  string   `json:"email,omitempty" form:"email,strip"`
-	Role   []string `json:"role,omitempty" form:"role,strip"`
-	Status []string `json:"status,omitempty" form:"status,strip"`
-	CIDR   string   `json:"cidr,omitempty" form:"cidr,strip"`
-}
-
-func (uqa *UserQueryArg) String() string {
-	return strutil.JSONString(uqa)
-}
-
-func (uqa *UserQueryArg) HasFilters() bool {
-	return uqa.ID != "" ||
-		uqa.Name != "" ||
-		uqa.Email != "" ||
-		len(uqa.Role) > 0 ||
-		len(uqa.Status) > 0 ||
-		uqa.CIDR != ""
-}
-
-func (uqa *UserQueryArg) AddFilters(sqb *sqlx.Builder) {
-	uqa.AddIDs(sqb, "id", uqa.ID)
-	uqa.AddIn(sqb, "status", uqa.Status)
-	uqa.AddIn(sqb, "role", uqa.Role)
-	uqa.AddLikes(sqb, "name", uqa.Name)
-	uqa.AddLikes(sqb, "email", uqa.Email)
-	uqa.AddLikes(sqb, "cidr", uqa.CIDR)
-}
-
-func (sm Schema) CountUsers(tx sqlx.Sqlx, role string, uqa *UserQueryArg) (cnt int, err error) {
+func (sm Schema) CountUsers(tx sqlx.Sqlx, role string, uqa *args.UserQueryArg) (cnt int, err error) {
 	sqb := tx.Builder()
 
 	sqb.Count()
@@ -60,7 +26,7 @@ func (sm Schema) CountUsers(tx sqlx.Sqlx, role string, uqa *UserQueryArg) (cnt i
 	return
 }
 
-func (sm Schema) FindUsers(tx sqlx.Sqlx, role string, uqa *UserQueryArg, cols ...string) (users []*models.User, err error) {
+func (sm Schema) FindUsers(tx sqlx.Sqlx, role string, uqa *args.UserQueryArg, cols ...string) (users []*models.User, err error) {
 	sqb := tx.Builder()
 
 	sqb.Select(cols...)
@@ -75,7 +41,7 @@ func (sm Schema) FindUsers(tx sqlx.Sqlx, role string, uqa *UserQueryArg, cols ..
 	return
 }
 
-func (sm Schema) IterUsers(tx sqlx.Sqlx, role string, uqa *UserQueryArg, fit func(*models.User) error, cols ...string) error {
+func (sm Schema) IterUsers(tx sqlx.Sqlx, role string, uqa *args.UserQueryArg, fit func(*models.User) error, cols ...string) error {
 	sqb := tx.Builder()
 
 	sqb.Select(cols...)
@@ -104,7 +70,7 @@ func (sm Schema) IterUsers(tx sqlx.Sqlx, role string, uqa *UserQueryArg, fit fun
 	return nil
 }
 
-func (sm Schema) DeleteUsersQuery(tx sqlx.Sqlx, au *models.User, uqa *UserQueryArg) (int64, error) {
+func (sm Schema) DeleteUsersQuery(tx sqlx.Sqlx, au *models.User, uqa *args.UserQueryArg) (int64, error) {
 	sqb := tx.Builder()
 
 	sqb.Delete(sm.TableUsers())
@@ -236,24 +202,7 @@ func (sm Schema) DeleteUsers(tx sqlx.Sqlx, au *models.User, ids ...int64) (int64
 	return r.RowsAffected()
 }
 
-type UserUpdatesArg struct {
-	argutil.IDArg
-
-	Role      string    `json:"role,omitempty" form:"role,strip"`
-	Status    string    `json:"status,omitempty" form:"status,strip"`
-	CIDR      *string   `json:"cidr,omitempty" form:"cidr,strip" validate:"omitempty,cidrs"`
-	UpdatedAt time.Time `json:"updated_at" form:"-"`
-}
-
-func (uua *UserUpdatesArg) String() string {
-	return strutil.JSONString(uua)
-}
-
-func (uua *UserUpdatesArg) IsEmpty() bool {
-	return uua.Role == "" && uua.Status == "" && uua.CIDR == nil
-}
-
-func (sm Schema) UpdateUsers(tx sqlx.Sqlx, au *models.User, uua *UserUpdatesArg) (int64, error) {
+func (sm Schema) UpdateUsers(tx sqlx.Sqlx, au *models.User, uua *args.UserUpdatesArg) (int64, error) {
 	sqb := tx.Builder()
 
 	sqb.Update(sm.TableUsers())

@@ -4,19 +4,18 @@ import (
 	"net/http"
 
 	"github.com/askasoft/pango-xdemo/app"
+	"github.com/askasoft/pango-xdemo/app/args"
 	"github.com/askasoft/pango-xdemo/app/handlers"
 	"github.com/askasoft/pango-xdemo/app/tenant"
-	"github.com/askasoft/pango-xdemo/app/utils/argutil"
-	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/tbs"
 	"github.com/askasoft/pango/xin"
 )
 
 func AuditLogDeletes(c *xin.Context) {
-	ida := &argutil.IDArg{}
+	ida := &args.IDArg{}
 	if err := ida.Bind(c); err != nil {
-		c.AddError(vadutil.ErrInvalidID(c))
+		c.AddError(args.ErrInvalidID(c))
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}
@@ -49,7 +48,7 @@ func AuditLogDeletes(c *xin.Context) {
 func AuditLogDeleteBatch(c *xin.Context) {
 	alqa, err := bindAuditLogQueryArg(c)
 	if err != nil {
-		vadutil.AddBindErrors(c, err, "auditlog.")
+		args.AddBindErrors(c, err, "auditlog.")
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}

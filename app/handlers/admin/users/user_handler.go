@@ -4,16 +4,15 @@ import (
 	"net/http"
 
 	"github.com/askasoft/pango-xdemo/app"
+	"github.com/askasoft/pango-xdemo/app/args"
 	"github.com/askasoft/pango-xdemo/app/handlers"
-	"github.com/askasoft/pango-xdemo/app/schema"
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
-	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
 	"github.com/askasoft/pango/xin"
 )
 
-func bindUserQueryArg(c *xin.Context) (uqa *schema.UserQueryArg, err error) {
-	uqa = &schema.UserQueryArg{}
+func bindUserQueryArg(c *xin.Context) (uqa *args.UserQueryArg, err error) {
+	uqa = &args.UserQueryArg{}
 	uqa.Col, uqa.Dir = "id", "asc"
 
 	err = c.Bind(uqa)
@@ -51,7 +50,7 @@ func UserIndex(c *xin.Context) {
 func UserList(c *xin.Context) {
 	uqa, err := bindUserQueryArg(c)
 	if err != nil {
-		vadutil.AddBindErrors(c, err, "user.")
+		args.AddBindErrors(c, err, "user.")
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}

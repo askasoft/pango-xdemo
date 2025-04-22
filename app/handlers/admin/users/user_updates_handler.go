@@ -4,12 +4,10 @@ import (
 	"net/http"
 
 	"github.com/askasoft/pango-xdemo/app"
+	"github.com/askasoft/pango-xdemo/app/args"
 	"github.com/askasoft/pango-xdemo/app/handlers"
 	"github.com/askasoft/pango-xdemo/app/models"
-	"github.com/askasoft/pango-xdemo/app/schema"
 	"github.com/askasoft/pango-xdemo/app/tenant"
-	"github.com/askasoft/pango-xdemo/app/utils/argutil"
-	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/tbs"
@@ -17,24 +15,14 @@ import (
 )
 
 func UserUpdates(c *xin.Context) {
-	uua := &schema.UserUpdatesArg{}
-	err := c.Bind(uua)
-	if err != nil {
-		vadutil.AddBindErrors(c, err, "user.")
+	uua := &args.UserUpdatesArg{}
+	if err := uua.Bind(c); err != nil {
+		args.AddBindErrors(c, err, "user.")
 	}
 	userValidateRole(c, uua.Role)
 	userValidateStatus(c, uua.Status)
 
-	if uua.IsEmpty() {
-		c.AddError(tbs.Error(c.Locale, "error.request.invalid"))
-	}
 	if len(c.Errors) > 0 {
-		c.JSON(http.StatusBadRequest, handlers.E(c))
-		return
-	}
-
-	if !uua.HasValidID() {
-		c.AddError(vadutil.ErrInvalidID(c))
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}
@@ -43,7 +31,7 @@ func UserUpdates(c *xin.Context) {
 	au := tenant.AuthUser(c)
 
 	var cnt int64
-	err = app.SDB.Transaction(func(tx *sqlx.Tx) error {
+	err := app.SDB.Transaction(func(tx *sqlx.Tx) (err error) {
 		cnt, err = tt.UpdateUsers(tx, au, uua)
 		if err != nil {
 			return err
@@ -67,9 +55,9 @@ func UserUpdates(c *xin.Context) {
 }
 
 func UserDeletes(c *xin.Context) {
-	ida := &argutil.IDArg{}
+	ida := &args.IDArg{}
 	if err := ida.Bind(c); err != nil {
-		c.AddError(vadutil.ErrInvalidID(c))
+		c.AddError(args.ErrInvalidID(c))
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}
@@ -106,7 +94,7 @@ func UserDeletes(c *xin.Context) {
 func UserDeleteBatch(c *xin.Context) {
 	uqa, err := bindUserQueryArg(c)
 	if err != nil {
-		vadutil.AddBindErrors(c, err, "user.")
+		args.AddBindErrors(c, err, "user.")
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}

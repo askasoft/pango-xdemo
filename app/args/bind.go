@@ -1,17 +1,14 @@
-package vadutil
+package args
 
 import (
 	"errors"
 	"fmt"
-	"regexp"
 
-	"github.com/askasoft/pango/ini"
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/tbs"
 	"github.com/askasoft/pango/vad"
 	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pango/xin/binding"
-	"github.com/crewjam/saml/samlsp"
 )
 
 type ParamError struct {
@@ -35,6 +32,10 @@ func ErrInvalidField(c *xin.Context, ns, field string) error {
 
 func ErrInvalidID(c *xin.Context) error {
 	return tbs.Errorf(c.Locale, "error.param.invalid", "ID")
+}
+
+func ErrInvalidRequest(c *xin.Context) error {
+	return tbs.Error(c.Locale, "error.request.invalid")
 }
 
 // AddBindErrors translate bind or validate errors
@@ -109,38 +110,14 @@ func AddBindErrors(c *xin.Context, err error, ns string, fks ...string) {
 		return
 	}
 
+	if errors.Is(err, errInvalidID) {
+		c.AddError(ErrInvalidID(c))
+		return
+	}
+	if errors.Is(err, errInvalidUpdates) {
+		c.AddError(ErrInvalidRequest(c))
+		return
+	}
+
 	c.AddError(err)
-}
-
-func ValidateCIDRs(fl vad.FieldLevel) bool {
-	v := false
-	for _, s := range str.Fields(fl.Field().String()) {
-		if !vad.IsCIDR(s) {
-			return false
-		}
-		v = true
-	}
-	return v
-}
-
-func ValidateRegexps(fl vad.FieldLevel) bool {
-	v := false
-	for _, s := range str.Fields(fl.Field().String()) {
-		_, err := regexp.Compile(s)
-		if err != nil {
-			return false
-		}
-		v = true
-	}
-	return v
-}
-
-func ValidateINI(fl vad.FieldLevel) bool {
-	err := ini.NewIni().LoadData(str.NewReader(fl.Field().String()))
-	return err == nil
-}
-
-func ValidateSAMLMeta(fl vad.FieldLevel) bool {
-	_, err := samlsp.ParseMetadata(str.UnsafeBytes(fl.Field().String()))
-	return err == nil
 }

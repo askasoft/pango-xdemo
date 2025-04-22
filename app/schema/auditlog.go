@@ -3,10 +3,8 @@ package schema
 import (
 	"time"
 
+	"github.com/askasoft/pango-xdemo/app/args"
 	"github.com/askasoft/pango-xdemo/app/models"
-	"github.com/askasoft/pango-xdemo/app/utils/argutil"
-	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
-	"github.com/askasoft/pango/cog/hashset"
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/str"
 )
@@ -15,52 +13,7 @@ func (sm Schema) ResetAuditLogsSequence(tx sqlx.Sqlx) error {
 	return ResetSequence(tx, sm.TableAuditLogs())
 }
 
-type AuditLogQueryArg struct {
-	argutil.QueryArg
-
-	ID       string    `json:"id,omitempty" form:"id,strip"`
-	DateFrom time.Time `json:"date_from,omitempty" form:"date_from,strip"`
-	DateTo   time.Time `json:"date_to,omitempty" form:"date_to,strip" validate:"omitempty,gtefield=DateFrom"`
-	User     string    `json:"user,omitempty" form:"user,strip"`
-	CIP      string    `json:"cip,omitempty" form:"cip,strip"`
-	Func     []string  `json:"func,omitempty" form:"func,strip"`
-	Action   string    `json:"action,omitempty" form:"action,strip"`
-}
-
-func (alqa *AuditLogQueryArg) HasFilters() bool {
-	return alqa.ID != "" ||
-		!alqa.DateFrom.IsZero() ||
-		!alqa.DateTo.IsZero() ||
-		alqa.User != "" ||
-		alqa.CIP != "" ||
-		len(alqa.Func) > 0 ||
-		alqa.Action != ""
-}
-
-func (alqa *AuditLogQueryArg) AddFilters(sqb *sqlx.Builder, locale string) {
-	alqa.AddIDs(sqb, "audit_logs.id", alqa.ID)
-	alqa.AddDates(sqb, "audit_logs.date", alqa.DateFrom, alqa.DateTo)
-	alqa.AddLikes(sqb, "users.email", alqa.User)
-	alqa.AddLikes(sqb, "audit_logs.cip", alqa.CIP)
-	alqa.AddIn(sqb, "audit_logs.func", alqa.Func)
-
-	if alqa.Action != "" {
-		ass := str.Fields(alqa.Action)
-		fam := tbsutil.GetAudioLogFunactMap(locale)
-
-		ahs := hashset.NewHashSet[string]()
-		for _, a := range ass {
-			for k, v := range fam {
-				if str.ContainsFold(v, a) {
-					ahs.Add(str.SubstrAfter(k, "."))
-				}
-			}
-		}
-		alqa.AddIn(sqb, "audit_logs.action", ahs.Values())
-	}
-}
-
-func (sm Schema) CountAuditLogs(tx sqlx.Sqlx, alqa *AuditLogQueryArg, locale string) (cnt int, err error) {
+func (sm Schema) CountAuditLogs(tx sqlx.Sqlx, alqa *args.AuditLogQueryArg, locale string) (cnt int, err error) {
 	sqb := tx.Builder()
 
 	sqb.Count()
@@ -73,7 +26,7 @@ func (sm Schema) CountAuditLogs(tx sqlx.Sqlx, alqa *AuditLogQueryArg, locale str
 	return
 }
 
-func (sm Schema) FindAuditLogs(tx sqlx.Sqlx, alqa *AuditLogQueryArg, locale string) (alogs []*models.AuditLogEx, err error) {
+func (sm Schema) FindAuditLogs(tx sqlx.Sqlx, alqa *args.AuditLogQueryArg, locale string) (alogs []*models.AuditLogEx, err error) {
 	sqb := tx.Builder()
 
 	sqb.Select("audit_logs.*", "COALESCE(users.email, '') AS user")
@@ -88,7 +41,7 @@ func (sm Schema) FindAuditLogs(tx sqlx.Sqlx, alqa *AuditLogQueryArg, locale stri
 	return
 }
 
-func (sm Schema) IterAuditLogs(tx sqlx.Sqlx, alqa *AuditLogQueryArg, locale string, fit func(*models.AuditLogEx) error) error {
+func (sm Schema) IterAuditLogs(tx sqlx.Sqlx, alqa *args.AuditLogQueryArg, locale string, fit func(*models.AuditLogEx) error) error {
 	sqb := tx.Builder()
 
 	sqb.Select("audit_logs.*", "COALESCE(users.email, '') AS user")
@@ -117,7 +70,7 @@ func (sm Schema) IterAuditLogs(tx sqlx.Sqlx, alqa *AuditLogQueryArg, locale stri
 	return nil
 }
 
-func (sm Schema) DeleteAuditLogsQuery(tx sqlx.Sqlx, alqa *AuditLogQueryArg, locale string) (int64, error) {
+func (sm Schema) DeleteAuditLogsQuery(tx sqlx.Sqlx, alqa *args.AuditLogQueryArg, locale string) (int64, error) {
 	sqa := tx.Builder()
 	sqa.Select("audit_logs.id")
 	sqa.From(sm.TableAuditLogs())

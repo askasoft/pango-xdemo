@@ -3,11 +3,11 @@ package pets
 import (
 	"net/http"
 
+	"github.com/askasoft/pango-xdemo/app/args"
 	"github.com/askasoft/pango-xdemo/app/handlers"
 	"github.com/askasoft/pango-xdemo/app/jobs"
 	"github.com/askasoft/pango-xdemo/app/jobs/pets"
 	"github.com/askasoft/pango-xdemo/app/tenant"
-	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
 	"github.com/askasoft/pango/xin"
 )
 
@@ -64,7 +64,7 @@ func bindPetGenerateJobArg(c *xin.Context) (jobs.IChainArg, bool) {
 	pga := &pets.PetGenerateArg{}
 
 	if err := pga.Bind(c); err != nil {
-		vadutil.AddBindErrors(c, err, "pet.generate.")
+		args.AddBindErrors(c, err, "pet.generate.")
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return nil, false
 	}

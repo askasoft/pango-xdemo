@@ -5,11 +5,11 @@ import (
 	"net/http"
 
 	"github.com/askasoft/pango-xdemo/app"
+	"github.com/askasoft/pango-xdemo/app/args"
 	"github.com/askasoft/pango-xdemo/app/handlers"
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
-	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
 	"github.com/askasoft/pango/iox"
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/tbs"
@@ -19,7 +19,7 @@ import (
 func UserCsvExport(c *xin.Context) {
 	uqa, err := bindUserQueryArg(c)
 	if err != nil {
-		vadutil.AddBindErrors(c, err, "user.")
+		args.AddBindErrors(c, err, "user.")
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}

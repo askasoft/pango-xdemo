@@ -3,11 +3,11 @@ package super
 import (
 	"net/http"
 
+	"github.com/askasoft/pango-xdemo/app/args"
 	"github.com/askasoft/pango-xdemo/app/handlers"
 	"github.com/askasoft/pango-xdemo/app/schema"
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
-	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
 	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pango/xsm"
 )
@@ -48,7 +48,7 @@ func TenantIndex(c *xin.Context) {
 func TenantList(c *xin.Context) {
 	tqa, err := bindTenantQueryArg(c)
 	if err != nil {
-		vadutil.AddBindErrors(c, err, "tenant.")
+		args.AddBindErrors(c, err, "tenant.")
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}

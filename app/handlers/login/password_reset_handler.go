@@ -9,12 +9,12 @@ import (
 	"time"
 
 	"github.com/askasoft/pango-xdemo/app"
+	"github.com/askasoft/pango-xdemo/app/args"
 	"github.com/askasoft/pango-xdemo/app/handlers"
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango-xdemo/app/utils/cptutil"
 	"github.com/askasoft/pango-xdemo/app/utils/smtputil"
-	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
 	"github.com/askasoft/pango/ini"
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/sqx/sqlx"
@@ -52,7 +52,7 @@ func PasswordResetSend(c *xin.Context) {
 	email := str.Strip(c.PostForm("email"))
 
 	if email == "" || !vad.IsEmail(email) {
-		c.AddError(&vadutil.ParamError{Param: "email", Message: tbs.GetText(c.Locale, "pwdrst.error.email")})
+		c.AddError(&args.ParamError{Param: "email", Message: tbs.GetText(c.Locale, "pwdrst.error.email")})
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}
@@ -170,13 +170,13 @@ func PasswordResetExecute(c *xin.Context) {
 
 	pra := &PwdRstArg{}
 	if err := c.Bind(pra); err != nil {
-		vadutil.AddBindErrors(c, err, "pwdrst.")
+		args.AddBindErrors(c, err, "pwdrst.")
 	}
 
 	if pra.Newpwd != "" {
 		if vs := tt.ValidatePassword(c.Locale, pra.Newpwd); len(vs) > 0 {
 			for _, v := range vs {
-				c.AddError(&vadutil.ParamError{
+				c.AddError(&args.ParamError{
 					Param:   "newpwd",
 					Message: v,
 				})

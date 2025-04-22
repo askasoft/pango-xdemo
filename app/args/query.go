@@ -1,4 +1,4 @@
-package argutil
+package args
 
 import (
 	"time"

@@ -4,8 +4,8 @@ import (
 	"time"
 
 	"github.com/askasoft/pango-xdemo/app"
+	"github.com/askasoft/pango-xdemo/app/args"
 	"github.com/askasoft/pango-xdemo/app/tenant"
-	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
 	"github.com/askasoft/pango/xin"
 )
 
@@ -38,7 +38,7 @@ func H(c *xin.Context) xin.H {
 func E(c *xin.Context) xin.H {
 	errs := []any{}
 	for _, e := range c.Errors {
-		if pe, ok := e.(*vadutil.ParamError); ok { //nolint: errorlint
+		if pe, ok := e.(*args.ParamError); ok { //nolint: errorlint
 			errs = append(errs, pe)
 		} else {
 			errs = append(errs, e.Error())

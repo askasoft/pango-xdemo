@@ -5,12 +5,10 @@ import (
 	"net/http"
 
 	"github.com/askasoft/pango-xdemo/app"
+	"github.com/askasoft/pango-xdemo/app/args"
 	"github.com/askasoft/pango-xdemo/app/handlers"
 	"github.com/askasoft/pango-xdemo/app/models"
-	"github.com/askasoft/pango-xdemo/app/schema"
 	"github.com/askasoft/pango-xdemo/app/tenant"
-	"github.com/askasoft/pango-xdemo/app/utils/argutil"
-	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/tbs"
@@ -18,28 +16,17 @@ import (
 )
 
 func PetUpdates(c *xin.Context) {
-	pua := &schema.PetUpdatesArg{}
-	err := c.Bind(pua)
-	if err != nil {
-		vadutil.AddBindErrors(c, err, "pet.")
-	}
-	if pua.IsEmpty() {
-		c.AddError(tbs.Error(c.Locale, "error.request.invalid"))
+	pua := &args.PetUpdatesArg{}
+	if err := pua.Bind(c); err != nil {
+		args.AddBindErrors(c, err, "pet.")
 	}
 	if pua.BornAt != nil && pua.BornAt.IsZero() {
-		c.AddError(&vadutil.ParamError{
+		c.AddError(&args.ParamError{
 			Param:   "born_at",
 			Message: tbs.Format(c.Locale, "error.param.required", tbs.GetText(c.Locale, "pet.born_at")),
 		})
 	}
-
 	if len(c.Errors) > 0 {
-		c.JSON(http.StatusBadRequest, handlers.E(c))
-		return
-	}
-
-	if !pua.HasValidID() {
-		c.AddError(vadutil.ErrInvalidID(c))
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}
@@ -47,7 +34,7 @@ func PetUpdates(c *xin.Context) {
 	tt := tenant.FromCtx(c)
 
 	var cnt int64
-	err = app.SDB.Transaction(func(tx *sqlx.Tx) error {
+	err := app.SDB.Transaction(func(tx *sqlx.Tx) (err error) {
 		cnt, err = tt.UpdatePets(tx, pua)
 		if err != nil {
 			return err
@@ -71,9 +58,9 @@ func PetUpdates(c *xin.Context) {
 }
 
 func PetDeletes(c *xin.Context) {
-	ida := &argutil.IDArg{}
+	ida := &args.IDArg{}
 	if err := ida.Bind(c); err != nil {
-		c.AddError(vadutil.ErrInvalidID(c))
+		c.AddError(args.ErrInvalidID(c))
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}
@@ -122,7 +109,7 @@ func PetDeletes(c *xin.Context) {
 func PetDeleteBatch(c *xin.Context) {
 	pqa, err := bindPetQueryArg(c)
 	if err != nil {
-		vadutil.AddBindErrors(c, err, "pet.")
+		args.AddBindErrors(c, err, "pet.")
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}

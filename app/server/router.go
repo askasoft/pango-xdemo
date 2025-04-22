@@ -18,7 +18,6 @@ import (
 	"github.com/askasoft/pango-xdemo/app/handlers/user"
 	"github.com/askasoft/pango-xdemo/app/middles"
 	"github.com/askasoft/pango-xdemo/app/tenant"
-	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
 	"github.com/askasoft/pango-xdemo/web"
 	"github.com/askasoft/pango/ini"
 	"github.com/askasoft/pango/log"
@@ -39,10 +38,10 @@ func initRouter() {
 
 	app.XIN = xin.New()
 	app.VAD = app.XIN.Validator.Engine().(*vad.Validate)
-	app.VAD.RegisterValidation("ini", vadutil.ValidateINI)
-	app.VAD.RegisterValidation("cidrs", vadutil.ValidateCIDRs)
-	app.VAD.RegisterValidation("regexps", vadutil.ValidateRegexps)
-	app.VAD.RegisterValidation("samlmeta", vadutil.ValidateSAMLMeta)
+	app.VAD.RegisterValidation("ini", app.ValidateINI)
+	app.VAD.RegisterValidation("cidrs", app.ValidateCIDRs)
+	app.VAD.RegisterValidation("regexps", app.ValidateRegexps)
+	app.VAD.RegisterValidation("samlmeta", app.ValidateSAMLMeta)
 
 	app.XAL = xmw.NewAccessLogger(nil)
 	app.XSL = xmw.NewRequestSizeLimiter(0)

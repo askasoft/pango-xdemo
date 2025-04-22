@@ -6,13 +6,13 @@ import (
 	"time"
 
 	"github.com/askasoft/pango-xdemo/app"
+	"github.com/askasoft/pango-xdemo/app/args"
 	"github.com/askasoft/pango-xdemo/app/handlers"
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango-xdemo/app/utils/pgutil"
 	"github.com/askasoft/pango-xdemo/app/utils/pwdutil"
 	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
-	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/ran"
 	"github.com/askasoft/pango/sqx/sqlx"
@@ -44,7 +44,7 @@ func UserEdit(c *xin.Context) {
 func userDetail(c *xin.Context, action string) {
 	uid := num.Atol(c.Query("id"))
 	if uid == 0 {
-		c.AddError(vadutil.ErrInvalidID(c))
+		c.AddError(args.ErrInvalidID(c))
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}
@@ -76,7 +76,7 @@ func userValidateRole(c *xin.Context, role string) {
 		au := tenant.AuthUser(c)
 		urm := tbsutil.GetUserRoleMap(c.Locale, au.Role)
 		if !urm.Contains(role) {
-			c.AddError(vadutil.ErrInvalidField(c, "user.", "role"))
+			c.AddError(args.ErrInvalidField(c, "user.", "role"))
 		}
 	}
 }
@@ -85,7 +85,7 @@ func userValidateStatus(c *xin.Context, status string) {
 	if status != "" {
 		sm := tbsutil.GetUserStatusMap(c.Locale)
 		if !sm.Contains(status) {
-			c.AddError(vadutil.ErrInvalidField(c, "user.", "status"))
+			c.AddError(args.ErrInvalidField(c, "user.", "status"))
 		}
 	}
 }
@@ -96,7 +96,7 @@ func userValidatePassword(c *xin.Context, password string) {
 
 		if vs := tt.ValidatePassword(c.Locale, password); len(vs) > 0 {
 			for _, v := range vs {
-				c.AddError(&vadutil.ParamError{
+				c.AddError(&args.ParamError{
 					Param:   "password",
 					Message: v,
 				})
@@ -108,7 +108,7 @@ func userValidatePassword(c *xin.Context, password string) {
 func userBind(c *xin.Context) *models.User {
 	user := &models.User{}
 	if err := c.Bind(user); err != nil {
-		vadutil.AddBindErrors(c, err, "user.")
+		args.AddBindErrors(c, err, "user.")
 	}
 
 	userValidateRole(c, user.Role)
@@ -147,7 +147,7 @@ func UserCreate(c *xin.Context) {
 	})
 	if err != nil {
 		if pgutil.IsUniqueViolationError(err) {
-			err = &vadutil.ParamError{
+			err = &args.ParamError{
 				Param:   "email",
 				Message: tbs.Format(c.Locale, "user.error.duplicated", tbs.GetText(c.Locale, "user.email", "email"), user.Email),
 			}
@@ -166,7 +166,7 @@ func UserCreate(c *xin.Context) {
 func UserUpdate(c *xin.Context) {
 	user := userBind(c)
 	if user.ID == 0 {
-		c.AddError(vadutil.ErrInvalidID(c))
+		c.AddError(args.ErrInvalidID(c))
 	}
 	if len(c.Errors) > 0 {
 		c.JSON(http.StatusBadRequest, handlers.E(c))

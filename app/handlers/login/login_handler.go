@@ -8,13 +8,13 @@ import (
 	"time"
 
 	"github.com/askasoft/pango-xdemo/app"
+	"github.com/askasoft/pango-xdemo/app/args"
 	"github.com/askasoft/pango-xdemo/app/handlers"
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango-xdemo/app/utils/cptutil"
 	"github.com/askasoft/pango-xdemo/app/utils/otputil"
 	"github.com/askasoft/pango-xdemo/app/utils/smtputil"
-	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
 	"github.com/askasoft/pango/ini"
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/ran"
@@ -54,7 +54,7 @@ func loginFindUser(c *xin.Context) (up *UserPass, au *models.User, ok bool) {
 	up = &UserPass{}
 	err := c.Bind(up)
 	if err != nil {
-		vadutil.AddBindErrors(c, err, "login.")
+		args.AddBindErrors(c, err, "login.")
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}

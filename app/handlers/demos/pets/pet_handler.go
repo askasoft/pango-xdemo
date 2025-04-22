@@ -4,11 +4,10 @@ import (
 	"net/http"
 
 	"github.com/askasoft/pango-xdemo/app"
+	"github.com/askasoft/pango-xdemo/app/args"
 	"github.com/askasoft/pango-xdemo/app/handlers"
-	"github.com/askasoft/pango-xdemo/app/schema"
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
-	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
 	"github.com/askasoft/pango/xin"
 )
 
@@ -27,8 +26,8 @@ var petListColumns = []string{
 	"updated_at",
 }
 
-func bindPetQueryArg(c *xin.Context) (pqa *schema.PetQueryArg, err error) {
-	pqa = &schema.PetQueryArg{}
+func bindPetQueryArg(c *xin.Context) (pqa *args.PetQueryArg, err error) {
+	pqa = &args.PetQueryArg{}
 	pqa.Col, pqa.Dir = "id", "desc"
 
 	err = c.Bind(pqa)
@@ -58,7 +57,7 @@ func PetIndex(c *xin.Context) {
 func PetList(c *xin.Context) {
 	pqa, err := bindPetQueryArg(c)
 	if err != nil {
-		vadutil.AddBindErrors(c, err, "pet.")
+		args.AddBindErrors(c, err, "pet.")
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}

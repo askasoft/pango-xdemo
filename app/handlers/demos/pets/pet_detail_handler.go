@@ -6,11 +6,11 @@ import (
 	"time"
 
 	"github.com/askasoft/pango-xdemo/app"
+	"github.com/askasoft/pango-xdemo/app/args"
 	"github.com/askasoft/pango-xdemo/app/handlers"
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
-	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/tbs"
@@ -47,7 +47,7 @@ func PetEdit(c *xin.Context) {
 func petDetail(c *xin.Context, action string) {
 	pid := num.Atol(c.Query("id"))
 	if pid == 0 {
-		c.AddError(vadutil.ErrInvalidID(c))
+		c.AddError(args.ErrInvalidID(c))
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}
@@ -76,27 +76,27 @@ func petDetail(c *xin.Context, action string) {
 func petBind(c *xin.Context) *PetWithFile {
 	pet := &PetWithFile{}
 	if err := c.Bind(pet); err != nil {
-		vadutil.AddBindErrors(c, err, "pet.")
+		args.AddBindErrors(c, err, "pet.")
 	}
 
 	if pet.Gender != "" {
 		pgm := tbsutil.GetPetGenderMap(c.Locale)
 		if !pgm.Contains(pet.Gender) {
-			c.AddError(vadutil.ErrInvalidField(c, "pet.", "gender"))
+			c.AddError(args.ErrInvalidField(c, "pet.", "gender"))
 		}
 	}
 
 	if pet.Origin != "" {
 		pom := tbsutil.GetPetOriginMap(c.Locale)
 		if !pom.Contains(pet.Origin) {
-			c.AddError(vadutil.ErrInvalidField(c, "pet.", "origin"))
+			c.AddError(args.ErrInvalidField(c, "pet.", "origin"))
 		}
 	}
 
 	if pet.Temper != "" {
 		ptm := tbsutil.GetPetTemperMap(c.Locale)
 		if !ptm.Contains(pet.Temper) {
-			c.AddError(vadutil.ErrInvalidField(c, "pet.", "temper"))
+			c.AddError(args.ErrInvalidField(c, "pet.", "temper"))
 		}
 	}
 
@@ -104,7 +104,7 @@ func petBind(c *xin.Context) *PetWithFile {
 		phm := tbsutil.GetPetHabitsMap(c.Locale)
 		for _, h := range pet.Habits {
 			if !phm.Contains(h) {
-				c.AddError(vadutil.ErrInvalidField(c, "pet.", "habits"))
+				c.AddError(args.ErrInvalidField(c, "pet.", "habits"))
 				break
 			}
 		}
@@ -158,7 +158,7 @@ func PetCreate(c *xin.Context) {
 func PetUpdate(c *xin.Context) {
 	pet := petBind(c)
 	if pet.ID == 0 {
-		c.AddError(vadutil.ErrInvalidID(c))
+		c.AddError(args.ErrInvalidID(c))
 	}
 	if len(c.Errors) > 0 {
 		c.JSON(http.StatusBadRequest, handlers.E(c))

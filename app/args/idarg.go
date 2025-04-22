@@ -1,4 +1,4 @@
-package argutil
+package args
 
 import (
 	"errors"
@@ -9,7 +9,7 @@ import (
 	"github.com/askasoft/pango/xin"
 )
 
-var ErrInvalidID = errors.New("invalid id")
+var errInvalidID = errors.New("invalid id")
 
 type IDArg struct {
 	ID string `json:"id,omitempty" form:"id,strip"`
@@ -29,20 +29,23 @@ func (ida *IDArg) IDs() []int64 {
 	return ida.ids
 }
 
-func (ida *IDArg) HasValidID() bool {
+func (ida *IDArg) hasValidID() bool {
 	return len(ida.ids) > 0 || ida.all
+}
+
+func (ida *IDArg) ParseID() error {
+	ida.ids, ida.all = splitIDs(ida.ID)
+	if !ida.hasValidID() {
+		return errInvalidID
+	}
+	return nil
 }
 
 func (ida *IDArg) Bind(c *xin.Context) error {
 	if err := c.Bind(ida); err != nil {
 		return err
 	}
-
-	ida.ids, ida.all = splitIDs(ida.ID)
-	if !ida.HasValidID() {
-		return ErrInvalidID
-	}
-	return nil
+	return ida.ParseID()
 }
 
 func splitIDs(id string) ([]int64, bool) {
