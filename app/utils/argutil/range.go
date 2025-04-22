@@ -32,8 +32,12 @@ type DateRangeArg struct {
 }
 
 func (dra *DateRangeArg) Normalize() {
-	dra.DateFrom = tmu.TruncateHours(dra.DateFrom)
-	dra.DateTo = tmu.TruncateHours(dra.DateTo).Add(time.Hour*24 - time.Microsecond)
+	if !dra.DateFrom.IsZero() {
+		dra.DateFrom = tmu.TruncateHours(dra.DateFrom)
+	}
+	if !dra.DateTo.IsZero() {
+		dra.DateTo = tmu.TruncateHours(dra.DateTo).Add(time.Hour*24 - time.Microsecond)
+	}
 }
 
 func (dra *DateRangeArg) AddDateRangeFilter(sqb *sqlx.Builder, col string) {

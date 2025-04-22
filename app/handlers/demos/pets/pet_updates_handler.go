@@ -11,7 +11,6 @@ import (
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango-xdemo/app/utils/argutil"
 	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
-	"github.com/askasoft/pango/asg"
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/tbs"
@@ -72,8 +71,8 @@ func PetUpdates(c *xin.Context) {
 }
 
 func PetDeletes(c *xin.Context) {
-	ids, ida := argutil.SplitIDs(c.PostForm("id"))
-	if len(ids) == 0 && !ida {
+	ida := &argutil.IDArg{}
+	if err := ida.Bind(c); err != nil {
 		c.AddError(vadutil.ErrInvalidID(c))
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
@@ -84,8 +83,8 @@ func PetDeletes(c *xin.Context) {
 	var cnt int64
 	err := app.SDB.Transaction(func(tx *sqlx.Tx) (err error) {
 		sfs := tt.SFS(tx)
-		if len(ids) > 0 {
-			for _, id := range ids {
+		if len(ida.IDs()) > 0 {
+			for _, id := range ida.IDs() {
 				if _, err = sfs.DeletePrefix(fmt.Sprintf("/%s/%d/", models.PrefixPetFile, id)); err != nil {
 					return
 				}
@@ -96,13 +95,13 @@ func PetDeletes(c *xin.Context) {
 			}
 		}
 
-		cnt, err = tt.DeletePets(tx, ids...)
+		cnt, err = tt.DeletePets(tx, ida.IDs()...)
 		if err != nil {
 			return
 		}
 
 		if cnt > 0 {
-			if err = tt.AddAuditLog(tx, c, models.AL_PETS_DELETES, num.Ltoa(cnt), asg.Join(ids, ", ")); err != nil {
+			if err = tt.AddAuditLog(tx, c, models.AL_PETS_DELETES, num.Ltoa(cnt), ida.String()); err != nil {
 				return
 			}
 			return tt.ResetPetsSequence(tx)

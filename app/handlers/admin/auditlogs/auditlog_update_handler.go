@@ -14,8 +14,8 @@ import (
 )
 
 func AuditLogDeletes(c *xin.Context) {
-	ids, ida := argutil.SplitIDs(c.PostForm("id"))
-	if len(ids) == 0 && !ida {
+	ida := &argutil.IDArg{}
+	if err := ida.Bind(c); err != nil {
 		c.AddError(vadutil.ErrInvalidID(c))
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
@@ -25,7 +25,7 @@ func AuditLogDeletes(c *xin.Context) {
 
 	var cnt int64
 	err := app.SDB.Transaction(func(tx *sqlx.Tx) (err error) {
-		cnt, err = tt.DeleteAuditLogs(tx, ids...)
+		cnt, err = tt.DeleteAuditLogs(tx, ida.IDs()...)
 		if err != nil {
 			return
 		}

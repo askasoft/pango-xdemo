@@ -10,7 +10,6 @@ import (
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango-xdemo/app/utils/argutil"
 	"github.com/askasoft/pango-xdemo/app/utils/vadutil"
-	"github.com/askasoft/pango/asg"
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/tbs"
@@ -68,8 +67,8 @@ func UserUpdates(c *xin.Context) {
 }
 
 func UserDeletes(c *xin.Context) {
-	ids, ida := argutil.SplitIDs(c.PostForm("id"))
-	if len(ids) == 0 && !ida {
+	ida := &argutil.IDArg{}
+	if err := ida.Bind(c); err != nil {
 		c.AddError(vadutil.ErrInvalidID(c))
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
@@ -80,13 +79,13 @@ func UserDeletes(c *xin.Context) {
 
 	var cnt int64
 	err := app.SDB.Transaction(func(tx *sqlx.Tx) (err error) {
-		cnt, err = tt.DeleteUsers(tx, au, ids...)
+		cnt, err = tt.DeleteUsers(tx, au, ida.IDs()...)
 		if err != nil {
 			return
 		}
 
 		if cnt > 0 {
-			if err = tt.AddAuditLog(tx, c, models.AL_USERS_DELETES, num.Ltoa(cnt), asg.Join(ids, ", ")); err != nil {
+			if err = tt.AddAuditLog(tx, c, models.AL_USERS_DELETES, num.Ltoa(cnt), ida.String()); err != nil {
 				return
 			}
 			return tt.ResetUsersSequence(tx)

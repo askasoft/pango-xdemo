@@ -1,25 +1,51 @@
 package argutil
 
 import (
+	"errors"
+
+	"github.com/askasoft/pango/asg"
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/str"
+	"github.com/askasoft/pango/xin"
 )
+
+var ErrInvalidID = errors.New("invalid id")
 
 type IDArg struct {
 	ID string `json:"id,omitempty" form:"id,strip"`
+
+	ids []int64
+	all bool
+}
+
+func (ida *IDArg) String() string {
+	if ida.all {
+		return "*"
+	}
+	return asg.Join(ida.ids, ", ")
 }
 
 func (ida *IDArg) IDs() []int64 {
-	ids, _ := SplitIDs(ida.ID)
-	return ids
+	return ida.ids
 }
 
 func (ida *IDArg) HasValidID() bool {
-	ids, all := SplitIDs(ida.ID)
-	return len(ids) > 0 || all
+	return len(ida.ids) > 0 || ida.all
 }
 
-func SplitIDs(id string) ([]int64, bool) {
+func (ida *IDArg) Bind(c *xin.Context) error {
+	if err := c.Bind(ida); err != nil {
+		return err
+	}
+
+	ida.ids, ida.all = splitIDs(ida.ID)
+	if !ida.HasValidID() {
+		return ErrInvalidID
+	}
+	return nil
+}
+
+func splitIDs(id string) ([]int64, bool) {
 	if id == "" {
 		return nil, false
 	}
