@@ -10,7 +10,6 @@ import (
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/tenant"
-	"github.com/askasoft/pango-xdemo/app/utils/errutil"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/xfs"
 	"github.com/askasoft/pango/xin"
@@ -294,7 +293,7 @@ func (jr *JobRunner[T]) Done(err error) {
 		}
 	}
 
-	if errutil.IsClientError(err) {
+	if app.IsClientError(err) {
 		jr.Logger.Warn(err)
 	} else {
 		jr.Logger.Error(err)

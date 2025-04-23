@@ -17,7 +17,7 @@ const (
 	TimeFormat = "2006-01-02 15:04:05"
 )
 
-func FormatDate(a any) string {
+func formatTime(a any, f string) string {
 	switch t := a.(type) {
 	case time.Time:
 		if !t.IsZero() {
@@ -31,18 +31,12 @@ func FormatDate(a any) string {
 	return ""
 }
 
+func FormatDate(a any) string {
+	return formatTime(a, DateFormat)
+}
+
 func FormatTime(a any) string {
-	switch t := a.(type) {
-	case time.Time:
-		if !t.IsZero() {
-			return t.Local().Format(TimeFormat)
-		}
-	case *time.Time:
-		if t != nil && !t.IsZero() {
-			return t.Local().Format(TimeFormat)
-		}
-	}
-	return ""
+	return formatTime(a, TimeFormat)
 }
 
 func MakeFileID(prefix, name string) string {

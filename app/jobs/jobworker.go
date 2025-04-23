@@ -6,8 +6,8 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/tenant"
-	"github.com/askasoft/pango-xdemo/app/utils/errutil"
 	"github.com/askasoft/pango/gwp"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/ref"
@@ -197,5 +197,5 @@ func StreamOrSubmitRun[T any, R any](ssr iStreamSubmitRun[T, R]) (err error) {
 		}
 	}
 
-	return errutil.ContextCause(ctx, err)
+	return app.ContextCause(ctx, err)
 }

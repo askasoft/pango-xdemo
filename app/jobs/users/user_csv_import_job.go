@@ -13,7 +13,6 @@ import (
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango-xdemo/app/utils/csvutil"
-	"github.com/askasoft/pango-xdemo/app/utils/errutil"
 	"github.com/askasoft/pango-xdemo/app/utils/pgutil"
 	"github.com/askasoft/pango-xdemo/app/utils/pwdutil"
 	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
@@ -87,7 +86,7 @@ func (ucij *UserCsvImportJob) Run() {
 
 	total, err := ucij.doCheckCsv()
 	if err != nil {
-		err = errutil.NewClientError(err)
+		err = app.NewClientError(err)
 		ucij.Done(err)
 		return
 	}
@@ -102,7 +101,7 @@ func (ucij *UserCsvImportJob) Run() {
 
 	err = ucij.doReadCsv(ctx, ucij.importRecord)
 
-	err = errutil.ContextCause(ctx, err)
+	err = app.ContextCause(ctx, err)
 
 	ucij.Done(err)
 }

@@ -107,21 +107,19 @@ func AddTimes(sqb *sqlx.Builder, col string, tmin, tmax time.Time) {
 }
 
 func AddInts(sqb *sqlx.Builder, col string, smin, smax string) {
-	if smin != "" && smax != "" {
-		sqb.Btw(col, num.Atoi(smin), num.Atoi(smax))
-	} else if smin != "" {
+	if smin != "" {
 		sqb.Gte(col, num.Atoi(smin))
-	} else if smax != "" {
+	}
+	if smax != "" {
 		sqb.Lte(col, num.Atoi(smax))
 	}
 }
 
 func AddFloats(sqb *sqlx.Builder, col string, smin, smax string) {
-	if smin != "" && smax != "" {
-		sqb.Btw(col, num.Atof(smin), num.Atof(smax))
-	} else if smin != "" {
+	if smin != "" {
 		sqb.Gte(col, num.Atof(smin))
-	} else if smax != "" {
+	}
+	if smax != "" {
 		sqb.Lte(col, num.Atof(smax))
 	}
 }
