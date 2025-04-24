@@ -4,3 +4,12 @@
 #sql_results > li {
 	margin-bottom: 40px;
 }
+
+#sql_results .result th.no, #sql_results .result td.no {
+	width: 1%;
+}
+#sql_results .result th.col, #sql_results .result td.col {
+	max-width: 600px;
+	white-space: pre-wrap;
+	word-break: break-all;
+}

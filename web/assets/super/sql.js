@@ -28,9 +28,9 @@
 
 					if (d.columns) {
 						var $th = $sr.find('thead'), $tr = $('<tr>');
-						$tr.append($('<td>').text('##'));
+						$tr.append($('<th class="no">').text('##'));
 						$.each(d.columns, function(i, c) {
-							$tr.append($('<th>').text(c));
+							$tr.append($('<th class="col">').text(c));
 						});
 						$th.append($tr);
 					}
@@ -38,9 +38,9 @@
 						var $tb = $sr.find('tbody');
 						$.each(d.datas, function(i, r) {
 							var $tr = $('<tr>');
-							$tr.append($('<td>').text('#' + (i+1)));
+							$tr.append($('<td class="no">').text('#' + (i+1)));
 							$.each(r, function(i, c) {
-								$tr.append($('<td>').text(c));
+								$tr.append($('<td class="col">').text(c));
 							});
 							$tb.append($tr);
 						});
