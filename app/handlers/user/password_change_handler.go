@@ -71,7 +71,7 @@ func PasswordChangeChange(c *xin.Context) {
 
 	var cnt int64
 	err := app.SDB.Transaction(func(tx *sqlx.Tx) (err error) {
-		cnt, err = tt.UpdateUserPassword(app.SDB, au.ID, nu.Password)
+		cnt, err = tt.UpdateUserPassword(tx, au.ID, nu.Password)
 		if err != nil {
 			return
 		}
