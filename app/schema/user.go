@@ -216,9 +216,7 @@ func (sm Schema) UpdateUsers(tx sqlx.Sqlx, au *models.User, uua *args.UserUpdate
 	if uua.CIDR != nil {
 		sqb.Setc("cidr", *uua.CIDR)
 	}
-
-	uua.UpdatedAt = time.Now()
-	sqb.Setc("updated_at", uua.UpdatedAt)
+	sqb.Setc("updated_at", time.Now())
 
 	sqb.Neq("id", au.ID)
 	sqb.Gte("role", au.Role)

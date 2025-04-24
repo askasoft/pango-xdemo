@@ -10,13 +10,21 @@ import (
 
 var errInvalidUpdates = errors.New("invalid updates")
 
+type UpdatedAtArg struct {
+	UpdatedAt *time.Time `json:"updated_at,omitempty" form:"-"`
+}
+
+func (uaa *UpdatedAtArg) SetUpdatedAt(t time.Time) {
+	uaa.UpdatedAt = &t
+}
+
 type UserUpdatesArg struct {
 	IDArg
+	UpdatedAtArg
 
-	Role      string    `json:"role,omitempty" form:"role,strip"`
-	Status    string    `json:"status,omitempty" form:"status,strip"`
-	CIDR      *string   `json:"cidr,omitempty" form:"cidr,strip" validate:"omitempty,cidrs"`
-	UpdatedAt time.Time `json:"updated_at" form:"-"`
+	Role   string  `json:"role,omitempty" form:"role,strip"`
+	Status string  `json:"status,omitempty" form:"status,strip"`
+	CIDR   *string `json:"cidr,omitempty" form:"cidr,strip" validate:"omitempty,cidrs"`
 }
 
 func (uua *UserUpdatesArg) Bind(c *xin.Context) error {
@@ -42,13 +50,13 @@ func (uua *UserUpdatesArg) isEmpty() bool {
 
 type PetUpdatesArg struct {
 	IDArg
+	UpdatedAtArg
 
-	Gender    string     `json:"gender,omitempty" form:"gender,strip"`
-	BornAt    *time.Time `json:"born_at,omitempty" form:"born_at"`
-	Origin    string     `json:"origin,omitempty" form:"origin,strip"`
-	Temper    string     `json:"temper,omitempty" form:"temper,strip"`
-	Habits    *[]string  `json:"habits,omitempty" form:"habits,strip"`
-	UpdatedAt time.Time  `json:"updated_at" form:"-"`
+	Gender string     `json:"gender,omitempty" form:"gender,strip"`
+	BornAt *time.Time `json:"born_at,omitempty" form:"born_at"`
+	Origin string     `json:"origin,omitempty" form:"origin,strip"`
+	Temper string     `json:"temper,omitempty" form:"temper,strip"`
+	Habits *[]string  `json:"habits,omitempty" form:"habits,strip"`
 }
 
 func (pua *PetUpdatesArg) Bind(c *xin.Context) error {

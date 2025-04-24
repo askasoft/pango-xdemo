@@ -147,9 +147,7 @@ func (sm Schema) UpdatePets(tx sqlx.Sqlx, pua *args.PetUpdatesArg) (int64, error
 	if pua.Habits != nil {
 		sqb.Setc("habits", pqx.StringArray(str.Strips(*pua.Habits)))
 	}
-
-	pua.UpdatedAt = time.Now()
-	sqb.Setc("updated_at", pua.UpdatedAt)
+	sqb.Setc("updated_at", time.Now())
 
 	sqlxutil.AddIn(sqb, "id", pua.IDs())
 

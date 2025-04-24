@@ -3,6 +3,7 @@ package pets
 import (
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/args"
@@ -39,7 +40,6 @@ func PetUpdates(c *xin.Context) {
 		if err != nil {
 			return err
 		}
-
 		if cnt > 0 {
 			return tt.AddAuditLog(tx, c, models.AL_PETS_UPDATES, num.Ltoa(cnt), pua.String())
 		}
@@ -50,6 +50,8 @@ func PetUpdates(c *xin.Context) {
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return
 	}
+
+	pua.SetUpdatedAt(time.Now())
 
 	c.JSON(http.StatusOK, xin.H{
 		"success": tbs.Format(c.Locale, "pet.success.updates", cnt),

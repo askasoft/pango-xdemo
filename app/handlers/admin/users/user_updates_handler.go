@@ -2,6 +2,7 @@ package users
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/args"
@@ -36,7 +37,6 @@ func UserUpdates(c *xin.Context) {
 		if err != nil {
 			return err
 		}
-
 		if cnt > 0 {
 			return tt.AddAuditLog(tx, c, models.AL_USERS_UPDATES, num.Ltoa(cnt), uua.String())
 		}
@@ -47,6 +47,8 @@ func UserUpdates(c *xin.Context) {
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return
 	}
+
+	uua.SetUpdatedAt(time.Now())
 
 	c.JSON(http.StatusOK, xin.H{
 		"success": tbs.Format(c.Locale, "user.success.updates", cnt),
