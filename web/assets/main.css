@@ -625,6 +625,9 @@ form div.verr {
 	line-height: 1em;
 	padding: 10px 0 0 0;
 }
+.s-menu-item i {
+	font-size: 4em;
+}
 [data-bs-theme=dark] .s-menu-item {
 	background-color: #292c2f;
 }
