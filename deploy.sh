@@ -1,4 +1,4 @@
-#!/bin/bash -ex
+#!/bin/bash -e
 
 APPNAME=xdemo
 APPHOME=/app/${APPNAME}

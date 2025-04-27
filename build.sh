@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 
 export GO111MODULE=on
 

@@ -169,7 +169,7 @@ func validateConfig(c *xin.Context, cfg *models.Config, v *string) bool {
 		validation = "required"
 	}
 	if cfg.Validation != "" {
-		validation += str.If(validation == "", "omitempty,", ",") + cfg.Validation
+		validation += str.If(cfg.Required, ",", "omitempty,") + cfg.Validation
 	}
 	if validation != "" {
 		var vv any
@@ -231,13 +231,8 @@ func checkPostConfigs(c *xin.Context, configs []*models.Config) (uconfigs []*mod
 			v, ok = c.GetPostForm(cfg.Name)
 		}
 
-		if !ok || v == cfg.Value {
+		if !ok || v == cfg.Value || v == cfg.DisplayValue() {
 			// skip unknown or unmodified value
-			continue
-		}
-
-		if cfg.Secret && v != "" && str.CountByte(v, '*') == len(v) {
-			// skip unmodified secret value
 			continue
 		}
 

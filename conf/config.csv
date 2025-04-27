@@ -5,5 +5,5 @@ secure_saml_usersync,true,R,11,FALSE,FALSE,A,A,boolean
 secure_saml_userrole,V,R,12,FALSE,FALSE,A,A,
 secure_saml_idpmeta,,T,13,FALSE,FALSE,A,A,samlmeta
 secure_client_cidr,,T,21,FALSE,FALSE,A,A,cidrs
-password_policy_minlen,8,N,1,FALSE,FALSE,A,A,btw=8 ~ 64
+password_policy_minlen,8,N,1,TRUE,FALSE,A,A,btw=8 ~ 64
 password_policy_strength,,VC,2,FALSE,FALSE,A,A,
