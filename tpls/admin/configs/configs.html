@@ -77,6 +77,12 @@
 									<input name="{{$c.Name}}" type="text" size="20" class="form-control" textclear value="{{$c.DisplayValue}}"{{if $ro}} disabled{{end}}/>
 								{{else if eq $c.Style "D"}}
 									<input name="{{$c.Name}}" type="text" size="20" class="form-control" textclear value="{{$c.DisplayValue}}"{{if $ro}} disabled{{end}}/>
+								{{else if eq $c.Style "TD"}}
+									<input name="{{$c.Name}}" type="date" class="form-control" textclear value="{{$c.DisplayValue}}"{{if $ro}} disabled{{end}}/>
+								{{else if eq $c.Style "TT"}}
+									<input name="{{$c.Name}}" type="time" class="form-control" textclear value="{{$c.DisplayValue}}"{{if $ro}} disabled{{end}}/>
+								{{else if eq $c.Style "TM"}}
+									<input name="{{$c.Name}}" type="month" class="form-control" textclear value="{{$c.DisplayValue}}"{{if $ro}} disabled{{end}}/>
 								{{else}}
 									<input name="{{$c.Name}}" type="text" class="form-control" textclear value="{{$c.DisplayValue}}"{{if $ro}} disabled{{end}}/>
 								{{end}}

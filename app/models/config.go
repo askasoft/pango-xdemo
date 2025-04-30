@@ -18,6 +18,9 @@ const (
 	ConfigStyleTextarea       = "T"
 	ConfigStyleNumeric        = "N"
 	ConfigStyleDecimal        = "D"
+	ConfigStyleMonth          = "TM"
+	ConfigStyleDate           = "TD"
+	ConfigStyleTime           = "TT"
 )
 
 type Config struct {

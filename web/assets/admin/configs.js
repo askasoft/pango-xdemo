@@ -95,8 +95,7 @@
 			configs_tab_show(cg);
 		}
 
-		$('.cfgform input[name="secure_login_method"]').change(toggle_login_method);
-		toggle_login_method();
+		$('.cfgform input[name="secure_login_method"]').on('change', toggle_login_method).trigger('change');
 	}
 
 	$(window).on('load', configs_init);
