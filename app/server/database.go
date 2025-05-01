@@ -116,16 +116,31 @@ func dbExecSQL(sqlfile string, schemas ...string) error {
 	return nil
 }
 
+func dbSchemaInit(schemas ...string) error {
+	if len(schemas) == 0 {
+		return schema.Iterate(func(sm schema.Schema) error {
+			return sm.InitSchema()
+		})
+	}
+
+	for _, s := range schemas {
+		if err := schema.Schema(s).InitSchema(); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func dbSchemaCheck(schemas ...string) error {
 	if len(schemas) == 0 {
 		return schema.Iterate(func(sm schema.Schema) error {
-			sm.SchemaCheck(app.SDB)
+			sm.CheckSchema(app.SDB)
 			return nil
 		})
 	}
 
 	for _, s := range schemas {
-		schema.Schema(s).SchemaCheck(app.SDB)
+		schema.Schema(s).CheckSchema(app.SDB)
 	}
 	return nil
 }

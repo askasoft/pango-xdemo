@@ -13,7 +13,7 @@ import (
 	"github.com/askasoft/pango/str"
 )
 
-func (sm Schema) SchemaCheck(tx sqlx.Sqlx) {
+func (sm Schema) CheckSchema(tx sqlx.Sqlx) {
 	logger := log.GetLogger("SQL")
 	logger.Info(str.Repeat("=", 40))
 

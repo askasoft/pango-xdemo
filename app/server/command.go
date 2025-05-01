@@ -33,12 +33,14 @@ func (s *service) Usage() {
 	fmt.Println("Usage: " + s.Name() + ".exe <command> [options]")
 	fmt.Println("  <command>:")
 	srv.PrintDefaultCommand(os.Stdout)
-	fmt.Println("    migrate <kind> [schema]...")
-	fmt.Println("      kind=config       migrate tenant configurations.")
-	fmt.Println("      kind=super        migrate tenant super user.")
+	fmt.Println("    migrate <target> [schema]...")
+	fmt.Println("      target=config     migrate tenant configurations.")
+	fmt.Println("      target=super      migrate tenant super user.")
 	fmt.Println("      [schema]...       specify schemas to migrate.")
-	fmt.Println("    smcheck [schema]...")
-	fmt.Println("      [schema]...       specify schemas to check.")
+	fmt.Println("    schema <command> [schema]...")
+	fmt.Println("      command=init      initialize the schema.")
+	fmt.Println("      command=check     check schema tables.")
+	fmt.Println("      [schema]...       specify schemas to execute.")
 	fmt.Println("    execsql <file> [schema]...")
 	fmt.Println("      <file>            execute sql file.")
 	fmt.Println("      [schema]...       specify schemas to execute sql.")
@@ -64,8 +66,8 @@ func (s *service) Exec(cmd string) {
 	switch cmd {
 	case "migrate":
 		doMigrate()
-	case "smcheck":
-		doSchemaCheck()
+	case "schema":
+		doSchemas()
 	case "execsql":
 		doExecSQL()
 	case "exectask":
@@ -86,7 +88,7 @@ func (s *service) Exec(cmd string) {
 func doMigrate() {
 	sub := flag.Arg(1)
 	if sub == "" {
-		fmt.Fprintln(os.Stderr, "Missing migrate target.")
+		fmt.Fprintln(os.Stderr, "Missing migrate <target>.")
 		app.Exit(app.ExitErrCMD)
 	}
 	args := flag.Args()[2:]
@@ -107,22 +109,39 @@ func doMigrate() {
 			app.Exit(app.ExitErrDB)
 		}
 	default:
-		fmt.Fprintf(os.Stderr, "Invalid migrate target %q", sub)
+		fmt.Fprintf(os.Stderr, "Invalid migrate <target>: %q", sub)
 		app.Exit(app.ExitErrCMD)
 	}
 
 	log.Info("DONE.")
 }
 
-func doSchemaCheck() {
-	args := flag.Args()[1:]
+func doSchemas() {
+	sub := flag.Arg(1)
+	if sub == "" {
+		fmt.Fprintln(os.Stderr, "Missing schema <command>.")
+		app.Exit(app.ExitErrCMD)
+	}
+	args := flag.Args()[2:]
 
-	initConfigs()
-	initDatabase()
-
-	if err := dbSchemaCheck(args...); err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		app.Exit(app.ExitErrDB)
+	switch sub {
+	case "init":
+		initConfigs()
+		initDatabase()
+		if err := dbSchemaInit(args...); err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			app.Exit(app.ExitErrDB)
+		}
+	case "check":
+		initConfigs()
+		initDatabase()
+		if err := dbSchemaCheck(args...); err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			app.Exit(app.ExitErrDB)
+		}
+	default:
+		fmt.Fprintf(os.Stderr, "Invalid schema <command>: %q", sub)
+		app.Exit(app.ExitErrCMD)
 	}
 
 	log.Info("DONE.")
