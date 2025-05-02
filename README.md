@@ -132,7 +132,7 @@ deploy.bat
 ### init database
 ```sh
 cd /app/xdemo
-./xdemo execsql conf/schema.sql
+./xdemo schema init
 ```
 
 ### install as windows service

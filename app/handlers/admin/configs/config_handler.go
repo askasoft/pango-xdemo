@@ -303,7 +303,7 @@ func ConfigExport(c *xin.Context) {
 	}
 }
 
-type ConfigCsvRecord struct {
+type configCsvRecord struct {
 	Name    string
 	Value   string
 	Display string
@@ -326,7 +326,7 @@ func ConfigImport(c *xin.Context) {
 	}
 	defer uf.Close()
 
-	var csvcfgs []*ConfigCsvRecord
+	var csvcfgs []*configCsvRecord
 	if err := csvx.ScanReader(uf, &csvcfgs); err != nil {
 		err = tbs.Error(c.Locale, "csv.error.data")
 		c.AddError(err)
@@ -350,7 +350,7 @@ func ConfigImport(c *xin.Context) {
 	}
 }
 
-func checkCsvConfigs(c *xin.Context, configs []*models.Config, csvcfgs []*ConfigCsvRecord) (uconfigs []*models.Config) {
+func checkCsvConfigs(c *xin.Context, configs []*models.Config, csvcfgs []*configCsvRecord) (uconfigs []*models.Config) {
 	cfgmaps := map[string]*models.Config{}
 	for _, cfg := range configs {
 		cfgmaps[cfg.Name] = cfg

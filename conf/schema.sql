@@ -82,6 +82,7 @@ CREATE TABLE "SCHEMA"."audit_logs" (
 	"date" timestamptz NOT NULL,
 	"uid" bigint NOT NULL,
 	"cip" varchar(40) NOT NULL,
+	"role" varchar(1) NOT NULL,
 	"func" varchar(32) NOT NULL,
 	"action" varchar(32) NOT NULL,
 	"params" text [],

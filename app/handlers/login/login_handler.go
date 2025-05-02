@@ -101,7 +101,7 @@ func loginFailed(c *xin.Context, reason string) {
 
 func loginPassed(c *xin.Context, au *models.User) {
 	tt := tenant.FromCtx(c)
-	if err := tt.Schema.AddAuditLog(app.SDB, au.ID, c.ClientIP(), models.AL_LOGIN_LOGIN, au.Email); err != nil {
+	if err := tt.Schema.AddAuditLog(app.SDB, au.ID, c.ClientIP(), au.Role, models.AL_LOGIN_LOGIN, au.Email); err != nil {
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
 	}

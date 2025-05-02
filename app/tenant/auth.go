@@ -133,7 +133,11 @@ func CheckClientIP(c *xin.Context, u *models.User) bool {
 
 func FindAuthUser(c *xin.Context, username string) (xmw.AuthUser, error) {
 	tt := FromCtx(c)
-	return tt.FindAuthUser(username)
+	au, err := tt.FindAuthUser(username)
+	if au == nil || err != nil {
+		return nil, err // prevent nil interface
+	}
+	return au, nil
 }
 
 func CheckClientAndFindAuthUser(c *xin.Context, username string) (xmw.AuthUser, error) {

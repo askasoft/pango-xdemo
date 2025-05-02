@@ -13,12 +13,13 @@ func (sm Schema) ResetAuditLogsSequence(tx sqlx.Sqlx) error {
 	return ResetSequence(tx, sm.TableAuditLogs())
 }
 
-func (sm Schema) CountAuditLogs(tx sqlx.Sqlx, alqa *args.AuditLogQueryArg, locale string) (cnt int, err error) {
+func (sm Schema) CountAuditLogs(tx sqlx.Sqlx, alqa *args.AuditLogQueryArg, role, locale string) (cnt int, err error) {
 	sqb := tx.Builder()
 
 	sqb.Count()
 	sqb.From(sm.TableAuditLogs())
 	sqb.Join("LEFT JOIN " + sm.TableUsers() + " ON users.id = audit_logs.uid")
+	sqb.Gte("audit_logs.role", role)
 	alqa.AddFilters(sqb, locale)
 	sql, args := sqb.Build()
 
@@ -26,12 +27,13 @@ func (sm Schema) CountAuditLogs(tx sqlx.Sqlx, alqa *args.AuditLogQueryArg, local
 	return
 }
 
-func (sm Schema) FindAuditLogs(tx sqlx.Sqlx, alqa *args.AuditLogQueryArg, locale string) (alogs []*models.AuditLogEx, err error) {
+func (sm Schema) FindAuditLogs(tx sqlx.Sqlx, alqa *args.AuditLogQueryArg, role, locale string) (alogs []*models.AuditLogEx, err error) {
 	sqb := tx.Builder()
 
 	sqb.Select("audit_logs.*", "COALESCE(users.email, '') AS user")
 	sqb.From(sm.TableAuditLogs())
 	sqb.Join("LEFT JOIN " + sm.TableUsers() + " ON users.id = audit_logs.uid")
+	sqb.Gte("audit_logs.role", role)
 	alqa.AddFilters(sqb, locale)
 	alqa.AddOrder(sqb, "id")
 	alqa.AddPager(sqb)
@@ -109,11 +111,12 @@ func (sm Schema) DeleteAuditLogsBefore(tx sqlx.Sqlx, before time.Time) (int64, e
 	return r.RowsAffected()
 }
 
-func (sm Schema) AddAuditLog(tx sqlx.Sqlx, uid int64, cip string, funact string, params ...string) error {
+func (sm Schema) AddAuditLog(tx sqlx.Sqlx, uid int64, cip, role, funact string, params ...string) error {
 	al := &models.AuditLog{
 		Date:   time.Now(),
 		UID:    uid,
 		CIP:    cip,
+		Role:   role,
 		Params: params,
 	}
 	al.Func, al.Action, _ = str.Cut(funact, ".")
