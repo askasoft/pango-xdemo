@@ -4,11 +4,13 @@ import (
 	"errors"
 	"net"
 	"sync"
+	"time"
 
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango/ini"
 	"github.com/askasoft/pango/sqx/sqlx"
+	"github.com/askasoft/pango/tmu"
 	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pango/xmw"
 )
@@ -142,7 +144,7 @@ func CheckClientAndFindAuthUser(c *xin.Context, username string) (xmw.AuthUser, 
 }
 
 //----------------------------------------------------
-// AFIP
+// auth
 
 func AuthPassed(c *xin.Context) {
 	cip := c.ClientIP()
@@ -152,6 +154,15 @@ func AuthPassed(c *xin.Context) {
 func AuthFailed(c *xin.Context) {
 	cip := c.ClientIP()
 	app.AFIPS.Increment(cip, 1)
+}
+
+func AuthCookieMaxAge(c *xin.Context) time.Duration {
+	tt := FromCtx(c)
+	ma := tmu.Atod(tt.ConfigValue("secure_session_timeout"))
+	if ma <= 0 {
+		ma = app.XCA.CookieMaxAge
+	}
+	return ma
 }
 
 //----------------------------------------------------

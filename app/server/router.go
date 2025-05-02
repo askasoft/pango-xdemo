@@ -58,6 +58,7 @@ func initRouter() {
 	app.XBA.AuthPassed = tenant.BasicAuthPassed
 	app.XBA.AuthFailed = tenant.BasicAuthFailed
 	app.XCA = xmw.NewCookieAuth(tenant.FindAuthUser, app.Secret())
+	app.XCA.GetCookieMaxAge = tenant.AuthCookieMaxAge
 
 	// only get AuthUser from cookie
 	app.XCN = xmw.NewCookieAuth(tenant.FindAuthUser, app.Secret())
