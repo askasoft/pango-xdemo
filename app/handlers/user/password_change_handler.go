@@ -93,7 +93,7 @@ func PasswordChangeChange(c *xin.Context) {
 	}
 
 	au.Password = nu.Password
-	if err := app.XCA.SaveUserPassToCookie(c, au.Email, pca.Newpwd); err != nil {
+	if err := app.XCA.SaveUserPassToCookie(c, au); err != nil {
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return

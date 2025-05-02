@@ -157,9 +157,9 @@ func AuthFailed(c *xin.Context) {
 //----------------------------------------------------
 // middleware
 
-func BasicAuthPassed(c *xin.Context) {
+func BasicAuthPassed(c *xin.Context, au xmw.AuthUser) {
 	AuthPassed(c)
-	app.XBA.Authorized(c)
+	app.XBA.Authorized(c, au)
 }
 
 func BasicAuthFailed(c *xin.Context) {

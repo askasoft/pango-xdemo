@@ -106,7 +106,7 @@ func loginPassed(c *xin.Context, au *models.User) {
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
 	}
 
-	if err := app.XCA.SaveUserPassToCookie(c, au.Email, au.GetPassword()); err != nil {
+	if err := app.XCA.SaveUserPassToCookie(c, au); err != nil {
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return
