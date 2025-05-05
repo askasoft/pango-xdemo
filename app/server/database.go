@@ -59,39 +59,34 @@ func openDatabase() error {
 	return nil
 }
 
-func dbMigrateConfigs(schemas ...string) error {
-	configs, err := schema.ReadConfigFile()
-	if err != nil {
-		return err
-	}
-
+func dbIterateSchemas(fn func(sm schema.Schema) error, schemas ...string) error {
 	if len(schemas) == 0 {
-		return schema.Iterate(func(sm schema.Schema) error {
-			return sm.MigrateConfig(configs)
-		})
+		return schema.Iterate(fn)
 	}
 
 	for _, s := range schemas {
-		if err := schema.Schema(s).MigrateConfig(configs); err != nil {
+		if err := fn(schema.Schema(s)); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func dbMigrateSupers(schemas ...string) error {
-	if len(schemas) == 0 {
-		return schema.Iterate(func(sm schema.Schema) error {
-			return sm.MigrateSuper()
-		})
+func dbMigrateConfigs(schemas ...string) error {
+	configs, err := schema.ReadConfigFile()
+	if err != nil {
+		return err
 	}
 
-	for _, s := range schemas {
-		if err := schema.Schema(s).MigrateSuper(); err != nil {
-			return err
-		}
-	}
-	return nil
+	return dbIterateSchemas(func(sm schema.Schema) error {
+		return sm.MigrateConfig(configs)
+	}, schemas...)
+}
+
+func dbMigrateSupers(schemas ...string) error {
+	return dbIterateSchemas(func(sm schema.Schema) error {
+		return sm.MigrateSuper()
+	}, schemas...)
 }
 
 func dbExecSQL(sqlfile string, schemas ...string) error {
@@ -102,45 +97,20 @@ func dbExecSQL(sqlfile string, schemas ...string) error {
 		return err
 	}
 
-	if len(schemas) == 0 {
-		return schema.Iterate(func(sm schema.Schema) error {
-			return sm.ExecSQL(sql)
-		})
-	}
-
-	for _, s := range schemas {
-		if err := schema.Schema(s).ExecSQL(sql); err != nil {
-			return err
-		}
-	}
-	return nil
+	return dbIterateSchemas(func(sm schema.Schema) error {
+		return sm.ExecSQL(sql)
+	}, schemas...)
 }
 
 func dbSchemaInit(schemas ...string) error {
-	if len(schemas) == 0 {
-		return schema.Iterate(func(sm schema.Schema) error {
-			return sm.InitSchema()
-		})
-	}
-
-	for _, s := range schemas {
-		if err := schema.Schema(s).InitSchema(); err != nil {
-			return err
-		}
-	}
-	return nil
+	return dbIterateSchemas(func(sm schema.Schema) error {
+		return sm.InitSchema()
+	}, schemas...)
 }
 
 func dbSchemaCheck(schemas ...string) error {
-	if len(schemas) == 0 {
-		return schema.Iterate(func(sm schema.Schema) error {
-			sm.CheckSchema(app.SDB)
-			return nil
-		})
-	}
-
-	for _, s := range schemas {
-		schema.Schema(s).CheckSchema(app.SDB)
-	}
-	return nil
+	return dbIterateSchemas(func(sm schema.Schema) error {
+		sm.CheckSchema(app.SDB)
+		return nil
+	}, schemas...)
 }
