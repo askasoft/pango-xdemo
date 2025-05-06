@@ -128,7 +128,7 @@ func loginMFACheck(c *xin.Context, au *models.User, up *UserPass) bool {
 	mfa := tt.ConfigValue("secure_login_mfa")
 
 	switch mfa {
-	case "E":
+	case app.LOGIN_MFA_EMAIL:
 		secret := loginMFASecret(c, au)
 		expire := ini.GetDuration("login", "emailPasscodeExpires", 10*time.Minute)
 		totp := otputil.NewTOTP(secret, expire)
@@ -143,11 +143,11 @@ func loginMFACheck(c *xin.Context, au *models.User, up *UserPass) bool {
 
 		loginFailed(c, "login.failed.passcode")
 		return false
-	case "M":
+	case app.LOGIN_MFA_MOBILE:
 		if up.Passcode == nil {
 			c.JSON(http.StatusOK, xin.H{
 				"message": tbs.GetText(c.Locale, "login.mfa.mobile.notice"),
-				"mfa":     "M",
+				"mfa":     app.LOGIN_MFA_MOBILE,
 			})
 			return false
 		}
@@ -191,7 +191,7 @@ func loginSendEmailPasscode(c *xin.Context, email, passcode string, expire time.
 
 	c.JSON(http.StatusOK, xin.H{
 		"message": tbs.Format(c.Locale, "login.mfa.email.notice", email),
-		"mfa":     "E",
+		"mfa":     app.LOGIN_MFA_EMAIL,
 	})
 }
 

@@ -9,6 +9,10 @@ import (
 )
 
 const (
+	LOGIN_MFA_UNSET  = ""
+	LOGIN_MFA_EMAIL  = "E"
+	LOGIN_MFA_MOBILE = "M"
+
 	DateFormat = "2006-01-02"
 	TimeFormat = "2006-01-02 15:04:05"
 )
