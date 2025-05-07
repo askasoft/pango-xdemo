@@ -1,3 +1,6 @@
 #auditlogs_table th {
 	white-space: nowrap;
 }
+#auditlogs_table td.detail {
+	white-space: pre-wrap;
+}

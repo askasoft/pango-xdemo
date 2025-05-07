@@ -8,7 +8,7 @@
 			{{if .AU.IsSuper}}
 			<th class="check"><input type="checkbox" checkall="#auditlogs_table td.check > input"/></th>
 			{{end}}
-			<th class="id sortable" data-sort-col="id">{{T .Loc "auditlog.id"}}</th>
+			<th class="no">#</th>
 			<th class="datetime sortable" data-sort-col="date">{{T .Loc "auditlog.date"}}</th>
 			<th class="user sortable" data-sort-col="user">{{T .Loc "auditlog.user"}}</th>
 			<th class="cip sortable" data-sort-col="cip">{{T .Loc "auditlog.cip"}}</th>
@@ -17,12 +17,13 @@
 		</tr>
 	</thead>
 	<tbody>
-		{{range $al := .AuditLogs}}
+		{{$n := .Q.Begin}}
+		{{range $i, $al := .AuditLogs}}
 		<tr id="al_{{$al.ID}}">
 			{{if $.AU.IsSuper}}
 			<td class="check"><input type="checkbox" value="{{$al.ID}}"/></td>
 			{{end}}
-			<td class="id">{{$al.ID}}</td>
+			<td class="no">{{Add $n $i}}</td>
 			<td class="datetime">{{TIME $al.Date}}</td>
 			<td class="userinfo" colspan="2">{{$al.User}}<br>{{$al.CIP}}</td>
 			<td class="funact">{{$.AuditLogFuncMap.SafeGet $al.Func $al.Func}} / {{$al.Action}}</td>

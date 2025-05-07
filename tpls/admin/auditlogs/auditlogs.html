@@ -123,21 +123,25 @@
 
 			<div class="row">
 				<label class="col-md-2 col-form-label">{{T .Loc "auditlog.user"}}</label>
-				<div class="col-md-10">
+				<div class="col">
 					<input name="user" type="text" class="form-control" textclear value="{{.Q.User}}"/>
 				</div>
-				<label class="col-md-2 col-xxl-1 col-form-label">{{T .Loc "auditlog.cip"}}</label>
-				<div class="col-md-4 col-xxl-5">
+			</div>
+			<div class="row">
+				<label class="col-md-2 col-form-label">{{T .Loc "auditlog.cip"}}</label>
+				<div class="col">
 					<input name="cip" type="text" class="form-control" textclear value="{{.Q.CIP}}"/>
 				</div>
 			</div>
 			<div class="row">
 				<label class="col-md-2 col-form-label">{{T .Loc "auditlog.func"}}</label>
-				<div class="col-md-10">
+				<div class="col">
 					{{Checks "Name=" "func" "List=" .AuditLogFuncMap "Values=" .Q.Func}}
 				</div>
-				<label class="col-md-2 col-xxl-1 col-form-label">{{T .Loc "auditlog.action"}}</label>
-				<div class="col-md-4 col-xxl-5">
+			</div>
+			<div class="row">
+				<label class="col-md-2 col-form-label">{{T .Loc "auditlog.action"}}</label>
+				<div class="col">
 					<input name="action" type="text" class="form-control" textclear value="{{.Q.Action}}"/>
 				</div>
 			</div>
