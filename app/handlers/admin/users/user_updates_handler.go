@@ -35,12 +35,12 @@ func UserUpdates(c *xin.Context) {
 	err := app.SDB.Transaction(func(tx *sqlx.Tx) (err error) {
 		cnt, err = tt.UpdateUsers(tx, au, uua)
 		if err != nil {
-			return err
+			return
 		}
 		if cnt > 0 {
-			return tt.AddAuditLog(tx, c, models.AL_USERS_UPDATES, num.Ltoa(cnt), uua.String())
+			err = tt.AddAuditLog(tx, c, models.AL_USERS_UPDATES, num.Ltoa(cnt), uua.String())
 		}
-		return nil
+		return
 	})
 	if err != nil {
 		c.AddError(err)

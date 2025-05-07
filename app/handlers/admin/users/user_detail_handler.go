@@ -52,12 +52,12 @@ func userDetail(c *xin.Context, action string) {
 	tt := tenant.FromCtx(c)
 
 	user, err := tt.GetUser(app.SDB, uid)
+	if errors.Is(err, sqlx.ErrNoRows) {
+		c.AddError(tbs.Errorf(c.Locale, "user.error.notfound", uid))
+		c.JSON(http.StatusNotFound, handlers.E(c))
+		return
+	}
 	if err != nil {
-		if errors.Is(err, sqlx.ErrNoRows) {
-			c.AddError(tbs.Errorf(c.Locale, "error.detail.notfound", uid))
-			c.JSON(http.StatusNotFound, handlers.E(c))
-			return
-		}
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return
