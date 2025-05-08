@@ -1,8 +1,9 @@
 (function($) {
 	function toggle_login_method() {
-		var saml = $('input[name="secure_login_method"]:checked').val() == 'S';
+		var $i = $('input[name="secure_login_method"]:checked'), saml = $i.val() == 'S';
 		$('[name="secure_login_mfa"]').prop('disabled', saml).closest('.row')[saml ? 'slideUp' : 'slideDown']();
 		$('[name^="secure_saml_"]').prop('disabled', !saml).closest('.row')[saml ? 'slideDown' : 'slideUp']();
+		$i.closest('.cfgform').find('textarea').autosize();
 	}
 
 	function configs_import() {

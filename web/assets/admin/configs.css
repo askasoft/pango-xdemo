@@ -13,12 +13,17 @@
 	}
 	.ccc > ul.nav {
 		flex-direction: column;
+		flex-wrap: nowrap;
 		min-width: 200px;
 		max-width: 200px;
+		max-height: calc(100vh - 260px);
+		overflow-y: auto;
 	}
 }
 .ccc .tab-content {
 	width: 100%;
+	max-height: calc(100vh - 260px);
+	overflow-y: auto;
 }
 
 label[editor="$"] {
