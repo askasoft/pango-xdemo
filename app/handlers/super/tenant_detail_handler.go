@@ -43,7 +43,7 @@ func TenantCreate(c *xin.Context) {
 
 type TenantEdit struct {
 	TenantInfo
-	Oname string `json:"oname" form:"oname,strip,lower" validate:"required,regexp=^[a-z][a-z0-9]{00x2C29}$"`
+	Oname string `json:"oname" form:"oname,strip,lower" validate:"required,rematch=^[a-z][a-z0-9]{00x2C29}$"`
 }
 
 func TenantUpdate(c *xin.Context) {
