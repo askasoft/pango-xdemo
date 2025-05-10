@@ -111,7 +111,7 @@ func (sm Schema) DeleteAuditLogsBefore(tx sqlx.Sqlx, before time.Time) (int64, e
 	return r.RowsAffected()
 }
 
-func (sm Schema) AddAuditLog(tx sqlx.Sqlx, uid int64, cip, role, funact string, params ...string) error {
+func (sm Schema) AddAuditLog(tx sqlx.Sqlx, uid int64, cip, role, funact string, params ...any) error {
 	al := &models.AuditLog{
 		Date:   time.Now(),
 		UID:    uid,

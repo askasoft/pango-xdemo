@@ -10,6 +10,7 @@ import (
 	"github.com/askasoft/pango-xdemo/cmd/tools"
 	"github.com/askasoft/pango/gog"
 	"github.com/askasoft/pango/log"
+	"github.com/askasoft/pango/str"
 )
 
 func usage() {
@@ -18,7 +19,8 @@ Usage: %s <command> [options]
   <command>:
     version             print the version information.
     help | usage        print the usage information.
-    generate [output]   generate database schema DDL.
+    generate [dbtype] [output] generate database schema DDL.
+      [dbtype]          specify the database type.
       [output]          specify the output DDL file.
     migrate [schema]... migrate database schemas.
       [schema]...       specify schemas to migrate.
@@ -62,7 +64,15 @@ func main() {
 	arg := flag.Arg(0)
 	switch arg {
 	case "generate":
-		if err := tools.GenerateSchema(flag.Arg(1)); err != nil {
+		dbtype, outfile := "", ""
+		for _, a := range flag.Args()[1:] {
+			if str.EndsWith(a, ".sql") {
+				outfile = a
+			} else {
+				dbtype = a
+			}
+		}
+		if err := tools.GenerateSchema(dbtype, outfile); err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			app.Exit(app.ExitErrCMD)
 		}

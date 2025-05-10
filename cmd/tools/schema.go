@@ -3,7 +3,6 @@ package tools
 import (
 	"time"
 
-	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango/fsu"
 	"github.com/askasoft/pango/log"
@@ -13,6 +12,7 @@ import (
 	"github.com/askasoft/pango/xfs"
 	"github.com/askasoft/pango/xjm"
 	"github.com/askasoft/pango/xsm/pgsm/pggormsm"
+	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	gormschema "gorm.io/gorm/schema"
@@ -30,19 +30,22 @@ var tables = []any{
 }
 
 // Generate Schema
-func GenerateSchema(outfile string) error {
+func GenerateSchema(dbtype, outfile string) error {
 	ini, err := loadConfigs()
 	if err != nil {
 		return err
 	}
 
+	if dbtype == "" {
+		dbtype = ini.GetString("database", "type")
+	}
 	if outfile == "" {
-		outfile = app.SQLSchemaFile
+		outfile = "conf/" + dbtype + ".sql"
 	}
 
 	log.Infof("Generate schema DDL: %q", outfile)
 
-	dsn := ini.GetString("database", "dsn")
+	dsn := ini.GetString("database", dbtype)
 
 	gsp := &gormx.GormSQLPrinter{}
 
@@ -52,7 +55,12 @@ func GenerateSchema(outfile string) error {
 		Logger:         gsp,
 	}
 
-	gdd := postgres.Open(dsn)
+	var gdd gorm.Dialector
+	if dbtype == "postgres" {
+		gdd = postgres.Open(dsn)
+	} else {
+		gdd = mysql.Open(dsn)
+	}
 
 	gdb, err := gorm.Open(gdd, dbc)
 	if err != nil {

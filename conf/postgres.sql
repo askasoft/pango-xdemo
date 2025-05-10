@@ -85,7 +85,7 @@ CREATE TABLE "SCHEMA"."audit_logs" (
 	"role" varchar(1) NOT NULL,
 	"func" varchar(32) NOT NULL,
 	"action" varchar(32) NOT NULL,
-	"params" text [],
+	"params" jsonb,
 	PRIMARY KEY ("id")
 );
 ---------------------------------;
@@ -96,7 +96,7 @@ CREATE TABLE "SCHEMA"."pets" (
 	"born_at" timestamptz NOT NULL,
 	"origin" varchar(10) NOT NULL,
 	"temper" varchar(1) NOT NULL,
-	"habits" character(1) [],
+	"habits" jsonb,
 	"amount" bigint NOT NULL,
 	"price" numeric(10, 2) NOT NULL,
 	"shop_name" varchar(200) NOT NULL,

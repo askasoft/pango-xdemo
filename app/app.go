@@ -29,9 +29,6 @@ const (
 
 	// Database Config table init file
 	DBConfigFile = "conf/config.csv"
-
-	// Schema DDL sql file
-	SQLSchemaFile = "conf/schema.sql"
 )
 
 const (
@@ -186,4 +183,8 @@ func Versions() string {
 
 func Secret() string {
 	return ini.GetString("app", "secret", "~ pango  xdemo ~")
+}
+
+func SchemaSQLFile() string {
+	return "conf/" + ini.GetString("database", "type") + ".sql"
 }

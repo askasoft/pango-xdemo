@@ -24,11 +24,31 @@ psql> \password
 psql> \q
 ```
 
-### create postgresql database
+#### create postgresql database
 ```sql
 CREATE USER xdemo PASSWORD 'xdemo';
 CREATE DATABASE xdemo WITH OWNER=xdemo ENCODING='UTF-8';
 GRANT ALL ON DATABASE xdemo TO xdemo;
+```
+
+
+### install mariadb server
+```sh
+sudo apt update
+sudo apt install postgresql postgresql-contrib libpq-dev
+
+sudo cp /etc/mysql/mariadb.conf.d/50-server.cnf /tmp/
+sudo sed -i -e "s/#bind-addresses.*/bind-addresses = 0.0.0.0/" /etc/mysql/mariadb.conf.d/50-server.cnf
+
+sudo systemctl enable  mariadb
+sudo systemctl restart mariadb
+```
+
+#### create mariadb database
+```sql
+CREATE USER 'xdemo'@'%' IDENTIFIED BY 'xdemo';
+CREATE DATABASE xdemo CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+GRANT ALL PRIVILEGES ON *.* TO 'xdemo'@'%';
 ```
 
 

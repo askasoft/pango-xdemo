@@ -49,9 +49,11 @@ func (sm Schema) InitSchema() error {
 }
 
 func (sm Schema) ExecSchemaSQL() error {
-	log.Infof("Execute Schema SQL file '%s'", app.SQLSchemaFile)
+	file := app.SchemaSQLFile()
 
-	sqls, err := fsu.ReadString(app.SQLSchemaFile)
+	log.Infof("Execute Schema SQL file '%s'", file)
+
+	sqls, err := fsu.ReadString(file)
 	if err != nil {
 		return err
 	}

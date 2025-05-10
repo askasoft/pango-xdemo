@@ -6,9 +6,7 @@ import (
 	"github.com/askasoft/pango-xdemo/app/args"
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/utils/sqlxutil"
-	"github.com/askasoft/pango/sqx/pqx"
 	"github.com/askasoft/pango/sqx/sqlx"
-	"github.com/askasoft/pango/str"
 )
 
 func (sm Schema) ResetPetsSequence(tx sqlx.Sqlx) error {
@@ -145,7 +143,8 @@ func (sm Schema) UpdatePets(tx sqlx.Sqlx, pua *args.PetUpdatesArg) (int64, error
 		sqb.Setc("temper", pua.Temper)
 	}
 	if pua.Habits != nil {
-		sqb.Setc("habits", pqx.StringArray(str.Strips(*pua.Habits)))
+		habits := models.FlagsToJSONObject(*pua.Habits)
+		sqb.Setc("habits", habits)
 	}
 	sqb.Setc("updated_at", time.Now())
 

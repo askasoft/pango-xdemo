@@ -8,6 +8,7 @@ import (
 	_ "github.com/askasoft/pango/log/smtplog"
 	_ "github.com/askasoft/pango/log/teamslog"
 	"github.com/askasoft/pango/srv"
+	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
 

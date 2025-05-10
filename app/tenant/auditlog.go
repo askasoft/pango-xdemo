@@ -6,7 +6,7 @@ import (
 	"github.com/askasoft/pango/xin"
 )
 
-func (tt *Tenant) AddAuditLog(tx sqlx.Sqlx, c *xin.Context, funact string, params ...string) error {
+func (tt *Tenant) AddAuditLog(tx sqlx.Sqlx, c *xin.Context, funact string, params ...any) error {
 	uid, role := int64(0), models.RoleGuest
 
 	au := GetAuthUser(c)

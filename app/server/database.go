@@ -9,6 +9,7 @@ import (
 	"github.com/askasoft/pango-xdemo/app/schema"
 	"github.com/askasoft/pango-xdemo/app/utils/pgutil"
 	"github.com/askasoft/pango/fsu"
+	"github.com/askasoft/pango/gog"
 	"github.com/askasoft/pango/ini"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/log/sqlog/sqlxlog"
@@ -35,10 +36,10 @@ func openDatabase() error {
 	}
 
 	typ := sec.GetString("type")
-	dsn := sec.GetString("dsn")
+	dsn := sec.GetString(typ)
 	log.Infof("Connect Database (%s): %s", typ, dsn)
 
-	db, err := sql.Open(typ, dsn)
+	db, err := sql.Open(gog.If(typ == "postgres", "pgx", typ), dsn)
 	if err != nil {
 		return err
 	}

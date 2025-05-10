@@ -12,15 +12,11 @@ import (
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
 	"github.com/askasoft/pango/num"
+	"github.com/askasoft/pango/sqx"
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/tbs"
 	"github.com/askasoft/pango/xin"
 )
-
-type PetWithFile struct {
-	models.Pet
-	File string `db:"-" json:"file" form:"file,strip"`
-}
 
 func PetNew(c *xin.Context) {
 	pet := &models.Pet{
@@ -73,8 +69,14 @@ func petDetail(c *xin.Context, action string) {
 	c.HTML(http.StatusOK, "demos/pets/pet_detail_"+action, h)
 }
 
-func petBind(c *xin.Context) *PetWithFile {
-	pet := &PetWithFile{}
+type petForm struct {
+	models.Pet
+	Habitc []string `form:"habitc,strip"`
+	File   string   `form:"file,strip"`
+}
+
+func petBind(c *xin.Context) *petForm {
+	pet := &petForm{}
 	if err := c.Bind(pet); err != nil {
 		args.AddBindErrors(c, err, "pet.")
 	}
@@ -100,13 +102,15 @@ func petBind(c *xin.Context) *PetWithFile {
 		}
 	}
 
-	if len(pet.Habits) > 0 {
+	pet.Habits = sqx.JSONObject{}
+	if len(pet.Habitc) > 0 {
 		phm := tbsutil.GetPetHabitsMap(c.Locale)
-		for _, h := range pet.Habits {
+		for _, h := range pet.Habitc {
 			if !phm.Contains(h) {
 				c.AddError(args.ErrInvalidField(c, "pet.", "habits"))
 				break
 			}
+			pet.Habits[h] = 1
 		}
 	}
 

@@ -161,9 +161,13 @@
 		$tr.find('td.origin').text(POM[pet.origin]);
 		$tr.find('td.temper').text(PTM[pet.temper]);
 		var hs = [];
-		$.each(pet.habits, function(i, h) {
-			hs.push($('<b>').text(PHM[h]));
-		})
+		if (pet.habits) {
+			for (var k in pet.habits) {
+				if (pet.habits[k]) {
+					hs.push($('<b>').text(PHM[k]));
+				}
+			}
+		}
 		$tr.find('td.habits').empty().append(hs);
 		main.blink($tr);
 	}

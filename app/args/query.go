@@ -81,10 +81,6 @@ func (qa *QueryArg) AddFloats(sqb *sqlx.Builder, col string, smin, smax string) 
 	sqlxutil.AddFloats(sqb, col, smin, smax)
 }
 
-func (qa *QueryArg) AddOverlap(sqb *sqlx.Builder, col string, vals []string) {
-	sqlxutil.AddOverlap(sqb, col, vals)
-}
-
 func (qa *QueryArg) AddIDs(sqb *sqlx.Builder, col string, id string) {
 	sqlxutil.AddIDs(sqb, col, id)
 }
@@ -95,4 +91,8 @@ func (qa *QueryArg) AddLikes(sqb *sqlx.Builder, col string, val string) {
 
 func (qa *QueryArg) AddLikesEx(sqb *sqlx.Builder, col string, val string, not bool) {
 	sqlxutil.AddLikesEx(sqb, col, val, not)
+}
+
+func (qa *QueryArg) AddFlags(sqb *sqlx.Builder, col string, vals []string) {
+	sqlxutil.AddFlags(sqb, col, vals)
 }

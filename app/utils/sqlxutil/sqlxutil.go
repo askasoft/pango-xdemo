@@ -5,12 +5,13 @@ import (
 
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/sqx"
-	"github.com/askasoft/pango/sqx/pqx"
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/tmu"
 	"github.com/askasoft/pango/xvw/args"
 )
+
+var LIKE = "ILIKE"
 
 func AddPager(sqb *sqlx.Builder, p *args.Pager) {
 	sqb.Offset(p.Start()).Limit(p.Limit)
@@ -169,38 +170,51 @@ func AddLikesEx(sqb *sqlx.Builder, col string, val string, not bool) {
 
 func addLikes(sqb *sqlx.Builder, col string, val string, not bool) {
 	ss := str.Fields(val)
-	if len(ss) > 0 {
-		var sb str.Builder
-		var args []any
-
-		if not {
-			sb.WriteString("NOT ")
-		}
-		sb.WriteByte('(')
-		for i, s := range ss {
-			if i > 0 {
-				sb.WriteString(" OR ")
-			}
-			sb.WriteString(col)
-			sb.WriteString(" ILIKE ?")
-			args = append(args, sqx.StringLike(s))
-		}
-		sb.WriteByte(')')
-
-		sqb.Where(sb.String(), args...)
+	if len(ss) == 0 {
+		return
 	}
-}
 
-func AddOverlap(sqb *sqlx.Builder, col string, vals []string) {
-	if len(vals) > 0 {
-		sqb.Where(col+" && ?", pqx.StringArray(vals))
+	var sb str.Builder
+	var args []any
+
+	if not {
+		sb.WriteString("NOT ")
 	}
+	sb.WriteByte('(')
+	for i, s := range ss {
+		if i > 0 {
+			sb.WriteString(" OR ")
+		}
+		sb.WriteString(col)
+		sb.WriteString(" ")
+		sb.WriteString(LIKE)
+		sb.WriteString(" ?")
+		args = append(args, sqx.StringLike(s))
+	}
+	sb.WriteByte(')')
+
+	sqb.Where(sb.String(), args...)
 }
 
-func ArrayContains(sqb *sqlx.Builder, col string, vals ...string) {
-	sqb.Where(col+" @> ?", pqx.StringArray(vals))
-}
+func AddFlags(sqb *sqlx.Builder, col string, props []string) {
+	if len(props) == 0 {
+		return
+	}
 
-func ArrayNotContains(sqb *sqlx.Builder, col string, vals ...string) {
-	sqb.Where("NOT "+col+" @> ?", pqx.StringArray(vals))
+	var sb str.Builder
+
+	sb.WriteByte('(')
+	for i, p := range props {
+		if i > 0 {
+			sb.WriteString(" OR ")
+		}
+		sb.WriteString("(")
+		sb.WriteString(col)
+		sb.WriteString("->'")
+		sb.WriteString(p)
+		sb.WriteString("')::integer = 1")
+	}
+	sb.WriteByte(')')
+
+	sqb.Where(sb.String())
 }
