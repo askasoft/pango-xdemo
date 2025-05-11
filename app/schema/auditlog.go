@@ -9,8 +9,8 @@ import (
 	"github.com/askasoft/pango/str"
 )
 
-func (sm Schema) ResetAuditLogsSequence(tx sqlx.Sqlx) error {
-	return ResetSequence(tx, sm.TableAuditLogs())
+func (sm Schema) ResetAuditLogsAutoIncrement(tx sqlx.Sqlx) error {
+	return ResetAutoIncrement(tx, sm.TableAuditLogs())
 }
 
 func (sm Schema) CountAuditLogs(tx sqlx.Sqlx, alqa *args.AuditLogQueryArg, role, locale string) (cnt int, err error) {

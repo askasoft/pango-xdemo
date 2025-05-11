@@ -179,7 +179,7 @@ func (sm Schema) MigrateSuper() error {
 			return err
 		}
 
-		return sm.ResetUsersSequence(db)
+		return sm.ResetUsersAutoIncrement(db)
 	}
 
 	sqb.Reset()

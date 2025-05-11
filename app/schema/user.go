@@ -9,8 +9,8 @@ import (
 	"github.com/askasoft/pango/sqx/sqlx"
 )
 
-func (sm Schema) ResetUsersSequence(tx sqlx.Sqlx) error {
-	return ResetSequence(tx, sm.TableUsers(), models.UserStartID)
+func (sm Schema) ResetUsersAutoIncrement(tx sqlx.Sqlx) error {
+	return ResetAutoIncrement(tx, sm.TableUsers(), models.UserStartID)
 }
 
 func (sm Schema) CountUsers(tx sqlx.Sqlx, role string, uqa *args.UserQueryArg) (cnt int, err error) {

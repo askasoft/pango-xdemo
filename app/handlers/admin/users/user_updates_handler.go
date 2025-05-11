@@ -78,7 +78,7 @@ func UserDeletes(c *xin.Context) {
 			if err = tt.AddAuditLog(tx, c, models.AL_USERS_DELETES, num.Ltoa(cnt), ida.String()); err != nil {
 				return
 			}
-			return tt.ResetUsersSequence(tx)
+			return tt.ResetUsersAutoIncrement(tx)
 		}
 		return
 	})
@@ -111,19 +111,19 @@ func UserDeleteBatch(c *xin.Context) {
 	au := tenant.AuthUser(c)
 
 	var cnt int64
-	err = app.SDB.Transaction(func(tx *sqlx.Tx) error {
+	err = app.SDB.Transaction(func(tx *sqlx.Tx) (err error) {
 		cnt, err = tt.DeleteUsersQuery(tx, au, uqa)
 		if err != nil {
-			return err
+			return
 		}
 
 		if cnt > 0 {
-			if err := tt.AddAuditLog(tx, c, models.AL_USERS_DELETES, num.Ltoa(cnt), uqa.String()); err != nil {
-				return err
+			if err = tt.AddAuditLog(tx, c, models.AL_USERS_DELETES, num.Ltoa(cnt), uqa.String()); err != nil {
+				return
 			}
-			return tt.ResetUsersSequence(tx)
+			err = tt.ResetUsersAutoIncrement(tx)
 		}
-		return nil
+		return
 	})
 	if err != nil {
 		c.AddError(err)

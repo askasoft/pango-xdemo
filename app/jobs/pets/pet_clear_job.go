@@ -82,7 +82,7 @@ func (pc *PetClearJob) clear() error {
 
 	if pc.Arg.ResetSequence {
 		pc.Logger.Info("Reset Pets Sequence")
-		err = tt.ResetPetsSequence(db)
+		err = tt.ResetPetsAutoIncrement(db)
 		if err != nil {
 			return err
 		}

@@ -6,10 +6,6 @@ import (
 	"github.com/askasoft/pango/str"
 )
 
-func ResetSequenceSQL(table string, starts ...int64) string {
-	return pqx.ResetSequenceSQL(table, "id", starts...)
-}
-
 func ArrayContainsAny(sqb *sqlx.Builder, col string, vals []string) {
 	if len(vals) > 0 {
 		sqb.Where(col+" && ?", pqx.StringArray(vals))

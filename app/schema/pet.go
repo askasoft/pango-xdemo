@@ -9,8 +9,8 @@ import (
 	"github.com/askasoft/pango/sqx/sqlx"
 )
 
-func (sm Schema) ResetPetsSequence(tx sqlx.Sqlx) error {
-	return ResetSequence(tx, sm.TablePets())
+func (sm Schema) ResetPetsAutoIncrement(tx sqlx.Sqlx) error {
+	return ResetAutoIncrement(tx, sm.TablePets())
 }
 
 func (sm Schema) CountPets(tx sqlx.Sqlx, pqa *args.PetQueryArg) (cnt int, err error) {

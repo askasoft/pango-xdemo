@@ -93,7 +93,7 @@ func PetDeletes(c *xin.Context) {
 			if err = tt.AddAuditLog(tx, c, models.AL_PETS_DELETES, num.Ltoa(cnt), ida.String()); err != nil {
 				return
 			}
-			return tt.ResetPetsSequence(tx)
+			err = tt.ResetPetsAutoIncrement(tx)
 		}
 		return
 	})
@@ -132,12 +132,12 @@ func PetDeleteBatch(c *xin.Context) {
 		}
 
 		if cnt > 0 {
-			if err := tt.AddAuditLog(tx, c, models.AL_PETS_DELETES, num.Ltoa(cnt), pqa.String()); err != nil {
-				return err
+			if err = tt.AddAuditLog(tx, c, models.AL_PETS_DELETES, num.Ltoa(cnt), pqa.String()); err != nil {
+				return
 			}
-			return tt.ResetPetsSequence(tx)
+			err = tt.ResetPetsAutoIncrement(tx)
 		}
-		return nil
+		return
 	})
 	if err != nil {
 		c.AddError(err)

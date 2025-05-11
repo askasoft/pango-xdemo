@@ -314,7 +314,7 @@ func (ucij *UserCsvImportJob) importRecord(rec *csvUserRecord) error {
 
 		if uid != 0 {
 			// reset sequence if create with ID
-			if err := ucij.Tenant.ResetUsersSequence(tx); err != nil {
+			if err := ucij.Tenant.ResetUsersAutoIncrement(tx); err != nil {
 				return err
 			}
 		}
