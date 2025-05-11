@@ -33,6 +33,8 @@ func AuditLogCsvExport(c *xin.Context) {
 	cw.UseCRLF = true
 	defer cw.Flush()
 
+	cnt := 0
+
 	var cols []string
 	err = tt.IterAuditLogs(app.SDB, alqa, c.Locale, func(al *models.AuditLogEx) error {
 		if len(cols) == 0 {
@@ -40,7 +42,7 @@ func AuditLogCsvExport(c *xin.Context) {
 			_, _ = c.Writer.WriteString(string(iox.BOM))
 
 			cols = append(cols,
-				tbs.GetText(c.Locale, "auditlog.id"),
+				"#",
 				tbs.GetText(c.Locale, "auditlog.date"),
 				tbs.GetText(c.Locale, "auditlog.user"),
 				tbs.GetText(c.Locale, "auditlog.cip"),
@@ -57,9 +59,10 @@ func AuditLogCsvExport(c *xin.Context) {
 			al.Detail = tbs.Format(c.Locale, "auditlog.detail."+al.Func+"."+al.Action, asg.Anys(al.Params)...)
 		}
 
+		cnt++
 		cols = cols[:0]
 		cols = append(cols,
-			num.Ltoa(al.ID),
+			num.Itoa(cnt),
 			app.FormatTime(al.Date),
 			al.User,
 			al.CIP,
