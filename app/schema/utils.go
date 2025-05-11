@@ -2,18 +2,27 @@ package schema
 
 import (
 	"github.com/askasoft/pango-xdemo/app"
+	"github.com/askasoft/pango-xdemo/app/utils/myutil"
 	"github.com/askasoft/pango-xdemo/app/utils/pgutil"
 	"github.com/askasoft/pango/sqx/sqlx"
 )
 
 func ResetSequence(tx sqlx.Sqlx, table string, starts ...int64) error {
+	var sql string
+
 	switch app.DBS["type"] {
 	case "mysql":
-		return nil
+		sql = myutil.ResetSequenceSQL(table, starts...)
 	default:
-		_, err := tx.Exec(pgutil.ResetSequenceSQL(table, starts...))
-		return err
+		sql = pgutil.ResetSequenceSQL(table, starts...)
 	}
+
+	if sql == "" {
+		return nil
+	}
+
+	_, err := tx.Exec(pgutil.ResetSequenceSQL(table, starts...))
+	return err
 }
 
 func (sm Schema) DeleteByID(tx sqlx.Sqlx, table string, ids ...int64) (int64, error) {

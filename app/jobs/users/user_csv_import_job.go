@@ -13,8 +13,8 @@ import (
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango-xdemo/app/utils/csvutil"
-	"github.com/askasoft/pango-xdemo/app/utils/pgutil"
 	"github.com/askasoft/pango-xdemo/app/utils/pwdutil"
+	"github.com/askasoft/pango-xdemo/app/utils/sqlutil"
 	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
 	"github.com/askasoft/pango/cog/hashmap"
 	"github.com/askasoft/pango/iox"
@@ -269,7 +269,7 @@ func (ucij *UserCsvImportJob) importRecord(rec *csvUserRecord) error {
 
 				cnt, err := tt.UpdateUser(tx, ucij.Arg.Role, user)
 				if err != nil {
-					if pgutil.IsUniqueViolationError(err) {
+					if sqlutil.IsUniqueViolationError(err) {
 						ucij.IncFailure()
 						ucij.Logger.Warnf(tbs.GetText(ucij.Locale(), "user.import.csv.step.duplicated"), ucij.Progress(), user.ID, user.Name, user.Email)
 						return jobs.ErrItemSkip
@@ -301,7 +301,7 @@ func (ucij *UserCsvImportJob) importRecord(rec *csvUserRecord) error {
 
 		err := tt.CreateUser(tx, user)
 		if err != nil {
-			if pgutil.IsUniqueViolationError(err) {
+			if sqlutil.IsUniqueViolationError(err) {
 				ucij.IncFailure()
 				ucij.Logger.Warnf(tbs.GetText(ucij.Locale(), "user.import.csv.step.duplicated"), ucij.Progress(), user.ID, user.Name, user.Email)
 				return jobs.ErrItemSkip

@@ -10,8 +10,8 @@ import (
 	"github.com/askasoft/pango-xdemo/app/handlers"
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/tenant"
-	"github.com/askasoft/pango-xdemo/app/utils/pgutil"
 	"github.com/askasoft/pango-xdemo/app/utils/pwdutil"
+	"github.com/askasoft/pango-xdemo/app/utils/sqlutil"
 	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/ran"
@@ -146,7 +146,7 @@ func UserCreate(c *xin.Context) {
 		return tt.AddAuditLog(tx, c, models.AL_USERS_CREATE, num.Ltoa(user.ID), user.Email)
 	})
 	if err != nil {
-		if pgutil.IsUniqueViolationError(err) {
+		if sqlutil.IsUniqueViolationError(err) {
 			err = &args.ParamError{
 				Param:   "email",
 				Message: tbs.Format(c.Locale, "user.error.duplicated", tbs.GetText(c.Locale, "user.email", "email"), user.Email),

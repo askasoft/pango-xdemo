@@ -40,7 +40,8 @@ func (sm Schema) ExecSQL(sqls string) error {
 	logger := log.GetLogger("SQL")
 	logger.Info(str.PadCenter(" "+string(sm)+" ", 78, "="))
 
-	sqls = str.ReplaceAll(sqls, `"SCHEMA"`, string(sm))
+	qte := sqx.GetQuoter(app.DBType())
+	sqls = str.ReplaceAll(sqls, qte.Quote("SCHEMA"), string(sm))
 
 	err := app.SDB.Transaction(func(tx *sqlx.Tx) error {
 		sb := &str.Builder{}

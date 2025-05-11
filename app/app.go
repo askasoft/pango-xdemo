@@ -185,6 +185,10 @@ func Secret() string {
 	return ini.GetString("app", "secret", "~ pango  xdemo ~")
 }
 
+func DBType() string {
+	return ini.GetString("database", "type", "postgres")
+}
+
 func SchemaSQLFile() string {
 	return "conf/" + ini.GetString("database", "type") + ".sql"
 }

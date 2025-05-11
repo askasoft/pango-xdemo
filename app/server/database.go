@@ -7,7 +7,7 @@ import (
 
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/schema"
-	"github.com/askasoft/pango-xdemo/app/utils/pgutil"
+	"github.com/askasoft/pango-xdemo/app/utils/sqlutil"
 	"github.com/askasoft/pango/fsu"
 	"github.com/askasoft/pango/gog"
 	"github.com/askasoft/pango/ini"
@@ -52,7 +52,7 @@ func openDatabase() error {
 		log.GetLogger("SQL"),
 		sec.GetDuration("slowSql", time.Second),
 	)
-	slg.GetErrLogLevel = pgutil.GetErrLogLevel
+	slg.GetErrLogLevel = sqlutil.GetErrLogLevel
 
 	app.DBS = dbs
 	app.SDB = sqlx.NewDB(db, typ, slg.Trace)

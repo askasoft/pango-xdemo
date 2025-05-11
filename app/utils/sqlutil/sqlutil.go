@@ -1,17 +1,37 @@
-package sqlxutil
+package sqlutil
 
 import (
 	"time"
 
+	"github.com/askasoft/pango-xdemo/app"
+	"github.com/askasoft/pango-xdemo/app/utils/myutil"
+	"github.com/askasoft/pango-xdemo/app/utils/pgutil"
+	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/sqx"
+	"github.com/askasoft/pango/sqx/myx"
+	"github.com/askasoft/pango/sqx/pqx/pgxv5"
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/tmu"
 	"github.com/askasoft/pango/xvw/args"
 )
 
-var LIKE = "ILIKE"
+func IsUniqueViolationError(err error) bool {
+	switch app.DBType() {
+	case "mysql":
+		return myx.IsUniqueViolationError(err)
+	default:
+		return pgxv5.IsUniqueViolationError(err)
+	}
+}
+
+func GetErrLogLevel(err error) log.Level {
+	if IsUniqueViolationError(err) {
+		return log.LevelWarn
+	}
+	return log.LevelError
+}
 
 func AddPager(sqb *sqlx.Builder, p *args.Pager) {
 	sqb.Offset(p.Start()).Limit(p.Limit)
@@ -160,15 +180,7 @@ func AddIDs(sqb *sqlx.Builder, col string, id string) {
 	}
 }
 
-func AddLikes(sqb *sqlx.Builder, col string, val string) {
-	addLikes(sqb, col, val, false)
-}
-
-func AddLikesEx(sqb *sqlx.Builder, col string, val string, not bool) {
-	addLikes(sqb, col, val, not)
-}
-
-func addLikes(sqb *sqlx.Builder, col string, val string, not bool) {
+func addLikesAny(sqb *sqlx.Builder, like, col, val string, not bool) {
 	ss := str.Fields(val)
 	if len(ss) == 0 {
 		return
@@ -187,7 +199,7 @@ func addLikes(sqb *sqlx.Builder, col string, val string, not bool) {
 		}
 		sb.WriteString(col)
 		sb.WriteString(" ")
-		sb.WriteString(LIKE)
+		sb.WriteString(like)
 		sb.WriteString(" ?")
 		args = append(args, sqx.StringLike(s))
 	}
@@ -196,25 +208,24 @@ func addLikes(sqb *sqlx.Builder, col string, val string, not bool) {
 	sqb.Where(sb.String(), args...)
 }
 
-func AddFlags(sqb *sqlx.Builder, col string, props []string) {
-	if len(props) == 0 {
-		return
+func AddLikes(sqb *sqlx.Builder, col string, val string) {
+	AddLikesEx(sqb, col, val, false)
+}
+
+func AddLikesEx(sqb *sqlx.Builder, col string, val string, not bool) {
+	switch app.DBType() {
+	case "postgres":
+		addLikesAny(sqb, "ILIKE", col, val, not)
+	default:
+		addLikesAny(sqb, "LIKE", col, val, not)
 	}
+}
 
-	var sb str.Builder
-
-	sb.WriteByte('(')
-	for i, p := range props {
-		if i > 0 {
-			sb.WriteString(" OR ")
-		}
-		sb.WriteString("(")
-		sb.WriteString(col)
-		sb.WriteString("->'")
-		sb.WriteString(p)
-		sb.WriteString("')::integer = 1")
+func AddFlags(sqb *sqlx.Builder, col string, vals []string) {
+	switch app.DBType() {
+	case "mysql":
+		myutil.FlagsContainsAny(sqb, col, vals)
+	default:
+		pgutil.FlagsContainsAny(sqb, col, vals)
 	}
-	sb.WriteByte(')')
-
-	sqb.Where(sb.String())
 }

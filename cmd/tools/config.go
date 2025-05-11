@@ -7,6 +7,15 @@ import (
 	"github.com/askasoft/pango/log"
 )
 
+func initConfigs() {
+	cfg, err := loadConfigs()
+	if err != nil {
+		app.Exit(app.ExitErrCFG)
+	}
+
+	ini.SetDefault(cfg)
+}
+
 func loadConfigs() (*ini.Ini, error) {
 	c := ini.NewIni()
 
@@ -17,6 +26,7 @@ func loadConfigs() (*ini.Ini, error) {
 
 		log.Infof("Loading config: %q", f)
 		if err := c.LoadFile(f); err != nil {
+			log.Errorf("Failed to load ini config file %q: %v", f, err)
 			return nil, err
 		}
 	}

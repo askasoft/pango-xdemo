@@ -3,7 +3,7 @@ package args
 import (
 	"time"
 
-	"github.com/askasoft/pango-xdemo/app/utils/sqlxutil"
+	"github.com/askasoft/pango-xdemo/app/utils/sqlutil"
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/tmu"
 )
@@ -41,7 +41,7 @@ func (dra *DateRangeArg) Normalize() {
 }
 
 func (dra *DateRangeArg) AddDateRangeFilter(sqb *sqlx.Builder, col string) {
-	sqlxutil.AddDates(sqb, col, dra.DateFrom, dra.DateTo)
+	sqlutil.AddDates(sqb, col, dra.DateFrom, dra.DateTo)
 }
 
 type TimeRangeArg struct {
@@ -50,5 +50,5 @@ type TimeRangeArg struct {
 }
 
 func (tra *TimeRangeArg) AddTimeRangeFilter(sqb *sqlx.Builder, col string) {
-	sqlxutil.AddTimes(sqb, col, tra.TimeFrom, tra.TimeTo)
+	sqlutil.AddTimes(sqb, col, tra.TimeFrom, tra.TimeTo)
 }

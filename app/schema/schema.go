@@ -10,6 +10,7 @@ import (
 	"github.com/askasoft/pango/xjm"
 	"github.com/askasoft/pango/xjm/sqlxjm"
 	"github.com/askasoft/pango/xsm"
+	"github.com/askasoft/pango/xsm/mysm/mysqlxsm"
 	"github.com/askasoft/pango/xsm/pgsm/pgsqlxsm"
 )
 
@@ -65,7 +66,12 @@ func DefaultSchema() string {
 }
 
 func SSM(db *sqlx.DB) xsm.SchemaManager {
-	return pgsqlxsm.SM(db)
+	switch app.DBType() {
+	case "mysql":
+		return mysqlxsm.SM(db)
+	default:
+		return pgsqlxsm.SM(db)
+	}
 }
 
 func SM() xsm.SchemaManager {
