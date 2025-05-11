@@ -18,7 +18,6 @@ import (
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/jobs"
 	"github.com/askasoft/pango-xdemo/app/models"
-	"github.com/askasoft/pango/fsu"
 	"github.com/askasoft/pango/fsw"
 	"github.com/askasoft/pango/gwp"
 	"github.com/askasoft/pango/imc"
@@ -180,7 +179,7 @@ func initLog() {
 }
 
 func initConfigs() {
-	cfg, err := loadConfigs()
+	cfg, err := app.LoadConfigs()
 	if err != nil {
 		app.Exit(app.ExitErrCFG)
 	}
@@ -319,24 +318,6 @@ func shutdown(hsv *http.Server, wg *sync.WaitGroup) {
 
 // ------------------------------------------------------
 
-func loadConfigs() (*ini.Ini, error) {
-	c := ini.NewIni()
-
-	for i, f := range app.AppConfigFiles {
-		if i > 0 && fsu.FileExists(f) != nil {
-			continue
-		}
-
-		log.Infof("Loading config: %q", f)
-		if err := c.LoadFile(f); err != nil {
-			log.Errorf("Failed to load ini config file %q: %v", f, err)
-			return nil, err
-		}
-	}
-
-	return c, nil
-}
-
 func loadCertificate() (*tls.Certificate, error) {
 	certificate := ini.GetString("server", "certificate")
 	certkeyfile := ini.GetString("server", "certkeyfile")
@@ -376,7 +357,7 @@ func reloadLog(path string, op fsw.Op) {
 func reloadConfigs(path string, op fsw.Op) {
 	log.Infof("Reloading configuration %v [%v]", path, op)
 
-	cfg, err := loadConfigs()
+	cfg, err := app.LoadConfigs()
 	if err != nil {
 		return
 	}

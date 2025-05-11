@@ -78,7 +78,7 @@ func UserDeletes(c *xin.Context) {
 			if err = tt.AddAuditLog(tx, c, models.AL_USERS_DELETES, num.Ltoa(cnt), ida.String()); err != nil {
 				return
 			}
-			return tt.ResetUsersAutoIncrement(tx)
+			err = tt.ResetUsersAutoIncrement(tx)
 		}
 		return
 	})

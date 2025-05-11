@@ -4,6 +4,9 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/askasoft/pango/fsu"
+	"github.com/askasoft/pango/ini"
+	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/str"
 )
@@ -16,6 +19,24 @@ const (
 	DateFormat = "2006-01-02"
 	TimeFormat = "2006-01-02 15:04:05"
 )
+
+func LoadConfigs() (*ini.Ini, error) {
+	c := ini.NewIni()
+
+	for i, f := range AppConfigFiles {
+		if i > 0 && fsu.FileExists(f) != nil {
+			continue
+		}
+
+		log.Infof("Loading config: %q", f)
+		if err := c.LoadFile(f); err != nil {
+			log.Errorf("Failed to load ini config file %q: %v", f, err)
+			return nil, err
+		}
+	}
+
+	return c, nil
+}
 
 func formatTime(a any, f string) string {
 	switch t := a.(type) {
