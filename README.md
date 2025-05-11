@@ -36,13 +36,23 @@ GRANT ALL ON DATABASE xdemo TO xdemo;
 ```sh
 sudo apt update
 sudo apt install postgresql postgresql-contrib libpq-dev
+```
 
-sudo cp /etc/mysql/mariadb.conf.d/50-server.cnf /tmp/
-sudo sed -i -e "s/#bind-addresses.*/bind-addresses = 0.0.0.0/" /etc/mysql/mariadb.conf.d/50-server.cnf
+```sh
+sudo nano /etc/mysql/mariadb.conf.d/50-server.cnf
+```
 
+```ini
+[mysqld]
+sql_mode = 'PIPES_AS_CONCAT'
+bind-addresses = 0.0.0.0
+```
+
+```sh
 sudo systemctl enable  mariadb
 sudo systemctl restart mariadb
 ```
+
 
 #### create mariadb database
 ```sql
