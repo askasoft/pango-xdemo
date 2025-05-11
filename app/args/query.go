@@ -93,6 +93,6 @@ func (qa *QueryArg) AddLikesEx(sqb *sqlx.Builder, col string, val string, not bo
 	sqlutil.AddLikesEx(sqb, col, val, not)
 }
 
-func (qa *QueryArg) AddFlags(sqb *sqlx.Builder, col string, vals []string) {
-	sqlutil.AddFlags(sqb, col, vals)
+func (qa *QueryArg) AddContains(sqb *sqlx.Builder, col string, vals []string) {
+	sqlutil.AddContains(sqb, col, vals)
 }

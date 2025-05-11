@@ -13,6 +13,8 @@ const (
 	PrefixPetFile = "p"
 )
 
+type Strings = sqx.JSONStringArray
+
 func toString(o any) string {
 	bs, err := json.MarshalIndent(o, "", "  ")
 	if err != nil {

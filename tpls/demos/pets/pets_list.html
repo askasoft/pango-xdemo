@@ -35,7 +35,7 @@
 			<td class="born_at date">{{DATE $p.BornAt}}</td>
 			<td class="origin">{{$.PetOriginMap.SafeGet $p.Origin $p.Origin}}</td>
 			<td class="temper">{{$.PetTemperMap.SafeGet $p.Temper $p.Temper}}</td>
-			<td class="habits">{{range $k, $v := $p.Habits}}{{if $v}}<b>{{$.PetHabitsMap.SafeGet $k $k}}</b>{{end}}{{end}}</td>
+			<td class="habits">{{range $h := $p.Habits}}<b>{{$.PetHabitsMap.SafeGet $h $h}}</b>{{end}}</td>
 			<td class="amount">{{$p.Amount}}</td>
 			<td class="price">{{$p.Price}}</td>
 			<td class="shop_name">{{$p.ShopName}}</td>

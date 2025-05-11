@@ -136,5 +136,5 @@ func (pqa *PetQueryArg) AddFilters(sqb *sqlx.Builder) {
 	pqa.AddFloats(sqb, "price", pqa.PriceMin, pqa.PriceMax)
 	pqa.AddLikes(sqb, "name", pqa.Name)
 	pqa.AddLikes(sqb, "shop_name", pqa.ShopName)
-	pqa.AddFlags(sqb, "habits", pqa.Habits)
+	pqa.AddContains(sqb, "habits", pqa.Habits)
 }

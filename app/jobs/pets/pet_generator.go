@@ -11,10 +11,10 @@ import (
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
+	"github.com/askasoft/pango/cog/hashset"
 	"github.com/askasoft/pango/fsu"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/num"
-	"github.com/askasoft/pango/sqx"
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/xfs"
@@ -115,10 +115,10 @@ func (pg *PetGenerator) randText(n int) string {
 	return str.Strip(sb.String())
 }
 
-func (pg *PetGenerator) randHabits() sqx.JSONObject {
-	m := sqx.JSONObject{}
+func (pg *PetGenerator) randHabits() models.Strings {
+	m := hashset.NewHashSet[string]()
 	for range rand.Intn(len(pg.phs)) {
-		m[pg.phs[rand.Intn(len(pg.phs))]] = 1
+		m.Add(pg.phs[rand.Intn(len(pg.phs))])
 	}
-	return m
+	return m.Values()
 }

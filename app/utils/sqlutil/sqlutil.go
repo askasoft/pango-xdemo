@@ -161,7 +161,7 @@ func AddIDs(sqb *sqlx.Builder, col string, id string) {
 			if sb.Len() > 1 {
 				sb.WriteString(" OR ")
 			}
-			sb.WriteString(col)
+			sb.WriteString(sqb.Quote(col))
 
 			smin, smax, ok := str.CutByte(s, '-')
 			if ok {
@@ -197,7 +197,7 @@ func addLikesAny(sqb *sqlx.Builder, like, col, val string, not bool) {
 		if i > 0 {
 			sb.WriteString(" OR ")
 		}
-		sb.WriteString(col)
+		sb.WriteString(sqb.Quote(col))
 		sb.WriteString(" ")
 		sb.WriteString(like)
 		sb.WriteString(" ?")
@@ -221,11 +221,20 @@ func AddLikesEx(sqb *sqlx.Builder, col string, val string, not bool) {
 	}
 }
 
-func AddFlags(sqb *sqlx.Builder, col string, vals []string) {
+func AddContains(sqb *sqlx.Builder, col string, vals []string) {
 	switch app.DBType() {
 	case "mysql":
-		myutil.FlagsContainsAny(sqb, col, vals)
+		myutil.JSONStringsContainsAll(sqb, col, vals...)
 	default:
-		pgutil.FlagsContainsAny(sqb, col, vals)
+		pgutil.JSONStringsContainsAll(sqb, col, vals...)
+	}
+}
+
+func AddJSONFlags(sqb *sqlx.Builder, col string, vals []string) {
+	switch app.DBType() {
+	case "mysql":
+		myutil.JSONFlagsContainsAll(sqb, col, vals...)
+	default:
+		pgutil.JSONFlagsContainsAll(sqb, col, vals...)
 	}
 }

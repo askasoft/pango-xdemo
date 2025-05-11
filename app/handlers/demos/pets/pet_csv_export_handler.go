@@ -10,7 +10,6 @@ import (
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
-	"github.com/askasoft/pango/cas"
 	"github.com/askasoft/pango/iox"
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/str"
@@ -67,11 +66,8 @@ func PetCsvExport(c *xin.Context) {
 		}
 
 		habits := []string{}
-		for k, v := range pet.Habits {
-			b, _ := cas.ToBool(v)
-			if b {
-				habits = append(habits, phm.SafeGet(k, k))
-			}
+		for _, h := range pet.Habits {
+			habits = append(habits, phm.SafeGet(h, h))
 		}
 
 		cols = cols[:0]
