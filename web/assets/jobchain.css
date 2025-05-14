@@ -8,10 +8,6 @@
 	--js-progress-bg: var(--bs-secondary-bg-subtle, #e2e3e5);
 }
 
-#jobchain_form {
-	margin-bottom: 1.5em;
-}
-
 #jobchain_tabs {
 	overflow-x: hidden;
 	overflow-y: auto;

@@ -10,9 +10,6 @@
 fieldset > form {
 	margin-bottom: 0;
 }
-#job_form {
-	margin-bottom: 1.5rem;
-}
 
 #job_tabs {
 	overflow-x: hidden;
