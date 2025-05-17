@@ -8,18 +8,18 @@
 <meta property="xdemo:domain" content="{{.Domain}}"/>
 <meta property="xdemo:token" content="{{.Token}}"/>
 <link rel="shortcut icon" href="{{.Base}}/favicon.ico"/>
-<link rel="stylesheet" type="text/css" href="{{.Base}}/static/bootstrap5/css/bootstrap.min.css?r={{.REV}}"/>
-{{/*<link rel="stylesheet" type="text/css" href="{{.Base}}/static/bootswatch5/cosmo/bootstrap.min.css?r={{.REV}}"/>*/}}
-{{/*<link rel="stylesheet" type="text/css" href="{{.Base}}/static/bootswatch5/flatly/bootstrap.min.css?r={{.REV}}"/>*/}}
-{{/*<link rel="stylesheet" type="text/css" href="{{.Base}}/static/bootswatch5/pulse/bootstrap.min.css?r={{.REV}}"/>*/}}
-<link rel="stylesheet" type="text/css" href="{{.Base}}/static/fontawesome6/css/all.min.css?r={{.REV}}"/>
-<link rel="stylesheet" type="text/css" href="{{.Base}}/static/plugins/css/plugins.min.css?r={{.REV}}"/>
-<link rel="stylesheet" type="text/css" href="{{.Base}}/assets/main.css?r={{.REV}}"/>
+<link rel="stylesheet" type="text/css" href="{{.Base}}/static/{{$.REV}}/bootstrap5/css/bootstrap.min.css"/>
+{{/*<link rel="stylesheet" type="text/css" href="{{.Base}}/static/{{$.REV}}/bootswatch5/cosmo/bootstrap.min.css"/>*/}}
+{{/*<link rel="stylesheet" type="text/css" href="{{.Base}}/static/{{$.REV}}/bootswatch5/flatly/bootstrap.min.css"/>*/}}
+{{/*<link rel="stylesheet" type="text/css" href="{{.Base}}/static/{{$.REV}}/bootswatch5/pulse/bootstrap.min.css"/>*/}}
+<link rel="stylesheet" type="text/css" href="{{.Base}}/static/{{$.REV}}/fontawesome6/css/all.min.css"/>
+<link rel="stylesheet" type="text/css" href="{{.Base}}/static/{{$.REV}}/plugins/css/plugins.min.css"/>
+<link rel="stylesheet" type="text/css" href="{{.Base}}/assets/{{$.REV}}/main.css"/>
 {{range $s := .Ctx.Attrs.sstyles}}
-<link rel="stylesheet" type="text/css" href="{{$.Base}}/static/{{$s}}?r={{$.REV}}"/>
+<link rel="stylesheet" type="text/css" href="{{$.Base}}/static/{{$.REV}}/{{$s}}"/>
 {{end}}
 {{range $s := .Ctx.Attrs.astyles}}
-<link rel="stylesheet" type="text/css" href="{{$.Base}}/assets/{{$s}}?r={{$.REV}}"/>
+<link rel="stylesheet" type="text/css" href="{{$.Base}}/assets/{{$.REV}}/{{$s}}"/>
 {{end}}
 </head>
 {{end}}

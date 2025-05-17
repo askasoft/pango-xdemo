@@ -1,24 +1,24 @@
 {{define "scripts"}}
 {{if eq .CFG.app.debug "true"}}
-<script type="text/javascript" src="{{.Base}}/static/jquery3/jquery-3.7.1.js?r={{.REV}}"></script>
-<script type="text/javascript" src="{{.Base}}/static/bootstrap5/js/bootstrap.bundle.js?r={{.REV}}"></script>
-<script type="text/javascript" src="{{.Base}}/static/corejs/corejs.js?r={{.REV}}"></script>
-<script type="text/javascript" src="{{.Base}}/static/plugins/js/plugins.js?r={{.REV}}"></script>
+<script type="text/javascript" src="{{.Base}}/static/{{$.REV}}/jquery3/jquery-3.7.1.js"></script>
+<script type="text/javascript" src="{{.Base}}/static/{{$.REV}}/bootstrap5/js/bootstrap.bundle.js"></script>
+<script type="text/javascript" src="{{.Base}}/static/{{$.REV}}/corejs/corejs.js"></script>
+<script type="text/javascript" src="{{.Base}}/static/{{$.REV}}/plugins/js/plugins.js"></script>
 {{else}}
-<script type="text/javascript" src="{{.Base}}/static/jquery3/jquery-3.7.1.min.js?r={{.REV}}"></script>
-<script type="text/javascript" src="{{.Base}}/static/bootstrap5/js/bootstrap.bundle.min.js?r={{.REV}}"></script>
-<script type="text/javascript" src="{{.Base}}/static/corejs/corejs.min.js?r={{.REV}}"></script>
-<script type="text/javascript" src="{{.Base}}/static/plugins/js/plugins.min.js?r={{.REV}}"></script>
+<script type="text/javascript" src="{{.Base}}/static/{{$.REV}}/jquery3/jquery-3.7.1.min.js"></script>
+<script type="text/javascript" src="{{.Base}}/static/{{$.REV}}/bootstrap5/js/bootstrap.bundle.min.js"></script>
+<script type="text/javascript" src="{{.Base}}/static/{{$.REV}}/corejs/corejs.min.js"></script>
+<script type="text/javascript" src="{{.Base}}/static/{{$.REV}}/plugins/js/plugins.min.js"></script>
 {{end}}
 {{range $s := .Ctx.Attrs.sscripts}}
-<script type="text/javascript" src="{{$.Base}}/static/{{$s}}?r={{$.REV}}"></script>
+<script type="text/javascript" src="{{$.Base}}/static/{{$.REV}}/{{$s}}"></script>
 {{end}}
 {{if eq .CFG.app.debug "true"}}
-<script type="text/javascript" src="{{.Base}}/assets/main.js?r={{.REV}}"></script>
+<script type="text/javascript" src="{{.Base}}/assets/{{$.REV}}/main.js"></script>
 {{else}}
-<script type="text/javascript" src="{{.Base}}/assets/main.js?r={{.REV}}"></script>
+<script type="text/javascript" src="{{.Base}}/assets/{{$.REV}}/main.js"></script>
 {{end}}
 {{range $s := .Ctx.Attrs.ascripts}}
-<script type="text/javascript" src="{{$.Base}}/assets/{{$s}}?r={{$.REV}}"></script>
+<script type="text/javascript" src="{{$.Base}}/assets/{{$.REV}}/{{$s}}"></script>
 {{end}}
 {{end}}

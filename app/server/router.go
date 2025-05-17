@@ -227,14 +227,14 @@ func addStaticHandlers(rg *xin.RouterGroup) {
 	xcch := app.XCC.Handle
 
 	for path, fs := range web.Statics {
-		xin.StaticFS(rg, "/static/"+path, xin.FixedModTimeFS(xin.FS(fs), mt), "", xcch)
+		xin.StaticFS(rg, "/static/"+app.Revision+"/"+path, xin.FixedModTimeFS(xin.FS(fs), mt), "", xcch)
 	}
 
 	wfsc := func(c *xin.Context) http.FileSystem {
 		return app.WAS
 	}
 
-	xin.StaticFSFunc(rg, "/assets", wfsc, "/assets", xcch)
+	xin.StaticFSFunc(rg, "/assets/"+app.Revision, wfsc, "/assets", xcch)
 	xin.StaticFSFuncFile(rg, "/favicon.ico", wfsc, "favicon.ico", xcch)
 	xin.StaticFSFuncFile(rg, "/robots.txt", wfsc, "robots.txt", xcch)
 }
