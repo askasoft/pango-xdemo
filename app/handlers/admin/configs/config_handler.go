@@ -188,26 +188,28 @@ func validateConfig(c *xin.Context, cfg *models.Config, v *string) bool {
 		}
 	}
 
-	if *v != "" {
-		lm := getConfigItemList(c.Locale, cfg.Name)
-		if lm != nil && !lm.IsEmpty() {
-			var ok bool
+	if *v == "" {
+		return true
+	}
 
-			switch cfg.Style {
-			case models.ConfigStyleChecks, models.ConfigStyleVerticalChecks, models.ConfigStyleOrderedChecks, models.ConfigStyleMultiSelect:
-				vs := str.FieldsByte(*v, '\t')
-				ok = lm.ContainsAll(vs...)
-			default:
-				ok = lm.Contains(*v)
-			}
+	lm := getConfigItemList(c.Locale, cfg.Name)
+	if lm != nil && !lm.IsEmpty() {
+		var ok bool
 
-			if !ok {
-				c.AddError(&args.ParamError{
-					Param:   cfg.Name,
-					Message: tbs.Format(c.Locale, "error.param.invalid", tbs.GetText(c.Locale, "config."+cfg.Name, cfg.Name)),
-				})
-				return false
-			}
+		switch cfg.Style {
+		case models.ConfigStyleChecks, models.ConfigStyleVerticalChecks, models.ConfigStyleOrderedChecks, models.ConfigStyleMultiSelect:
+			vs := str.FieldsByte(*v, '\t')
+			ok = lm.ContainsAll(vs...)
+		default:
+			ok = lm.Contains(*v)
+		}
+
+		if !ok {
+			c.AddError(&args.ParamError{
+				Param:   cfg.Name,
+				Message: tbs.Format(c.Locale, "error.param.invalid", tbs.GetText(c.Locale, "config."+cfg.Name, cfg.Name)),
+			})
+			return false
 		}
 	}
 
