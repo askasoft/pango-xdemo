@@ -1,6 +1,19 @@
 #auditlogs_table th {
 	white-space: nowrap;
 }
-#auditlogs_table td.detail {
+
+#auditlogs_table td.detail>pre {
+	cursor: pointer;
+	display: -webkit-box;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 3;
+	max-height: 5rem;
+}
+
+#auditlogs_detail_popup pre {
+	margin-bottom: 0;
 	white-space: pre-wrap;
+	word-break: break-all;
 }

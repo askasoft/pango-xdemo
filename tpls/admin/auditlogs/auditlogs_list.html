@@ -26,8 +26,12 @@
 			<td class="no">{{Add $n $i}}</td>
 			<td class="datetime">{{TIME $al.Date}}</td>
 			<td class="userinfo" colspan="2">{{$al.User}}<br>{{$al.CIP}}</td>
-			<td class="funact">{{$.AuditLogFuncMap.SafeGet $al.Func $al.Func}} / {{$al.Action}}</td>
-			<td class="detail">{{$al.Detail}}</td>
+			<td class="funact" data-funact="{{$al.Func}}.{{$al.Action}}">
+				{{$.AuditLogFuncMap.SafeGet $al.Func $al.Func}}
+				/
+				{{T $.Loc (print "auditlog.action." $al.Func "." $al.Action)}}
+			</td>
+			<td class="detail"><pre>{{$al.Detail}}</pre></td>
 		</tr>
 		{{end}}
 	</tbody>

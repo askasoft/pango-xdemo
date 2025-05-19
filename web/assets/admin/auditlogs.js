@@ -113,6 +113,34 @@
 		return false;
 	}
 
+	function on_detail_click() {
+		var $b = $('#auditlogs_detail_popup .ui-popup-body').empty();
+		var detail = $(this).text();
+		if (!detail) {
+			return false;
+		}
+
+		try {
+			var jo = JSON.parse(detail);
+			var $t = $('<table class="table">'), $tb = $('<tbody>');
+			for (var k in jo) {
+				var v = jo[k];
+				if (typeof(v) != 'string') {
+					v = JSON.stringify(v);
+				}
+				$tb.append($('<tr>').append(
+					$('<td>').text(k),
+					$('<td>').append($('<pre>').text(v))
+				));
+			}
+			$b.append($t.append($tb));
+		} catch (ex) {
+			$b.append($('<pre>').text(detail));
+		}
+
+		$('#auditlogs_detail_popup').popup('toggle', this);
+		return false;
+	}
 
 	//----------------------------------------------------
 	// init
@@ -133,6 +161,8 @@
 		$('#auditlogs_deletebat_popup')
 			.on('submit', 'form', auditlogs_deletebat)
 			.on('click', '.ui-popup-footer button[type=submit]', auditlogs_deletebat);
+
+		$('#auditlogs_list').on('click', 'td.detail > pre', on_detail_click);
 	}
 
 	$(window).on('load', auditlogs_init);

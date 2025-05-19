@@ -2,6 +2,7 @@ package configs
 
 import (
 	"encoding/csv"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -12,6 +13,7 @@ import (
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/schema"
 	"github.com/askasoft/pango-xdemo/app/tenant"
+	"github.com/askasoft/pango/asg"
 	"github.com/askasoft/pango/cog/linkedhashmap"
 	"github.com/askasoft/pango/doc/csvx"
 	"github.com/askasoft/pango/gog"
@@ -23,14 +25,20 @@ import (
 	"github.com/askasoft/pango/xin"
 )
 
-type ConfigGroup struct {
+type configItem struct {
+	Name    string
+	Value   string
+	Display string
+}
+
+type configGroup struct {
 	Name  string           `json:"name"`
 	Items []*models.Config `json:"items"`
 }
 
-type ConfigCategory struct {
+type configCategory struct {
 	Name   string         `json:"name"`
-	Groups []*ConfigGroup `json:"groups"`
+	Groups []*configGroup `json:"groups"`
 }
 
 func loadConfigList(c *xin.Context, actor string) []*models.Config {
@@ -55,12 +63,12 @@ func disableConfigSuperSecret(c *xin.Context, configs []*models.Config) {
 	}
 }
 
-func buildConfigCategories(c *xin.Context, configs []*models.Config) []*ConfigCategory {
-	ccs := []*ConfigCategory{}
+func buildConfigCategories(c *xin.Context, configs []*models.Config) []*configCategory {
+	ccs := []*configCategory{}
 
 	cks := tbs.GetBundle(c.Locale).GetSection("config.category").Keys()
 	for _, ck := range cks {
-		cgs := []*ConfigGroup{}
+		cgs := []*configGroup{}
 		gks := str.Fields(tbs.GetText(c.Locale, "config.category."+ck))
 		for _, gk := range gks {
 			items := []*models.Config{}
@@ -70,12 +78,12 @@ func buildConfigCategories(c *xin.Context, configs []*models.Config) []*ConfigCa
 				}
 			}
 			if len(items) > 0 {
-				cg := &ConfigGroup{Name: gk, Items: items}
+				cg := &configGroup{Name: gk, Items: items}
 				cgs = append(cgs, cg)
 			}
 		}
 		if len(cgs) > 0 {
-			cc := &ConfigCategory{Name: ck, Groups: cgs}
+			cc := &configCategory{Name: ck, Groups: cgs}
 			ccs = append(ccs, cc)
 		}
 	}
@@ -136,10 +144,56 @@ func ConfigSave(c *xin.Context) {
 		return
 	}
 
-	if saveConfigs(c, uconfigs, models.AL_CONFIG_UPDATE) {
+	detail := buildConfigDetails(c, configs, uconfigs)
+	if saveConfigs(c, uconfigs, models.AL_CONFIG_UPDATE, detail) {
 		tt.PurgeConfig()
 		c.JSON(http.StatusOK, xin.H{"success": tbs.GetText(c.Locale, "success.saved")})
 	}
+}
+
+func buildConfigDetails(c *xin.Context, configs []*models.Config, uconfigs []*models.Config) string {
+	ccs := buildConfigCategories(c, configs)
+
+	ads := map[string]any{}
+	for _, cc := range ccs {
+		ccn := tbs.GetText(c.Locale, "config.category.label."+cc.Name)
+		for _, cg := range cc.Groups {
+			cgn := tbs.GetText(c.Locale, "config.group.label."+cg.Name)
+			for _, ci := range cg.Items {
+				i := asg.IndexFunc(uconfigs, func(cfg *models.Config) bool {
+					return cfg.Name == ci.Name
+				})
+				if i < 0 {
+					continue
+				}
+
+				cfg := uconfigs[i]
+
+				cin := ccn + " / " + cgn + " / " + tbs.GetText(c.Locale, "config."+cfg.Name)
+
+				var civ any = cfg.Value
+				lm := getConfigItemList(c.Locale, cfg.Name)
+				if lm != nil && !lm.IsEmpty() {
+					switch cfg.Style {
+					case models.ConfigStyleChecks, models.ConfigStyleVerticalChecks, models.ConfigStyleOrderedChecks, models.ConfigStyleMultiSelect:
+						vs := str.FieldsByte(cfg.Value, '\t')
+						lbs := make([]string, 0, len(vs))
+						for _, v := range vs {
+							lbs = append(lbs, lm.SafeGet(v, v))
+						}
+						civ = lbs
+					default:
+						civ = lm.SafeGet(cfg.Name)
+					}
+				}
+
+				ads[cin] = civ
+			}
+		}
+	}
+
+	bs, _ := json.Marshal(ads)
+	return str.UnsafeString(bs)
 }
 
 func validateConfig(c *xin.Context, cfg *models.Config, v *string) bool {
@@ -249,7 +303,7 @@ func checkPostConfigs(c *xin.Context, configs []*models.Config) (uconfigs []*mod
 	return
 }
 
-func saveConfigs(c *xin.Context, configs []*models.Config, action string) bool {
+func saveConfigs(c *xin.Context, configs []*models.Config, action string, details ...any) bool {
 	tt := tenant.FromCtx(c)
 	au := tenant.AuthUser(c)
 
@@ -257,7 +311,7 @@ func saveConfigs(c *xin.Context, configs []*models.Config, action string) bool {
 		if err := tt.SaveConfigs(tx, au, configs, c.Locale); err != nil {
 			return err
 		}
-		return tt.AddAuditLog(tx, c, action)
+		return tt.AddAuditLog(tx, c, action, details...)
 	})
 	if err == nil {
 		return true
@@ -294,21 +348,15 @@ func ConfigExport(c *xin.Context) {
 		ccn := tbs.GetText(c.Locale, "config.category.label."+cc.Name)
 		for _, cg := range cc.Groups {
 			cgn := tbs.GetText(c.Locale, "config.group.label."+cg.Name)
-			for _, cfg := range cg.Items {
-				disp := fmt.Sprintf("%s / %s / %s", ccn, cgn, tbs.GetText(c.Locale, "config."+cfg.Name, cfg.Name))
-				if err := cw.Write([]string{cfg.Name, cfg.Value, disp}); err != nil {
+			for _, ci := range cg.Items {
+				disp := fmt.Sprintf("%s / %s / %s", ccn, cgn, tbs.GetText(c.Locale, "config."+ci.Name, ci.Name))
+				if err := cw.Write([]string{ci.Name, ci.Value, disp}); err != nil {
 					c.Logger.Error(err)
 					return
 				}
 			}
 		}
 	}
-}
-
-type configCsvRecord struct {
-	Name    string
-	Value   string
-	Display string
 }
 
 func ConfigImport(c *xin.Context) {
@@ -328,7 +376,7 @@ func ConfigImport(c *xin.Context) {
 	}
 	defer uf.Close()
 
-	var csvcfgs []*configCsvRecord
+	var csvcfgs []*configItem
 	if err := csvx.ScanReader(uf, &csvcfgs); err != nil {
 		err = tbs.Error(c.Locale, "csv.error.data")
 		c.AddError(err)
@@ -346,13 +394,17 @@ func ConfigImport(c *xin.Context) {
 		return
 	}
 
-	if saveConfigs(c, uconfigs, models.AL_CONFIG_IMPORT) {
+	if len(configs) > 0 {
+		if !saveConfigs(c, uconfigs, models.AL_CONFIG_IMPORT) {
+			return
+		}
 		tt.PurgeConfig()
-		c.JSON(http.StatusOK, xin.H{"success": tbs.GetText(c.Locale, "success.imported")})
 	}
+
+	c.JSON(http.StatusOK, xin.H{"success": tbs.GetText(c.Locale, "success.imported")})
 }
 
-func checkCsvConfigs(c *xin.Context, configs []*models.Config, csvcfgs []*configCsvRecord) (uconfigs []*models.Config) {
+func checkCsvConfigs(c *xin.Context, configs []*models.Config, csvcfgs []*configItem) (uconfigs []*models.Config) {
 	cfgmaps := map[string]*models.Config{}
 	for _, cfg := range configs {
 		cfgmaps[cfg.Name] = cfg

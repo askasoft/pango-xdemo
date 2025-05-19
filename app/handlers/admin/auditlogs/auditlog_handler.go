@@ -8,7 +8,6 @@ import (
 	"github.com/askasoft/pango-xdemo/app/handlers"
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
-	"github.com/askasoft/pango/asg"
 	"github.com/askasoft/pango/tbs"
 	"github.com/askasoft/pango/xin"
 )
@@ -77,11 +76,7 @@ func AuditLogList(c *xin.Context) {
 
 		for _, al := range results {
 			if len(al.Params) > 0 {
-				al.Detail = tbs.Format(c.Locale, "auditlog.detail."+al.Func+"."+al.Action, asg.Anys(al.Params)...)
-			}
-			act := tbs.Format(c.Locale, "auditlog.action."+al.Func+"."+al.Action)
-			if act != "" {
-				al.Action = act
+				al.Detail = tbs.Format(c.Locale, "auditlog.detail."+al.Func+"."+al.Action, al.Params...)
 			}
 		}
 

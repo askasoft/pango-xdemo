@@ -65,7 +65,7 @@ var (
 
 var (
 	// BuildTime app build time
-	BuildTime, _ = time.ParseInLocation("2006-01-02T15:04:05Z", buildTime, time.UTC)
+	BuildTime time.Time
 
 	// StartupTime app start time
 	StartupTime = time.Now()
@@ -171,6 +171,23 @@ var (
 	// AFIPS authenticate failure ip cache
 	AFIPS *imc.Cache[string, int]
 )
+
+// init built-in variables on debug
+func init() {
+	if Version == "" {
+		Version = "0"
+	}
+
+	if Revision == "" {
+		Revision = fmt.Sprintf("%x", StartupTime.Unix())
+	}
+
+	if buildTime == "" {
+		BuildTime = StartupTime
+	} else {
+		BuildTime, _ = time.ParseInLocation("2006-01-02T15:04:05Z", buildTime, time.UTC)
+	}
+}
 
 func Exit(code int) {
 	log.Close()
