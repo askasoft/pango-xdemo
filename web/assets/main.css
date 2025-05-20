@@ -166,8 +166,15 @@ body {
 	padding-top: 50px; /* for #header.fixed-top */
 }
 pre {
+	background-color: transparent;
+	border: 0 none;
+	font-family: var(--bs-font-sans-serif);
 	font-size: 1em;
+	margin: 0;
+	padding: 0;
+	overflow: visible;
 	white-space: pre-wrap;
+	word-break: break-all;
 }
 a > s {
 	text-decoration: none;
@@ -176,6 +183,10 @@ blockquote {
 	border-left: 0.25rem solid var(--bs-border-color, #ccc);
 	padding-left: 0.5rem;
 }
+mark {
+	background-color: yellow;
+}
+
 
 #header {
 	background-color: var(--bs-body-bg);
@@ -474,12 +485,6 @@ form div.verr {
 }
 
 .s-table td > pre {
-	background-color: transparent;
-	border: 0 none;
-	margin: 0;
-	padding: 0;
-	white-space: pre-wrap;
-	word-break: break-all;
 	max-height: 3em;
 	overflow-y: auto;
 }
@@ -526,9 +531,6 @@ form div.verr {
 	max-width: 90vw;
 }
 
-.s-popup-detail .ui-popup-body pre {
-	white-space: pre-wrap;
-}
 .s-popup-detail > .prev, .s-popup-detail > .next {
 	background-color: var(--bs-body-bg);
 	border: solid 1px var(--bs-secondary);
