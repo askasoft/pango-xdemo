@@ -20,7 +20,6 @@ import (
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/tbs"
-	"github.com/askasoft/pango/vad"
 	"github.com/askasoft/pango/xin"
 )
 
@@ -37,7 +36,11 @@ func (pts *PwdRstToken) String() string {
 	return str.UnsafeString(bs)
 }
 
-type PwdRstArg struct {
+type PwdRstSendArg struct {
+	Email string `form:"email" validate:"required,email"`
+}
+
+type PwdRstExecArg struct {
 	Newpwd string `form:"newpwd" validate:"required,printascii"`
 	Conpwd string `form:"conpwd" validate:"required,eqfield=Newpwd"`
 }
@@ -49,17 +52,16 @@ func PasswordResetIndex(c *xin.Context) {
 }
 
 func PasswordResetSend(c *xin.Context) {
-	email := str.Strip(c.PostForm("email"))
-
-	if email == "" || !vad.IsEmail(email) {
-		c.AddError(&args.ParamError{Param: "email", Message: tbs.GetText(c.Locale, "pwdrst.error.email")})
+	arg := &PwdRstSendArg{}
+	if err := c.Bind(arg); err != nil {
+		args.AddBindErrors(c, err, "pwdrst.")
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}
 
 	tt := tenant.FromCtx(c)
 
-	user, err := tt.FindAuthUser(email)
+	user, err := tt.FindAuthUser(arg.Email)
 	if err != nil {
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
@@ -69,12 +71,12 @@ func PasswordResetSend(c *xin.Context) {
 	if user == nil {
 		// show success message even user is not found
 		c.JSON(http.StatusOK, xin.H{
-			"success": tbs.Format(c.Locale, "pwdrst.success.sent", email),
+			"success": tbs.Format(c.Locale, "pwdrst.success.sent", arg.Email),
 		})
 		return
 	}
 
-	token := &PwdRstToken{Email: email, Timestamp: time.Now().UnixMilli()}
+	token := &PwdRstToken{Email: arg.Email, Timestamp: time.Now().UnixMilli()}
 	tkenc := cptutil.MustEncrypt(app.Secret(), token.String())
 	rsurl := fmt.Sprintf("%s://%s%s/login/pwdrst/reset/%s", str.If(c.IsSecure(), "https", "http"), c.RequestHostname(), app.Base, tkenc)
 
@@ -100,7 +102,7 @@ func PasswordResetSend(c *xin.Context) {
 	)
 	message := sr.Replace(tbs.GetText(c.Locale, "pwdrst.email.send.message"))
 
-	if err := smtputil.SendHTMLMail(email, subject, message); err != nil {
+	if err := smtputil.SendHTMLMail(arg.Email, subject, message); err != nil {
 		c.Logger.Error(err)
 		c.AddError(tbs.Error(c.Locale, "pwdrst.error.sendmail"))
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
@@ -108,7 +110,7 @@ func PasswordResetSend(c *xin.Context) {
 	}
 
 	c.JSON(http.StatusOK, xin.H{
-		"success": tbs.Format(c.Locale, "pwdrst.success.sent", email),
+		"success": tbs.Format(c.Locale, "pwdrst.success.sent", arg.Email),
 	})
 }
 
@@ -168,15 +170,16 @@ func PasswordResetExecute(c *xin.Context) {
 		return
 	}
 
-	pra := &PwdRstArg{}
-	if err := c.Bind(pra); err != nil {
+	arg := &PwdRstExecArg{}
+	if err := c.Bind(arg); err != nil {
 		args.AddBindErrors(c, err, "pwdrst.")
 	}
-	if pra.Newpwd != "" {
-		if vs := tt.ValidatePassword(c.Locale, pra.Newpwd); len(vs) > 0 {
+	if arg.Newpwd != "" {
+		if vs := tt.ValidatePassword(c.Locale, arg.Newpwd); len(vs) > 0 {
 			for _, v := range vs {
 				c.AddError(&args.ParamError{
 					Param:   "newpwd",
+					Label:   tbs.GetText(c.Locale, "pwdrst.newpwd"),
 					Message: v,
 				})
 			}
@@ -187,7 +190,7 @@ func PasswordResetExecute(c *xin.Context) {
 		return
 	}
 
-	user.SetPassword(pra.Newpwd)
+	user.SetPassword(arg.Newpwd)
 
 	err = app.SDB.Transaction(func(tx *sqlx.Tx) error {
 		cnt, err := tt.UpdateUserPassword(tx, user.ID, user.Password)

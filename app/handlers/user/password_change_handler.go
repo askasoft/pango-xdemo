@@ -33,6 +33,7 @@ func pwdchgValidatePassword(c *xin.Context, password string) {
 			for _, v := range vs {
 				c.AddError(&args.ParamError{
 					Param:   "newpwd",
+					Label:   tbs.GetText(c.Locale, "pwdchg.newpwd"),
 					Message: v,
 				})
 			}

@@ -70,7 +70,7 @@ func (jc *JobController) List(c *xin.Context) {
 func (jc *JobController) Logs(c *xin.Context) {
 	jid := num.Atol(c.Query("jid"))
 	if jid <= 0 {
-		c.AddError(tbs.Errorf(c.Locale, "error.param.invalid", "jid"))
+		c.AddError(tbs.Error(c.Locale, "error.param.id"))
 		c.JSON(http.StatusBadRequest, E(c))
 		return
 	}
@@ -122,7 +122,7 @@ func (jc *JobController) logs(c *xin.Context, tjm xjm.JobManager) (logs []*xjm.J
 func (jc *JobController) Status(c *xin.Context) {
 	jid := num.Atol(c.Query("jid"))
 	if jid <= 0 {
-		c.AddError(tbs.Errorf(c.Locale, "error.param.invalid", "jid"))
+		c.AddError(tbs.Error(c.Locale, "error.param.id"))
 		c.JSON(http.StatusBadRequest, E(c))
 		return
 	}
@@ -184,7 +184,11 @@ func (jc *JobController) Start(c *xin.Context) {
 
 		jid = id
 
-		return tt.AddAuditLog(tx, c, jobs.JobStartAuditLogs[jc.Name])
+		fa := jobs.JobStartAuditLogs[jc.Name]
+		if fa == "" {
+			fa = jc.Name + ".start"
+		}
+		return tt.AddAuditLog(tx, c, fa)
 	})
 	if err != nil {
 		if errors.Is(err, xjm.ErrJobExisting) {
@@ -209,7 +213,7 @@ func (jc *JobController) Start(c *xin.Context) {
 func (jc *JobController) Cancel(c *xin.Context) {
 	jid := num.Atol(c.PostForm("jid"))
 	if jid <= 0 {
-		c.AddError(tbs.Errorf(c.Locale, "error.param.invalid", "jid"))
+		c.AddError(tbs.Error(c.Locale, "error.param.id"))
 		c.JSON(http.StatusBadRequest, E(c))
 		return
 	}
@@ -243,7 +247,11 @@ func (jc *JobController) Cancel(c *xin.Context) {
 			return
 		}
 
-		if err = tt.AddAuditLog(tx, c, jobs.JobCancelAuditLogs[jc.Name]); err != nil {
+		fa := jobs.JobCancelAuditLogs[jc.Name]
+		if fa == "" {
+			fa = jc.Name + ".cancel"
+		}
+		if err = tt.AddAuditLog(tx, c, fa); err != nil {
 			return
 		}
 

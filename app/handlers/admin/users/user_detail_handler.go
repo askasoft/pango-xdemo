@@ -98,6 +98,7 @@ func userValidatePassword(c *xin.Context, password string) {
 			for _, v := range vs {
 				c.AddError(&args.ParamError{
 					Param:   "password",
+					Label:   tbs.GetText(c.Locale, "user.password"),
 					Message: v,
 				})
 			}
@@ -140,22 +141,23 @@ func UserCreate(c *xin.Context) {
 			return err
 		}
 
-		user.Password = ""
-		user.Secret = 0
-
 		return tt.AddAuditLog(tx, c, models.AL_USERS_CREATE, num.Ltoa(user.ID), user.Email)
 	})
 	if err != nil {
 		if sqlutil.IsUniqueViolationError(err) {
 			err = &args.ParamError{
 				Param:   "email",
-				Message: tbs.Format(c.Locale, "user.error.duplicated", tbs.GetText(c.Locale, "user.email", "email"), user.Email),
+				Label:   tbs.GetText(c.Locale, "user.email", "email"),
+				Message: tbs.Format(c.Locale, "user.error.duplicated", user.Email),
 			}
 		}
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return
 	}
+
+	user.Password = ""
+	user.Secret = 0
 
 	c.JSON(http.StatusOK, xin.H{
 		"success": tbs.GetText(c.Locale, "success.created"),
@@ -197,18 +199,25 @@ func UserUpdate(c *xin.Context) {
 			return
 		}
 
-		user.Password = ""
-
 		if cnt > 0 {
 			err = tt.AddAuditLog(tx, c, models.AL_USERS_UPDATE, num.Ltoa(user.ID), user.Email)
 		}
 		return
 	})
 	if err != nil {
+		if sqlutil.IsUniqueViolationError(err) {
+			err = &args.ParamError{
+				Param:   "email",
+				Label:   tbs.GetText(c.Locale, "user.email", "email"),
+				Message: tbs.Format(c.Locale, "user.error.duplicated", user.Email),
+			}
+		}
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return
 	}
+
+	user.Password = ""
 
 	c.JSON(http.StatusOK, xin.H{
 		"success": tbs.Format(c.Locale, "user.success.updates", cnt),

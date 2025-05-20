@@ -141,23 +141,21 @@ var main = {
 			err = xhr.responseJSON.error || JSON.stringify(xhr.responseJSON, null, 2) || err;
 		}
 
-		if ($.isArray(err)) {
-			var es = [];
-			$.each(err, function(i, e) {
-				if (e.param) {
-					main.form_add_invalid($f, e);
-				}
-				es.push(e.message || e + "");
-			});
-			err = es;
-		} else if (err.param && err.message) {
-			main.form_add_invalid($f, err);
-			err = err.message;
+		if (!$.isArray(err)) {
+			err = [ err ];
 		}
+
+		var msgs = [];
+		$.each(err, function(i, e) {
+			if (e.param) {
+				main.form_add_invalid($f, e);
+			}
+			msgs.push((e.label ? e.label + ': ' : '') + (e.message || e + ""));
+		});
 
 		$.toast({
 			icon: 'error',
-			text: err,
+			text: msgs,
 			afterHidden: afterHidden
 		});
 	},
@@ -185,6 +183,11 @@ var main = {
 	form_input_values: function($f) {
 		var vs = $f.formValues();
 		for (var k in vs) {
+			if ($f.find('[name="'+ k +'"]').prop('type') == 'checkbox') {
+				// do not delete empty check value
+				continue;
+			}
+
 			if (!vs[k]) {
 				delete vs[k];
 			}

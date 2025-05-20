@@ -24,7 +24,8 @@ func PetUpdates(c *xin.Context) {
 	if pua.BornAt != nil && pua.BornAt.IsZero() {
 		c.AddError(&args.ParamError{
 			Param:   "born_at",
-			Message: tbs.Format(c.Locale, "error.param.required", tbs.GetText(c.Locale, "pet.born_at")),
+			Label:   tbs.GetText(c.Locale, "pet.born_at"),
+			Message: tbs.GetText(c.Locale, "error.param.required"),
 		})
 	}
 	if len(c.Errors) > 0 {

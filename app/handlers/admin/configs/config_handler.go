@@ -144,11 +144,15 @@ func ConfigSave(c *xin.Context) {
 		return
 	}
 
-	detail := buildConfigDetails(c, configs, uconfigs)
-	if saveConfigs(c, uconfigs, models.AL_CONFIG_UPDATE, detail) {
+	if len(uconfigs) > 0 {
+		detail := buildConfigDetails(c, configs, uconfigs)
+		if !saveConfigs(c, uconfigs, models.AL_CONFIG_UPDATE, detail) {
+			return
+		}
 		tt.PurgeConfig()
-		c.JSON(http.StatusOK, xin.H{"success": tbs.GetText(c.Locale, "success.saved")})
 	}
+
+	c.JSON(http.StatusOK, xin.H{"success": tbs.GetText(c.Locale, "success.saved")})
 }
 
 func buildConfigDetails(c *xin.Context, configs []*models.Config, uconfigs []*models.Config) string {
@@ -203,7 +207,8 @@ func validateConfig(c *xin.Context, cfg *models.Config, v *string) bool {
 		if *v != "" && !str.IsNumeric(*v) {
 			c.AddError(&args.ParamError{
 				Param:   cfg.Name,
-				Message: tbs.Format(c.Locale, "error.param.numeric", tbs.GetText(c.Locale, "config."+cfg.Name, cfg.Name)),
+				Label:   tbs.GetText(c.Locale, "config."+cfg.Name, cfg.Name),
+				Message: tbs.GetText(c.Locale, "error.param.numeric"),
 			})
 			return false
 		}
@@ -212,7 +217,8 @@ func validateConfig(c *xin.Context, cfg *models.Config, v *string) bool {
 		if *v != "" && !str.IsDecimal(*v) {
 			c.AddError(&args.ParamError{
 				Param:   cfg.Name,
-				Message: tbs.Format(c.Locale, "error.param.decimal", tbs.GetText(c.Locale, "config."+cfg.Name, cfg.Name)),
+				Label:   tbs.GetText(c.Locale, "config."+cfg.Name, cfg.Name),
+				Message: tbs.GetText(c.Locale, "error.param.decimal"),
 			})
 			return false
 		}
@@ -261,7 +267,8 @@ func validateConfig(c *xin.Context, cfg *models.Config, v *string) bool {
 		if !ok {
 			c.AddError(&args.ParamError{
 				Param:   cfg.Name,
-				Message: tbs.Format(c.Locale, "error.param.invalid", tbs.GetText(c.Locale, "config."+cfg.Name, cfg.Name)),
+				Label:   tbs.GetText(c.Locale, "config."+cfg.Name, cfg.Name),
+				Message: tbs.GetText(c.Locale, "error.param.invalid"),
 			})
 			return false
 		}
@@ -394,7 +401,7 @@ func ConfigImport(c *xin.Context) {
 		return
 	}
 
-	if len(configs) > 0 {
+	if len(uconfigs) > 0 {
 		if !saveConfigs(c, uconfigs, models.AL_CONFIG_IMPORT) {
 			return
 		}

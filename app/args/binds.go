@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/tbs"
 	"github.com/askasoft/pango/vad"
@@ -12,8 +13,9 @@ import (
 )
 
 type ParamError struct {
-	Param   string `json:"param"`
-	Message string `json:"message"`
+	Param   string `json:"param,omitempty"`
+	Label   string `json:"label,omitempty"`
+	Message string `json:"message,omitempty"`
 }
 
 func (pe *ParamError) Error() string {
@@ -21,17 +23,17 @@ func (pe *ParamError) Error() string {
 }
 
 func ErrInvalidField(c *xin.Context, ns, field string) error {
-	fn := ns + field
-	fn = tbs.GetText(c.Locale, fn, fn)
+	label := tbs.GetText(c.Locale, ns+field, field)
 	fe := &ParamError{
 		Param:   field,
-		Message: tbs.Format(c.Locale, "error.param.invalid", fn),
+		Label:   label,
+		Message: tbs.GetText(c.Locale, "error.param.invalid"),
 	}
 	return fe
 }
 
 func ErrInvalidID(c *xin.Context) error {
-	return tbs.Errorf(c.Locale, "error.param.invalid", "ID")
+	return tbs.Error(c.Locale, "error.param.id")
 }
 
 func ErrInvalidRequest(c *xin.Context) error {
@@ -56,12 +58,13 @@ func AddBindErrors(c *xin.Context, err error, ns string, fks ...string) {
 			if fk == "" && len(fks) > 0 {
 				fk = fks[0]
 			}
+
 			fn := tbs.GetText(c.Locale, ns+fk, fk)
 			fm := tbs.GetText(c.Locale, ns+"error."+fk)
 			if fm == "" {
-				fm = tbs.Format(c.Locale, "error.param.invalid", fn)
+				fm = tbs.GetText(c.Locale, "error.param.invalid")
 			}
-			c.AddError(&ParamError{Param: fk, Message: fm})
+			c.AddError(&ParamError{Param: fk, Label: fn, Message: fm})
 		}
 		return
 	}
@@ -72,6 +75,13 @@ func AddBindErrors(c *xin.Context, err error, ns string, fks ...string) {
 			fk := str.SnakeCase(fe.Field())
 			if fk == "" && len(fks) > 0 {
 				fk = fks[0]
+			}
+
+			if le, ok := fe.Cause().(app.LocaleError); ok {
+				fn := tbs.GetText(c.Locale, ns+fk, fk)
+				em := le.LocaleError(c.Locale)
+				c.AddError(&ParamError{Param: fk, Label: fn, Message: em})
+				continue
 			}
 
 			fn := ""
@@ -90,22 +100,17 @@ func AddBindErrors(c *xin.Context, err error, ns string, fks ...string) {
 				}
 			}
 
-			var em string
-			switch str.Count(fm, "%s") {
-			case 2:
+			em := fm
+			if str.Contains(fm, "%s") {
 				fp := fe.Param()
 				if str.EndsWith(fe.Tag(), "field") {
 					tk := str.SnakeCase(fp)
 					fp = tbs.GetText(c.Locale, ns+tk, tk)
 				}
-				em = fmt.Sprintf(fm, fn, fp)
-			case 1:
-				em = fmt.Sprintf(fm, fn)
-			default:
-				em = fm
+				em = fmt.Sprintf(fm, fp)
 			}
 
-			c.AddError(&ParamError{Param: fk, Message: em})
+			c.AddError(&ParamError{Param: fk, Label: fn, Message: em})
 		}
 		return
 	}

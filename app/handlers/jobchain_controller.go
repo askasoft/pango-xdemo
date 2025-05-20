@@ -101,7 +101,7 @@ func (jcc *JobChainController) List(c *xin.Context) {
 func (jcc *JobChainController) Status(c *xin.Context) {
 	cid := num.Atol(c.Query("cid"))
 	if cid <= 0 {
-		c.AddError(tbs.Errorf(c.Locale, "error.param.invalid", "cid"))
+		c.AddError(tbs.Error(c.Locale, "error.param.id"))
 		c.JSON(http.StatusBadRequest, E(c))
 		return
 	}
@@ -192,7 +192,11 @@ func (jcc *JobChainController) StartJob(c *xin.Context) {
 		return
 	}
 
-	_ = tt.AddAuditLog(app.SDB, c, jobs.JobChainStartAuditLogs[jcc.ChainName])
+	fa := jobs.JobChainStartAuditLogs[jcc.ChainName]
+	if fa == "" {
+		fa = jcc.ChainName + ".start"
+	}
+	_ = tt.AddAuditLog(app.SDB, c, fa)
 
 	c.JSON(http.StatusOK, xin.H{
 		"cid":     cid,
@@ -203,7 +207,7 @@ func (jcc *JobChainController) StartJob(c *xin.Context) {
 func (jcc *JobChainController) Cancel(c *xin.Context) {
 	cid := num.Atol(c.PostForm("cid"))
 	if cid <= 0 {
-		c.AddError(tbs.Errorf(c.Locale, "error.param.invalid", "cid"))
+		c.AddError(tbs.Error(c.Locale, "error.param.id"))
 		c.JSON(http.StatusBadRequest, E(c))
 		return
 	}
@@ -231,6 +235,12 @@ func (jcc *JobChainController) Cancel(c *xin.Context) {
 		c.JSON(http.StatusInternalServerError, E(c))
 		return
 	}
+
+	fa := jobs.JobChainCancelAuditLogs[jcc.ChainName]
+	if fa == "" {
+		fa = jcc.ChainName + ".cancel"
+	}
+	_ = tt.AddAuditLog(app.SDB, c, fa)
 
 	c.JSON(http.StatusOK, xin.H{"warning": tbs.GetText(c.Locale, "job.message.canceled")})
 }
