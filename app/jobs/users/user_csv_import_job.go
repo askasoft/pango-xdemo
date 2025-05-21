@@ -112,9 +112,9 @@ type csvUserHeader struct {
 	IdxID       int
 	IdxName     int
 	IdxEmail    int
+	IdxPassword int
 	IdxRole     int
 	IdxStatus   int
-	IdxPassword int
 	IdxCIDR     int
 }
 
@@ -123,9 +123,9 @@ func (cuh *csvUserHeader) init() {
 	cuh.AddColumn("user.id", &cuh.IdxID)
 	cuh.AddColumn("user.name", &cuh.IdxName)
 	cuh.AddColumn("user.email", &cuh.IdxEmail)
+	cuh.AddColumn("user.password", &cuh.IdxPassword)
 	cuh.AddColumn("user.role", &cuh.IdxRole)
 	cuh.AddColumn("user.status", &cuh.IdxStatus)
-	cuh.AddColumn("user.password", &cuh.IdxPassword)
 	cuh.AddColumn("user.cidr", &cuh.IdxCIDR)
 }
 
@@ -134,9 +134,9 @@ type csvUserRecord struct {
 	ID       string
 	Name     string
 	Email    string
+	Password string
 	Role     string
 	Status   string
-	Password string
 	CIDR     string
 	Others   map[string]string
 }
@@ -220,16 +220,16 @@ func (ucij *UserCsvImportJob) checkRecord(rec *csvUserRecord) error {
 	if rec.Email == "" {
 		errs = append(errs, tbs.GetText(ucij.Locale(), "user.email"))
 	}
+	if rec.Password != "" {
+		if vs := ucij.pwdPolicy.ValidatePassword(rec.Password); len(vs) > 0 {
+			errs = append(errs, tbs.GetText(ucij.Locale(), "user.password")+":["+str.Join(vs, ",")+"]")
+		}
+	}
 	if rec.Role != "" && !ucij.roleRevMap.Contains(rec.Role) {
 		errs = append(errs, tbs.GetText(ucij.Locale(), "user.role"))
 	}
 	if rec.Status != "" && !ucij.statusRevMap.Contains(rec.Status) {
 		errs = append(errs, tbs.GetText(ucij.Locale(), "user.status"))
-	}
-	if rec.Password != "" {
-		if vs := ucij.pwdPolicy.ValidatePassword(rec.Password); len(vs) > 0 {
-			errs = append(errs, tbs.GetText(ucij.Locale(), "user.password")+":["+str.Join(vs, ",")+"]")
-		}
 	}
 
 	if len(errs) > 0 {
@@ -342,8 +342,8 @@ func (ucij *UserCsvImportJob) parseData(row []string) *csvUserRecord {
 	rec.Name = csvutil.GetString(row, h.IdxName)
 	rec.Email = csvutil.GetColumn(row, h.IdxEmail)
 	rec.Password = csvutil.GetString(row, h.IdxPassword)
-	rec.Status = csvutil.GetString(row, h.IdxStatus)
 	rec.Role = csvutil.GetString(row, h.IdxRole)
+	rec.Status = csvutil.GetString(row, h.IdxStatus)
 	rec.CIDR = csvutil.GetColumn(row, h.IdxCIDR)
 
 	rec.Others = make(map[string]string)

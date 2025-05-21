@@ -36,10 +36,10 @@ func (uqa *UserQueryArg) HasFilters() bool {
 
 func (uqa *UserQueryArg) AddFilters(sqb *sqlx.Builder) {
 	uqa.AddIDs(sqb, "id", uqa.ID)
-	uqa.AddIn(sqb, "status", uqa.Status)
-	uqa.AddIn(sqb, "role", uqa.Role)
 	uqa.AddLikes(sqb, "name", uqa.Name)
 	uqa.AddLikes(sqb, "email", uqa.Email)
+	uqa.AddIn(sqb, "role", uqa.Role)
+	uqa.AddIn(sqb, "status", uqa.Status)
 	uqa.AddLikes(sqb, "cidr", uqa.CIDR)
 }
 

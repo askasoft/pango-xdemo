@@ -31,8 +31,8 @@ func bindUserQueryArg(c *xin.Context) (uqa *args.UserQueryArg, err error) {
 
 func bindUserMaps(c *xin.Context, h xin.H) {
 	au := tenant.AuthUser(c)
-	h["UserStatusMap"] = tbsutil.GetUserStatusMap(c.Locale)
 	h["UserRoleMap"] = tbsutil.GetUserRoleMap(c.Locale, au.Role)
+	h["UserStatusMap"] = tbsutil.GetUserStatusMap(c.Locale)
 }
 
 func UserIndex(c *xin.Context) {

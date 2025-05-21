@@ -27,8 +27,8 @@ func UserCsvExport(c *xin.Context) {
 	tt := tenant.FromCtx(c)
 	au := tenant.AuthUser(c)
 
-	sm := tbsutil.GetUserStatusMap(c.Locale)
 	rm := tbsutil.GetUserRoleMap(c.Locale, au.Role)
+	sm := tbsutil.GetUserStatusMap(c.Locale)
 
 	cw := csv.NewWriter(c.Writer)
 	cw.UseCRLF = true
@@ -44,9 +44,9 @@ func UserCsvExport(c *xin.Context) {
 				tbs.GetText(c.Locale, "user.id"),
 				tbs.GetText(c.Locale, "user.name"),
 				tbs.GetText(c.Locale, "user.email"),
+				tbs.GetText(c.Locale, "user.password"),
 				tbs.GetText(c.Locale, "user.role"),
 				tbs.GetText(c.Locale, "user.status"),
-				tbs.GetText(c.Locale, "user.password"),
 				tbs.GetText(c.Locale, "user.cidr"),
 				tbs.GetText(c.Locale, "user.created_at"),
 				tbs.GetText(c.Locale, "user.updated_at"),
@@ -61,9 +61,9 @@ func UserCsvExport(c *xin.Context) {
 			num.Ltoa(user.ID),
 			user.Name,
 			user.Email,
+			"",
 			rm.SafeGet(user.Role, user.Role),
 			sm.SafeGet(user.Status, user.Status),
-			"",
 			user.CIDR,
 			app.FormatTime(user.CreatedAt),
 			app.FormatTime(user.UpdatedAt),
