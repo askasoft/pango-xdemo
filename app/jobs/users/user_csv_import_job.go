@@ -212,7 +212,7 @@ func (ucij *UserCsvImportJob) checkRecord(rec *csvUserRecord) error {
 	var errs []string
 
 	if rec.ID != "" && num.Atol(rec.ID) < models.UserStartID {
-		errs = append(errs, tbs.Format(ucij.Locale(), "error.param.gte", tbs.GetText(ucij.Locale(), "user.id", "ID"), num.Ltoa(models.UserStartID)))
+		errs = append(errs, tbs.GetText(ucij.Locale(), "user.id", "ID")+":"+tbs.Format(ucij.Locale(), "error.param.gte", num.Ltoa(models.UserStartID)))
 	}
 	if rec.Name == "" {
 		errs = append(errs, tbs.GetText(ucij.Locale(), "user.name"))

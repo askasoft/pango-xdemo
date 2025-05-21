@@ -115,6 +115,7 @@
 
 	function on_detail_click() {
 		var $b = $('#auditlogs_detail_popup .ui-popup-body').empty();
+
 		var detail = $(this).text();
 		if (!detail) {
 			return false;
@@ -142,6 +143,10 @@
 		return false;
 	}
 
+	function auditlogs_detail_popup_shown() {
+		$('#auditlogs_detail_popup .ui-popup-body').prop('scrollTop', 0);
+	}
+
 	//----------------------------------------------------
 	// init
 	//
@@ -163,6 +168,8 @@
 			.on('click', '.ui-popup-footer button[type=submit]', auditlogs_deletebat);
 
 		$('#auditlogs_list').on('click', 'td.detail > pre', on_detail_click);
+		$('#auditlogs_detail_popup')
+			.on('shown.popup', auditlogs_detail_popup_shown)
 	}
 
 	$(window).on('load', auditlogs_init);

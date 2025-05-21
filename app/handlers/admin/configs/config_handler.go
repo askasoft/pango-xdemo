@@ -158,7 +158,7 @@ func ConfigSave(c *xin.Context) {
 func buildConfigDetails(c *xin.Context, configs []*models.Config, uconfigs []*models.Config) string {
 	ccs := buildConfigCategories(c, configs)
 
-	ads := map[string]any{}
+	ads := linkedhashmap.NewLinkedHashMap[string, any]()
 	for _, cc := range ccs {
 		ccn := tbs.GetText(c.Locale, "config.category.label."+cc.Name)
 		for _, cg := range cc.Groups {
@@ -187,11 +187,11 @@ func buildConfigDetails(c *xin.Context, configs []*models.Config, uconfigs []*mo
 						}
 						civ = lbs
 					default:
-						civ = lm.SafeGet(cfg.Name)
+						civ = lm.SafeGet(cfg.Value, cfg.Value)
 					}
 				}
 
-				ads[cin] = civ
+				ads.Set(cin, civ)
 			}
 		}
 	}
@@ -310,7 +310,7 @@ func checkPostConfigs(c *xin.Context, configs []*models.Config) (uconfigs []*mod
 	return
 }
 
-func saveConfigs(c *xin.Context, configs []*models.Config, action string, details ...any) bool {
+func saveConfigs(c *xin.Context, configs []*models.Config, action string, detail string) bool {
 	tt := tenant.FromCtx(c)
 	au := tenant.AuthUser(c)
 
@@ -318,7 +318,7 @@ func saveConfigs(c *xin.Context, configs []*models.Config, action string, detail
 		if err := tt.SaveConfigs(tx, au, configs, c.Locale); err != nil {
 			return err
 		}
-		return tt.AddAuditLog(tx, c, action, details...)
+		return tt.AddAuditLog(tx, c, action, detail)
 	})
 	if err == nil {
 		return true
@@ -402,7 +402,8 @@ func ConfigImport(c *xin.Context) {
 	}
 
 	if len(uconfigs) > 0 {
-		if !saveConfigs(c, uconfigs, models.AL_CONFIG_IMPORT) {
+		detail := buildConfigDetails(c, configs, uconfigs)
+		if !saveConfigs(c, uconfigs, models.AL_CONFIG_IMPORT, detail) {
 			return
 		}
 		tt.PurgeConfig()
@@ -417,18 +418,27 @@ func checkCsvConfigs(c *xin.Context, configs []*models.Config, csvcfgs []*config
 		cfgmaps[cfg.Name] = cfg
 	}
 
-	for _, csvcfg := range csvcfgs {
-		cfg, ok := cfgmaps[csvcfg.Name]
+	for _, ci := range csvcfgs {
+		cfg, ok := cfgmaps[ci.Name]
 		if !ok {
-			msg := tbs.Format(c.Locale, "config.import.invalid", csvcfg.Name)
+			msg := tbs.Format(c.Locale, "config.import.invalid", ci.Name)
 			c.AddError(errors.New(msg))
 			continue
 		}
 
-		if validateConfig(c, cfg, &csvcfg.Value) {
+		// drop '\r' (because csv reader drop '\r')
+		ci.Value = str.RemoveByte(ci.Value, '\r')
+		cfg.Value = str.RemoveByte(cfg.Value, '\r')
+
+		if ci.Value == cfg.Value || ci.Value == cfg.DisplayValue() {
+			// skip unmodified value
+			continue
+		}
+
+		if validateConfig(c, cfg, &ci.Value) {
 			ucfg := &models.Config{}
 			*ucfg = *cfg
-			ucfg.Value = csvcfg.Value
+			ucfg.Value = ci.Value
 			uconfigs = append(uconfigs, ucfg)
 		}
 	}

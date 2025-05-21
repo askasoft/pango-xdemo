@@ -7,7 +7,7 @@ require (
 	github.com/askasoft/pango-assets v1.0.16
 	github.com/crewjam/saml v0.4.14
 	github.com/go-sql-driver/mysql v1.9.2
-	github.com/jackc/pgx/v5 v5.7.4
+	github.com/jackc/pgx/v5 v5.7.5
 	github.com/liuzl/gocc v0.0.0-20231231122217-0372e1059ca5
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
 	github.com/xlzd/gotp v0.1.0
