@@ -12,6 +12,7 @@ import (
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/ran"
 	"github.com/askasoft/pango/sqx/sqlx"
+	"github.com/askasoft/pango/str"
 )
 
 func ReadConfigFile() ([]*models.Config, error) {
@@ -138,56 +139,75 @@ func (sm Schema) MigrateSuper() error {
 		return errors.New("missing [super] settings")
 	}
 
-	superEmail := suc.GetString("email")
-	if superEmail == "" {
+	emails := str.Fields(suc.GetString("email"))
+	if len(emails) == 0 {
 		return errors.New("missing [super] email settings")
 	}
 
-	log.Infof("Migrate super %q: %s", sm, superEmail)
+	err := app.SDB.Transaction(func(tx *sqlx.Tx) (err error) {
+		var uid int64
 
-	db := app.SDB
-
-	sqb := db.Builder()
-	sqb.Select().From(sm.TableUsers()).Eq("email", superEmail)
-	sql, args := sqb.Build()
-
-	user := &models.User{}
-	err := db.Get(user, sql, args...)
-	if err != nil {
-		if !errors.Is(err, sqlx.ErrNoRows) {
-			return err
+		sqb := tx.Builder()
+		sqb.Select("COALESCE(MAX(id), 0)").From(sm.TableUsers()).Lt("id", models.UserStartID)
+		sql, args := sqb.Build()
+		if err = tx.Get(&uid, sql, args...); err != nil {
+			return
 		}
 
-		user.ID = suc.GetInt64("id", 1)
-		user.Email = superEmail
-		user.Name = suc.GetString("name", "SUPER")
-		user.SetPassword(suc.GetString("password", "changeme"))
-		user.Role = models.RoleSuper
-		user.Status = models.UserActive
-		user.Secret = ran.RandInt63()
-		user.CIDR = suc.GetString("cidr", "0.0.0.0/0\n::/0")
-		user.CreatedAt = time.Now()
-		user.UpdatedAt = user.CreatedAt
+		for _, email := range emails {
+			log.Infof("Migrate super %q: %s", sm, email)
 
-		sqb.Reset()
-		sqb.Insert(sm.TableUsers())
-		sqb.StructNames(user)
-		sql := sqb.SQL()
+			sqb.Reset()
+			sqb.Select().From(sm.TableUsers()).Eq("email", email)
+			sql, args = sqb.Build()
 
-		_, err = db.NamedExec(sql, user)
-		if err != nil {
-			return err
+			user := &models.User{}
+			err = tx.Get(user, sql, args...)
+			if err == nil {
+				if user.Role != models.RoleSuper || user.Status != models.UserActive {
+					sqb.Reset()
+					sqb.Update(sm.TableUsers())
+					sqb.Setc("role", models.RoleSuper)
+					sqb.Setc("status", models.UserActive)
+					sql, args = sqb.Build()
+
+					_, err = tx.Exec(sql, args...)
+					if err != nil {
+						return
+					}
+				}
+				continue
+			}
+
+			if !errors.Is(err, sqlx.ErrNoRows) {
+				return
+			}
+
+			uid++
+			user.ID = uid
+			user.Email = email
+			user.Name = str.SubstrBefore(email, "@")
+			user.SetPassword(suc.GetString("password", "changeme"))
+			user.Role = models.RoleSuper
+			user.Status = models.UserActive
+			user.Secret = ran.RandInt63()
+			user.CIDR = suc.GetString("cidr", "0.0.0.0/0\n::/0")
+			user.CreatedAt = time.Now()
+			user.UpdatedAt = user.CreatedAt
+
+			sqb.Reset()
+			sqb.Insert(sm.TableUsers())
+			sqb.StructNames(user)
+			sql = sqb.SQL()
+
+			_, err = tx.NamedExec(sql, user)
+			if err != nil {
+				return err
+			}
 		}
 
-		return sm.ResetUsersAutoIncrement(db)
-	}
+		return sm.ResetUsersAutoIncrement(tx)
+	})
 
-	sqb.Reset()
-	sqb.Update(sm.TableUsers())
-	sqb.Setc("role", models.RoleSuper)
-	sqb.Setc("status", models.UserActive)
-	sql, args = sqb.Build()
-
-	_, err = db.Exec(sql, args...)
 	return err
 }
