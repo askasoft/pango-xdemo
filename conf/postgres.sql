@@ -54,8 +54,8 @@ CREATE TABLE "SCHEMA"."users" (
 	"password" varchar(200) NOT NULL,
 	"role" varchar(1) NOT NULL,
 	"status" varchar(1) NOT NULL,
-	"cidr" text NOT NULL,
 	"secret" bigint NOT NULL,
+	"cidr" text NOT NULL,
 	"created_at" timestamptz NOT NULL,
 	"updated_at" timestamptz NOT NULL,
 	PRIMARY KEY ("id")
