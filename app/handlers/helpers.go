@@ -28,10 +28,6 @@ func H(c *xin.Context) xin.H {
 		"TT":      tt,
 		"AU":      au,
 	}
-
-	if au != nil {
-		h["DCM"] = tt.ConfigMap()
-	}
 	return h
 }
 
