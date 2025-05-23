@@ -23,6 +23,11 @@
 			</div>
 		</div>
 		<div class="row">
+			<label class="col-md-2 ui-label">{{T .Loc "user.login_mfa"}}</label>
+			<div class="col-md-10 ui-value">{{.UserLoginMFAMap.SafeGet $u.LoginMFA $u.LoginMFA}}
+			</div>
+		</div>
+		<div class="row">
 			<label class="col-md-2 ui-label">{{T .Loc "user.cidr"}}</label>
 			<div class="col-md-10 ui-value"><pre>{{$u.CIDR}}</pre></div>
 		</div>

@@ -136,6 +136,7 @@ func (sm Schema) UpdateUser(tx sqlx.Sqlx, role string, user *models.User) (int64
 	sqb.Setc("password", user.Password)
 	sqb.Setc("role", user.Role)
 	sqb.Setc("status", user.Status)
+	sqb.Setc("login_mfa", user.LoginMFA)
 	sqb.Setc("cidr", user.CIDR)
 	sqb.Setc("updated_at", user.UpdatedAt)
 	sqb.Eq("id", user.ID)
@@ -212,6 +213,9 @@ func (sm Schema) UpdateUsers(tx sqlx.Sqlx, au *models.User, uua *args.UserUpdate
 	}
 	if uua.Status != "" {
 		sqb.Setc("status", uua.Status)
+	}
+	if uua.LoginMFA != nil {
+		sqb.Setc("login_mfa", *uua.LoginMFA)
 	}
 	if uua.CIDR != nil {
 		sqb.Setc("cidr", *uua.CIDR)

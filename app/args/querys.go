@@ -13,12 +13,13 @@ import (
 type UserQueryArg struct {
 	QueryArg
 
-	ID     string   `json:"id,omitempty" form:"id,strip"`
-	Name   string   `json:"name,omitempty" form:"name,strip"`
-	Email  string   `json:"email,omitempty" form:"email,strip"`
-	Role   []string `json:"role,omitempty" form:"role,strip"`
-	Status []string `json:"status,omitempty" form:"status,strip"`
-	CIDR   string   `json:"cidr,omitempty" form:"cidr,strip"`
+	ID       string   `json:"id,omitempty" form:"id,strip"`
+	Name     string   `json:"name,omitempty" form:"name,strip"`
+	Email    string   `json:"email,omitempty" form:"email,strip"`
+	Role     []string `json:"role,omitempty" form:"role,strip"`
+	Status   []string `json:"status,omitempty" form:"status,strip"`
+	LoginMFA []string `json:"login_mfa,omitempty" form:"login_mfa"`
+	CIDR     string   `json:"cidr,omitempty" form:"cidr,strip"`
 }
 
 func (uqa *UserQueryArg) String() string {
@@ -31,6 +32,7 @@ func (uqa *UserQueryArg) HasFilters() bool {
 		uqa.Email != "" ||
 		len(uqa.Role) > 0 ||
 		len(uqa.Status) > 0 ||
+		len(uqa.LoginMFA) > 0 ||
 		uqa.CIDR != ""
 }
 
@@ -40,6 +42,7 @@ func (uqa *UserQueryArg) AddFilters(sqb *sqlx.Builder) {
 	uqa.AddLikes(sqb, "email", uqa.Email)
 	uqa.AddIn(sqb, "role", uqa.Role)
 	uqa.AddIn(sqb, "status", uqa.Status)
+	uqa.AddIn(sqb, "login_mfa", uqa.LoginMFA)
 	uqa.AddLikes(sqb, "cidr", uqa.CIDR)
 }
 
@@ -76,7 +79,7 @@ func (alqa *AuditLogQueryArg) AddFilters(sqb *sqlx.Builder, locale string) {
 		ass := str.Fields(alqa.Action)
 		fam := tbsutil.GetAudioLogFunactMap(locale)
 
-		ahs := hashset.NewHashSet[string]()
+		ahs := hashset.NewHashSet("") // fake item to prevent empty slice
 		for _, a := range ass {
 			for k, v := range fam {
 				if str.ContainsFold(v, a) {

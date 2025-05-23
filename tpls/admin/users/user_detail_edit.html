@@ -39,6 +39,12 @@
 			</div>
 		</div>
 		<div class="row">
+			<label class="col-md-2 col-form-label">{{T .Loc "user.login_mfa"}}</label>
+			<div class="col-md-10">
+				{{Radios "Name=" "login_mfa" "List=" .UserLoginMFAMap "Value=" $u.LoginMFA}}
+			</div>
+		</div>
+		<div class="row">
 			<label class="col-md-2 col-form-label">{{T .Loc "user.cidr"}}</label>
 			<div class="col-md-10">
 				<textarea name="cidr" class="form-control" rows="2" autosize enterfire textclear>{{$u.CIDR}}</textarea>

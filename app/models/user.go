@@ -32,6 +32,7 @@ type User struct {
 	Role      string    `gorm:"size:1;not null" json:"role" form:"role,strip" validate:"required"`
 	Status    string    `gorm:"size:1;not null" json:"status" form:"status,strip" validate:"required"`
 	Secret    int64     `gorm:"not null" json:"secret" form:"secret"`
+	LoginMFA  string    `gorm:"column:login_mfa;size:1;not null" json:"login_mfa" form:"login_mfa,strip"`
 	CIDR      string    `gorm:"column:cidr;not null" json:"cidr" form:"cidr,strip" validate:"omitempty,cidrs"`
 	CreatedAt time.Time `gorm:"not null;<-:create" json:"created_at"`
 	UpdatedAt time.Time `gorm:"not null;autoUpdateTime:true" json:"updated_at"`

@@ -4,6 +4,7 @@ import (
 	"encoding/csv"
 	"net/http"
 
+	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/handlers"
 	"github.com/askasoft/pango-xdemo/app/jobs"
 	"github.com/askasoft/pango-xdemo/app/jobs/users"
@@ -71,6 +72,7 @@ func UserCsvImportSample(c *xin.Context) {
 		tbs.GetText(c.Locale, "user.password"),
 		tbs.GetText(c.Locale, "user.role"),
 		tbs.GetText(c.Locale, "user.status"),
+		tbs.GetText(c.Locale, "user.login_mfa"),
 		tbs.GetText(c.Locale, "user.cidr"),
 	}
 	if err := cw.Write(cols); err != nil {
@@ -80,14 +82,15 @@ func UserCsvImportSample(c *xin.Context) {
 
 	rm := tbsutil.GetUserRoleMap(c.Locale, models.RoleAdmin)
 	sm := tbsutil.GetUserStatusMap(c.Locale)
+	mm := tbsutil.GetUserLoginMFAMap(c.Locale)
 
 	domain := c.RequestHostname()
 	data := [][]string{
-		{"101", "admin", "admin@" + domain, ran.RandString(16), rm.SafeGet(models.RoleAdmin), sm.SafeGet(models.UserActive), "127.0.0.1/32\n192.168.1.1/32"},
-		{"102", "editor", "editor@" + domain, ran.RandString(16), rm.SafeGet(models.RoleEditor), sm.SafeGet(models.UserActive), "127.0.0.1/32\n192.168.1.1/32"},
-		{"103", "viewer", "viewer@" + domain, ran.RandString(16), rm.SafeGet(models.RoleViewer), sm.SafeGet(models.UserActive), "127.0.0.1/32\n192.168.1.1/32"},
-		{"104", "api", "api@" + domain, ran.RandString(16), rm.SafeGet(models.RoleApiOnly), sm.SafeGet(models.UserActive), "127.0.0.1/32\n192.168.1.1/32"},
-		{"", "disabled", "disabled@" + domain, ran.RandString(16), rm.SafeGet(models.RoleViewer), sm.SafeGet(models.UserDisabled), "127.0.0.1/32\n192.168.1.1/32"},
+		{"101", "admin", "admin@" + domain, ran.RandString(16), rm.SafeGet(models.RoleAdmin), sm.SafeGet(models.UserActive), mm.SafeGet(app.LOGIN_MFA_EMAIL), "127.0.0.1/32\n192.168.1.1/32"},
+		{"102", "editor", "editor@" + domain, ran.RandString(16), rm.SafeGet(models.RoleEditor), sm.SafeGet(models.UserActive), mm.SafeGet(app.LOGIN_MFA_MOBILE), "127.0.0.1/32\n192.168.1.1/32"},
+		{"103", "viewer", "viewer@" + domain, ran.RandString(16), rm.SafeGet(models.RoleViewer), sm.SafeGet(models.UserActive), mm.SafeGet(app.LOGIN_MFA_NONE), "127.0.0.1/32\n192.168.1.1/32"},
+		{"104", "api", "api@" + domain, ran.RandString(16), rm.SafeGet(models.RoleApiOnly), sm.SafeGet(models.UserActive), "", "127.0.0.1/32\n192.168.1.1/32"},
+		{"", "disabled", "disabled@" + domain, ran.RandString(16), rm.SafeGet(models.RoleViewer), sm.SafeGet(models.UserDisabled), "", "127.0.0.1/32\n192.168.1.1/32"},
 	}
 
 	if err := cw.WriteAll(data); err != nil {

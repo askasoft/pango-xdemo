@@ -50,8 +50,9 @@ type UserCsvImportJob struct {
 	data []byte
 	head csvUserHeader
 
-	roleRevMap   *hashmap.HashMap[string, string]
-	statusRevMap *hashmap.HashMap[string, string]
+	roleRevMap     *hashmap.HashMap[string, string]
+	statusRevMap   *hashmap.HashMap[string, string]
+	loginMFARevMap *hashmap.HashMap[string, string]
 
 	pwdPolicy *tenant.PasswordPolicy
 }
@@ -82,6 +83,7 @@ func (ucij *UserCsvImportJob) Run() {
 
 	ucij.roleRevMap = tbsutil.GetUserRoleReverseMap()
 	ucij.statusRevMap = tbsutil.GetUserStatusReverseMap()
+	ucij.loginMFARevMap = tbsutil.GetUserLoginMFAReverseMap()
 	ucij.pwdPolicy = ucij.Tenant.GetPasswordPolicy(ucij.Locale())
 
 	total, err := ucij.doCheckCsv()
@@ -115,6 +117,7 @@ type csvUserHeader struct {
 	IdxPassword int
 	IdxRole     int
 	IdxStatus   int
+	IdxLoginMFA int
 	IdxCIDR     int
 }
 
@@ -126,6 +129,7 @@ func (cuh *csvUserHeader) init() {
 	cuh.AddColumn("user.password", &cuh.IdxPassword)
 	cuh.AddColumn("user.role", &cuh.IdxRole)
 	cuh.AddColumn("user.status", &cuh.IdxStatus)
+	cuh.AddColumn("user.login_mfa", &cuh.IdxLoginMFA)
 	cuh.AddColumn("user.cidr", &cuh.IdxCIDR)
 }
 
@@ -137,6 +141,7 @@ type csvUserRecord struct {
 	Password string
 	Role     string
 	Status   string
+	LoginMFA string
 	CIDR     string
 	Others   map[string]string
 }
@@ -231,6 +236,9 @@ func (ucij *UserCsvImportJob) checkRecord(rec *csvUserRecord) error {
 	if rec.Status != "" && !ucij.statusRevMap.Contains(rec.Status) {
 		errs = append(errs, tbs.GetText(ucij.Locale(), "user.status"))
 	}
+	if rec.LoginMFA != "" && !ucij.loginMFARevMap.Contains(rec.LoginMFA) {
+		errs = append(errs, tbs.GetText(ucij.Locale(), "user.login_mfa"))
+	}
 
 	if len(errs) > 0 {
 		return tbs.Errorf(ucij.Locale(), "csv.error.line", rec.Line, str.Join(errs, ","))
@@ -249,6 +257,7 @@ func (ucij *UserCsvImportJob) importRecord(rec *csvUserRecord) error {
 		Email:     rec.Email,
 		Role:      ucij.roleRevMap.SafeGet(rec.Role, models.RoleViewer),
 		Status:    ucij.statusRevMap.SafeGet(rec.Status, models.UserActive),
+		LoginMFA:  ucij.loginMFARevMap.SafeGet(rec.LoginMFA, app.LOGIN_MFA_UNSET),
 		CIDR:      rec.CIDR,
 		CreatedAt: time.Now(),
 	}
@@ -344,6 +353,7 @@ func (ucij *UserCsvImportJob) parseData(row []string) *csvUserRecord {
 	rec.Password = csvutil.GetString(row, h.IdxPassword)
 	rec.Role = csvutil.GetString(row, h.IdxRole)
 	rec.Status = csvutil.GetString(row, h.IdxStatus)
+	rec.LoginMFA = csvutil.GetString(row, h.IdxLoginMFA)
 	rec.CIDR = csvutil.GetColumn(row, h.IdxCIDR)
 
 	rec.Others = make(map[string]string)

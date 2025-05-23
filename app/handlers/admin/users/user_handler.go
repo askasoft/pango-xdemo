@@ -33,6 +33,7 @@ func bindUserMaps(c *xin.Context, h xin.H) {
 	au := tenant.AuthUser(c)
 	h["UserRoleMap"] = tbsutil.GetUserRoleMap(c.Locale, au.Role)
 	h["UserStatusMap"] = tbsutil.GetUserStatusMap(c.Locale)
+	h["UserLoginMFAMap"] = tbsutil.GetUserLoginMFAMap(c.Locale)
 }
 
 func UserIndex(c *xin.Context) {

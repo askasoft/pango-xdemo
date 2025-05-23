@@ -22,6 +22,9 @@ func UserUpdates(c *xin.Context) {
 	}
 	userValidateRole(c, uua.Role)
 	userValidateStatus(c, uua.Status)
+	if uua.LoginMFA != nil {
+		userValidateLoginMFA(c, *uua.LoginMFA)
+	}
 
 	if len(c.Errors) > 0 {
 		c.JSON(http.StatusBadRequest, handlers.E(c))

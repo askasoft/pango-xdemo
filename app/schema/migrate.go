@@ -191,6 +191,7 @@ func (sm Schema) MigrateSuper() error {
 			user.Role = models.RoleSuper
 			user.Status = models.UserActive
 			user.Secret = ran.RandInt63()
+			user.LoginMFA = suc.GetString("login_mfa")
 			user.CIDR = suc.GetString("cidr", "0.0.0.0/0\n::/0")
 			user.CreatedAt = time.Now()
 			user.UpdatedAt = user.CreatedAt

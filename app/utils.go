@@ -13,6 +13,7 @@ import (
 
 const (
 	LOGIN_MFA_UNSET  = ""
+	LOGIN_MFA_NONE   = "-"
 	LOGIN_MFA_EMAIL  = "E"
 	LOGIN_MFA_MOBILE = "M"
 

@@ -90,6 +90,15 @@ func userValidateStatus(c *xin.Context, status string) {
 	}
 }
 
+func userValidateLoginMFA(c *xin.Context, status string) {
+	if status != "" {
+		sm := tbsutil.GetUserLoginMFAMap(c.Locale)
+		if !sm.Contains(status) {
+			c.AddError(args.ErrInvalidField(c, "user.", "login_mfa"))
+		}
+	}
+}
+
 func userValidatePassword(c *xin.Context, password string) {
 	if password != "" {
 		tt := tenant.FromCtx(c)
@@ -114,6 +123,7 @@ func userBind(c *xin.Context) *models.User {
 
 	userValidateRole(c, user.Role)
 	userValidateStatus(c, user.Status)
+	userValidateLoginMFA(c, user.LoginMFA)
 	userValidatePassword(c, user.Password)
 	return user
 }

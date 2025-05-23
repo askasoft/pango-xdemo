@@ -49,15 +49,21 @@
 					<div class="col-md-4 col-xxl-5">
 						<input name="id" type="text" class="form-control" textclear value="{{.Q.ID}}"/>
 					</div>
+				</div>
+				<div class="row">
+					<label class="col-md-2 col-xxl-1 col-form-label">{{T .Loc "user.role"}}</label>
+					<div class="col-md-4 col-xxl-5">
+						{{Checks "Name=" "role" "List=" .UserRoleMap "Values=" .Q.Role}}
+					</div>
 					<label class="col-md-2 col-xxl-1 col-form-label">{{T .Loc "user.status"}}</label>
 					<div class="col-md-4 col-xxl-5">
 						{{Checks "Name=" "status" "List=" .UserStatusMap "Values=" .Q.Status}}
 					</div>
 				</div>
 				<div class="row">
-					<label class="col-md-2 col-xxl-1 col-form-label">{{T .Loc "user.role"}}</label>
+					<label class="col-md-2 col-xxl-1 col-form-label">{{T .Loc "user.login_mfa"}}</label>
 					<div class="col-md-4 col-xxl-5">
-						{{Checks "Name=" "role" "List=" .UserRoleMap "Values=" .Q.Role}}
+						{{Checks "Name=" "login_mfa" "List=" .UserLoginMFAMap "Values=" .Q.LoginMFA}}
 					</div>
 					<label class="col-md-2 col-xxl-1 col-form-label">{{T .Loc "user.cidr"}}</label>
 					<div class="col-md-4 col-xxl-5">
@@ -160,6 +166,12 @@
 					{{Checks "Name=" "status" "List=" .UserStatusMap "Values=" .Q.Status}}
 				</div>
 			</div>
+			<div class="row">
+				<label class="col-md-2 col-form-label">{{T .Loc "user.login_mfa"}}</label>
+				<div class="col-md-10">
+					{{Checks "Name=" "login_mfa" "List=" .UserLoginMFAMap "Values=" .Q.LoginMFA}}
+				</div>
+			</div>
 			<button type="submit" class="hidden"></button>
 		</form>
 	</div>
@@ -188,6 +200,12 @@
 				<label class="col-md-2 col-form-label">{{T .Loc "user.status"}} <input type="checkbox"></label>
 				<div class="col-md-10">
 					{{Radios "Name=" "status" "List=" .UserStatusMap "Value=" "A" "Disabled=" true}}
+				</div>
+			</div>
+			<div class="row">
+				<label class="col-md-2 col-form-label">{{T .Loc "user.login_mfa"}} <input type="checkbox"></label>
+				<div class="col-md-10">
+					{{Radios "Name=" "login_mfa" "List=" .UserLoginMFAMap "Disabled=" true}}
 				</div>
 			</div>
 			<div class="row">

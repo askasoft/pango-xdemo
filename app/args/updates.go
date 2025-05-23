@@ -22,9 +22,10 @@ type UserUpdatesArg struct {
 	IDArg
 	UpdatedAtArg
 
-	Role   string  `json:"role,omitempty" form:"role,strip"`
-	Status string  `json:"status,omitempty" form:"status,strip"`
-	CIDR   *string `json:"cidr,omitempty" form:"cidr,strip" validate:"omitempty,cidrs"`
+	Role     string  `json:"role,omitempty" form:"role,strip"`
+	Status   string  `json:"status,omitempty" form:"status,strip"`
+	LoginMFA *string `json:"login_mfa,omitempty" form:"login_mfa,strip"`
+	CIDR     *string `json:"cidr,omitempty" form:"cidr,strip" validate:"omitempty,cidrs"`
 }
 
 func (uua *UserUpdatesArg) Bind(c *xin.Context) error {
@@ -45,7 +46,7 @@ func (uua *UserUpdatesArg) String() string {
 }
 
 func (uua *UserUpdatesArg) isEmpty() bool {
-	return uua.Role == "" && uua.Status == "" && uua.CIDR == nil
+	return uua.Role == "" && uua.Status == "" && uua.LoginMFA == nil && uua.CIDR == nil
 }
 
 type PetUpdatesArg struct {
