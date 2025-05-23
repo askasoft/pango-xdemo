@@ -3,6 +3,7 @@ package middles
 import (
 	"errors"
 	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/askasoft/pango-xdemo/app"
@@ -19,7 +20,14 @@ import (
 )
 
 func SAMLProtect(c *xin.Context) {
-	if _, ok := c.Get(app.XCA.AuthUserKey); ok {
+	next, au, err := app.XCA.Authenticate(c)
+	if err != nil {
+		c.Logger.Errorf("CookieAuth: %v", err)
+		c.AbortWithStatus(http.StatusInternalServerError)
+		return
+	}
+
+	if next || au != nil {
 		// already authenticated
 		c.Next()
 		return

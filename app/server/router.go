@@ -63,7 +63,6 @@ func initRouter() {
 	// only get AuthUser from cookie
 	app.XCN = xmw.NewCookieAuth(tenant.FindAuthUser, app.Secret())
 	app.XCN.AuthFailed = xin.Next
-	app.XCN.AuthRequired = xin.Next
 	app.XCN.GetCookieMaxAge = tenant.AuthCookieMaxAge
 
 	configMiddleware()
