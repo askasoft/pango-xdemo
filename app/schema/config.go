@@ -48,10 +48,24 @@ func (sm Schema) LoadConfigMap(tx sqlx.Sqlx) (map[string]string, error) {
 	return cm, nil
 }
 
-func (sm Schema) ListConfigs(tx sqlx.Sqlx, actor, role string) (configs []*models.Config, err error) {
+func (sm Schema) ListConfigsByRole(tx sqlx.Sqlx, actor, role string) (configs []*models.Config, err error) {
 	sqb := tx.Builder()
 	sqb.Select().From(sm.TableConfigs())
 	sqb.Gte(actor, role)
+	sqb.Order("order")
+	sqb.Order("name")
+	sql, args := sqb.Build()
+
+	err = tx.Select(&configs, sql, args...)
+	return
+}
+
+func (sm Schema) SelectConfigs(tx sqlx.Sqlx, items ...string) (configs []*models.Config, err error) {
+	sqb := tx.Builder()
+	sqb.Select().From(sm.TableConfigs())
+	if len(items) > 0 {
+		sqb.In("name", items)
+	}
 	sqb.Order("order")
 	sqb.Order("name")
 	sql, args := sqb.Build()
