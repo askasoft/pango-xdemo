@@ -51,7 +51,7 @@ func AppAuth(c *xin.Context) {
 func IPProtect(c *xin.Context) {
 	au := tenant.AuthUser(c)
 
-	if !tenant.CheckClientIP(c, au) {
+	if !tenant.CheckUserClientIP(c, au) {
 		c.AddError(tbs.Error(c.Locale, "error.forbidden.ip"))
 		handlers.Forbidden(c)
 		return

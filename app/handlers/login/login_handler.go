@@ -84,7 +84,7 @@ func loginFindUser(c *xin.Context) (up *UserPass, au *models.User, ok bool) {
 		return
 	}
 
-	if !tenant.CheckClientIP(c, au) {
+	if !tenant.CheckUserClientIP(c, au) {
 		loginFailed(c, "login.failed.restricted")
 		return
 	}

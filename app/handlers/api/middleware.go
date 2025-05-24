@@ -13,7 +13,7 @@ import (
 func IPProtect(c *xin.Context) {
 	au := tenant.AuthUser(c)
 
-	if !tenant.CheckClientIP(c, au) {
+	if !tenant.CheckUserClientIP(c, au) {
 		c.AddError(tbs.Error(c.Locale, "error.forbidden.ip"))
 		c.JSON(http.StatusForbidden, handlers.E(c))
 		c.Abort()

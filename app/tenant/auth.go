@@ -102,16 +102,19 @@ func IsClientBlocked(c *xin.Context) bool {
 	return false
 }
 
-func CheckClientIP(c *xin.Context, u *models.User) bool {
-	ip := net.ParseIP(c.ClientIP())
-	if ip == nil {
-		return false
-	}
-
+func CheckUserClientIP(c *xin.Context, u *models.User) bool {
 	cidrs := u.CIDRs()
 	if len(cidrs) == 0 {
 		tt := FromCtx(c)
 		cidrs = tt.SecureClientCIDRs()
+	}
+	return CheckClientIP(c, cidrs...)
+}
+
+func CheckClientIP(c *xin.Context, cidrs ...*net.IPNet) bool {
+	ip := net.ParseIP(c.ClientIP())
+	if ip == nil {
+		return false
 	}
 
 	if len(cidrs) > 0 {

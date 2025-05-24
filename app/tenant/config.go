@@ -49,12 +49,22 @@ func (tt *Tenant) ConfigMap() map[string]string {
 	return tt.config
 }
 
+// CV shortcut for ConfigValue()
+func (tt *Tenant) CV(k string, defs ...string) string {
+	return tt.ConfigValue(k, defs...)
+}
+
 func (tt *Tenant) ConfigValue(k string, defs ...string) string {
 	v := tt.config[k]
 	if v == "" && len(defs) > 0 {
 		return defs[0]
 	}
 	return v
+}
+
+// CVs shortcut for ConfigValues()
+func (tt *Tenant) CVs(k string) []string {
+	return tt.ConfigValues(k)
 }
 
 func (tt *Tenant) ConfigValues(k string) []string {
