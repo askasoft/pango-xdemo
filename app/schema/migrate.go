@@ -169,6 +169,7 @@ func (sm Schema) MigrateSuper() error {
 					sqb.Update(sm.TableUsers())
 					sqb.Setc("role", models.RoleSuper)
 					sqb.Setc("status", models.UserActive)
+					sqb.Setc("updated_at", time.Now())
 					sql, args = sqb.Build()
 
 					_, err = tx.Exec(sql, args...)
