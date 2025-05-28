@@ -6,6 +6,7 @@ import (
 	"github.com/askasoft/pango-xdemo/app/utils/strutil"
 	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
 	"github.com/askasoft/pango/cog/hashset"
+	"github.com/askasoft/pango/sqx"
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/str"
 )
@@ -77,17 +78,43 @@ func (alqa *AuditLogQueryArg) AddFilters(sqb *sqlx.Builder, locale string) {
 
 	if alqa.Action != "" {
 		ass := str.Fields(alqa.Action)
-		fam := tbsutil.GetAudioLogFunactMap(locale)
+		acm := tbsutil.GetAudioLogFunactMap(locale)
 
-		ahs := hashset.NewHashSet("") // fake item to prevent empty slice
+		fam := map[string]*hashset.HashSet[string]{}
 		for _, a := range ass {
-			for k, v := range fam {
+			for k, v := range acm {
 				if str.ContainsFold(v, a) {
-					ahs.Add(str.SubstrAfter(k, "."))
+					fun, act, _ := str.CutByte(k, '.')
+					if fa, ok := fam[fun]; ok {
+						fa.Add(act)
+					} else {
+						fam[fun] = hashset.NewHashSet(act)
+					}
 				}
 			}
 		}
-		alqa.AddIn(sqb, "audit_logs.action", ahs.Values())
+
+		if len(fam) > 0 {
+			var sb str.Builder
+			var args []any
+
+			sb.WriteByte('(')
+			for fun, acts := range fam {
+				if sb.Len() > 1 {
+					sb.WriteString(" OR ")
+				}
+
+				sin, ains := sqx.In("audit_logs.action", acts.Values())
+				sb.WriteString("(audit_logs.func = ? AND ")
+				sb.WriteString(sin)
+				sb.WriteString(")")
+				args = append(args, fun)
+				args = append(args, ains...)
+			}
+			sb.WriteByte(')')
+
+			sqb.Where(sb.String(), args...)
+		}
 	}
 }
 
