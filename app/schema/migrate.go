@@ -65,7 +65,7 @@ func (sm Schema) ExecSchemaSQL() error {
 func (sm Schema) MigrateConfig(configs []*models.Config) error {
 	tb := sm.TableConfigs()
 
-	log.Infof("Migrate %q", tb)
+	log.Infof("Migrate Config %q", tb)
 
 	db := app.SDB
 
@@ -144,21 +144,23 @@ func (sm Schema) MigrateSuper() error {
 		return errors.New("missing [super] email settings")
 	}
 
+	tb := sm.TableUsers()
+
+	log.Infof("Migrate Super %q", tb)
+
 	err := app.SDB.Transaction(func(tx *sqlx.Tx) (err error) {
 		var uid int64
 
 		sqb := tx.Builder()
-		sqb.Select("COALESCE(MAX(id), 0)").From(sm.TableUsers()).Lt("id", models.UserStartID)
+		sqb.Select("COALESCE(MAX(id), 0)").From(tb).Lt("id", models.UserStartID)
 		sql, args := sqb.Build()
 		if err = tx.Get(&uid, sql, args...); err != nil {
 			return
 		}
 
 		for _, email := range emails {
-			log.Infof("Migrate super %q: %s", sm, email)
-
 			sqb.Reset()
-			sqb.Select().From(sm.TableUsers()).Eq("email", email)
+			sqb.Select().From(tb).Eq("email", email)
 			sql, args = sqb.Build()
 
 			user := &models.User{}
@@ -166,7 +168,7 @@ func (sm Schema) MigrateSuper() error {
 			if err == nil {
 				if user.Role != models.RoleSuper || user.Status != models.UserActive {
 					sqb.Reset()
-					sqb.Update(sm.TableUsers())
+					sqb.Update(tb)
 					sqb.Setc("role", models.RoleSuper)
 					sqb.Setc("status", models.UserActive)
 					sqb.Setc("updated_at", time.Now())
@@ -192,13 +194,13 @@ func (sm Schema) MigrateSuper() error {
 			user.Role = models.RoleSuper
 			user.Status = models.UserActive
 			user.Secret = ran.RandInt63()
-			user.LoginMFA = suc.GetString("login_mfa")
+			user.LoginMFA = suc.GetString("loginmfa")
 			user.CIDR = suc.GetString("cidr", "0.0.0.0/0\n::/0")
 			user.CreatedAt = time.Now()
 			user.UpdatedAt = user.CreatedAt
 
 			sqb.Reset()
-			sqb.Insert(sm.TableUsers())
+			sqb.Insert(tb)
 			sqb.StructNames(user)
 			sql = sqb.SQL()
 
