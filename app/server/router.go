@@ -46,22 +46,24 @@ func initRouter() {
 
 	app.XAL = xmw.NewAccessLogger(nil)
 	app.XSL = xmw.NewRequestSizeLimiter(0)
+	app.XSL.BodyTooLarge = handlers.BodyTooLarge
 	app.XRC = xmw.DefaultResponseCompressor()
 	app.XHD = xmw.NewHTTPDumper(app.XIN.Logger.GetOutputer("XHD", log.LevelTrace))
 	app.XSR = xmw.NewHTTPSRedirector()
 	app.XLL = xmw.NewLocalizer()
 	app.XTP = xmw.NewTokenProtector("")
+	app.XTP.AbortFunc = handlers.InvalidToken
 	app.XRH = xmw.NewResponseHeader(nil)
 	app.XAC = xmw.NewOriginAccessController()
 	app.XCC = xin.NewCacheControlSetter()
 	app.XBA = xmw.NewBasicAuth(tenant.CheckClientAndFindAuthUser)
 	app.XBA.AuthPassed = tenant.BasicAuthPassed
 	app.XBA.AuthFailed = tenant.BasicAuthFailed
-	app.XCA = xmw.NewCookieAuth(tenant.FindAuthUser, app.Secret())
+	app.XCA = xmw.NewCookieAuth(tenant.FindAuthUser, "")
 	app.XCA.GetCookieMaxAge = tenant.AuthCookieMaxAge
 
 	// only get AuthUser from cookie
-	app.XCN = xmw.NewCookieAuth(tenant.FindAuthUser, app.Secret())
+	app.XCN = xmw.NewCookieAuth(tenant.FindAuthUser, "")
 	app.XCN.AuthFailed = xin.Next
 	app.XCN.GetCookieMaxAge = tenant.AuthCookieMaxAge
 
@@ -73,7 +75,6 @@ func initRouter() {
 func configMiddleware() {
 	app.XSL.DrainBody = ini.GetBool("server", "httpDrainRequestBody", false)
 	app.XSL.MaxBodySize = ini.GetSize("server", "httpMaxRequestBodySize", 8<<20)
-	app.XSL.BodyTooLarge = handlers.BodyTooLarge
 
 	app.XRC.Disable(!ini.GetBool("server", "httpGzip"))
 	app.XHD.Disable(!ini.GetBool("server", "httpDump"))
@@ -89,6 +90,7 @@ func configMiddleware() {
 
 	app.XCC.CacheControl = ini.GetString("server", "staticCacheControl", "public, max-age=31536000, immutable")
 
+	app.XCA.SetSecret(app.Secret())
 	app.XCA.RedirectURL = app.Base + "/login/"
 	app.XCA.CookiePath = str.IfEmpty(app.Base, "/")
 	app.XCA.CookieMaxAge = ini.GetDuration("login", "cookieMaxAge", time.Minute*30)
@@ -100,6 +102,7 @@ func configMiddleware() {
 		app.XCA.CookieSameSite = http.SameSiteStrictMode
 	}
 
+	app.XCN.SetSecret(app.Secret())
 	app.XCN.CookieMaxAge = app.XCA.CookieMaxAge
 	app.XCN.CookiePath = app.XCA.CookiePath
 	app.XCN.CookieSecure = app.XCA.CookieSecure

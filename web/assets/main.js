@@ -132,7 +132,7 @@ var main = {
 		var afterHidden;
 		if (xhr.status == 401 || xhr.status == 403) { // unauthorized, forbidden
 			afterHidden = function() {
-				window.location.href = main.base + '/login/';
+				location.href = main.base + '/login/?origin=' + encodeURIComponent(location.pathname + location.search + location.hash);
 			};
 		}
 
