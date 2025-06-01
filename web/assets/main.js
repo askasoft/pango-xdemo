@@ -153,6 +153,10 @@ var main = {
 			msgs.push((e.label ? e.label + ': ' : '') + (e.message || e + ""));
 		});
 
+		if (msgs.length == 1) {
+			msgs = msgs[0];
+		}
+
 		$.toast({
 			icon: 'error',
 			text: msgs,
