@@ -38,25 +38,11 @@
 				<input type="hidden" name="d" value="{{.Q.Dir}}"/>
 
 				<div class="row">
-					<label class="col-md-2 col-xxl-1 col-form-label">{{T .Loc "auditlog.id"}}</label>
-					<div class="col-md-4 col-xxl-5">
-						<input name="id" type="text" class="form-control" textclear value="{{.Q.ID}}"/>
-					</div>
 					<label class="col-md-2 col-xxl-1 col-form-label">{{T .Loc "auditlog.date"}}</label>
-					<div class="col-md-4 col-xxl-5">
+					<div class="col">
 						<input type="date" class="form-control" name="date_from" value="{{DATE .Q.DateFrom}}">
 						～
 						<input type="date" class="form-control" name="date_to" value="{{DATE .Q.DateTo}}">
-					</div>
-				</div>
-				<div class="row">
-					<label class="col-md-2 col-xxl-1 col-form-label">{{T .Loc "auditlog.user"}}</label>
-					<div class="col-md-4 col-xxl-5">
-						<input name="user" type="text" class="form-control" textclear value="{{.Q.User}}"/>
-					</div>
-					<label class="col-md-2 col-xxl-1 col-form-label">{{T .Loc "auditlog.cip"}}</label>
-					<div class="col-md-4 col-xxl-5">
-						<input name="cip" type="text" class="form-control" textclear value="{{.Q.CIP}}"/>
 					</div>
 				</div>
 				<div class="row">
@@ -67,6 +53,16 @@
 					<label class="col-md-2 col-xxl-1 col-form-label">{{T .Loc "auditlog.action"}}</label>
 					<div class="col-md-4 col-xxl-5">
 						<input name="action" type="text" class="form-control" textclear value="{{.Q.Action}}"/>
+					</div>
+				</div>
+				<div class="row">
+					<label class="col-md-2 col-xxl-1 col-form-label">{{T .Loc "auditlog.user"}}</label>
+					<div class="col-md-4 col-xxl-5">
+						<input name="user" type="text" class="form-control" textclear value="{{.Q.User}}"/>
+					</div>
+					<label class="col-md-2 col-xxl-1 col-form-label">{{T .Loc "auditlog.cip"}}</label>
+					<div class="col-md-4 col-xxl-5">
+						<input name="cip" type="text" class="form-control" textclear value="{{.Q.CIP}}"/>
 					</div>
 				</div>
 				<div class="row pt-3 pb-2">
@@ -122,18 +118,6 @@
 			<div class="well text-center">{{T .Loc "auditlog.deletebat.well"}}</div>
 
 			<div class="row">
-				<label class="col-md-2 col-form-label">{{T .Loc "auditlog.user"}}</label>
-				<div class="col">
-					<input name="user" type="text" class="form-control" textclear value="{{.Q.User}}"/>
-				</div>
-			</div>
-			<div class="row">
-				<label class="col-md-2 col-form-label">{{T .Loc "auditlog.cip"}}</label>
-				<div class="col">
-					<input name="cip" type="text" class="form-control" textclear value="{{.Q.CIP}}"/>
-				</div>
-			</div>
-			<div class="row">
 				<label class="col-md-2 col-form-label">{{T .Loc "auditlog.func"}}</label>
 				<div class="col">
 					{{Checks "Name=" "func" "List=" .AuditLogFuncMap "Values=" .Q.Func}}
@@ -143,6 +127,18 @@
 				<label class="col-md-2 col-form-label">{{T .Loc "auditlog.action"}}</label>
 				<div class="col">
 					<input name="action" type="text" class="form-control" textclear value="{{.Q.Action}}"/>
+				</div>
+			</div>
+			<div class="row">
+				<label class="col-md-2 col-form-label">{{T .Loc "auditlog.user"}}</label>
+				<div class="col">
+					<input name="user" type="text" class="form-control" textclear value="{{.Q.User}}"/>
+				</div>
+			</div>
+			<div class="row">
+				<label class="col-md-2 col-form-label">{{T .Loc "auditlog.cip"}}</label>
+				<div class="col">
+					<input name="cip" type="text" class="form-control" textclear value="{{.Q.CIP}}"/>
 				</div>
 			</div>
 			<button type="submit" class="hidden"></button>

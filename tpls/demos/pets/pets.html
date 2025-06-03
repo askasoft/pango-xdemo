@@ -44,7 +44,7 @@
 				<div class="row">
 					<label class="col-md-2 col-xxl-1 col-form-label">{{T .Loc "pet.id"}}</label>
 					<div class="col-md-4 col-xxl-5">
-						<input name="id" type="text" class="form-control" textclear value="{{.Q.ID}}"/>
+						<input name="id" type="text" class="form-control" textclear value="{{.Q.ID}}" placeholder="{{T .Loc "filter.integers"}}"/>
 					</div>
 					<label class="col-md-2 col-xxl-1 col-form-label">{{T .Loc "pet.gender"}}</label>
 					<div class="col-md-4 col-xxl-5">
@@ -76,15 +76,11 @@
 				<div class="row">
 					<label class="col-md-2 col-xxl-1 col-form-label">{{T .Loc "pet.amount"}}</label>
 					<div class="col-md-4 col-xxl-5">
-						<input type="number" class="form-control" name="amount_min" size="13">
-						～
-						<input type="number" class="form-control" name="amount_max" size="13">
+						<input name="amount" type="text" class="form-control" textclear value="{{.Q.Amount}}" placeholder="{{T .Loc "filter.integers"}}"/>
 					</div>
 					<label class="col-md-2 col-xxl-1 col-form-label">{{T .Loc "pet.price"}}</label>
 					<div class="col-md-4 col-xxl-5">
-						<input type="number" class="form-control" name="price_min" size="13">
-						～
-						<input type="number" class="form-control" name="price_max" size="13">
+						<input name="price" type="text" class="form-control" textclear value="{{.Q.Price}}" placeholder="{{T .Loc "filter.decimals"}}"/>
 					</div>
 				</div>
 				<div class="row">
@@ -155,6 +151,10 @@
 			<div class="well text-center">{{T .Loc "pet.deletebat.well"}}</div>
 
 			<div class="row">
+				<label class="col-md-1 col-form-label">{{T .Loc "pet.id"}}</label>
+				<div class="col-md-5">
+					<input name="id" type="text" class="form-control" textclear value="{{.Q.ID}}" placeholder="{{T .Loc "filter.integers"}}"/>
+				</div>
 				<label class="col-md-1 col-form-label">{{T .Loc "pet.gender"}}</label>
 				<div class="col-md-5">
 					{{Checks "Name=" "gender" "List=" .PetGenderMap "Values=" .Q.Gender}}
@@ -185,15 +185,11 @@
 			<div class="row">
 				<label class="col-md-1 col-form-label">{{T .Loc "pet.amount"}}</label>
 				<div class="col-md-5">
-					<input type="number" class="form-control" name="amount_min" size="13">
-					～
-					<input type="number" class="form-control" name="amount_max" size="13">
+					<input name="amount" type="text" class="form-control" textclear value="{{.Q.Amount}}" placeholder="{{T .Loc "filter.integers"}}"/>
 				</div>
 				<label class="col-md-1 col-form-label">{{T .Loc "pet.price"}}</label>
 				<div class="col-md-5">
-					<input type="number" class="form-control" name="price_min" size="13">
-					～
-					<input type="number" class="form-control" name="price_max" size="13">
+					<input name="price" type="text" class="form-control" textclear value="{{.Q.Price}}" placeholder="{{T .Loc "filter.decimals"}}"/>
 				</div>
 			</div>
 			<div class="row">

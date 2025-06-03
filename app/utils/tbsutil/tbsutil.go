@@ -57,7 +57,7 @@ func GetPagerLimits(locale string) []int {
 }
 
 func GetBoolMap(locale string) *linkedhashmap.LinkedHashMap[string, string] {
-	return GetLinkedHashMap(locale, "maps.bool")
+	return GetLinkedHashMap(locale, "map.bool")
 }
 
 func GetUserStatusMap(locale string) *linkedhashmap.LinkedHashMap[string, string] {

@@ -47,7 +47,7 @@
 				<div class="row">
 					<label class="col-md-2 col-xxl-1 col-form-label">{{T .Loc "user.id"}}</label>
 					<div class="col-md-4 col-xxl-5">
-						<input name="id" type="text" class="form-control" textclear value="{{.Q.ID}}"/>
+						<input name="id" type="text" class="form-control" textclear value="{{.Q.ID}}" placeholder="{{T .Loc "filter.integers"}}"/>
 					</div>
 				</div>
 				<div class="row">
@@ -137,21 +137,9 @@
 			<div class="well text-center">{{T .Loc "user.deletebat.well"}}</div>
 
 			<div class="row">
-				<label class="col-md-2 col-form-label">{{T .Loc "user.name"}}</label>
+				<label class="col-md-2 col-form-label">{{T .Loc "user.id"}}</label>
 				<div class="col-md-10">
-					<input name="name" type="text" class="form-control" textclear value="{{.Q.Name}}"/>
-				</div>
-			</div>
-			<div class="row">
-				<label class="col-md-2 col-form-label">{{T .Loc "user.email"}}</label>
-				<div class="col-md-10">
-					<input name="email" type="text" class="form-control" textclear value="{{.Q.Email}}"/>
-				</div>
-			</div>
-			<div class="row">
-				<label class="col-md-2 col-form-label">{{T .Loc "user.cidr"}}</label>
-				<div class="col-md-10">
-					<input name="cidr" type="text" class="form-control" textclear value="{{.Q.CIDR}}"/>
+					<input name="id" type="text" class="form-control" textclear value="{{.Q.ID}}" placeholder="{{T .Loc "filter.integers"}}"/>
 				</div>
 			</div>
 			<div class="row">
@@ -170,6 +158,24 @@
 				<label class="col-md-2 col-form-label">{{T .Loc "user.login_mfa"}}</label>
 				<div class="col-md-10">
 					{{Checks "Name=" "login_mfa" "List=" .UserLoginMFAMap "Values=" .Q.LoginMFA}}
+				</div>
+			</div>
+			<div class="row">
+				<label class="col-md-2 col-form-label">{{T .Loc "user.name"}}</label>
+				<div class="col-md-10">
+					<input name="name" type="text" class="form-control" textclear value="{{.Q.Name}}"/>
+				</div>
+			</div>
+			<div class="row">
+				<label class="col-md-2 col-form-label">{{T .Loc "user.email"}}</label>
+				<div class="col-md-10">
+					<input name="email" type="text" class="form-control" textclear value="{{.Q.Email}}"/>
+				</div>
+			</div>
+			<div class="row">
+				<label class="col-md-2 col-form-label">{{T .Loc "user.cidr"}}</label>
+				<div class="col-md-10">
+					<input name="cidr" type="text" class="form-control" textclear value="{{.Q.CIDR}}"/>
 				</div>
 			</div>
 			<button type="submit" class="hidden"></button>

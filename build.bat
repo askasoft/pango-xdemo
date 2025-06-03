@@ -67,3 +67,4 @@ echo }
 
 go generate
 go build -ldflags "-X %PKG%.Version=%VERSION% -X %PKG%.Revision=%REVISION% -X %PKG%.buildTime=%BUILD_TIME%" -o %EXE%
+go test ./...

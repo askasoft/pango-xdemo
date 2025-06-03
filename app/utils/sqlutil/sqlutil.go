@@ -6,6 +6,7 @@ import (
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/utils/myutil"
 	"github.com/askasoft/pango-xdemo/app/utils/pgutil"
+	"github.com/askasoft/pango-xdemo/app/utils/strutil"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/sqx"
@@ -42,6 +43,11 @@ func AddOrder(sqb *sqlx.Builder, st *args.Sorter, defcol string) {
 
 	defs := false
 	for _, col := range cols {
+		b, a, ok := str.CutByte(col, '.')
+		if ok {
+			col = b + "->>'" + a + "'"
+		}
+
 		sqb.Order(col, st.IsDesc())
 		if col == defcol {
 			defs = true
@@ -107,120 +113,6 @@ func AddILike(sqb *sqlx.Builder, col string, val string) {
 	}
 }
 
-func AddDates(sqb *sqlx.Builder, col string, tmin, tmax time.Time) {
-	if !tmin.IsZero() {
-		tmin = tmu.TruncateHours(tmin)
-		sqb.Gte(col, tmin)
-	}
-	if !tmax.IsZero() {
-		tmax = tmu.TruncateHours(tmax).Add(time.Hour * 24)
-		sqb.Lt(col, tmax)
-	}
-}
-
-func AddTimes(sqb *sqlx.Builder, col string, tmin, tmax time.Time) {
-	if !tmin.IsZero() {
-		sqb.Gte(col, tmin)
-	}
-	if !tmax.IsZero() {
-		sqb.Lte(col, tmax)
-	}
-}
-
-func AddInts(sqb *sqlx.Builder, col string, smin, smax string) {
-	if smin != "" {
-		sqb.Gte(col, num.Atoi(smin))
-	}
-	if smax != "" {
-		sqb.Lte(col, num.Atoi(smax))
-	}
-}
-
-func AddFloats(sqb *sqlx.Builder, col string, smin, smax string) {
-	if smin != "" {
-		sqb.Gte(col, num.Atof(smin))
-	}
-	if smax != "" {
-		sqb.Lte(col, num.Atof(smax))
-	}
-}
-
-func AddIDs(sqb *sqlx.Builder, col string, id string) {
-	ss := str.FieldsByte(id, ',')
-	if len(ss) > 0 {
-		var sb str.Builder
-		var args []any
-
-		sb.WriteByte('(')
-		for _, s := range ss {
-			s = str.Strip(s)
-			if s == "" {
-				continue
-			}
-
-			if sb.Len() > 1 {
-				sb.WriteString(" OR ")
-			}
-			sb.WriteString(sqb.Quote(col))
-
-			smin, smax, ok := str.CutByte(s, '-')
-			if ok {
-				smin = str.Strip(smin)
-				smax = str.Strip(smax)
-				sb.WriteString(" BETWEEN ? AND ?")
-				args = append(args, num.Atol(smin), num.Atol(smax))
-			} else {
-				sb.WriteString(" = ?")
-				args = append(args, num.Atol(s))
-			}
-		}
-		sb.WriteByte(')')
-
-		sqb.Where(sb.String(), args...)
-	}
-}
-
-func addLikesAny(sqb *sqlx.Builder, like, col, val string, not bool) {
-	ss := str.Fields(val)
-	if len(ss) == 0 {
-		return
-	}
-
-	var sb str.Builder
-	var args []any
-
-	if not {
-		sb.WriteString("NOT ")
-	}
-	sb.WriteByte('(')
-	for i, s := range ss {
-		if i > 0 {
-			sb.WriteString(" OR ")
-		}
-		sb.WriteString(sqb.Quote(col))
-		sb.WriteString(" ")
-		sb.WriteString(like)
-		sb.WriteString(" ?")
-		args = append(args, sqx.StringLike(s))
-	}
-	sb.WriteByte(')')
-
-	sqb.Where(sb.String(), args...)
-}
-
-func AddLikes(sqb *sqlx.Builder, col string, val string) {
-	AddLikesEx(sqb, col, val, false)
-}
-
-func AddLikesEx(sqb *sqlx.Builder, col string, val string, not bool) {
-	switch app.DBType() {
-	case "postgres":
-		addLikesAny(sqb, "ILIKE", col, val, not)
-	default:
-		addLikesAny(sqb, "LIKE", col, val, not)
-	}
-}
-
 func AddContains(sqb *sqlx.Builder, col string, vals []string) {
 	switch app.DBType() {
 	case "mysql":
@@ -236,5 +128,277 @@ func AddJSONFlags(sqb *sqlx.Builder, col string, vals []string) {
 		myutil.JSONFlagsContainsAll(sqb, col, vals...)
 	default:
 		pgutil.JSONFlagsContainsAll(sqb, col, vals...)
+	}
+}
+
+func AddDateRange(sqb *sqlx.Builder, col string, tmin, tmax time.Time) {
+	if !tmin.IsZero() {
+		tmin = tmu.TruncateHours(tmin)
+		sqb.Gte(col, tmin)
+	}
+	if !tmax.IsZero() {
+		tmax = tmu.TruncateHours(tmax).Add(time.Hour * 24)
+		sqb.Lt(col, tmax)
+	}
+}
+
+func AddTimeRange(sqb *sqlx.Builder, col string, tmin, tmax time.Time) {
+	if !tmin.IsZero() {
+		sqb.Gte(col, tmin)
+	}
+	if !tmax.IsZero() {
+		sqb.Lte(col, tmax)
+	}
+}
+
+func AddIntRange(sqb *sqlx.Builder, col string, smin, smax string) {
+	if smin != "" {
+		sqb.Gte(col, num.Atoi(smin))
+	}
+	if smax != "" {
+		sqb.Lte(col, num.Atoi(smax))
+	}
+}
+
+func AddFloatRange(sqb *sqlx.Builder, col string, smin, smax string) {
+	if smin != "" {
+		sqb.Gte(col, num.Atof(smin))
+	}
+	if smax != "" {
+		sqb.Lte(col, num.Atof(smax))
+	}
+}
+
+func AddIntegers(sqb *sqlx.Builder, col string, val string) {
+	AddIntegersEx(sqb, col, val, false)
+}
+
+func AddIntegersEx(sqb *sqlx.Builder, col string, val string, not bool) {
+	ss := str.Fields(val)
+
+	if len(ss) == 0 {
+		return
+	}
+
+	var sb str.Builder
+	var args []any
+
+	if not {
+		sb.WriteString("NOT ")
+	}
+
+	sb.WriteByte('(')
+	for _, s := range ss {
+		if len(args) > 0 {
+			sb.WriteString(" OR ")
+		}
+
+		sb.WriteString(sqb.Quote(col))
+
+		smin, smax, ok := str.CutByte(s, '~')
+		if ok {
+			switch {
+			case smin == "" && smax == "": // invalid
+			case smin == "":
+				sb.WriteString(" <= ?")
+				args = append(args, num.Atol(smax))
+			case smax == "":
+				sb.WriteString(" >= ?")
+				args = append(args, num.Atol(smin))
+			default:
+				imin := num.Atol(smin)
+				imax := num.Atol(smax)
+				switch {
+				case imin < imax:
+					sb.WriteString(" BETWEEN ? AND ?")
+					args = append(args, imin, imax)
+				case imin > imax:
+					sb.WriteString(" BETWEEN ? AND ?")
+					args = append(args, imax, imin)
+				default:
+					sb.WriteString(" = ?")
+					args = append(args, imin)
+				}
+			}
+		} else {
+			sb.WriteString(" = ?")
+			args = append(args, num.Atol(s))
+		}
+	}
+	sb.WriteByte(')')
+
+	sqb.Where(sb.String(), args...)
+}
+
+func AddDecimals(sqb *sqlx.Builder, col string, val string) {
+	AddDecimalsEx(sqb, col, val, false)
+}
+
+func AddDecimalsEx(sqb *sqlx.Builder, col string, val string, not bool) {
+	ss := str.Fields(val)
+
+	if len(ss) == 0 {
+		return
+	}
+
+	var sb str.Builder
+	var args []any
+
+	if not {
+		sb.WriteString("NOT ")
+	}
+
+	sb.WriteByte('(')
+	for _, s := range ss {
+		if len(args) > 0 {
+			sb.WriteString(" OR ")
+		}
+
+		sb.WriteString(sqb.Quote(col))
+
+		smin, smax, ok := str.CutByte(s, '~')
+		if ok {
+			switch {
+			case smin == "" && smax == "": // invalid
+			case smin == "":
+				sb.WriteString(" <= ?")
+				args = append(args, num.Atof(smax))
+			case smax == "":
+				sb.WriteString(" >= ?")
+				args = append(args, num.Atof(smin))
+			default:
+				fmin := num.Atof(smin)
+				fmax := num.Atof(smax)
+				switch {
+				case fmin < fmax:
+					sb.WriteString(" BETWEEN ? AND ?")
+					args = append(args, fmin, fmax)
+				case fmin > fmax:
+					sb.WriteString(" BETWEEN ? AND ?")
+					args = append(args, fmax, fmin)
+				default:
+					sb.WriteString(" = ?")
+					args = append(args, fmin)
+				}
+			}
+		} else {
+			sb.WriteString(" = ?")
+			args = append(args, num.Atof(s))
+		}
+	}
+	sb.WriteByte(')')
+
+	sqb.Where(sb.String(), args...)
+}
+
+func AddKeywords(sqb *sqlx.Builder, col string, val string) {
+	AddKeywordsEx(sqb, col, val, false)
+}
+
+func AddKeywordsEx(sqb *sqlx.Builder, col string, val string, not bool) {
+	switch app.DBType() {
+	case "postgres":
+		addLikesAny(sqb, "ILIKE", col, val, not)
+	default:
+		addLikesAny(sqb, "LIKE", col, val, not)
+	}
+}
+
+func addLikesAny(sqb *sqlx.Builder, like, col, val string, not bool) {
+	val = str.Strip(val)
+	if val == "" {
+		return
+	}
+
+	var (
+		sb   str.Builder
+		args []any
+		key  string
+	)
+
+	if not {
+		sb.WriteString("NOT ")
+	}
+
+	sb.WriteByte('(')
+	for val != "" {
+		key, val, _ = strutil.NextKeyword(val)
+
+		if key == "" {
+			continue
+		}
+
+		if len(args) > 0 {
+			sb.WriteString(" OR ")
+		}
+		sb.WriteString(sqb.Quote(col))
+		sb.WriteString(" ")
+		sb.WriteString(like)
+		sb.WriteString(" ?")
+		args = append(args, sqx.StringLike(key))
+	}
+	if len(args) > 0 {
+		sb.WriteByte(')')
+		sqb.Where(sb.String(), args...)
+	}
+}
+
+func AddAndwords(sqb *sqlx.Builder, col string, val string) {
+	AddAndwordsEx(sqb, col, val, false)
+}
+
+func AddAndwordsEx(sqb *sqlx.Builder, col string, val string, not bool) {
+	switch app.DBType() {
+	case "postgres":
+		addLikesAnd(sqb, "ILIKE", col, val, not)
+	default:
+		addLikesAnd(sqb, "LIKE", col, val, not)
+	}
+}
+
+func addLikesAnd(sqb *sqlx.Builder, like, col, val string, not bool) {
+	val = str.Strip(val)
+	if val == "" {
+		return
+	}
+
+	var (
+		sb     str.Builder
+		args   []any
+		key    string
+		and    bool
+		quoted bool
+	)
+
+	if not {
+		sb.WriteString("NOT ")
+	}
+
+	sb.WriteByte('(')
+	for val != "" {
+		key, val, quoted = strutil.NextKeyword(val)
+
+		if key == "" {
+			continue
+		}
+		if !quoted && key == "&" {
+			and = true
+			continue
+		}
+
+		if len(args) > 0 {
+			sb.WriteString(str.If(and, " AND ", " OR "))
+		}
+		sb.WriteString(sqb.Quote(col))
+		sb.WriteString(" ")
+		sb.WriteString(like)
+		sb.WriteString(" ?")
+		args = append(args, sqx.StringLike(key))
+
+		and = false
+	}
+	if len(args) > 0 {
+		sb.WriteByte(')')
+		sqb.Where(sb.String(), args...)
 	}
 }
