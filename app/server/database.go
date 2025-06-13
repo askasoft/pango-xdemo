@@ -45,6 +45,7 @@ func openDatabase() error {
 	}
 
 	db.SetMaxIdleConns(sec.GetInt("maxIdleConns", 5))
+	db.SetConnMaxIdleTime(sec.GetDuration("connMaxIdleTime", time.Minute*5))
 	db.SetMaxOpenConns(sec.GetInt("maxOpenConns", 10))
 	db.SetConnMaxLifetime(sec.GetDuration("connMaxLifetime", time.Hour))
 
