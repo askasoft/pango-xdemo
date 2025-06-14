@@ -41,6 +41,8 @@ func initRouter() {
 	app.VAD = app.XIN.Validator.Engine().(*vad.Validate)
 	app.VAD.RegisterValidation("ini", vadutil.ValidateINI)
 	app.VAD.RegisterValidation("cidrs", vadutil.ValidateCIDRs)
+	app.VAD.RegisterValidation("integers", vadutil.ValidateIntegers)
+	app.VAD.RegisterValidation("decimals", vadutil.ValidateIntegers)
 	app.VAD.RegisterValidation("regexps", vadutil.ValidateRegexps)
 	app.VAD.RegisterValidation("samlmeta", vadutil.ValidateSAMLMeta)
 

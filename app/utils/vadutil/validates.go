@@ -3,6 +3,7 @@ package vadutil
 import (
 	"regexp"
 
+	"github.com/askasoft/pango-xdemo/app/args"
 	"github.com/askasoft/pango/ini"
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/vad"
@@ -20,6 +21,16 @@ func ValidateCIDRs(fl vad.FieldLevel) bool {
 
 func ValidateINI(fl vad.FieldLevel) bool {
 	err := ini.NewIni().LoadData(str.NewReader(fl.Field().String()))
+	return err == nil
+}
+
+func ValidateIntegers(fl vad.FieldLevel) bool {
+	_, err := args.ParseIntegers(fl.Field().String())
+	return err == nil
+}
+
+func ValidateDecimals(fl vad.FieldLevel) bool {
+	_, err := args.ParseDecimals(fl.Field().String())
 	return err == nil
 }
 

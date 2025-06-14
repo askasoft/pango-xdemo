@@ -14,7 +14,7 @@ import (
 type UserQueryArg struct {
 	QueryArg
 
-	ID       string   `json:"id,omitempty" form:"id,strip"`
+	ID       string   `json:"id,omitempty" form:"id,strip,ascii" validate:"integers"`
 	Role     []string `json:"role,omitempty" form:"role,strip"`
 	Status   []string `json:"status,omitempty" form:"status,strip"`
 	LoginMFA []string `json:"login_mfa,omitempty" form:"login_mfa"`
@@ -118,7 +118,7 @@ func (alqa *AuditLogQueryArg) AddFilters(sqb *sqlx.Builder, locale string) {
 type PetQueryArg struct {
 	QueryArg
 
-	ID       string    `json:"id,omitempty" form:"id,strip"`
+	ID       string    `json:"id,omitempty" form:"id,strip,ascii" validate:"integers"`
 	Name     string    `json:"name,omitempty" form:"name,strip"`
 	BornFrom time.Time `json:"born_from,omitempty" form:"born_from,strip"`
 	BornTo   time.Time `json:"born_to,omitempty" form:"born_to,strip" validate:"omitempty,gtefield=BornFrom"`
@@ -126,8 +126,8 @@ type PetQueryArg struct {
 	Origin   []string  `json:"origin,omitempty" form:"origin,strip"`
 	Habits   []string  `json:"habits,omitempty" form:"habits,strip"`
 	Temper   []string  `json:"temper,omitempty" form:"temper,strip"`
-	Amount   string    `json:"amount,omitempty" form:"amount,strip"`
-	Price    string    `json:"price,omitempty" form:"price,strip"`
+	Amount   string    `json:"amount,omitempty" form:"amount,strip,ascii" validate:"integers"`
+	Price    string    `json:"price,omitempty" form:"price,strip,ascii" validate:"decimals"`
 	ShopName string    `json:"shop_name,omitempty" form:"shop_name,strip"`
 }
 
