@@ -32,11 +32,12 @@ func addSuperTenantHandlers(rg *xin.RouterGroup) {
 func addSuperStatsHandlers(rg *xin.RouterGroup) {
 	rg.GET("/", StatsIndex)
 	rg.GET("/jobs", StatsJobs)
-	rg.GET("/configs", StatsCacheConfigs)
-	rg.GET("/schemas", StatsCacheSchemas)
-	rg.GET("/workers", StatsCacheWorkers)
-	rg.GET("/users", StatsCacheUsers)
-	rg.GET("/afips", StatsCacheAfips)
+	rg.GET("/db", StatsDB)
+	rg.GET("/cache/configs", StatsCacheConfigs)
+	rg.GET("/cache/schemas", StatsCacheSchemas)
+	rg.GET("/cache/workers", StatsCacheWorkers)
+	rg.GET("/cache/users", StatsCacheUsers)
+	rg.GET("/cache/afips", StatsCacheAfips)
 }
 
 func addSuperSqlHandlers(rg *xin.RouterGroup) {

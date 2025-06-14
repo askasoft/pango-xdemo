@@ -3,6 +3,7 @@ package super
 import (
 	"cmp"
 	"net/http"
+	"reflect"
 	"time"
 
 	"github.com/askasoft/pango-xdemo/app"
@@ -11,23 +12,40 @@ import (
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango/bol"
 	"github.com/askasoft/pango/cas"
+	"github.com/askasoft/pango/cog/linkedhashmap"
 	"github.com/askasoft/pango/cog/treemap"
 	"github.com/askasoft/pango/gwp"
 	"github.com/askasoft/pango/imc"
 	"github.com/askasoft/pango/num"
+	"github.com/askasoft/pango/ref"
 	"github.com/askasoft/pango/tmu"
 	"github.com/askasoft/pango/xin"
 )
 
 func StatsIndex(c *xin.Context) {
 	h := handlers.H(c)
+
 	h["Jobs"] = jobs.Stats()
+
+	dbstats := linkedhashmap.NewLinkedHashMap[string, any]()
+	_ = ref.IterStructFields(app.SDB.Stats(), func(sf reflect.StructField, v reflect.Value) {
+		if sf.IsExported() {
+			dbstats.Set(sf.Name, v.Interface())
+		}
+	})
+	h["DB"] = dbstats.Entries()
+
 	h["Caches"] = []string{"configs", "schemas", "workers", "users", "afips"}
+
 	c.HTML(http.StatusOK, "super/stats", h)
 }
 
 func StatsJobs(c *xin.Context) {
 	c.String(http.StatusOK, jobs.Stats())
+}
+
+func StatsDB(c *xin.Context) {
+	c.JSON(http.StatusOK, app.SDB.Stats())
 }
 
 func StatsCacheConfigs(c *xin.Context) {
@@ -80,5 +98,5 @@ func statsCacheStats[K comparable, T any](c *xin.Context, ic *imc.Cache[K, T], f
 		return cis.Len() <= limit
 	})
 
-	c.JSON(http.StatusOK, xin.H{"size": cis.Len(), "data": cis})
+	c.JSON(http.StatusOK, xin.H{"type": "cache", "size": cis.Len(), "data": cis})
 }

@@ -1,9 +1,9 @@
 (function($) {
-	function stats_build($d, data) {
+	function stats_cache_build($d, data) {
 		$d.find('.size').text(data.size);
 
-		var i = 0;
-		var $tb = $d.find('table > tbody').empty();
+		var i = 0, $tb = $d.find('table > tbody').empty();
+
 		$.each(data.data, function(k, v) {
 			$tb.append($('<tr>').append(
 				$('<td>').text(++i),
@@ -14,22 +14,40 @@
 		});
 	}
 
+	function stats_items_build($d, data) {
+		var i = 0, $tb = $d.find('table > tbody').empty();
+
+		for (var k in data) {
+			$tb.append($('<tr>').append(
+				$('<td>').text(++i),
+				$('<td>').text(k),
+				$('<td>').text(data[k])
+			));
+		}
+	}
+
+	function stats_build($d, data) {
+		if (typeof(data) == 'string') {
+			$t.find('.jobstats').empty().text(data);
+		} else if (data.type == 'cache') {
+			stats_cache_build($d, data);
+		} else {
+			stats_items_build($d, data);
+		}
+	}
+
 	function stats_load($t, force) {
 		if (!force && $t.data('loaded')) {
 			return;
 		}
 
 		$.ajax({
-			url: $t.attr('id').replace('aps_', ''),
+			url: $t.attr('id').replace('aps_', '').replace('_', '/'),
 			method: 'GET',
 			beforeSend: $t.loadmask.delegate($t),
 			success: function(data) {
 				$t.data('loaded', true);
-				if (typeof(data) == 'string') {
-					$t.find('.stats').empty().text(data);
-				} else {
-					stats_build($t, data);
-				}
+				stats_build($t, data);
 			},
 			error: main.ajax_error,
 			complete: $t.unloadmask.delegate($t)
