@@ -91,17 +91,15 @@ func buildConfigCategories(c *xin.Context, configs []*models.Config) []*configCa
 	return ccs
 }
 
-func getConfigItemList(locale, name string) *linkedhashmap.LinkedHashMap[string, string] {
-	name = "config.list." + name
-
-	value := tbs.GetText(locale, name)
+func getConfigItemList(locale string, name string) *linkedhashmap.LinkedHashMap[string, string] {
+	value := tbs.GetText(locale, "config.list."+name)
 	if value == "" {
 		return nil
 	}
 
 	m := &linkedhashmap.LinkedHashMap[string, string]{}
 	if err := m.UnmarshalJSON(str.UnsafeBytes(value)); err != nil {
-		panic(fmt.Errorf("invalid [%s] %s: %w", locale, name, err))
+		panic(fmt.Errorf("invalid setting list [%s] %s: %w", locale, name, err))
 	}
 	return m
 }
@@ -200,7 +198,9 @@ func buildConfigDetails(c *xin.Context, configs []*models.Config, uconfigs []*mo
 	return str.UnsafeString(bs)
 }
 
-func validateConfig(c *xin.Context, cfg *models.Config, v *string) bool {
+func validateConfig(c *xin.Context, cfg *models.Config) bool {
+	v := &cfg.Value
+
 	switch cfg.Style {
 	case models.ConfigStyleNumeric:
 		*v = str.RemoveByte(*v, ',')
@@ -299,12 +299,12 @@ func checkPostConfigs(c *xin.Context, configs []*models.Config) (uconfigs []*mod
 			continue
 		}
 
-		if validateConfig(c, cfg, &v) {
-			ucfg := &models.Config{}
-			*ucfg = *cfg
-			ucfg.Value = v
-			uconfigs = append(uconfigs, ucfg)
-		}
+		cfg.Value = v
+		uconfigs = append(uconfigs, cfg)
+	}
+
+	for _, ucfg := range uconfigs {
+		validateConfig(c, ucfg)
 	}
 
 	return
@@ -435,12 +435,12 @@ func checkCsvConfigs(c *xin.Context, configs []*models.Config, csvcfgs []*config
 			continue
 		}
 
-		if validateConfig(c, cfg, &ci.Value) {
-			ucfg := &models.Config{}
-			*ucfg = *cfg
-			ucfg.Value = ci.Value
-			uconfigs = append(uconfigs, ucfg)
-		}
+		cfg.Value = ci.Value
+		uconfigs = append(uconfigs, cfg)
+	}
+
+	for _, ucfg := range uconfigs {
+		validateConfig(c, ucfg)
 	}
 
 	return
