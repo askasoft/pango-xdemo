@@ -51,7 +51,7 @@ type AuditLogQueryArg struct {
 	QueryArg
 
 	DateFrom time.Time `json:"date_from,omitempty" form:"date_from,strip"`
-	DateTo   time.Time `json:"date_to,omitempty" form:"date_to,strip" validate:"omitempty,gtefield=DateFrom"`
+	DateTo   time.Time `json:"date_to,omitempty" form:"date_to,strip"`
 	Func     []string  `json:"func,omitempty" form:"func,strip"`
 	Action   string    `json:"action,omitempty" form:"action,strip"`
 	User     string    `json:"user,omitempty" form:"user,strip"`
