@@ -134,38 +134,87 @@ func AddJSONFlags(sqb *sqlx.Builder, col string, vals []string) {
 func AddDateRange(sqb *sqlx.Builder, col string, tmin, tmax time.Time) {
 	if !tmin.IsZero() {
 		tmin = tmu.TruncateHours(tmin)
-		sqb.Gte(col, tmin)
 	}
 	if !tmax.IsZero() {
 		tmax = tmu.TruncateHours(tmax).Add(time.Hour * 24)
-		sqb.Lt(col, tmax)
 	}
+	AddTimeRange(sqb, col, tmin, tmax)
 }
 
 func AddTimeRange(sqb *sqlx.Builder, col string, tmin, tmax time.Time) {
-	if !tmin.IsZero() {
-		sqb.Gte(col, tmin)
-	}
-	if !tmax.IsZero() {
+	switch {
+	case tmin.IsZero() && tmax.IsZero():
+	case tmin.IsZero():
 		sqb.Lte(col, tmax)
+	case tmax.IsZero():
+		sqb.Gte(col, tmin)
+	default:
+		switch {
+		case tmin.Before(tmax):
+			sqb.Btw(col, tmin, tmax)
+		case tmin.After(tmax):
+			sqb.Btw(col, tmax, tmin)
+		default:
+			sqb.Eq(col, tmin)
+		}
 	}
 }
 
 func AddIntRange(sqb *sqlx.Builder, col string, smin, smax string) {
-	if smin != "" {
-		sqb.Gte(col, num.Atoi(smin))
+	q, a := buildIntRange(smin, smax)
+	if q != "" {
+		sqb.Where(sqb.Quote(col)+q, a...)
 	}
-	if smax != "" {
-		sqb.Lte(col, num.Atoi(smax))
+}
+
+func buildIntRange(smin, smax string) (string, []any) {
+	switch {
+	case smin == "" && smax == "": // invalid
+		return "", nil
+	case smin == "":
+		return " <= ?", []any{num.Atol(smax)}
+	case smax == "":
+		return " >= ?", []any{num.Atol(smin)}
+	default:
+		imin := num.Atol(smin)
+		imax := num.Atol(smax)
+		switch {
+		case imin < imax:
+			return " BETWEEN ? AND ?", []any{imin, imax}
+		case imin > imax:
+			return " BETWEEN ? AND ?", []any{imax, imin}
+		default:
+			return " = ?", []any{imin}
+		}
 	}
 }
 
 func AddFloatRange(sqb *sqlx.Builder, col string, smin, smax string) {
-	if smin != "" {
-		sqb.Gte(col, num.Atof(smin))
+	q, a := buildFloatRange(smin, smax)
+	if q != "" {
+		sqb.Where(sqb.Quote(col)+" "+q, a...)
 	}
-	if smax != "" {
-		sqb.Lte(col, num.Atof(smax))
+}
+
+func buildFloatRange(smin, smax string) (string, []any) {
+	switch {
+	case smin == "" && smax == "": // invalid
+		return "", nil
+	case smin == "":
+		return " <= ?", []any{num.Atof(smax)}
+	case smax == "":
+		return " >= ?", []any{num.Atof(smin)}
+	default:
+		fmin := num.Atof(smin)
+		fmax := num.Atof(smax)
+		switch {
+		case fmin < fmax:
+			return " BETWEEN ? AND ?", []any{fmin, fmax}
+		case fmin > fmax:
+			return " BETWEEN ? AND ?", []any{fmax, fmin}
+		default:
+			return " = ?", []any{fmin}
+		}
 	}
 }
 
@@ -193,34 +242,16 @@ func AddIntegersEx(sqb *sqlx.Builder, col string, val string, not bool) {
 			sb.WriteString(" OR ")
 		}
 
-		sb.WriteString(sqb.Quote(col))
-
 		smin, smax, ok := str.CutByte(s, '~')
 		if ok {
-			switch {
-			case smin == "" && smax == "": // invalid
-			case smin == "":
-				sb.WriteString(" <= ?")
-				args = append(args, num.Atol(smax))
-			case smax == "":
-				sb.WriteString(" >= ?")
-				args = append(args, num.Atol(smin))
-			default:
-				imin := num.Atol(smin)
-				imax := num.Atol(smax)
-				switch {
-				case imin < imax:
-					sb.WriteString(" BETWEEN ? AND ?")
-					args = append(args, imin, imax)
-				case imin > imax:
-					sb.WriteString(" BETWEEN ? AND ?")
-					args = append(args, imax, imin)
-				default:
-					sb.WriteString(" = ?")
-					args = append(args, imin)
-				}
+			q, a := buildIntRange(smin, smax)
+			if q != "" {
+				sb.WriteString(sqb.Quote(col))
+				sb.WriteString(q)
+				args = append(args, a...)
 			}
 		} else {
+			sb.WriteString(sqb.Quote(col))
 			sb.WriteString(" = ?")
 			args = append(args, num.Atol(s))
 		}
@@ -254,34 +285,16 @@ func AddDecimalsEx(sqb *sqlx.Builder, col string, val string, not bool) {
 			sb.WriteString(" OR ")
 		}
 
-		sb.WriteString(sqb.Quote(col))
-
 		smin, smax, ok := str.CutByte(s, '~')
 		if ok {
-			switch {
-			case smin == "" && smax == "": // invalid
-			case smin == "":
-				sb.WriteString(" <= ?")
-				args = append(args, num.Atof(smax))
-			case smax == "":
-				sb.WriteString(" >= ?")
-				args = append(args, num.Atof(smin))
-			default:
-				fmin := num.Atof(smin)
-				fmax := num.Atof(smax)
-				switch {
-				case fmin < fmax:
-					sb.WriteString(" BETWEEN ? AND ?")
-					args = append(args, fmin, fmax)
-				case fmin > fmax:
-					sb.WriteString(" BETWEEN ? AND ?")
-					args = append(args, fmax, fmin)
-				default:
-					sb.WriteString(" = ?")
-					args = append(args, fmin)
-				}
+			q, a := buildFloatRange(smin, smax)
+			if q != "" {
+				sb.WriteString(sqb.Quote(col))
+				sb.WriteString(q)
+				args = append(args, a...)
 			}
 		} else {
+			sb.WriteString(sqb.Quote(col))
 			sb.WriteString(" = ?")
 			args = append(args, num.Atof(s))
 		}
