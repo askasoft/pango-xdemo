@@ -6,6 +6,13 @@
 	table.dbstats th.no, table.cache th.no {
 		width: 1%;
 	}
+
+	#aps_cache ul.nav {
+		flex-direction: column;
+		flex-wrap: nowrap;
+		min-width: 200px;
+		max-width: 200px;
+	}
 	table.cache th.key, table.cache th.val, table.cache th.ttl {
 		width: 33%;
 	}
@@ -16,61 +23,70 @@
 		<h2>{{I "super.stats"}}<span>{{T .Loc "menu.super.stats"}}</span></h2>
 	</div>
 	<div class="s-section-body s-stats">
-		<h3><i class="fas fa-fw fa-spinner"></i> Jobs</h3>
-		<div id="aps_jobs" class="aps pt-1 pb-4" data-loaded="true">
-			<button class="reload btn btn-primary">{{I "refresh"}} Reload</button>
-			<pre class="jobstats py-3">{{.Jobs}}</pre>
-		</div>
-
-		<h3><i class="fas fa-fw fa-database"></i> Database</h3>
-		<div id="aps_db" class="aps pt-1 pb-4" data-loaded="true">
-			<button class="reload btn btn-primary">{{I "refresh"}} Reload</button>
-			<div class="py-3">
-				<table class="dbstats table table-bordered table-striped">
-					<thead>
-						<tr>
-							<th class="no">#</th>
-							<th class="key">Key</th>
-							<th class="val">Value</th>
-						</tr>
-					</thead>
-					<tbody>
-						{{range $i, $e := .DB}}
-						<tr>
-							<td>{{(Add $i 1)}}</td>
-							<td>{{$e.Key}}</td>
-							<td>{{$e.Val}}</td>
-						</tr>
-						{{end}}
-					</tbody>
-				</table>
-			</div>
-		</div>
-
-		<h3><i class="fas fa-fw fa-memory"></i> Caches</h3>
 		<ul class="nav nav-tabs">
-			{{range $c := .Caches}}
-			<li class="nav-item"><a class="nav-link" href="#aps_cache_{{$c}}" data-bs-toggle="tab">{{T $.Loc (print "stats." $c)}}</a></li>
-			{{end}}
+			<li class="nav-item"><a class="nav-link active" href="#aps_jobs" data-bs-toggle="tab"><i class="fas fa-fw fa-gears"></i> Jobs</a></li>
+			<li class="nav-item"><a class="nav-link" href="#aps_db" data-bs-toggle="tab"><i class="fas fa-fw fa-database"></i> Database</a></li>
+			<li class="nav-item"><a class="nav-link" href="#aps_cache" data-bs-toggle="tab"><i class="fas fa-fw fa-memory"></i> Caches</a></li>
 		</ul>
+
 		<div class="tab-content py-3">
-			{{range $c := .Caches}}
-			<div id="aps_cache_{{$c}}" class="aps tab-pane">
+			<div id="aps_jobs" class="aps tab-pane active" data-loaded="true">
 				<button class="reload btn btn-primary">{{I "refresh"}} Reload</button>
-				<div class="mt-2 mb-1">Total: <span class="size"></span></div>
-				<table class="cache table table-bordered table-striped">
-					<thead>
-						<tr>
-							<th class="no">#</th>
-							<th class="key">Key</th>
-							<th class="val">Value</th>
-							<th class="ttl">TTL</th>
-						</tr>
-					</thead>
-					<tbody></tbody>
-				</table>
+				<pre class="jobstats py-3">{{.Jobs}}</pre>
 			</div>
-			{{end}}
+
+			<div id="aps_db" class="aps tab-pane" data-loaded="true">
+				<button class="reload btn btn-primary">{{I "refresh"}} Reload</button>
+				<div class="py-3">
+					<table class="dbstats table table-bordered table-striped">
+						<thead>
+							<tr>
+								<th class="no">#</th>
+								<th class="key">Key</th>
+								<th class="val">Value</th>
+							</tr>
+						</thead>
+						<tbody>
+							{{range $i, $e := .DB}}
+							<tr>
+								<td>{{(Add $i 1)}}</td>
+								<td>{{$e.Key}}</td>
+								<td>{{$e.Val}}</td>
+							</tr>
+							{{end}}
+						</tbody>
+					</table>
+				</div>
+			</div>
+
+			<div id="aps_cache" class="tab-pane">
+				<div class="d-flex">
+					<ul class="nav nav-pills">
+						{{range $i, $c := .Caches}}
+						<li class="nav-item"><a class="nav-link{{if eq $i 0}} active{{end}}" href="#aps_cache_{{$c}}" data-bs-toggle="tab">{{T $.Loc (print "stats." $c)}}</a></li>
+						{{end}}
+					</ul>
+					<div class="tab-content ps-4 w-100">
+						{{range $i, $c := .Caches}}
+						<div id="aps_cache_{{$c}}" class="aps tab-pane{{if eq $i 0}} active{{end}}">
+							<button class="reload btn btn-primary">{{I "refresh"}} Reload</button>
+							<div class="mt-2 mb-1">Total: <span class="size"></span></div>
+							<table class="cache table table-bordered table-striped">
+								<thead>
+									<tr>
+										<th class="no">#</th>
+										<th class="key">Key</th>
+										<th class="val">Value</th>
+										<th class="ttl">TTL</th>
+									</tr>
+								</thead>
+								<tbody></tbody>
+							</table>
+						</div>
+						{{end}}
+					</div>
+				</div>
+			</div>
 		</div>
 	</div>
 </div>

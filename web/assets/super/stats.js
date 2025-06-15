@@ -55,13 +55,26 @@
 	}
 
 	function init() {
-		$('a[data-bs-toggle="tab"]').on('shown.bs.tab', function() {
+		$('.s-stats > ul.nav a[data-bs-toggle="tab"]').on('shown.bs.tab', function() {
+			var t = $(this).attr('href');
+			if (t == '#aps_cache') {
+				stats_load($($('#aps_cache ul.nav a.active').attr('href')));
+			}
+			history.replaceState(null, null, location.href.split('#')[0] + t);
+		});
+
+		$('#aps_cache a[data-bs-toggle="tab"]').on('shown.bs.tab', function() {
 			stats_load($($(this).attr('href')));
 		});
 
 		$('.s-stats button.reload').on('click', function() {
 			stats_load($(this).closest('.aps'), true);
 		});
+
+		var $t = $('a[href="' + location.hash + '"]');
+		if ($t.length) {
+			new bootstrap.Tab($t.get(0)).show();
+		}
 	}
 
 	$(window).on('load', init);

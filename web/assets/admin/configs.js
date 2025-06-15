@@ -85,7 +85,7 @@
 		$('#configs_export').on('click', configs_export);
 		$('#configs_import_popup').on('click', 'button[type=submit]', configs_import);
 
-		var cg = location.href.substrAfter('#'), cc = cg;
+		var cg = location.hash.substrAfter('#'), cc = cg;
 		if (cc.startsWith('cg_')) {
 			cc = $('#' + cc).parent().closest('.tab-pane').attr('id');
 		}

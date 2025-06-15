@@ -15,9 +15,9 @@ func Router(rg *xin.RouterGroup) {
 	rg.GET("/", Index)
 
 	addSuperTenantHandlers(rg.Group("/tenants"))
-	addSuperStatsHandlers(rg.Group("/stats"))
-	addSuperSqlHandlers(rg.Group("/sql"))
 	addSuperShellHandlers(rg.Group("/shell"))
+	addSuperSqlHandlers(rg.Group("/sql"))
+	addSuperStatsHandlers(rg.Group("/stats"))
 	addSuperRuntimeHandlers(rg.Group("/runtime"))
 }
 
@@ -29,6 +29,16 @@ func addSuperTenantHandlers(rg *xin.RouterGroup) {
 	rg.POST("/delete", TenantDelete)
 }
 
+func addSuperShellHandlers(rg *xin.RouterGroup) {
+	rg.GET("/", ShellIndex)
+	rg.POST("/exec", ShellExec)
+}
+
+func addSuperSqlHandlers(rg *xin.RouterGroup) {
+	rg.GET("/", SqlIndex)
+	rg.POST("/exec", SqlExec)
+}
+
 func addSuperStatsHandlers(rg *xin.RouterGroup) {
 	rg.GET("/", StatsIndex)
 	rg.GET("/jobs", StatsJobs)
@@ -38,16 +48,6 @@ func addSuperStatsHandlers(rg *xin.RouterGroup) {
 	rg.GET("/cache/workers", StatsCacheWorkers)
 	rg.GET("/cache/users", StatsCacheUsers)
 	rg.GET("/cache/afips", StatsCacheAfips)
-}
-
-func addSuperSqlHandlers(rg *xin.RouterGroup) {
-	rg.GET("/", SqlIndex)
-	rg.POST("/exec", SqlExec)
-}
-
-func addSuperShellHandlers(rg *xin.RouterGroup) {
-	rg.GET("/", ShellIndex)
-	rg.POST("/exec", ShellExec)
 }
 
 func addSuperRuntimeHandlers(rg *xin.RouterGroup) {
