@@ -1,0 +1,10 @@
+.runtime .card {
+	min-width: 9rem;
+	max-width: 19rem;
+}
+.runtime .card .card-header {
+	white-space: nowrap;
+}
+.runtime .card .card-body {
+	white-space: pre-wrap;
+}

@@ -41,6 +41,7 @@ func addSuperSqlHandlers(rg *xin.RouterGroup) {
 
 func addSuperStatsHandlers(rg *xin.RouterGroup) {
 	rg.GET("/", StatsIndex)
+	rg.GET("/server", StatsServer)
 	rg.GET("/jobs", StatsJobs)
 	rg.GET("/db", StatsDB)
 	rg.GET("/cache/configs", StatsCacheConfigs)

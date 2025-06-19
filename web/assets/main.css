@@ -57,6 +57,27 @@ dl, ol, ul {
 	margin-top: 0;
 	margin-bottom: 0;
 }
+a > s {
+	text-decoration: none;
+}
+blockquote {
+	border-left: 0.25rem solid var(--bs-border-color, #ccc);
+	padding-left: 0.5rem;
+}
+mark {
+	background-color: yellow;
+}
+pre {
+	background-color: transparent;
+	border: 0 none;
+	font-family: var(--bs-font-sans-serif);
+	font-size: 1em;
+	margin: 0;
+	padding: 0;
+	overflow: visible;
+	white-space: pre-wrap;
+	word-break: break-all;
+}
 
 /* alert */
 .alert.alert-dismissible {
@@ -98,6 +119,11 @@ input::placeholder, textarea::placeholder {
 	font-family: var(--bs-font-monospace);
 	margin: 0 1em;
 	padding: 0;
+}
+
+/* text-waiting */
+.text-waiting {
+	color: #aaa;
 }
 
 /* well */
@@ -165,28 +191,6 @@ body {
 	min-height: 100vh;
 	padding-top: 50px; /* for #header.fixed-top */
 }
-pre {
-	background-color: transparent;
-	border: 0 none;
-	font-family: var(--bs-font-sans-serif);
-	font-size: 1em;
-	margin: 0;
-	padding: 0;
-	overflow: visible;
-	white-space: pre-wrap;
-	word-break: break-all;
-}
-a > s {
-	text-decoration: none;
-}
-blockquote {
-	border-left: 0.25rem solid var(--bs-border-color, #ccc);
-	padding-left: 0.5rem;
-}
-mark {
-	background-color: yellow;
-}
-
 
 #header {
 	background-color: var(--bs-body-bg);
@@ -411,12 +415,12 @@ mark {
 }
 
 /** form **/
-form div.desc, form div.verr {
+div.desc, div.verr {
 	margin-top: 0.5em;
 	margin-bottom: 0.5em;
 	white-space: pre-wrap;
 }
-form div.verr {
+div.verr {
 	color: #a94442;
 }
 .ui-fieldset > legend.circle > i {

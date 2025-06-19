@@ -39,13 +39,7 @@
 		</button>
 		<ul class="dropdown-menu dropdown-menu-end">
 			{{if and .TT.IsDefault .AU.IsSuper}}
-			{{if eq .CFG.tenant.multiple "true"}}
-			<li><a class="dropdown-item" href="{{.Base}}/s/tenants/">{{I "super.tenants"}}<span>{{T .Loc "menu.super.tenants"}}</span></a></li>
-			{{end}}
-			<li><a class="dropdown-item" href="{{.Base}}/s/stats/">{{I "super.stats"}}<span>{{T .Loc "menu.super.stats"}}</span></a></li>
-			<li><a class="dropdown-item" href="{{.Base}}/s/sql/">{{I "super.sql"}}<span>{{T .Loc "menu.super.sql"}}</span></a></li>
-			<li><a class="dropdown-item" href="{{.Base}}/s/shell/">{{I "super.shell"}}<span>{{T .Loc "menu.super.shell"}}</span></a></li>
-			<li><a class="dropdown-item" href="{{.Base}}/s/runtime/">{{I "super.runtime"}}<span>{{T .Loc "menu.super.runtime"}}</span></a></li>
+			<li><a class="dropdown-item" href="{{.Base}}/s/">{{I "super"}}<span>{{T .Loc "menu.super"}}</span></a></li>
 			<li><hr class="dropdown-divider"></li>
 			{{end}}
 			{{if .AU.IsAdmin}}

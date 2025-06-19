@@ -1,6 +1,6 @@
 (function($) {
 	function stats_cache_build($d, data) {
-		$d.find('.size').text(data.size);
+		$d.find('.total').text(data.total);
 
 		var i = 0, $tb = $d.find('table > tbody').empty();
 
@@ -14,25 +14,29 @@
 		});
 	}
 
-	function stats_items_build($d, data) {
-		var i = 0, $tb = $d.find('table > tbody').empty();
+	function stats_cards_build($d, data) {
+		var $cs = $d.find('.cards').empty();
 
 		for (var k in data) {
-			$tb.append($('<tr>').append(
-				$('<td>').text(++i),
-				$('<td>').text(k),
-				$('<td>').text(data[k])
+			$cs.append($('<div class="card">').append(
+				$('<div class="card-header">').text(k),
+				$('<div class="card-body">').text(data[k])
 			));
 		}
 	}
 
-	function stats_build($d, data) {
-		if (typeof(data) == 'string') {
-			$t.find('.jobstats').empty().text(data);
-		} else if (data.type == 'cache') {
+	function stats_build($d, uri, data) {
+		switch (uri) {
+		case 'db':
+		case 'server':
+			stats_cards_build($d, data);
+			break;
+		case 'jobs':
+			$d.find('pre').empty().text(data);
+			break;
+		default:
 			stats_cache_build($d, data);
-		} else {
-			stats_items_build($d, data);
+			break;
 		}
 	}
 
@@ -41,13 +45,15 @@
 			return;
 		}
 
+		var uri = $t.attr('id').replace('stats_', '').replace('_', '/');
+
 		$.ajax({
-			url: $t.attr('id').replace('aps_', '').replace('_', '/'),
+			url: uri,
 			method: 'GET',
 			beforeSend: $t.loadmask.delegate($t),
 			success: function(data) {
 				$t.data('loaded', true);
-				stats_build($t, data);
+				stats_build($t, uri, data);
 			},
 			error: main.ajax_error,
 			complete: $t.unloadmask.delegate($t)
@@ -57,18 +63,20 @@
 	function init() {
 		$('.s-stats > ul.nav a[data-bs-toggle="tab"]').on('shown.bs.tab', function() {
 			var t = $(this).attr('href');
-			if (t == '#aps_cache') {
-				stats_load($($('#aps_cache ul.nav a.active').attr('href')));
+			if (t == '#stats_cache') {
+				stats_load($($('#stats_cache ul.nav a.active').attr('href')));
+			} else {
+				stats_load($(t));
 			}
 			history.replaceState(null, null, location.href.split('#')[0] + t);
 		});
 
-		$('#aps_cache a[data-bs-toggle="tab"]').on('shown.bs.tab', function() {
+		$('#stats_cache a[data-bs-toggle="tab"]').on('shown.bs.tab', function() {
 			stats_load($($(this).attr('href')));
 		});
 
 		$('.s-stats button.reload').on('click', function() {
-			stats_load($(this).closest('.aps'), true);
+			stats_load($(this).closest('.stats'), true);
 		});
 
 		var $t = $('a[href="' + location.hash + '"]');

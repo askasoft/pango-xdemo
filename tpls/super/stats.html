@@ -1,22 +1,7 @@
+{{MapSet .Ctx.Attrs "astyles" (Array "super/stats.css")}}
 {{MapSet .Ctx.Attrs "ascripts" (Array "super/stats.js")}}
 
 {{template "main_header" .}}
-
-<style>
-	table.dbstats th.no, table.cache th.no {
-		width: 1%;
-	}
-
-	#aps_cache ul.nav {
-		flex-direction: column;
-		flex-wrap: nowrap;
-		min-width: 200px;
-		max-width: 200px;
-	}
-	table.cache th.key, table.cache th.val, table.cache th.ttl {
-		width: 33%;
-	}
-</style>
 
 <div class="s-section">
 	<div class="s-section-head">
@@ -24,54 +9,50 @@
 	</div>
 	<div class="s-section-body s-stats">
 		<ul class="nav nav-tabs">
-			<li class="nav-item"><a class="nav-link active" href="#aps_jobs" data-bs-toggle="tab"><i class="fas fa-fw fa-gears"></i> Jobs</a></li>
-			<li class="nav-item"><a class="nav-link" href="#aps_db" data-bs-toggle="tab"><i class="fas fa-fw fa-database"></i> Database</a></li>
-			<li class="nav-item"><a class="nav-link" href="#aps_cache" data-bs-toggle="tab"><i class="fas fa-fw fa-memory"></i> Caches</a></li>
+			<li class="nav-item"><a class="nav-link active" href="#stats_server" data-bs-toggle="tab"><i class="fas fa-fw fa-server"></i> Server</a></li>
+			<li class="nav-item"><a class="nav-link" href="#stats_jobs" data-bs-toggle="tab"><i class="fas fa-fw fa-gears"></i> Jobs</a></li>
+			<li class="nav-item"><a class="nav-link" href="#stats_db" data-bs-toggle="tab"><i class="fas fa-fw fa-database"></i> Database</a></li>
+			<li class="nav-item"><a class="nav-link" href="#stats_cache" data-bs-toggle="tab"><i class="fas fa-fw fa-memory"></i> Caches</a></li>
 		</ul>
 
 		<div class="tab-content py-3">
-			<div id="aps_jobs" class="aps tab-pane active" data-loaded="true">
-				<button class="reload btn btn-primary">{{I "refresh"}} Reload</button>
-				<pre class="jobstats py-3">{{.Jobs}}</pre>
-			</div>
-
-			<div id="aps_db" class="aps tab-pane" data-loaded="true">
-				<button class="reload btn btn-primary">{{I "refresh"}} Reload</button>
-				<div class="py-3">
-					<table class="dbstats table table-bordered table-striped">
-						<thead>
-							<tr>
-								<th class="no">#</th>
-								<th class="key">Key</th>
-								<th class="val">Value</th>
-							</tr>
-						</thead>
-						<tbody>
-							{{range $i, $e := .DB}}
-							<tr>
-								<td>{{(Add $i 1)}}</td>
-								<td>{{$e.Key}}</td>
-								<td>{{$e.Val}}</td>
-							</tr>
-							{{end}}
-						</tbody>
-					</table>
+			<div id="stats_server" class="stats tab-pane active" data-loaded="true">
+				<button class="reload btn btn-sm btn-outline-primary">{{I "refresh"}} Reload</button>
+				<div class="cards d-flex flex-row flex-wrap gap-3 py-3">
+					{{range $e := .Server.Entries}}
+					<div class="card">
+						<div class="card-header">{{$e.Key}}</div>
+						<div class="card-body">{{$e.Val}}</div>
+					</div>
+					{{end}}
 				</div>
 			</div>
 
-			<div id="aps_cache" class="tab-pane">
-				<div class="d-flex">
+			<div id="stats_jobs" class="stats tab-pane">
+				<button class="reload btn btn-sm btn-outline-primary">{{I "refresh"}} Reload</button>
+				<pre class="py-3 font-monospace"></pre>
+			</div>
+
+			<div id="stats_db" class="stats tab-pane">
+				<button class="reload btn btn-sm btn-outline-primary">{{I "refresh"}} Reload</button>
+				<div class="cards d-flex flex-row flex-wrap gap-3 py-3"></div>
+			</div>
+
+			<div id="stats_cache" class="tab-pane">
+				<div>
 					<ul class="nav nav-pills">
 						{{range $i, $c := .Caches}}
-						<li class="nav-item"><a class="nav-link{{if eq $i 0}} active{{end}}" href="#aps_cache_{{$c}}" data-bs-toggle="tab">{{T $.Loc (print "stats." $c)}}</a></li>
+						<li class="nav-item"><a class="nav-link{{if eq $i 0}} active{{end}}" href="#stats_cache_{{$c}}" data-bs-toggle="tab">{{T $.Loc (print "stats." $c)}}</a></li>
 						{{end}}
 					</ul>
-					<div class="tab-content ps-4 w-100">
+					<div class="tab-content w-100">
 						{{range $i, $c := .Caches}}
-						<div id="aps_cache_{{$c}}" class="aps tab-pane{{if eq $i 0}} active{{end}}">
-							<button class="reload btn btn-primary">{{I "refresh"}} Reload</button>
-							<div class="mt-2 mb-1">Total: <span class="size"></span></div>
-							<table class="cache table table-bordered table-striped">
+						<div id="stats_cache_{{$c}}" class="stats tab-pane{{if eq $i 0}} active{{end}}">
+							<div class="py-2 d-flex">
+								<span class="fs-5 font-monospace">Total: <span class="total"></span></span>
+								<button class="reload ms-auto btn btn-sm btn-outline-primary">{{I "refresh"}} Reload</button>
+							</div>
+							<table class="table table-bordered table-striped">
 								<thead>
 									<tr>
 										<th class="no">#</th>

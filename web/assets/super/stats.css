@@ -1,0 +1,35 @@
+.cards .card {
+	min-width: 9rem;
+	max-width: 19rem;
+}
+.cards .card .card-header {
+	white-space: nowrap;
+}
+.cards .card .card-body {
+	white-space: pre-wrap;
+}
+
+@media (min-width: 992px) {
+	#stats_cache > div {
+		display: flex;
+	}
+	#stats_cache ul.nav {
+		flex-direction: column;
+		flex-wrap: nowrap;
+		min-width: 200px;
+		max-width: 200px;
+		padding-right: 1.5rem;
+	}
+}
+@media (max-width: 991px) {
+	#stats_cache .tab-content {
+		padding-top: 1rem;
+	}
+}
+#stats_cache th.no {
+	width: 1%;
+}
+#stats_cache th.key, #stats_cache th.val, #stats_cache th.ttl {
+	width: 33%;
+}
+
