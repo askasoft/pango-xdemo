@@ -1,10 +1,14 @@
 ﻿Name,Value,Style,Order,Required,Secret,Viewer,Editor,Validation
 secure_login_method,P,R,1,FALSE,FALSE,A,A,
 secure_login_mfa,,R,2,FALSE,FALSE,A,A,
-secure_saml_usersync,true,R,11,FALSE,FALSE,A,A,boolean
-secure_saml_userrole,V,R,12,FALSE,FALSE,A,A,
-secure_saml_idpmeta,,T,13,FALSE,FALSE,A,A,samlmeta
-secure_client_cidr,,T,21,FALSE,FALSE,A,A,cidrs
-secure_session_timeout,30m,,22,FALSE,FALSE,A,A,duration
+secure_ldap_usersync,true,R,11,FALSE,FALSE,A,A,boolean
+secure_ldap_userrole,V,R,12,FALSE,FALSE,A,A,
+secure_ldap_server,ldap://localhost:389,,13,FALSE,FALSE,A,A,
+secure_ldap_binduser,"cn={{USERNAME}},ou=people,dc=ap1,dc=aska-soft,dc=com",,14,FALSE,FALSE,A,A,
+secure_saml_usersync,true,R,21,FALSE,FALSE,A,A,boolean
+secure_saml_userrole,V,R,22,FALSE,FALSE,A,A,
+secure_saml_idpmeta,,T,23,FALSE,FALSE,A,A,samlmeta
+secure_client_cidr,,T,31,FALSE,FALSE,A,A,cidrs
+secure_session_timeout,30m,,32,FALSE,FALSE,A,A,duration
 password_policy_minlen,8,N,1,TRUE,FALSE,A,A,btw=8 ~ 64
 password_policy_strength,,VC,2,FALSE,FALSE,A,A,

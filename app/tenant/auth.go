@@ -8,11 +8,16 @@ import (
 
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/models"
+	"github.com/askasoft/pango-xdemo/app/utils/pwdutil"
+	"github.com/askasoft/pango/bol"
 	"github.com/askasoft/pango/ini"
+	"github.com/askasoft/pango/ran"
 	"github.com/askasoft/pango/sqx/sqlx"
+	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/tmu"
 	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pango/xmw"
+	"github.com/go-ldap/ldap/v3"
 )
 
 // empty user
@@ -65,6 +70,22 @@ func (tt *Tenant) CacheUser(u *models.User) {
 	k := string(tt.Schema) + "/" + u.Email
 
 	app.USERS.Set(k, u)
+}
+
+func (tt *Tenant) CreateAuthUser(email, name, role string) (*models.User, error) {
+	mu := &models.User{
+		Email:     email,
+		Name:      str.Left(name, 100),
+		Role:      str.IfEmpty(role, models.RoleViewer),
+		Status:    models.UserActive,
+		Secret:    ran.RandInt63(),
+		CreatedAt: time.Now(),
+	}
+	mu.SetPassword(pwdutil.RandomPassword())
+	mu.UpdatedAt = mu.CreatedAt
+
+	err := tt.CreateUser(app.SDB, mu)
+	return mu, err
 }
 
 //----------------------------------------------------
@@ -134,24 +155,75 @@ func CheckClientIP(c *xin.Context, cidrs ...*net.IPNet) bool {
 //----------------------------------------------------
 // Auth
 
-func FindAuthUser(c *xin.Context, username string) (xmw.AuthUser, error) {
+func findAuthUser(c *xin.Context, username, password string) (xmw.AuthUser, error) {
 	tt := FromCtx(c)
+
 	au, err := tt.FindAuthUser(username)
-	if au == nil || err != nil {
+	if err != nil || au == nil || au.GetPassword() != password {
 		return nil, err // prevent nil interface
 	}
+
 	return au, nil
 }
 
-func CheckClientAndFindAuthUser(c *xin.Context, username string) (xmw.AuthUser, error) {
+func ldapAuthencate(c *xin.Context, username, password string) (*models.User, error) {
+	tt := FromCtx(c)
+
+	con, err := ldap.DialURL(tt.ConfigValue("secure_ldap_server"))
+	if err != nil {
+		return nil, err
+	}
+
+	dn := str.ReplaceAll(tt.ConfigValue("secure_ldap_binduser"), "{{USERNAME}}", username)
+	if err := con.Bind(dn, password); err != nil {
+		c.Logger.Warn(err)
+		return nil, nil
+	}
+
+	au, err := tt.FindAuthUser(username)
+	if err != nil {
+		return nil, err
+	}
+
+	if au == nil {
+		if bol.Atob(tt.ConfigValue("secure_ldap_usersync")) {
+			mu, err := tt.CreateAuthUser(username, str.SubstrBeforeByte(username, '@'), tt.ConfigValue("secure_ldap_userrole"))
+			if err != nil {
+				return nil, err
+			}
+
+			au = mu
+			tt.CacheUser(mu)
+		}
+	}
+
+	if au == nil {
+		return nil, nil
+	}
+
+	return au, nil
+}
+
+func Authenticate(c *xin.Context, username, password string) (xmw.AuthUser, error) {
+	tt := FromCtx(c)
+
+	if tt.IsLDAPLogin() {
+		au, err := ldapAuthencate(c, username, password)
+		if err != nil || au == nil {
+			return nil, err // prevent nil interface
+		}
+		return au, nil
+	}
+
+	return findAuthUser(c, username, password)
+}
+
+func CheckClientAndAuthenticate(c *xin.Context, username, password string) (xmw.AuthUser, error) {
 	if IsClientBlocked(c) {
 		return nil, nil
 	}
-	return FindAuthUser(c, username)
+	return findAuthUser(c, username, password)
 }
-
-//----------------------------------------------------
-// auth
 
 func AuthPassed(c *xin.Context) {
 	cip := c.ClientIP()

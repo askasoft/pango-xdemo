@@ -4,17 +4,12 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango-xdemo/app/handlers"
 	"github.com/askasoft/pango-xdemo/app/handlers/saml"
-	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/tenant"
-	"github.com/askasoft/pango-xdemo/app/utils/pwdutil"
 	"github.com/askasoft/pango/bol"
-	"github.com/askasoft/pango/ran"
-	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/xin"
 	"github.com/crewjam/saml/samlsp"
 )
@@ -69,18 +64,7 @@ func SAMLProtect(c *xin.Context) {
 
 		if au == nil {
 			if bol.Atob(tt.ConfigValue("secure_saml_usersync")) {
-				mu := &models.User{
-					Email:     email,
-					Name:      str.Left(samlUserName(attrs), 100),
-					Role:      str.IfEmpty(tt.ConfigValue("secure_saml_userrole"), models.RoleViewer),
-					Status:    models.UserActive,
-					Secret:    ran.RandInt63(),
-					CreatedAt: time.Now(),
-				}
-				mu.SetPassword(pwdutil.RandomPassword())
-				mu.UpdatedAt = mu.CreatedAt
-
-				err := tt.CreateUser(app.SDB, mu)
+				mu, err := tt.CreateAuthUser(email, samlUserName(attrs), tt.ConfigValue("secure_saml_userrole"))
 				if err != nil {
 					c.Logger.Errorf("SAML Auth: %v", err)
 					c.AddError(err)

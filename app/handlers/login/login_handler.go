@@ -50,7 +50,7 @@ func Login(c *xin.Context) {
 	}
 }
 
-func loginFindUser(c *xin.Context) (up *UserPass, au *models.User, ok bool) {
+func loginFindUser(c *xin.Context) (up *UserPass, mu *models.User, ok bool) {
 	up = &UserPass{}
 	err := c.Bind(up)
 	if err != nil {
@@ -65,26 +65,25 @@ func loginFindUser(c *xin.Context) (up *UserPass, au *models.User, ok bool) {
 		return
 	}
 
-	tt := tenant.FromCtx(c)
-
-	au, err = tt.FindAuthUser(up.Username)
+	au, err := tenant.Authenticate(c, up.Username, up.Password)
 	if err != nil {
 		c.AddError(err)
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
 		return
 	}
 
-	if au == nil || au.GetPassword() != up.Password {
+	if au == nil {
 		loginFailed(c, "login.failed.userpass")
 		return
 	}
 
-	if !au.HasRole(models.RoleViewer) {
+	mu = au.(*models.User)
+	if !mu.HasRole(models.RoleViewer) {
 		loginFailed(c, "login.failed.notallowed")
 		return
 	}
 
-	if !tenant.CheckUserClientIP(c, au) {
+	if !tenant.CheckUserClientIP(c, mu) {
 		loginFailed(c, "login.failed.restricted")
 		return
 	}

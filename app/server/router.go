@@ -58,14 +58,14 @@ func initRouter() {
 	app.XRH = xmw.NewResponseHeader(nil)
 	app.XAC = xmw.NewOriginAccessController()
 	app.XCC = xin.NewCacheControlSetter()
-	app.XBA = xmw.NewBasicAuth(tenant.CheckClientAndFindAuthUser)
+	app.XBA = xmw.NewBasicAuth(tenant.CheckClientAndAuthenticate)
 	app.XBA.AuthPassed = tenant.BasicAuthPassed
 	app.XBA.AuthFailed = tenant.BasicAuthFailed
-	app.XCA = xmw.NewCookieAuth(tenant.FindAuthUser, "")
+	app.XCA = xmw.NewCookieAuth(tenant.Authenticate, "")
 	app.XCA.GetCookieMaxAge = tenant.AuthCookieMaxAge
 
 	// only get AuthUser from cookie
-	app.XCN = xmw.NewCookieAuth(tenant.FindAuthUser, "")
+	app.XCN = xmw.NewCookieAuth(tenant.Authenticate, "")
 	app.XCN.AuthFailed = xin.Next
 	app.XCN.GetCookieMaxAge = tenant.AuthCookieMaxAge
 

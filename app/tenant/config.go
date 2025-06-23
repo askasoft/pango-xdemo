@@ -133,9 +133,14 @@ func (tt *Tenant) ValidatePassword(loc, pwd string) []string {
 
 const (
 	AuthMethodPassword = "P"
-	AuthMethodSSOSaml  = "S"
+	AuthMethodLDAP     = "L"
+	AuthMethodSAML     = "S"
 )
 
+func (tt *Tenant) IsLDAPLogin() bool {
+	return tt.ConfigValue("secure_login_method") == AuthMethodLDAP
+}
+
 func (tt *Tenant) IsSAMLLogin() bool {
-	return tt.ConfigValue("secure_login_method") == AuthMethodSSOSaml && tt.ConfigValue("secure_saml_idpmeta") != ""
+	return tt.ConfigValue("secure_login_method") == AuthMethodSAML && tt.ConfigValue("secure_saml_idpmeta") != ""
 }
