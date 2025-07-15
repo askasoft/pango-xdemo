@@ -6,6 +6,7 @@ require (
 	github.com/askasoft/pango v1.0.21
 	github.com/askasoft/pango-assets v1.0.16
 	github.com/crewjam/saml v0.4.14
+	github.com/go-ldap/ldap/v3 v3.4.11
 	github.com/go-sql-driver/mysql v1.9.3
 	github.com/jackc/pgx/v5 v5.7.5
 	github.com/liuzl/gocc v0.0.0-20231231122217-0372e1059ca5
@@ -21,7 +22,6 @@ require (
 	github.com/crewjam/httperr v0.2.0 // indirect
 	github.com/fsnotify/fsnotify v1.9.0 // indirect
 	github.com/go-asn1-ber/asn1-ber v1.5.8-0.20250403174932-29230038a667 // indirect
-	github.com/go-ldap/ldap/v3 v3.4.11 // indirect
 	github.com/golang-jwt/jwt/v4 v4.4.3 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/jackc/pgerrcode v0.0.0-20240316143900-6e2875d9b438 // indirect
@@ -34,10 +34,10 @@ require (
 	github.com/mattermost/xml-roundtrip-validator v0.1.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/russellhaering/goxmldsig v1.3.0 // indirect
-	golang.org/x/crypto v0.39.0 // indirect
-	golang.org/x/sync v0.15.0 // indirect
-	golang.org/x/sys v0.33.0 // indirect
-	golang.org/x/text v0.26.0 // indirect
+	golang.org/x/crypto v0.40.0 // indirect
+	golang.org/x/sync v0.16.0 // indirect
+	golang.org/x/sys v0.34.0 // indirect
+	golang.org/x/text v0.27.0 // indirect
 )
 
 replace github.com/askasoft/pango => ../pango
