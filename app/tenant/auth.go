@@ -249,7 +249,7 @@ func AuthCookieMaxAge(c *xin.Context) time.Duration {
 
 func BasicAuthPassed(c *xin.Context, au xmw.AuthUser) {
 	AuthPassed(c)
-	app.XBA.Authorized(c, au)
+	c.Next()
 }
 
 func BasicAuthFailed(c *xin.Context) {
