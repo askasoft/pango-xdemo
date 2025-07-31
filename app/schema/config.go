@@ -4,49 +4,10 @@ import (
 	"time"
 
 	"github.com/askasoft/pango-xdemo/app/models"
-	"github.com/askasoft/pango/ini"
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/tbs"
 )
-
-func (sm Schema) LoadConfigMap(tx sqlx.Sqlx) (map[string]string, error) {
-	sqb := tx.Builder()
-	sqb.Select().From(sm.TableConfigs())
-	sql, args := sqb.Build()
-
-	configs := []*models.Config{}
-	if err := tx.Select(&configs, sql, args...); err != nil {
-		return nil, err
-	}
-
-	cm := make(map[string]string, len(configs))
-	for _, c := range configs {
-		cm[c.Name] = c.Value
-	}
-
-	if tv, ok := cm["tenant_vars"]; ok && tv != "" {
-		i := ini.NewIni()
-		if err := i.LoadData(str.NewReader(tv)); err != nil {
-			sm.Logger("CFG").Errorf("Invalid tenant_vars: %s", tv)
-		} else {
-			var kvs []string
-			sec := i.Section("")
-			for _, key := range sec.Keys() {
-				kvs = append(kvs, "{{"+key+"}}", sec.GetString(key))
-			}
-
-			sr := str.NewReplacer(kvs...)
-			for ck, cv := range cm {
-				if ck != "tenant_vars" {
-					cm[ck] = sr.Replace(cv)
-				}
-			}
-		}
-	}
-
-	return cm, nil
-}
 
 func (sm Schema) ListConfigsByRole(tx sqlx.Sqlx, actor, role string) (configs []*models.Config, err error) {
 	sqb := tx.Builder()

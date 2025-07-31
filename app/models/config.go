@@ -8,6 +8,8 @@ import (
 )
 
 const (
+	ConfigStyleDefault        = ""
+	ConfigStyleHidden         = "H"
 	ConfigStyleChecks         = "C"
 	ConfigStyleVerticalChecks = "VC"
 	ConfigStyleOrderedChecks  = "OC"

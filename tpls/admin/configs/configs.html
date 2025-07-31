@@ -16,7 +16,7 @@
 	</div>
 	<div class="s-section-body">
 		{{if gt (len .Configs) 1}}
-		<ul class="nav nav-tabs">
+		<ul class="nav nav-tabs cc-nav">
 			{{range $i, $cc := .Configs}}
 			<li id="cch_{{$cc.Name}}" class="nav-item">
 				<a class="nav-link{{if eq $i 0}} active{{end}}" href="#cc_{{$cc.Name}}" data-bs-toggle="tab">{{T $.Loc (print "config.category.label." $cc.Name)}}</a>
@@ -53,7 +53,9 @@
 								<label class="col-md-2 col-form-label{{if $c.Required}} required{{end}}"
 									viewer="{{$c.Viewer}}" editor="{{$c.Editor}}">{{T $.Loc (print "config." $c.Name)}}</label>
 								<div class="col-md-10">
-								{{if eq $c.Style "C"}}
+								{{if eq $c.Style "H"}}
+									<input name="{{$c.Name}}" type="hidden" value="{{$c.DisplayValue}}"{{if $ro}} disabled{{end}}/>
+								{{else if eq $c.Style "C"}}
 									<input type="checkbox" name="{{$c.Name}}" value="" checked{{if $ro}} disabled{{end}} style="display:none">
 									{{Checks "Name=" $c.Name "List=" (MapGet $.Lists $c.Name) "Values=" $c.Values "Disabled=" $ro}}
 								{{else if eq $c.Style "VC"}}
