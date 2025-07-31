@@ -207,21 +207,7 @@ func (sm Schema) UpdateUsers(tx sqlx.Sqlx, au *models.User, uua *args.UserUpdate
 	sqb := tx.Builder()
 
 	sqb.Update(sm.TableUsers())
-
-	if uua.Role != "" {
-		sqb.Setc("role", uua.Role)
-	}
-	if uua.Status != "" {
-		sqb.Setc("status", uua.Status)
-	}
-	if uua.LoginMFA != nil {
-		sqb.Setc("login_mfa", *uua.LoginMFA)
-	}
-	if uua.CIDR != nil {
-		sqb.Setc("cidr", *uua.CIDR)
-	}
-	sqb.Setc("updated_at", time.Now())
-
+	uua.AddUpdates(sqb)
 	sqb.Neq("id", au.ID)
 	sqb.Gte("role", au.Role)
 	sqlutil.AddIn(sqb, "id", uua.IDs())

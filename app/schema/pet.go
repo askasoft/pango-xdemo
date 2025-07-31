@@ -1,8 +1,6 @@
 package schema
 
 import (
-	"time"
-
 	"github.com/askasoft/pango-xdemo/app/args"
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/utils/sqlutil"
@@ -129,24 +127,7 @@ func (sm Schema) UpdatePets(tx sqlx.Sqlx, pua *args.PetUpdatesArg) (int64, error
 	sqb := tx.Builder()
 
 	sqb.Update(sm.TablePets())
-
-	if pua.Gender != "" {
-		sqb.Setc("gender", pua.Gender)
-	}
-	if pua.BornAt != nil {
-		sqb.Setc("born_at", *pua.BornAt)
-	}
-	if pua.Origin != "" {
-		sqb.Setc("origin", pua.Origin)
-	}
-	if pua.Temper != "" {
-		sqb.Setc("temper", pua.Temper)
-	}
-	if pua.Habits != nil {
-		habits := models.FlagsToJSONObject(*pua.Habits)
-		sqb.Setc("habits", habits)
-	}
-	sqb.Setc("updated_at", time.Now())
+	pua.AddUpdates(sqb)
 
 	sqlutil.AddIn(sqb, "id", pua.IDs())
 
