@@ -13,7 +13,7 @@ import (
 var errInvalidUpdates = errors.New("invalid updates")
 
 type UpdatedAtArg struct {
-	UpdatedAt *time.Time `json:"updated_at,omitempty" form:"-"`
+	UpdatedAt *time.Time `json:"-" form:"-"`
 }
 
 func (uaa *UpdatedAtArg) SetUpdatedAt(t time.Time) {
