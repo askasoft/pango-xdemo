@@ -4,8 +4,8 @@ import (
 	"errors"
 	"time"
 
-	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/utils/strutil"
+	"github.com/askasoft/pango/sqx"
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/xin"
 )
@@ -123,8 +123,7 @@ func (pua *PetUpdatesArg) AddUpdates(sqb *sqlx.Builder) {
 		sqb.Setc("temper", pua.Temper)
 	}
 	if pua.Habits != nil {
-		habits := models.FlagsToJSONObject(*pua.Habits)
-		sqb.Setc("habits", habits)
+		sqb.Setc("habits", sqx.JSONStringArray(*pua.Habits))
 	}
 
 	pua.SetUpdatedAt(time.Now())

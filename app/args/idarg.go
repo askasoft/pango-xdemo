@@ -20,9 +20,9 @@ type IDArg struct {
 
 func (ida *IDArg) String() string {
 	if ida.all {
-		return "*"
+		return "[*]"
 	}
-	return asg.Join(ida.ids, ", ")
+	return "[" + asg.Join(ida.ids, ",") + "]"
 }
 
 func (ida *IDArg) IDs() []int64 {
