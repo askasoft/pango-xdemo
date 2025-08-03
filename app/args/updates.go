@@ -13,11 +13,19 @@ import (
 var errInvalidUpdates = errors.New("invalid updates")
 
 type UpdatedAtArg struct {
-	UpdatedAt *time.Time `json:"-" form:"-"`
+	UpdatedAt *time.Time `json:"updated_at,omitempty" form:"-"`
 }
 
 func (uaa *UpdatedAtArg) SetUpdatedAt(t time.Time) {
 	uaa.UpdatedAt = &t
+}
+
+func (uaa *UpdatedAtArg) ToString(a any) string {
+	u := uaa.UpdatedAt
+	uaa.UpdatedAt = nil
+	s := strutil.JSONString(a)
+	uaa.UpdatedAt = u
+	return s
 }
 
 type UserUpdatesArg struct {
@@ -31,7 +39,7 @@ type UserUpdatesArg struct {
 }
 
 func (uua *UserUpdatesArg) String() string {
-	return strutil.JSONString(uua)
+	return uua.ToString(uua)
 }
 
 func (uua *UserUpdatesArg) Bind(c *xin.Context) error {
@@ -81,7 +89,7 @@ type PetUpdatesArg struct {
 }
 
 func (pua *PetUpdatesArg) String() string {
-	return strutil.JSONString(pua)
+	return pua.ToString(pua)
 }
 
 func (pua *PetUpdatesArg) Bind(c *xin.Context) error {
