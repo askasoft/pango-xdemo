@@ -3,6 +3,7 @@ package args
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango/str"
@@ -19,7 +20,10 @@ type ParamError struct {
 }
 
 func (pe *ParamError) Error() string {
-	return pe.Message
+	if pe.Label == "" || pe.Label == pe.Param {
+		return pe.Param + ": " + pe.Message
+	}
+	return pe.Param + " [" + pe.Label + "]: " + pe.Message
 }
 
 func ErrInvalidField(c *xin.Context, ns, field string) error {
@@ -40,7 +44,26 @@ func ErrInvalidRequest(c *xin.Context) error {
 	return tbs.Error(c.Locale, "error.request.invalid")
 }
 
-// AddBindErrors translate bind or validate errors
+// AddBindErrors translate bind or validate errors and add it to context
+func AddBindErrors(c *xin.Context, err error, ns string) {
+	TranslateBindErrors(c.Locale, err, ns, func(err error) {
+		c.AddError(err)
+	})
+}
+
+// FormatBindErrors translate bind or validate errors and merge it to a new error
+func FormatBindErrors(locale string, err error, ns string) error {
+	var sb strings.Builder
+	TranslateBindErrors(locale, err, ns, func(err error) {
+		if sb.Len() > 0 {
+			sb.WriteByte('\n')
+		}
+		sb.WriteString(err.Error())
+	})
+	return errors.New(sb.String())
+}
+
+// TranslateBindErrors translate bind or validate errors
 // FieldBindErrors:
 //  1. {xxx}.error.{field}
 //  2. error.param.invalid
@@ -50,21 +73,17 @@ func ErrInvalidRequest(c *xin.Context) error {
 //  2. {xxx}.error.param.{tag}
 //  3. error.param.{tag}
 //  4. error.param.invalid
-func AddBindErrors(c *xin.Context, err error, ns string, fks ...string) {
+func TranslateBindErrors(locale string, err error, ns string, tf func(error)) {
 	var fbes *binding.FieldBindErrors
 	if ok := errors.As(err, &fbes); ok {
 		for _, fbe := range *fbes {
 			fk := str.SnakeCase(fbe.Field)
-			if fk == "" && len(fks) > 0 {
-				fk = fks[0]
-			}
-
-			fn := tbs.GetText(c.Locale, ns+fk, fk)
-			fm := tbs.GetText(c.Locale, ns+"error."+fk)
+			fn := tbs.GetText(locale, ns+fk, fk)
+			fm := tbs.GetText(locale, ns+"error."+fk)
 			if fm == "" {
-				fm = tbs.GetText(c.Locale, "error.param.invalid")
+				fm = tbs.GetText(locale, "error.param.invalid")
 			}
-			c.AddError(&ParamError{Param: fk, Label: fn, Message: fm})
+			tf(&ParamError{Param: fk, Label: fn, Message: fm})
 		}
 		return
 	}
@@ -73,28 +92,24 @@ func AddBindErrors(c *xin.Context, err error, ns string, fks ...string) {
 	if ok := errors.As(err, &ves); ok {
 		for _, fe := range *ves {
 			fk := str.SnakeCase(fe.Field())
-			if fk == "" && len(fks) > 0 {
-				fk = fks[0]
-			}
-
 			if le, ok := fe.Cause().(app.LocaleError); ok {
-				fn := tbs.GetText(c.Locale, ns+fk, fk)
-				em := le.LocaleError(c.Locale)
-				c.AddError(&ParamError{Param: fk, Label: fn, Message: em})
+				fn := tbs.GetText(locale, ns+fk, fk)
+				em := le.LocaleError(locale)
+				tf(&ParamError{Param: fk, Label: fn, Message: em})
 				continue
 			}
 
 			fn := ""
-			fm := tbs.GetText(c.Locale, ns+"error."+fk+"."+fe.Tag())
+			fm := tbs.GetText(locale, ns+"error."+fk+"."+fe.Tag())
 			if fm == "" {
-				fm = tbs.GetText(c.Locale, ns+"error."+fk)
+				fm = tbs.GetText(locale, ns+"error."+fk)
 				if fm == "" {
-					fn = tbs.GetText(c.Locale, ns+fk, fk)
-					fm = tbs.GetText(c.Locale, ns+"error.param."+fe.Tag())
+					fn = tbs.GetText(locale, ns+fk, fk)
+					fm = tbs.GetText(locale, ns+"error.param."+fe.Tag())
 					if fm == "" {
-						fm = tbs.GetText(c.Locale, "error.param."+fe.Tag())
+						fm = tbs.GetText(locale, "error.param."+fe.Tag())
 						if fm == "" {
-							fm = tbs.GetText(c.Locale, "error.param.invalid")
+							fm = tbs.GetText(locale, "error.param.invalid")
 						}
 					}
 				}
@@ -105,24 +120,24 @@ func AddBindErrors(c *xin.Context, err error, ns string, fks ...string) {
 				fp := fe.Param()
 				if str.EndsWith(fe.Tag(), "field") {
 					tk := str.SnakeCase(fp)
-					fp = tbs.GetText(c.Locale, ns+tk, tk)
+					fp = tbs.GetText(locale, ns+tk, tk)
 				}
 				em = fmt.Sprintf(fm, fp)
 			}
 
-			c.AddError(&ParamError{Param: fk, Label: fn, Message: em})
+			tf(&ParamError{Param: fk, Label: fn, Message: em})
 		}
 		return
 	}
 
 	if errors.Is(err, errInvalidID) {
-		c.AddError(ErrInvalidID(c))
+		tf(tbs.Error(locale, "error.param.id"))
 		return
 	}
 	if errors.Is(err, errInvalidUpdates) {
-		c.AddError(ErrInvalidRequest(c))
+		tf(tbs.Error(locale, "error.request.invalid"))
 		return
 	}
 
-	c.AddError(err)
+	tf(err)
 }
