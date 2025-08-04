@@ -76,7 +76,7 @@ func (tt *Tenant) loadConfigMap(tx sqlx.Sqlx) (map[string]string, error) {
 	for _, c := range configs {
 		cv := c.Value
 		if sr != nil && c.Validation == "" && (c.Style == models.ConfigStyleDefault || c.Style == models.ConfigStyleTextarea) {
-			sr.Replace(cv)
+			cv = sr.Replace(cv)
 		}
 		cm[c.Name] = cv
 	}
