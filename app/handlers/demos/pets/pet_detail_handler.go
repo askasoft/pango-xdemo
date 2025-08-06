@@ -138,7 +138,9 @@ func PetCreate(c *xin.Context) {
 			if err := sfs.DeleteFile(fid); err != nil {
 				return err
 			}
-			return sfs.MoveFile(pet.File, fid)
+			if err := sfs.MoveFile(pet.File, fid); err != nil {
+				return err
+			}
 		}
 
 		return tt.AddAuditLog(tx, c, models.AL_PETS_CREATE, num.Ltoa(pet.ID), pet.Name)
@@ -183,9 +185,11 @@ func PetUpdate(c *xin.Context) {
 				if err = sfs.DeleteFile(fid); err != nil {
 					return
 				}
-				return sfs.MoveFile(pet.File, fid)
+				if err = sfs.MoveFile(pet.File, fid); err != nil {
+					return
+				}
 			}
-			return tt.AddAuditLog(tx, c, models.AL_PETS_UPDATE, num.Ltoa(pet.ID), pet.Name)
+			err = tt.AddAuditLog(tx, c, models.AL_PETS_UPDATE, num.Ltoa(pet.ID), pet.Name)
 		}
 		return
 	})
