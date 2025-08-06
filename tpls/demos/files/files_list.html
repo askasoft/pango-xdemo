@@ -17,7 +17,7 @@
 		{{range $i, $f := .Files}}
 		<tr id="file_{{$f.ID}}">
 			<td class="check"><input type="checkbox" value="{{$f.ID}}"/></td>
-			<td class="id">{{$f.ID}}</td>
+			<td class="id"><a href="{{$.Base}}/files/preview{{$f.ID}}" target="_blank">{{$f.ID}} {{I "exlink"}}</a></td>
 			<td class="name">{{$f.Name}}</td>
 			<td class="ext">{{$f.Ext}}</td>
 			<td class="size">{{HumanSize $f.Size}}</td>

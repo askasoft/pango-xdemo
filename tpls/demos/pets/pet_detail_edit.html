@@ -14,7 +14,7 @@
 		<div class="row">
 			<label class="col-md-2 col-form-label">{{T .Loc "pet.photo"}}</label>
 			{{if ne $p.ID 0}}
-			<div class="col-md-5"><img src="{{.Base}}/files{{$p.PhotoURI}}"></div>
+			<div class="col-md-5"><img src="{{.Base}}/files/dnload{{$p.PhotoURI}}"></div>
 			<div class="col-md-5">
 			{{else}}
 			<div class="col-md-10">

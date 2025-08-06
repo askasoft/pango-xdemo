@@ -55,6 +55,7 @@ CREATE TABLE `SCHEMA`.`users` (
 	`role` varchar(1) NOT NULL,
 	`status` varchar(1) NOT NULL,
 	`secret` bigint NOT NULL,
+	`login_mfa` varchar(1) NOT NULL,
 	`cidr` longtext NOT NULL,
 	`created_at` datetime(3) NOT NULL,
 	`updated_at` datetime(3) NOT NULL,

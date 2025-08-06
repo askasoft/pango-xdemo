@@ -1,0 +1,18 @@
+{{$f := .File}}
+{{MapSet .Ctx.Attrs "title" $f.Name}}
+
+{{template "main_header" .}}
+
+<div class="s-section">
+	<div class="s-section-head">
+		<h1>{{$f.Name}}</h1>
+		<div class="me-auto"></div>
+		<p>{{T .Loc "file.time"}} {{TIME $f.Time}}</p>
+		<a class="btn btn-sm btn-outline-primary ms-4" href="{{$.Base}}/files/dnload{{$f.ID}}">{{I "dnload"}}</a>
+	</div>
+	<div class="s-section-body">
+		<pre linkify>{{.Content}}</pre>
+	</div>
+</div>
+
+{{template "main_footer" .}}

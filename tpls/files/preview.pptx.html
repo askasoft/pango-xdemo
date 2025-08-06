@@ -1,0 +1,27 @@
+{{$f := .File}}
+{{MapSet .Ctx.Attrs "title" $f.Name}}
+{{MapSet .Ctx.Attrs "astyles" (Array "pptxjs/css/pptxjs.css" "pptxjs/css/nv.d3.min.css")}}
+{{MapSet .Ctx.Attrs "sscripts" (Array "jszip/jszip.min.js")}}
+{{MapSet .Ctx.Attrs "ascripts" (Array
+	"pptxjs/js/d3.min.js"
+	"pptxjs/js/dingbat.js"
+	"pptxjs/js/filereader.js"
+	"pptxjs/js/jszip.min.js"
+	"pptxjs/js/nv.d3.min.js"
+	"pptxjs/js/pptxjs.min.js"
+	"files/preview.pptx.js"
+)}}
+
+{{template "main_header" .}}
+
+<div class="s-section">
+	<div class="s-section-head">
+		<h1>{{$f.Name}}</h1>
+		<div class="me-auto"></div>
+		<p>{{T .Loc "file.time"}} {{TIME $f.Time}}</p>
+		<a id="pptx_dnload" class="btn btn-sm btn-outline-primary ms-4" href="{{$.Base}}/files/dnload{{$f.ID}}">{{I "dnload"}}</a>
+	</div>
+	<div id="pptx_preview" class="pptx"></div>
+</div>
+
+{{template "main_footer" .}}

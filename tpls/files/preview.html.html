@@ -1,0 +1,16 @@
+{{$f := .File}}
+{{MapSet .Ctx.Attrs "title" $f.Name}}
+{{MapSet .Ctx.Attrs "ascripts" (Array "files/preview.html.js")}}
+
+{{template "main_header" .}}
+
+<div class="s-section">
+	<div class="s-section-head">
+		<h1>{{$f.Name}}</h1>
+		<div class="me-auto"></div>
+		<p>{{T .Loc "file.time"}} {{TIME $f.Time}}</p>
+	</div>
+	<iframe id="html_iframe" src="{{$.Base}}/files/dnload{{$f.ID}}"></iframe>
+</div>
+
+{{template "main_footer" .}}

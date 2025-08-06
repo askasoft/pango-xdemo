@@ -1,0 +1,19 @@
+{{$f := .File}}
+{{MapSet .Ctx.Attrs "title" $f.Name}}
+{{MapSet .Ctx.Attrs "sscripts" (Array "jszip/jszip.min.js" "docxjs/docx-preview.min.js")}}
+{{MapSet .Ctx.Attrs "ascripts" (Array "files/preview.docx.js")}}
+
+{{template "main_header" .}}
+
+<div class="s-section">
+	<div class="s-section-head">
+		<h1>{{$f.Name}}</h1>
+		<div class="me-auto"></div>
+		<p>{{T .Loc "file.time"}} {{TIME $f.Time}}</p>
+		<a id="docx_dnload" class="btn btn-sm btn-outline-primary ms-4" href="{{$.Base}}/files/dnload{{$f.ID}}">{{I "dnload"}}</a>
+	</div>
+	<div id="docx_styles"></div>
+	<div id="docx_preview" class="docx-side2side docx-pagering"></div>
+</div>
+
+{{template "main_footer" .}}

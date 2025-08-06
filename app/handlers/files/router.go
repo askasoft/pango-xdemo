@@ -13,10 +13,10 @@ func Router(rg *xin.RouterGroup) {
 	rg.POST("/upload", Upload)
 	rg.POST("/uploads", Uploads)
 
-	xcch := app.XCC.Handle
+	rg.GET("/preview/*id", Preview)
 
 	xin.StaticFSFunc(rg, "/dnload/", func(c *xin.Context) http.FileSystem {
 		tt := tenant.FromCtx(c)
 		return xfs.HFS(tt.FS())
-	}, "", xcch)
+	}, "", app.XCC.Handle)
 }
