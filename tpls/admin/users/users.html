@@ -67,17 +67,17 @@
 					</div>
 					<label class="col-md-2 col-xxl-1 col-form-label">{{T .Loc "user.cidr"}}</label>
 					<div class="col-md-4 col-xxl-5">
-						<input name="cidr" type="text" class="form-control" textclear value="{{.Q.CIDR}}"/>
+						<input name="cidr" type="text" class="form-control" textclear value="{{.Q.CIDR}}" placeholder="{{T .Loc "filter.keywords"}}"/>
 					</div>
 				</div>
 				<div class="row">
 					<label class="col-md-2 col-xxl-1 col-form-label">{{T .Loc "user.name"}}</label>
 					<div class="col-md-4 col-xxl-5">
-						<input name="name" type="text" class="form-control" textclear value="{{.Q.Name}}"/>
+						<input name="name" type="text" class="form-control" textclear value="{{.Q.Name}}" placeholder="{{T .Loc "filter.keywords"}}"/>
 					</div>
 					<label class="col-md-2 col-xxl-1 col-form-label">{{T .Loc "user.email"}}</label>
 					<div class="col-md-4 col-xxl-5">
-						<input name="email" type="text" class="form-control" textclear value="{{.Q.Email}}"/>
+						<input name="email" type="text" class="form-control" textclear value="{{.Q.Email}}" placeholder="{{T .Loc "filter.keywords"}}"/>
 					</div>
 				</div>
 				<div class="row pt-3 pb-2">
@@ -163,19 +163,19 @@
 			<div class="row">
 				<label class="col-md-2 col-form-label">{{T .Loc "user.name"}}</label>
 				<div class="col-md-10">
-					<input name="name" type="text" class="form-control" textclear value="{{.Q.Name}}"/>
+					<input name="name" type="text" class="form-control" textclear value="{{.Q.Name}}" placeholder="{{T .Loc "filter.keywords"}}"/>
 				</div>
 			</div>
 			<div class="row">
 				<label class="col-md-2 col-form-label">{{T .Loc "user.email"}}</label>
 				<div class="col-md-10">
-					<input name="email" type="text" class="form-control" textclear value="{{.Q.Email}}"/>
+					<input name="email" type="text" class="form-control" textclear value="{{.Q.Email}}" placeholder="{{T .Loc "filter.keywords"}}"/>
 				</div>
 			</div>
 			<div class="row">
 				<label class="col-md-2 col-form-label">{{T .Loc "user.cidr"}}</label>
 				<div class="col-md-10">
-					<input name="cidr" type="text" class="form-control" textclear value="{{.Q.CIDR}}"/>
+					<input name="cidr" type="text" class="form-control" textclear value="{{.Q.CIDR}}" placeholder="{{T .Loc "filter.keywords"}}"/>
 				</div>
 			</div>
 			<button type="submit" class="hidden"></button>

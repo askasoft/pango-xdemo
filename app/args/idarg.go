@@ -66,3 +66,52 @@ func splitIDs(id string) ([]int64, bool) {
 	}
 	return ids, false
 }
+
+type PKArg struct {
+	ID string `json:"id,omitempty" form:"id,strip"`
+
+	pks []string
+	all bool
+}
+
+func (pka *PKArg) String() string {
+	if pka.all {
+		return "[*]"
+	}
+	return "[" + asg.Join(pka.pks, ",") + "]"
+}
+
+func (pka *PKArg) PKs() []string {
+	return pka.pks
+}
+
+func (pka *PKArg) hasValidID() bool {
+	return len(pka.pks) > 0 || pka.all
+}
+
+func (pka *PKArg) ParseID() error {
+	pka.pks, pka.all = splitPKs(pka.ID)
+	if !pka.hasValidID() {
+		return errInvalidID
+	}
+	return nil
+}
+
+func (pka *PKArg) Bind(c *xin.Context) error {
+	if err := c.Bind(pka); err != nil {
+		return err
+	}
+	return pka.ParseID()
+}
+
+func splitPKs(id string) ([]string, bool) {
+	if id == "" {
+		return nil, false
+	}
+	if id == "*" {
+		return nil, true
+	}
+
+	pks := str.RemoveEmpties(str.Strips(str.FieldsByte(id, ',')))
+	return pks, false
+}

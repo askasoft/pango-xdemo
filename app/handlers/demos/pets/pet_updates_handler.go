@@ -38,12 +38,12 @@ func PetUpdates(c *xin.Context) {
 	err := app.SDB.Transaction(func(tx *sqlx.Tx) (err error) {
 		cnt, err = tt.UpdatePets(tx, pua)
 		if err != nil {
-			return err
+			return
 		}
 		if cnt > 0 {
-			return tt.AddAuditLog(tx, c, models.AL_PETS_UPDATES, num.Ltoa(cnt), pua.String())
+			err = tt.AddAuditLog(tx, c, models.AL_PETS_UPDATES, num.Ltoa(cnt), pua.String())
 		}
-		return nil
+		return
 	})
 	if err != nil {
 		c.AddError(err)

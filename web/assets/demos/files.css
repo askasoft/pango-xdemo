@@ -1,0 +1,12 @@
+#files_table th.id, #files_table td.id,
+#files_table th.name, #files_table td.name {
+	min-width: 10em;
+}
+
+#files_table th.ext, #files_table td.ext,
+#files_table th.size, #files_table td.size,
+#files_table th.time, #files_table td.time {
+	white-space: nowrap;
+	width: 1%;
+}
+

@@ -2,6 +2,7 @@ package demos
 
 import (
 	"github.com/askasoft/pango-xdemo/app"
+	"github.com/askasoft/pango-xdemo/app/handlers/demos/files"
 	"github.com/askasoft/pango-xdemo/app/handlers/demos/pets"
 	"github.com/askasoft/pango/xin"
 )
@@ -12,11 +13,11 @@ func Router(rg *xin.RouterGroup) {
 
 	rg.GET("/tags/", TagsIndex)
 	rg.POST("/tags/", TagsIndex)
-	rg.GET("/uploads/", UploadsIndex)
 
 	addDemosChineseHandlers(rg.Group("/chiconv"))
 
 	pets.Router(rg.Group("/pets"))
+	files.Router(rg.Group("/files"))
 }
 
 func addDemosChineseHandlers(rg *xin.RouterGroup) {

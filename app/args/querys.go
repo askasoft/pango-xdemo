@@ -115,6 +115,38 @@ func (alqa *AuditLogQueryArg) AddFilters(sqb *sqlx.Builder, locale string) {
 	}
 }
 
+type FileQueryArg struct {
+	QueryArg
+
+	ID       string    `json:"id,omitempty" form:"id,strip,ascii" validate:"integers"`
+	Name     string    `json:"name,omitempty" form:"name,strip"`
+	Ext      string    `json:"ext,omitempty" form:"ext,strip"`
+	Size     string    `json:"size,omitempty" form:"size,strip,ascii" validate:"integers"`
+	TimeFrom time.Time `json:"time_from,omitempty" form:"time_from,strip"`
+	TimeTo   time.Time `json:"time_to,omitempty" form:"time_to,strip" validate:"omitempty,gtefield=TimeFrom"`
+}
+
+func (fqa *FileQueryArg) String() string {
+	return strutil.JSONString(fqa)
+}
+
+func (fqa *FileQueryArg) HasFilters() bool {
+	return fqa.ID != "" ||
+		fqa.Name != "" ||
+		fqa.Ext != "" ||
+		fqa.Size != "" ||
+		!fqa.TimeFrom.IsZero() ||
+		!fqa.TimeTo.IsZero()
+}
+
+func (fqa *FileQueryArg) AddFilters(sqb *sqlx.Builder) {
+	fqa.AddKeywords(sqb, "id", fqa.ID)
+	fqa.AddKeywords(sqb, "name", fqa.Name)
+	fqa.AddKeywords(sqb, "ext", fqa.Ext)
+	fqa.AddIntegers(sqb, "size", fqa.Size)
+	fqa.AddTimeRange(sqb, "time", fqa.TimeFrom, fqa.TimeTo)
+}
+
 type PetQueryArg struct {
 	QueryArg
 

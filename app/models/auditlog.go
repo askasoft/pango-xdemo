@@ -30,6 +30,7 @@ const (
 	AL_PETS_CAT_CREATE_CANCEL = "pets.catgen-cancel"
 	AL_PETS_DOG_CREATE_START  = "pets.doggen-start"
 	AL_PETS_DOG_CREATE_CANCEL = "pets.doggen-cancel"
+	AL_FILES_DELETES          = "files.deletes"
 )
 
 var AL_FUNACTS = []string{
