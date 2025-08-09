@@ -10,7 +10,6 @@ import (
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
-	"github.com/askasoft/pango/asg"
 	"github.com/askasoft/pango/iox"
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/tbs"
@@ -56,7 +55,7 @@ func AuditLogCsvExport(c *xin.Context) {
 		}
 
 		if len(al.Params) > 0 {
-			al.Detail = tbs.Format(c.Locale, "auditlog.detail."+al.Func+"."+al.Action, asg.Anys(al.Params)...)
+			al.Detail = tbs.Format(c.Locale, "auditlog.detail."+al.Func+"."+al.Action, al.Params...)
 		}
 
 		cnt++
