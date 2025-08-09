@@ -5,13 +5,33 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/tbs"
 	"github.com/askasoft/pango/vad"
 	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pango/xin/binding"
 )
+
+type LocaleError struct {
+	name string
+	vars []any
+}
+
+func NewLocaleError(name string, vars ...any) *LocaleError {
+	return &LocaleError{name, vars}
+}
+
+func (le *LocaleError) Error() string {
+	return le.LocaleError("")
+}
+
+func (le *LocaleError) LocaleError(loc string) string {
+	err := tbs.Format(loc, le.name, le.vars...)
+	if err == "" {
+		err = le.name
+	}
+	return err
+}
 
 type ParamError struct {
 	Param   string `json:"param,omitempty"`
@@ -92,7 +112,9 @@ func TranslateBindErrors(locale string, err error, ns string, tf func(error)) {
 	if ok := errors.As(err, &ves); ok {
 		for _, fe := range *ves {
 			fk := str.SnakeCase(fe.Field())
-			if le, ok := fe.Cause().(app.LocaleError); ok {
+
+			var le *LocaleError
+			if ok := errors.As(fe.Cause(), &le); ok {
 				fn := tbs.GetText(locale, ns+fk, fk)
 				em := le.LocaleError(locale)
 				tf(&ParamError{Param: fk, Label: fn, Message: em})

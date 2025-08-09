@@ -59,7 +59,3 @@ func (fe *FailedError) Error() string {
 func (fe *FailedError) Unwrap() error {
 	return fe.Err
 }
-
-type LocaleError interface {
-	LocaleError(loc string) string
-}
