@@ -65,10 +65,6 @@ func (qa *QueryArg) AddILike(sqb *sqlx.Builder, col string, val string) {
 	sqlutil.AddILike(sqb, col, val)
 }
 
-func (qa *QueryArg) AddContains(sqb *sqlx.Builder, col string, vals []string) {
-	sqlutil.AddContains(sqb, col, vals)
-}
-
 func (qa *QueryArg) AddDateRange(sqb *sqlx.Builder, col string, tmin, tmax time.Time) {
 	sqlutil.AddDateRange(sqb, col, tmin, tmax)
 }
@@ -115,4 +111,8 @@ func (qa *QueryArg) AddAndwords(sqb *sqlx.Builder, col string, val string) {
 
 func (qa *QueryArg) AddAndwordsEx(sqb *sqlx.Builder, col string, val string, not bool) {
 	sqlutil.AddAndwordsEx(sqb, col, val, not)
+}
+
+func (qa *QueryArg) AddContainsAll(sqb *sqlx.Builder, col string, vals []string) {
+	sqlutil.AddJSONStringsContainsAll(sqb, col, vals)
 }

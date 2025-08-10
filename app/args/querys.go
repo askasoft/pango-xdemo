@@ -191,5 +191,5 @@ func (pqa *PetQueryArg) AddFilters(sqb *sqlx.Builder) {
 	pqa.AddDecimals(sqb, "price", pqa.Price)
 	pqa.AddKeywords(sqb, "name", pqa.Name)
 	pqa.AddKeywords(sqb, "shop_name", pqa.ShopName)
-	pqa.AddContains(sqb, "habits", pqa.Habits)
+	pqa.AddContainsAll(sqb, "habits", pqa.Habits)
 }

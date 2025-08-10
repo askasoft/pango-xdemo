@@ -16,9 +16,33 @@ func JSONStringsContainsAny(sqb *sqlx.Builder, col string, vals ...string) {
 	}
 }
 
+func JSONIntsContainsAny(sqb *sqlx.Builder, col string, vals ...int) {
+	if len(vals) > 0 {
+		sqb.Where("json_overlaps("+sqb.Quote(col)+", ?)", sqx.JSONIntArray(vals))
+	}
+}
+
+func JSONInt64sContainsAny(sqb *sqlx.Builder, col string, vals ...int64) {
+	if len(vals) > 0 {
+		sqb.Where("json_overlaps("+sqb.Quote(col)+", ?)", sqx.JSONInt64Array(vals))
+	}
+}
+
 func JSONStringsContainsAll(sqb *sqlx.Builder, col string, vals ...string) {
 	if len(vals) > 0 {
 		sqb.Where("json_contains("+sqb.Quote(col)+", ?)", sqx.JSONStringArray(vals))
+	}
+}
+
+func JSONIntsContainsAll(sqb *sqlx.Builder, col string, vals ...int) {
+	if len(vals) > 0 {
+		sqb.Where("json_contains("+sqb.Quote(col)+", ?)", sqx.JSONIntArray(vals))
+	}
+}
+
+func JSONInt64sContainsAll(sqb *sqlx.Builder, col string, vals ...int64) {
+	if len(vals) > 0 {
+		sqb.Where("json_contains("+sqb.Quote(col)+", ?)", sqx.JSONInt64Array(vals))
 	}
 }
 
