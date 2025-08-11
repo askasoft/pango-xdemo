@@ -13,9 +13,51 @@ func StringArrayContainsAny(sqb *sqlx.Builder, col string, vals ...string) {
 	}
 }
 
+func IntArrayContainsAny(sqb *sqlx.Builder, col string, vals ...int) {
+	if len(vals) > 0 {
+		sqb.Where(sqb.Quote(col)+" && ?", pqx.IntArray(vals))
+	}
+}
+
+func Int64ArrayContainsAny(sqb *sqlx.Builder, col string, vals ...int64) {
+	if len(vals) > 0 {
+		sqb.Where(sqb.Quote(col)+" && ?", pqx.Int64Array(vals))
+	}
+}
+
+func StringArrayNotContainsAny(sqb *sqlx.Builder, col string, vals ...string) {
+	if len(vals) > 0 {
+		sqb.Where("NOT "+sqb.Quote(col)+" && ?", pqx.StringArray(vals))
+	}
+}
+
+func IntArrayNotContainsAny(sqb *sqlx.Builder, col string, vals ...int) {
+	if len(vals) > 0 {
+		sqb.Where("NOT "+sqb.Quote(col)+" && ?", pqx.IntArray(vals))
+	}
+}
+
+func Int64ArrayNotContainsAny(sqb *sqlx.Builder, col string, vals ...int64) {
+	if len(vals) > 0 {
+		sqb.Where("NOT "+sqb.Quote(col)+" && ?", pqx.Int64Array(vals))
+	}
+}
+
 func StringArrayContainsAll(sqb *sqlx.Builder, col string, vals ...string) {
 	if len(vals) > 0 {
 		sqb.Where(sqb.Quote(col)+" @> ?", pqx.StringArray(vals))
+	}
+}
+
+func IntArrayContainsAll(sqb *sqlx.Builder, col string, vals ...int) {
+	if len(vals) > 0 {
+		sqb.Where(sqb.Quote(col)+" @> ?", pqx.IntArray(vals))
+	}
+}
+
+func Int64ArrayContainsAll(sqb *sqlx.Builder, col string, vals ...int64) {
+	if len(vals) > 0 {
+		sqb.Where(sqb.Quote(col)+" @> ?", pqx.Int64Array(vals))
 	}
 }
 
@@ -25,13 +67,25 @@ func StringArrayNotContainsAll(sqb *sqlx.Builder, col string, vals ...string) {
 	}
 }
 
-func JSONArrayContainsAny[T any](sqb *sqlx.Builder, col string, cast func(T) any, vals ...T) {
+func IntArrayNotContainsAll(sqb *sqlx.Builder, col string, vals ...int) {
+	if len(vals) > 0 {
+		sqb.Where("NOT "+sqb.Quote(col)+" @> ?", pqx.IntArray(vals))
+	}
+}
+
+func Int64ArrayNotContainsAll(sqb *sqlx.Builder, col string, vals ...int64) {
+	if len(vals) > 0 {
+		sqb.Where("NOT "+sqb.Quote(col)+" @> ?", pqx.Int64Array(vals))
+	}
+}
+
+func JSONStringsContainsAny(sqb *sqlx.Builder, col string, vals ...string) {
 	if len(vals) == 0 {
 		return
 	}
 
-	var args []any
 	var sb str.Builder
+	args := make([]any, 0, len(vals))
 
 	sb.WriteByte('(')
 	for i, v := range vals {
@@ -40,23 +94,23 @@ func JSONArrayContainsAny[T any](sqb *sqlx.Builder, col string, cast func(T) any
 		}
 		sb.WriteString(sqb.Quote(col))
 		sb.WriteString(" @> ?")
-		args = append(args, cast(v))
+		args = append(args, sqx.JSONStringArray{v})
 	}
 	sb.WriteByte(')')
 
 	sqb.Where(sb.String(), args...)
 }
 
-func JSONStringsContainsAny(sqb *sqlx.Builder, col string, vals ...string) {
-	JSONArrayContainsAny(sqb, col, func(v string) any { return sqx.JSONStringArray{v} }, vals...)
-}
-
 func JSONIntsContainsAny(sqb *sqlx.Builder, col string, vals ...int) {
-	JSONArrayContainsAny(sqb, col, func(v int) any { return sqx.JSONIntArray{v} }, vals...)
+	if len(vals) > 0 {
+		sqb.Where("translate("+sqb.Quote(col)+", '[]', '{}')::bigint[] && ?", pqx.IntArray(vals))
+	}
 }
 
 func JSONInt64sContainsAny(sqb *sqlx.Builder, col string, vals ...int64) {
-	JSONArrayContainsAny(sqb, col, func(v int64) any { return sqx.JSONInt64Array{v} }, vals...)
+	if len(vals) > 0 {
+		sqb.Where("translate("+sqb.Quote(col)+", '[]', '{}')::bigint[] && ?", pqx.Int64Array(vals))
+	}
 }
 
 func JSONStringsContainsAll(sqb *sqlx.Builder, col string, vals ...string) {
