@@ -202,6 +202,7 @@ func initHandlers() {
 
 	addRootHandlers(rg.Group(""))
 	addStaticHandlers(rg.Group(""))
+	addErrorsHandlers(rg.Group("/e"))
 
 	api.Router(rg.Group("/api"))
 	saml.Router(rg.Group("/saml"))
@@ -220,9 +221,6 @@ func addRootHandlers(rg *xin.RouterGroup) {
 	rg.Use(app.XCN.Handle)
 
 	rg.GET("/", handlers.Index)
-	rg.GET("/403", handlers.Forbidden)
-	rg.GET("/404", handlers.NotFound)
-	rg.GET("/500", handlers.InternalServerError)
 }
 
 func addStaticHandlers(rg *xin.RouterGroup) {
@@ -241,4 +239,12 @@ func addStaticHandlers(rg *xin.RouterGroup) {
 	xin.StaticFSFunc(rg, "/assets/"+app.Revision, wfsc, "/assets", xcch)
 	xin.StaticFSFuncFile(rg, "/favicon.ico", wfsc, "favicon.ico", xcch)
 	xin.StaticFSFuncFile(rg, "/robots.txt", wfsc, "robots.txt", xcch)
+}
+
+func addErrorsHandlers(rg *xin.RouterGroup) {
+	rg.Use(app.XCN.Handle)
+
+	rg.GET("/403", handlers.Forbidden)
+	rg.GET("/404", handlers.NotFound)
+	rg.GET("/500", handlers.InternalServerError)
 }
