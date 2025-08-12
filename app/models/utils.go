@@ -1,9 +1,8 @@
 package models
 
 import (
-	"encoding/json"
-
 	"github.com/askasoft/pango/cas"
+	"github.com/askasoft/pango/doc/jsonx"
 	"github.com/askasoft/pango/sqx"
 )
 
@@ -16,11 +15,7 @@ const (
 type Strings = sqx.JSONStringArray
 
 func toString(o any) string {
-	bs, err := json.MarshalIndent(o, "", "  ")
-	if err != nil {
-		return err.Error()
-	}
-	return string(bs)
+	return jsonx.Prettify(o)
 }
 
 func ValidFlags(jo sqx.JSONObject) (ks []string) {

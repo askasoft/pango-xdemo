@@ -15,6 +15,7 @@ import (
 	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango-xdemo/app/utils/cptutil"
 	"github.com/askasoft/pango-xdemo/app/utils/smtputil"
+	"github.com/askasoft/pango/doc/jsonx"
 	"github.com/askasoft/pango/ini"
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/sqx/sqlx"
@@ -29,11 +30,7 @@ type PwdRstToken struct {
 }
 
 func (pts *PwdRstToken) String() string {
-	bs, err := json.Marshal(pts)
-	if err != nil {
-		panic(err)
-	}
-	return str.UnsafeString(bs)
+	return jsonx.Stringify(pts)
 }
 
 type PwdRstSendArg struct {

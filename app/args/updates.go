@@ -4,7 +4,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/askasoft/pango-xdemo/app/utils/strutil"
+	"github.com/askasoft/pango/doc/jsonx"
 	"github.com/askasoft/pango/sqx"
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/xin"
@@ -23,7 +23,7 @@ func (uaa *UpdatedAtArg) SetUpdatedAt(t time.Time) {
 func (uaa *UpdatedAtArg) ToString(a any) string {
 	u := uaa.UpdatedAt
 	uaa.UpdatedAt = nil
-	s := strutil.JSONString(a)
+	s := jsonx.Stringify(a)
 	uaa.UpdatedAt = u
 	return s
 }

@@ -3,9 +3,9 @@ package args
 import (
 	"time"
 
-	"github.com/askasoft/pango-xdemo/app/utils/strutil"
 	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
 	"github.com/askasoft/pango/cog/hashset"
+	"github.com/askasoft/pango/doc/jsonx"
 	"github.com/askasoft/pango/sqx"
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/str"
@@ -24,7 +24,7 @@ type UserQueryArg struct {
 }
 
 func (uqa *UserQueryArg) String() string {
-	return strutil.JSONString(uqa)
+	return jsonx.Stringify(uqa)
 }
 
 func (uqa *UserQueryArg) HasFilters() bool {
@@ -127,7 +127,7 @@ type FileQueryArg struct {
 }
 
 func (fqa *FileQueryArg) String() string {
-	return strutil.JSONString(fqa)
+	return jsonx.Stringify(fqa)
 }
 
 func (fqa *FileQueryArg) HasFilters() bool {
@@ -164,7 +164,7 @@ type PetQueryArg struct {
 }
 
 func (pqa *PetQueryArg) String() string {
-	return strutil.JSONString(pqa)
+	return jsonx.Stringify(pqa)
 }
 
 func (pqa *PetQueryArg) HasFilters() bool {

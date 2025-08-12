@@ -2,7 +2,6 @@ package configs
 
 import (
 	"encoding/csv"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -16,6 +15,7 @@ import (
 	"github.com/askasoft/pango/asg"
 	"github.com/askasoft/pango/cog/linkedhashmap"
 	"github.com/askasoft/pango/doc/csvx"
+	"github.com/askasoft/pango/doc/jsonx"
 	"github.com/askasoft/pango/gog"
 	"github.com/askasoft/pango/iox"
 	"github.com/askasoft/pango/num"
@@ -194,8 +194,7 @@ func buildConfigDetails(c *xin.Context, configs []*models.Config, uconfigs []*mo
 		}
 	}
 
-	bs, _ := json.Marshal(ads)
-	return str.UnsafeString(bs)
+	return jsonx.Stringify(ads)
 }
 
 func validateConfig(c *xin.Context, cfg *models.Config) bool {
