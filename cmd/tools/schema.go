@@ -5,8 +5,8 @@ import (
 
 	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango-xdemo/cmd/tools/mymodels"
-	"github.com/askasoft/pango/fsu"
 	"github.com/askasoft/pango/ini"
+	"github.com/askasoft/pango/iox/fsu"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/log/sqlog/gormlog"
 	"github.com/askasoft/pango/sqx"

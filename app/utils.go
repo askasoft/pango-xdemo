@@ -4,8 +4,8 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/askasoft/pango/fsu"
 	"github.com/askasoft/pango/ini"
+	"github.com/askasoft/pango/iox/fsu"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/str"
