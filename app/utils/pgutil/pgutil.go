@@ -7,6 +7,42 @@ import (
 	"github.com/askasoft/pango/str"
 )
 
+func StringArrayContainsAll(sqb *sqlx.Builder, col string, vals ...string) {
+	if len(vals) > 0 {
+		sqb.Where(sqb.Quote(col)+" @> ?", pqx.StringArray(vals))
+	}
+}
+
+func IntArrayContainsAll(sqb *sqlx.Builder, col string, vals ...int) {
+	if len(vals) > 0 {
+		sqb.Where(sqb.Quote(col)+" @> ?", pqx.IntArray(vals))
+	}
+}
+
+func Int64ArrayContainsAll(sqb *sqlx.Builder, col string, vals ...int64) {
+	if len(vals) > 0 {
+		sqb.Where(sqb.Quote(col)+" @> ?", pqx.Int64Array(vals))
+	}
+}
+
+func StringArrayNotContainsAll(sqb *sqlx.Builder, col string, vals ...string) {
+	if len(vals) > 0 {
+		sqb.Where("NOT "+sqb.Quote(col)+" @> ?", pqx.StringArray(vals))
+	}
+}
+
+func IntArrayNotContainsAll(sqb *sqlx.Builder, col string, vals ...int) {
+	if len(vals) > 0 {
+		sqb.Where("NOT "+sqb.Quote(col)+" @> ?", pqx.IntArray(vals))
+	}
+}
+
+func Int64ArrayNotContainsAll(sqb *sqlx.Builder, col string, vals ...int64) {
+	if len(vals) > 0 {
+		sqb.Where("NOT "+sqb.Quote(col)+" @> ?", pqx.Int64Array(vals))
+	}
+}
+
 func StringArrayContainsAny(sqb *sqlx.Builder, col string, vals ...string) {
 	if len(vals) > 0 {
 		sqb.Where(sqb.Quote(col)+" && ?", pqx.StringArray(vals))
@@ -43,39 +79,21 @@ func Int64ArrayNotContainsAny(sqb *sqlx.Builder, col string, vals ...int64) {
 	}
 }
 
-func StringArrayContainsAll(sqb *sqlx.Builder, col string, vals ...string) {
+func JSONStringsContainsAll(sqb *sqlx.Builder, col string, vals ...string) {
 	if len(vals) > 0 {
-		sqb.Where(sqb.Quote(col)+" @> ?", pqx.StringArray(vals))
+		sqb.Where(sqb.Quote(col)+" @> ?", sqx.JSONStringArray(vals))
 	}
 }
 
-func IntArrayContainsAll(sqb *sqlx.Builder, col string, vals ...int) {
+func JSONIntsContainsAll(sqb *sqlx.Builder, col string, vals ...int) {
 	if len(vals) > 0 {
-		sqb.Where(sqb.Quote(col)+" @> ?", pqx.IntArray(vals))
+		sqb.Where(sqb.Quote(col)+" @> ?", sqx.JSONIntArray(vals))
 	}
 }
 
-func Int64ArrayContainsAll(sqb *sqlx.Builder, col string, vals ...int64) {
+func JSONInt64sContainsAll(sqb *sqlx.Builder, col string, vals ...int64) {
 	if len(vals) > 0 {
-		sqb.Where(sqb.Quote(col)+" @> ?", pqx.Int64Array(vals))
-	}
-}
-
-func StringArrayNotContainsAll(sqb *sqlx.Builder, col string, vals ...string) {
-	if len(vals) > 0 {
-		sqb.Where("NOT "+sqb.Quote(col)+" @> ?", pqx.StringArray(vals))
-	}
-}
-
-func IntArrayNotContainsAll(sqb *sqlx.Builder, col string, vals ...int) {
-	if len(vals) > 0 {
-		sqb.Where("NOT "+sqb.Quote(col)+" @> ?", pqx.IntArray(vals))
-	}
-}
-
-func Int64ArrayNotContainsAll(sqb *sqlx.Builder, col string, vals ...int64) {
-	if len(vals) > 0 {
-		sqb.Where("NOT "+sqb.Quote(col)+" @> ?", pqx.Int64Array(vals))
+		sqb.Where(sqb.Quote(col)+" @> ?", sqx.JSONInt64Array(vals))
 	}
 }
 
@@ -113,30 +131,12 @@ func JSONInt64sContainsAny(sqb *sqlx.Builder, col string, vals ...int64) {
 	}
 }
 
-func JSONStringsContainsAll(sqb *sqlx.Builder, col string, vals ...string) {
-	if len(vals) > 0 {
-		sqb.Where(sqb.Quote(col)+" @> ?", sqx.JSONStringArray(vals))
-	}
-}
-
-func JSONIntsContainsAll(sqb *sqlx.Builder, col string, vals ...int) {
-	if len(vals) > 0 {
-		sqb.Where(sqb.Quote(col)+" @> ?", sqx.JSONIntArray(vals))
-	}
-}
-
-func JSONInt64sContainsAll(sqb *sqlx.Builder, col string, vals ...int64) {
-	if len(vals) > 0 {
-		sqb.Where(sqb.Quote(col)+" @> ?", sqx.JSONInt64Array(vals))
-	}
+func JSONFlagsContainsAll(sqb *sqlx.Builder, col string, props ...string) {
+	jsonFlagsContains(sqb, col, props, true)
 }
 
 func JSONFlagsContainsAny(sqb *sqlx.Builder, col string, props ...string) {
 	jsonFlagsContains(sqb, col, props, false)
-}
-
-func JSONFlagsContainsAll(sqb *sqlx.Builder, col string, props ...string) {
-	jsonFlagsContains(sqb, col, props, true)
 }
 
 func jsonFlagsContains(sqb *sqlx.Builder, col string, props []string, all bool) {

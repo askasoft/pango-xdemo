@@ -10,24 +10,6 @@ func ResetSequenceSQL(table string, starts ...int64) string {
 	return ""
 }
 
-func JSONStringsContainsAny(sqb *sqlx.Builder, col string, vals ...string) {
-	if len(vals) > 0 {
-		sqb.Where("json_overlaps("+sqb.Quote(col)+", ?)", sqx.JSONStringArray(vals))
-	}
-}
-
-func JSONIntsContainsAny(sqb *sqlx.Builder, col string, vals ...int) {
-	if len(vals) > 0 {
-		sqb.Where("json_overlaps("+sqb.Quote(col)+", ?)", sqx.JSONIntArray(vals))
-	}
-}
-
-func JSONInt64sContainsAny(sqb *sqlx.Builder, col string, vals ...int64) {
-	if len(vals) > 0 {
-		sqb.Where("json_overlaps("+sqb.Quote(col)+", ?)", sqx.JSONInt64Array(vals))
-	}
-}
-
 func JSONStringsContainsAll(sqb *sqlx.Builder, col string, vals ...string) {
 	if len(vals) > 0 {
 		sqb.Where("json_contains("+sqb.Quote(col)+", ?)", sqx.JSONStringArray(vals))
@@ -46,11 +28,29 @@ func JSONInt64sContainsAll(sqb *sqlx.Builder, col string, vals ...int64) {
 	}
 }
 
-func JSONFlagsContainsAny(sqb *sqlx.Builder, col string, props ...string) {
-	jsonFlagsContains(sqb, col, props, false)
+func JSONStringsContainsAny(sqb *sqlx.Builder, col string, vals ...string) {
+	if len(vals) > 0 {
+		sqb.Where("json_overlaps("+sqb.Quote(col)+", ?)", sqx.JSONStringArray(vals))
+	}
+}
+
+func JSONIntsContainsAny(sqb *sqlx.Builder, col string, vals ...int) {
+	if len(vals) > 0 {
+		sqb.Where("json_overlaps("+sqb.Quote(col)+", ?)", sqx.JSONIntArray(vals))
+	}
+}
+
+func JSONInt64sContainsAny(sqb *sqlx.Builder, col string, vals ...int64) {
+	if len(vals) > 0 {
+		sqb.Where("json_overlaps("+sqb.Quote(col)+", ?)", sqx.JSONInt64Array(vals))
+	}
 }
 
 func JSONFlagsContainsAll(sqb *sqlx.Builder, col string, props ...string) {
+	jsonFlagsContains(sqb, col, props, false)
+}
+
+func JSONFlagsContainsAny(sqb *sqlx.Builder, col string, props ...string) {
 	jsonFlagsContains(sqb, col, props, false)
 }
 

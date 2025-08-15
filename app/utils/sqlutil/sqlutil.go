@@ -113,33 +113,6 @@ func AddILike(sqb *sqlx.Builder, col string, val string) {
 	}
 }
 
-func AddJSONStringsContainsAny(sqb *sqlx.Builder, col string, vals []string) {
-	switch app.DBType() {
-	case "mysql":
-		myutil.JSONStringsContainsAny(sqb, col, vals...)
-	default:
-		pgutil.JSONStringsContainsAny(sqb, col, vals...)
-	}
-}
-
-func AddJSONIntsContainsAny(sqb *sqlx.Builder, col string, vals []int) {
-	switch app.DBType() {
-	case "mysql":
-		myutil.JSONIntsContainsAny(sqb, col, vals...)
-	default:
-		pgutil.JSONIntsContainsAny(sqb, col, vals...)
-	}
-}
-
-func AddJSONInt64sContainsAny(sqb *sqlx.Builder, col string, vals []int64) {
-	switch app.DBType() {
-	case "mysql":
-		myutil.JSONInt64sContainsAny(sqb, col, vals...)
-	default:
-		pgutil.JSONInt64sContainsAny(sqb, col, vals...)
-	}
-}
-
 func AddJSONStringsContainsAll(sqb *sqlx.Builder, col string, vals []string) {
 	switch app.DBType() {
 	case "mysql":
@@ -167,12 +140,48 @@ func AddJSONInt64sContainsAll(sqb *sqlx.Builder, col string, vals []int64) {
 	}
 }
 
-func AddJSONFlags(sqb *sqlx.Builder, col string, vals []string) {
+func AddJSONStringsContainsAny(sqb *sqlx.Builder, col string, vals []string) {
+	switch app.DBType() {
+	case "mysql":
+		myutil.JSONStringsContainsAny(sqb, col, vals...)
+	default:
+		pgutil.JSONStringsContainsAny(sqb, col, vals...)
+	}
+}
+
+func AddJSONIntsContainsAny(sqb *sqlx.Builder, col string, vals []int) {
+	switch app.DBType() {
+	case "mysql":
+		myutil.JSONIntsContainsAny(sqb, col, vals...)
+	default:
+		pgutil.JSONIntsContainsAny(sqb, col, vals...)
+	}
+}
+
+func AddJSONInt64sContainsAny(sqb *sqlx.Builder, col string, vals []int64) {
+	switch app.DBType() {
+	case "mysql":
+		myutil.JSONInt64sContainsAny(sqb, col, vals...)
+	default:
+		pgutil.JSONInt64sContainsAny(sqb, col, vals...)
+	}
+}
+
+func AddJSONFlagsContailsAll(sqb *sqlx.Builder, col string, vals []string) {
 	switch app.DBType() {
 	case "mysql":
 		myutil.JSONFlagsContainsAll(sqb, col, vals...)
 	default:
 		pgutil.JSONFlagsContainsAll(sqb, col, vals...)
+	}
+}
+
+func AddJSONFlagsContailsAny(sqb *sqlx.Builder, col string, vals []string) {
+	switch app.DBType() {
+	case "mysql":
+		myutil.JSONFlagsContainsAny(sqb, col, vals...)
+	default:
+		pgutil.JSONFlagsContainsAny(sqb, col, vals...)
 	}
 }
 

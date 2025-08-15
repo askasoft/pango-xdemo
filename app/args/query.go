@@ -116,3 +116,7 @@ func (qa *QueryArg) AddAndwordsEx(sqb *sqlx.Builder, col string, val string, not
 func (qa *QueryArg) AddContainsAll(sqb *sqlx.Builder, col string, vals []string) {
 	sqlutil.AddJSONStringsContainsAll(sqb, col, vals)
 }
+
+func (qa *QueryArg) AddContainsAny(sqb *sqlx.Builder, col string, vals []string) {
+	sqlutil.AddJSONStringsContainsAny(sqb, col, vals)
+}
