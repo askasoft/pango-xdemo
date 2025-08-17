@@ -3,10 +3,10 @@ package vadutil
 import (
 	"regexp"
 
-	"github.com/askasoft/pango-xdemo/app/args"
 	"github.com/askasoft/pango/ini"
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/vad"
+	"github.com/askasoft/pangox-xdemo/app/args"
 	"github.com/crewjam/saml/samlsp"
 )
 

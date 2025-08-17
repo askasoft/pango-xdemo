@@ -1,7 +1,7 @@
 package configs
 
 import (
-	"github.com/askasoft/pango/xin"
+	"github.com/askasoft/pangox/xin"
 )
 
 func Router(rg *xin.RouterGroup) {

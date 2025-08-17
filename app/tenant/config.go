@@ -5,10 +5,6 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/askasoft/pango-xdemo/app"
-	"github.com/askasoft/pango-xdemo/app/models"
-	"github.com/askasoft/pango-xdemo/app/utils/pwdutil"
-	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
 	"github.com/askasoft/pango/cog/linkedhashmap"
 	"github.com/askasoft/pango/ini"
 	"github.com/askasoft/pango/net/netx"
@@ -16,6 +12,10 @@ import (
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/tbs"
+	"github.com/askasoft/pangox-xdemo/app"
+	"github.com/askasoft/pangox-xdemo/app/models"
+	"github.com/askasoft/pangox-xdemo/app/utils/pwdutil"
+	"github.com/askasoft/pangox-xdemo/app/utils/tbsutil"
 )
 
 // CONFS write lock

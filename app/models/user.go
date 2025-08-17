@@ -5,8 +5,8 @@ import (
 	"net"
 	"time"
 
-	"github.com/askasoft/pango-xdemo/app/utils/cptutil"
 	"github.com/askasoft/pango/str"
+	"github.com/askasoft/pangox-xdemo/app/utils/cptutil"
 )
 
 const (

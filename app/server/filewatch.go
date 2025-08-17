@@ -1,11 +1,11 @@
 package server
 
 import (
-	"github.com/askasoft/pango-xdemo/app"
+	"github.com/askasoft/pango/fsu"
+	"github.com/askasoft/pango/fsw"
 	"github.com/askasoft/pango/ini"
-	"github.com/askasoft/pango/iox/fsu"
-	"github.com/askasoft/pango/iox/fsw"
 	"github.com/askasoft/pango/log"
+	"github.com/askasoft/pangox-xdemo/app"
 )
 
 // initFileWatch initialize file watch

@@ -5,9 +5,9 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/askasoft/pango-xdemo/app/utils/strutil"
 	"github.com/askasoft/pango/asg"
 	"github.com/askasoft/pango/str"
+	"github.com/askasoft/pangox-xdemo/app/utils/strutil"
 )
 
 type Keywords []string

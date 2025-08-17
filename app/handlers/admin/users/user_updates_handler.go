@@ -3,15 +3,15 @@ package users
 import (
 	"net/http"
 
-	"github.com/askasoft/pango-xdemo/app"
-	"github.com/askasoft/pango-xdemo/app/args"
-	"github.com/askasoft/pango-xdemo/app/handlers"
-	"github.com/askasoft/pango-xdemo/app/models"
-	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/tbs"
-	"github.com/askasoft/pango/xin"
+	"github.com/askasoft/pangox-xdemo/app"
+	"github.com/askasoft/pangox-xdemo/app/args"
+	"github.com/askasoft/pangox-xdemo/app/handlers"
+	"github.com/askasoft/pangox-xdemo/app/models"
+	"github.com/askasoft/pangox-xdemo/app/tenant"
+	"github.com/askasoft/pangox/xin"
 )
 
 func UserUpdates(c *xin.Context) {

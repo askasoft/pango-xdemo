@@ -5,12 +5,12 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/askasoft/pango-xdemo/app"
-	"github.com/askasoft/pango-xdemo/app/handlers"
-	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/str"
-	"github.com/askasoft/pango/xin"
+	"github.com/askasoft/pangox-xdemo/app"
+	"github.com/askasoft/pangox-xdemo/app/handlers"
+	"github.com/askasoft/pangox-xdemo/app/tenant"
+	"github.com/askasoft/pangox/xin"
 	"github.com/crewjam/saml"
 	"github.com/crewjam/saml/samlsp"
 )

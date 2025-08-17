@@ -3,9 +3,9 @@ package tasks
 import (
 	"time"
 
-	"github.com/askasoft/pango-xdemo/app"
-	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango/ini"
+	"github.com/askasoft/pangox-xdemo/app"
+	"github.com/askasoft/pangox-xdemo/app/tenant"
 )
 
 func CleanOutdatedAuditLogs() {

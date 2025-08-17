@@ -3,19 +3,19 @@ package web
 import (
 	"embed"
 
-	"github.com/askasoft/pango-assets/html/bootstrap5"
-	"github.com/askasoft/pango-assets/html/bootswatch5/cosmo"
-	"github.com/askasoft/pango-assets/html/bootswatch5/flatly"
-	"github.com/askasoft/pango-assets/html/bootswatch5/pulse"
-	"github.com/askasoft/pango-assets/html/corejs"
-	"github.com/askasoft/pango-assets/html/docxjs"
-	"github.com/askasoft/pango-assets/html/fontawesome6"
-	"github.com/askasoft/pango-assets/html/jquery3"
-	"github.com/askasoft/pango-assets/html/jszip"
-	"github.com/askasoft/pango-assets/html/pdfjs"
-	"github.com/askasoft/pango-assets/html/pdfviewer"
-	"github.com/askasoft/pango-assets/html/plugins"
-	"github.com/askasoft/pango-assets/html/summernote"
+	"github.com/askasoft/pangox-assets/html/bootstrap5"
+	"github.com/askasoft/pangox-assets/html/bootswatch5/cosmo"
+	"github.com/askasoft/pangox-assets/html/bootswatch5/flatly"
+	"github.com/askasoft/pangox-assets/html/bootswatch5/pulse"
+	"github.com/askasoft/pangox-assets/html/corejs"
+	"github.com/askasoft/pangox-assets/html/docxjs"
+	"github.com/askasoft/pangox-assets/html/fontawesome6"
+	"github.com/askasoft/pangox-assets/html/jquery3"
+	"github.com/askasoft/pangox-assets/html/jszip"
+	"github.com/askasoft/pangox-assets/html/pdfjs"
+	"github.com/askasoft/pangox-assets/html/pdfviewer"
+	"github.com/askasoft/pangox-assets/html/plugins"
+	"github.com/askasoft/pangox-assets/html/summernote"
 )
 
 // Static embed static folder

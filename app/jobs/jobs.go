@@ -7,9 +7,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/askasoft/pango-xdemo/app"
-	"github.com/askasoft/pango-xdemo/app/models"
-	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango/asg"
 	"github.com/askasoft/pango/cog/treemap"
 	"github.com/askasoft/pango/ini"
@@ -17,7 +14,10 @@ import (
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/str"
-	"github.com/askasoft/pango/xjm"
+	"github.com/askasoft/pangox-xdemo/app"
+	"github.com/askasoft/pangox-xdemo/app/models"
+	"github.com/askasoft/pangox-xdemo/app/tenant"
+	"github.com/askasoft/pangox/xjm"
 )
 
 const (

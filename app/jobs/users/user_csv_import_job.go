@@ -8,14 +8,6 @@ import (
 	"io"
 	"time"
 
-	"github.com/askasoft/pango-xdemo/app"
-	"github.com/askasoft/pango-xdemo/app/jobs"
-	"github.com/askasoft/pango-xdemo/app/models"
-	"github.com/askasoft/pango-xdemo/app/tenant"
-	"github.com/askasoft/pango-xdemo/app/utils/csvutil"
-	"github.com/askasoft/pango-xdemo/app/utils/pwdutil"
-	"github.com/askasoft/pango-xdemo/app/utils/sqlutil"
-	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
 	"github.com/askasoft/pango/cog/hashmap"
 	"github.com/askasoft/pango/iox"
 	"github.com/askasoft/pango/num"
@@ -23,7 +15,15 @@ import (
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/tbs"
-	"github.com/askasoft/pango/xjm"
+	"github.com/askasoft/pangox-xdemo/app"
+	"github.com/askasoft/pangox-xdemo/app/jobs"
+	"github.com/askasoft/pangox-xdemo/app/models"
+	"github.com/askasoft/pangox-xdemo/app/tenant"
+	"github.com/askasoft/pangox-xdemo/app/utils/csvutil"
+	"github.com/askasoft/pangox-xdemo/app/utils/pwdutil"
+	"github.com/askasoft/pangox-xdemo/app/utils/sqlutil"
+	"github.com/askasoft/pangox-xdemo/app/utils/tbsutil"
+	"github.com/askasoft/pangox/xjm"
 )
 
 func init() {

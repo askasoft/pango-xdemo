@@ -7,7 +7,7 @@ import (
 	"github.com/askasoft/pango/doc/jsonx"
 	"github.com/askasoft/pango/sqx"
 	"github.com/askasoft/pango/sqx/sqlx"
-	"github.com/askasoft/pango/xin"
+	"github.com/askasoft/pangox/xin"
 )
 
 var errInvalidUpdates = errors.New("invalid updates")

@@ -8,7 +8,6 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango/gwp"
 	"github.com/askasoft/pango/ids/npid"
 	"github.com/askasoft/pango/ids/snowflake"
@@ -18,9 +17,10 @@ import (
 	"github.com/askasoft/pango/net/netx"
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/vad"
-	"github.com/askasoft/pango/xin"
-	"github.com/askasoft/pango/xin/render"
-	"github.com/askasoft/pango/xmw"
+	"github.com/askasoft/pangox-xdemo/app/models"
+	"github.com/askasoft/pangox/xin"
+	"github.com/askasoft/pangox/xin/render"
+	"github.com/askasoft/pangox/xmw"
 )
 
 const (

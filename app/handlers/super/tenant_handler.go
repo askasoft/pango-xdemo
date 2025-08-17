@@ -3,13 +3,13 @@ package super
 import (
 	"net/http"
 
-	"github.com/askasoft/pango-xdemo/app/args"
-	"github.com/askasoft/pango-xdemo/app/handlers"
-	"github.com/askasoft/pango-xdemo/app/schema"
-	"github.com/askasoft/pango-xdemo/app/tenant"
-	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
-	"github.com/askasoft/pango/xin"
-	"github.com/askasoft/pango/xsm"
+	"github.com/askasoft/pangox-xdemo/app/args"
+	"github.com/askasoft/pangox-xdemo/app/handlers"
+	"github.com/askasoft/pangox-xdemo/app/schema"
+	"github.com/askasoft/pangox-xdemo/app/tenant"
+	"github.com/askasoft/pangox-xdemo/app/utils/tbsutil"
+	"github.com/askasoft/pangox/xin"
+	"github.com/askasoft/pangox/xsm"
 )
 
 type TenantInfo struct {

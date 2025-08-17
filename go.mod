@@ -1,10 +1,11 @@
-module github.com/askasoft/pango-xdemo
+module github.com/askasoft/pangox-xdemo
 
 go 1.23.0
 
 require (
-	github.com/askasoft/pango v1.0.21
-	github.com/askasoft/pango-assets v1.0.16
+	github.com/askasoft/pango v1.2.0
+	github.com/askasoft/pangox v1.2.0
+	github.com/askasoft/pangox-assets v1.1.0
 	github.com/crewjam/saml v0.4.14
 	github.com/go-ldap/ldap/v3 v3.4.11
 	github.com/go-sql-driver/mysql v1.9.3
@@ -43,4 +44,6 @@ require (
 
 replace github.com/askasoft/pango => ../pango
 
-replace github.com/askasoft/pango-assets => ../pango-assets
+replace github.com/askasoft/pangox => ../pangox
+
+replace github.com/askasoft/pangox-assets => ../pangox-assets

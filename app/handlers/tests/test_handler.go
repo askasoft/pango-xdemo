@@ -6,12 +6,12 @@ import (
 	"runtime"
 	"sync"
 
-	"github.com/askasoft/pango-xdemo/app/handlers"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/oss/mem"
 	"github.com/askasoft/pango/str"
-	"github.com/askasoft/pango/xin"
+	"github.com/askasoft/pangox-xdemo/app/handlers"
+	"github.com/askasoft/pangox/xin"
 )
 
 func Index(c *xin.Context) {

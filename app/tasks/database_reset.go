@@ -1,8 +1,8 @@
 package tasks
 
 import (
-	"github.com/askasoft/pango-xdemo/app/jobs/pets"
-	"github.com/askasoft/pango-xdemo/app/tenant"
+	"github.com/askasoft/pangox-xdemo/app/jobs/pets"
+	"github.com/askasoft/pangox-xdemo/app/tenant"
 )
 
 func ResetDatabase() {

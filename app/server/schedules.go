@@ -1,14 +1,14 @@
 package server
 
 import (
-	"github.com/askasoft/pango-xdemo/app"
-	"github.com/askasoft/pango-xdemo/app/jobs"
-	"github.com/askasoft/pango-xdemo/app/tasks"
 	"github.com/askasoft/pango/cog"
 	"github.com/askasoft/pango/cog/linkedhashmap"
 	"github.com/askasoft/pango/ini"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/sch"
+	"github.com/askasoft/pangox-xdemo/app"
+	"github.com/askasoft/pangox-xdemo/app/jobs"
+	"github.com/askasoft/pangox-xdemo/app/tasks"
 )
 
 var schedules = linkedhashmap.NewLinkedHashMap(

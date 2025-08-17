@@ -5,13 +5,13 @@ import (
 	"net/http"
 	"path/filepath"
 
-	"github.com/askasoft/pango-xdemo/app"
-	"github.com/askasoft/pango-xdemo/app/handlers"
-	"github.com/askasoft/pango-xdemo/app/tenant"
-	"github.com/askasoft/pango-xdemo/app/utils/docutil"
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/str"
-	"github.com/askasoft/pango/xin"
+	"github.com/askasoft/pangox-xdemo/app"
+	"github.com/askasoft/pangox-xdemo/app/handlers"
+	"github.com/askasoft/pangox-xdemo/app/tenant"
+	"github.com/askasoft/pangox-xdemo/app/utils/docutil"
+	"github.com/askasoft/pangox/xin"
 )
 
 func Preview(c *xin.Context) {

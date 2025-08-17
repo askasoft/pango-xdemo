@@ -7,17 +7,17 @@ import (
 	"strings"
 	"time"
 
-	"github.com/askasoft/pango-xdemo/app/jobs"
-	"github.com/askasoft/pango-xdemo/app/models"
-	"github.com/askasoft/pango-xdemo/app/tenant"
-	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
 	"github.com/askasoft/pango/cog/hashset"
-	"github.com/askasoft/pango/iox/fsu"
+	"github.com/askasoft/pango/fsu"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/str"
-	"github.com/askasoft/pango/xfs"
+	"github.com/askasoft/pangox-xdemo/app/jobs"
+	"github.com/askasoft/pangox-xdemo/app/models"
+	"github.com/askasoft/pangox-xdemo/app/tenant"
+	"github.com/askasoft/pangox-xdemo/app/utils/tbsutil"
+	"github.com/askasoft/pangox/xfs"
 )
 
 type PetGenerator struct {

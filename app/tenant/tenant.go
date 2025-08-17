@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/askasoft/pango-xdemo/app"
-	"github.com/askasoft/pango-xdemo/app/schema"
 	"github.com/askasoft/pango/str"
-	"github.com/askasoft/pango/xin"
+	"github.com/askasoft/pangox-xdemo/app"
+	"github.com/askasoft/pangox-xdemo/app/schema"
+	"github.com/askasoft/pangox/xin"
 )
 
 type HostnameError struct {

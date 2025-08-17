@@ -5,16 +5,16 @@ import (
 	"errors"
 	"time"
 
-	"github.com/askasoft/pango-xdemo/app"
-	"github.com/askasoft/pango-xdemo/app/schema"
-	"github.com/askasoft/pango-xdemo/app/utils/sqlutil"
+	"github.com/askasoft/pango/fsu"
 	"github.com/askasoft/pango/gog"
 	"github.com/askasoft/pango/ini"
-	"github.com/askasoft/pango/iox/fsu"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/log/sqlog/sqlxlog"
 	"github.com/askasoft/pango/mag"
 	"github.com/askasoft/pango/sqx/sqlx"
+	"github.com/askasoft/pangox-xdemo/app"
+	"github.com/askasoft/pangox-xdemo/app/schema"
+	"github.com/askasoft/pangox-xdemo/app/utils/sqlutil"
 )
 
 func initDatabase() {

@@ -3,8 +3,8 @@ package tenant
 import (
 	"sync"
 
-	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango/gwp"
+	"github.com/askasoft/pangox-xdemo/app"
 )
 
 var muWORKS sync.Mutex

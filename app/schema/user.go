@@ -3,10 +3,10 @@ package schema
 import (
 	"time"
 
-	"github.com/askasoft/pango-xdemo/app/args"
-	"github.com/askasoft/pango-xdemo/app/models"
-	"github.com/askasoft/pango-xdemo/app/utils/sqlutil"
 	"github.com/askasoft/pango/sqx/sqlx"
+	"github.com/askasoft/pangox-xdemo/app/args"
+	"github.com/askasoft/pangox-xdemo/app/models"
+	"github.com/askasoft/pangox-xdemo/app/utils/sqlutil"
 )
 
 func (sm Schema) ResetUsersAutoIncrement(tx sqlx.Sqlx) error {

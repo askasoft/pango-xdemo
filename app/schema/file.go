@@ -1,10 +1,10 @@
 package schema
 
 import (
-	"github.com/askasoft/pango-xdemo/app/args"
-	"github.com/askasoft/pango-xdemo/app/utils/sqlutil"
 	"github.com/askasoft/pango/sqx/sqlx"
-	"github.com/askasoft/pango/xfs"
+	"github.com/askasoft/pangox-xdemo/app/args"
+	"github.com/askasoft/pangox-xdemo/app/utils/sqlutil"
+	"github.com/askasoft/pangox/xfs"
 )
 
 func (sm Schema) CountFiles(tx sqlx.Sqlx, fqa *args.FileQueryArg) (cnt int, err error) {

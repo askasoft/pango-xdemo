@@ -6,13 +6,13 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/askasoft/pango-xdemo/app"
-	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango/gwp"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/ref"
 	"github.com/askasoft/pango/sqx/sqlx"
-	"github.com/askasoft/pango/xjm"
+	"github.com/askasoft/pangox-xdemo/app"
+	"github.com/askasoft/pangox-xdemo/app/tenant"
+	"github.com/askasoft/pangox/xjm"
 )
 
 type JobWorker[R any] struct {

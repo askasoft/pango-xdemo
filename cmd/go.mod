@@ -1,10 +1,11 @@
-module github.com/askasoft/pango-xdemo/cmd
+module github.com/askasoft/pangox-xdemo/cmd
 
 go 1.23.0
 
 require (
-	github.com/askasoft/pango v1.0.21
-	github.com/askasoft/pango-xdemo v0.0.0-00010101000000-000000000000
+	github.com/askasoft/pango v1.2.0
+	github.com/askasoft/pangox v1.2.0
+	github.com/askasoft/pangox-xdemo v0.0.0
 	gorm.io/driver/mysql v1.5.7
 	gorm.io/driver/postgres v1.6.0
 	gorm.io/gorm v1.30.1
@@ -24,6 +25,8 @@ require (
 	golang.org/x/text v0.28.0 // indirect
 )
 
-replace github.com/askasoft/pango-xdemo => ../
-
 replace github.com/askasoft/pango => ../../pango
+
+replace github.com/askasoft/pangox => ../../pangox
+
+replace github.com/askasoft/pangox-xdemo => ../

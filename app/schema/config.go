@@ -3,10 +3,10 @@ package schema
 import (
 	"time"
 
-	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/tbs"
+	"github.com/askasoft/pangox-xdemo/app/models"
 )
 
 func (sm Schema) ListConfigsByRole(tx sqlx.Sqlx, actor, role string) (configs []*models.Config, err error) {

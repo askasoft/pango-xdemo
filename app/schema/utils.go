@@ -1,10 +1,10 @@
 package schema
 
 import (
-	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango/sqx/myx"
 	"github.com/askasoft/pango/sqx/pqx"
 	"github.com/askasoft/pango/sqx/sqlx"
+	"github.com/askasoft/pangox-xdemo/app"
 )
 
 func ResetAutoIncrement(tx sqlx.Sqlx, table string, starts ...int64) error {

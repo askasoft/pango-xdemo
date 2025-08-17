@@ -5,7 +5,7 @@ SET GOOS=windows
 SET GO111MODULE=on
 
 IF [%EXE%] == [] SET EXE=xdemo.exe
-SET PKG=github.com/askasoft/pango-xdemo/app
+SET PKG=github.com/askasoft/pangox-xdemo/app
 SET COMPANY=Askasoft LLC.
 SET PRODUCT=Pango Xdemo
 SET VER_MAJOR=1

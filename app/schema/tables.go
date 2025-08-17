@@ -1,10 +1,10 @@
 package schema
 
 import (
-	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango/cog/linkedhashmap"
-	"github.com/askasoft/pango/xfs"
-	"github.com/askasoft/pango/xjm"
+	"github.com/askasoft/pangox-xdemo/app/models"
+	"github.com/askasoft/pangox/xfs"
+	"github.com/askasoft/pangox/xjm"
 )
 
 var tables = linkedhashmap.NewLinkedHashMap[string, any]()

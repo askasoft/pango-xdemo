@@ -7,13 +7,13 @@ import (
 	"mime/multipart"
 	"time"
 
-	"github.com/askasoft/pango-xdemo/app"
-	"github.com/askasoft/pango-xdemo/app/models"
-	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango/log"
-	"github.com/askasoft/pango/xfs"
-	"github.com/askasoft/pango/xin"
-	"github.com/askasoft/pango/xjm"
+	"github.com/askasoft/pangox-xdemo/app"
+	"github.com/askasoft/pangox-xdemo/app/models"
+	"github.com/askasoft/pangox-xdemo/app/tenant"
+	"github.com/askasoft/pangox/xfs"
+	"github.com/askasoft/pangox/xin"
+	"github.com/askasoft/pangox/xjm"
 )
 
 var (

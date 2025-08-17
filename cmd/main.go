@@ -6,11 +6,11 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/askasoft/pango-xdemo/app"
-	"github.com/askasoft/pango-xdemo/cmd/tools"
 	"github.com/askasoft/pango/gog"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/str"
+	"github.com/askasoft/pangox-xdemo/app"
+	"github.com/askasoft/pangox-xdemo/cmd/tools"
 )
 
 func usage() {

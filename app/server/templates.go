@@ -1,15 +1,15 @@
 package server
 
 import (
-	"github.com/askasoft/pango-assets/html/summernote"
-	"github.com/askasoft/pango-xdemo/app"
-	"github.com/askasoft/pango-xdemo/tpls"
+	"github.com/askasoft/pango/fsw"
 	"github.com/askasoft/pango/ini"
-	"github.com/askasoft/pango/iox/fsw"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/tpl"
-	"github.com/askasoft/pango/xin/render"
-	"github.com/askasoft/pango/xvw"
+	"github.com/askasoft/pangox-assets/html/summernote"
+	"github.com/askasoft/pangox-xdemo/app"
+	"github.com/askasoft/pangox-xdemo/tpls"
+	"github.com/askasoft/pangox/xin/render"
+	"github.com/askasoft/pangox/xvw"
 )
 
 // templates external template path

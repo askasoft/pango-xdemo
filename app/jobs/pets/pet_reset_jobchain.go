@@ -1,8 +1,8 @@
 package pets
 
 import (
-	"github.com/askasoft/pango-xdemo/app/jobs"
-	"github.com/askasoft/pango-xdemo/app/tenant"
+	"github.com/askasoft/pangox-xdemo/app/jobs"
+	"github.com/askasoft/pangox-xdemo/app/tenant"
 )
 
 func PetResetJobChainStart(tt *tenant.Tenant) error {

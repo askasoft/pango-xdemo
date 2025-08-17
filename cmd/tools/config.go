@@ -1,8 +1,8 @@
 package tools
 
 import (
-	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango/ini"
+	"github.com/askasoft/pangox-xdemo/app"
 )
 
 func initConfigs() {

@@ -5,7 +5,7 @@ export GO111MODULE=on
 if [ -z "$EXE" ]; then
   EXE=xdemo
 fi
-PKG=github.com/askasoft/pango-xdemo/app
+PKG=github.com/askasoft/pangox-xdemo/app
 VERSION=1.0.0
 if [ -z "$REVISION" ]; then
   REVISION=`git rev-parse --short HEAD`

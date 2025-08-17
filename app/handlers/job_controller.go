@@ -5,17 +5,17 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/askasoft/pango-xdemo/app"
-	"github.com/askasoft/pango-xdemo/app/jobs"
-	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango/bol"
 	"github.com/askasoft/pango/ini"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/tbs"
-	"github.com/askasoft/pango/xin"
-	"github.com/askasoft/pango/xjm"
+	"github.com/askasoft/pangox-xdemo/app"
+	"github.com/askasoft/pangox-xdemo/app/jobs"
+	"github.com/askasoft/pangox-xdemo/app/tenant"
+	"github.com/askasoft/pangox/xin"
+	"github.com/askasoft/pangox/xjm"
 )
 
 // JobArg job argument struct

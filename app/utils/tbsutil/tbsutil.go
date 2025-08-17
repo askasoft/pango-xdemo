@@ -4,13 +4,13 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/askasoft/pango-xdemo/app"
-	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango/cog/hashmap"
 	"github.com/askasoft/pango/cog/linkedhashmap"
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/tbs"
+	"github.com/askasoft/pangox-xdemo/app"
+	"github.com/askasoft/pangox-xdemo/app/models"
 )
 
 func GetStrings(locale, name string) []string {

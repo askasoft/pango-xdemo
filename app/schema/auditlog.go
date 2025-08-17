@@ -3,10 +3,10 @@ package schema
 import (
 	"time"
 
-	"github.com/askasoft/pango-xdemo/app/args"
-	"github.com/askasoft/pango-xdemo/app/models"
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/str"
+	"github.com/askasoft/pangox-xdemo/app/args"
+	"github.com/askasoft/pangox-xdemo/app/models"
 )
 
 func (sm Schema) ResetAuditLogsAutoIncrement(tx sqlx.Sqlx) error {

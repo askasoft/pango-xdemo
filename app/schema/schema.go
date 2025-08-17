@@ -1,17 +1,17 @@
 package schema
 
 import (
-	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango/ini"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/sqx/sqlx"
-	"github.com/askasoft/pango/xfs"
-	"github.com/askasoft/pango/xfs/sqlxfs"
-	"github.com/askasoft/pango/xjm"
-	"github.com/askasoft/pango/xjm/sqlxjm"
-	"github.com/askasoft/pango/xsm"
-	"github.com/askasoft/pango/xsm/mysm/mysqlxsm"
-	"github.com/askasoft/pango/xsm/pgsm/pgsqlxsm"
+	"github.com/askasoft/pangox-xdemo/app"
+	"github.com/askasoft/pangox/xfs"
+	"github.com/askasoft/pangox/xfs/sqlxfs"
+	"github.com/askasoft/pangox/xjm"
+	"github.com/askasoft/pangox/xjm/sqlxjm"
+	"github.com/askasoft/pangox/xsm"
+	"github.com/askasoft/pangox/xsm/mysm/mysqlxsm"
+	"github.com/askasoft/pangox/xsm/pgsm/pgsqlxsm"
 )
 
 type Schema string

@@ -6,17 +6,17 @@ import (
 	"sync"
 	"time"
 
-	"github.com/askasoft/pango-xdemo/app"
-	"github.com/askasoft/pango-xdemo/app/models"
-	"github.com/askasoft/pango-xdemo/app/utils/pwdutil"
 	"github.com/askasoft/pango/bol"
 	"github.com/askasoft/pango/ini"
 	"github.com/askasoft/pango/ran"
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/tmu"
-	"github.com/askasoft/pango/xin"
-	"github.com/askasoft/pango/xmw"
+	"github.com/askasoft/pangox-xdemo/app"
+	"github.com/askasoft/pangox-xdemo/app/models"
+	"github.com/askasoft/pangox-xdemo/app/utils/pwdutil"
+	"github.com/askasoft/pangox/xin"
+	"github.com/askasoft/pangox/xmw"
 	"github.com/go-ldap/ldap/v3"
 )
 

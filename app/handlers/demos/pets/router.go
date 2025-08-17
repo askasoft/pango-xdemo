@@ -1,6 +1,6 @@
 package pets
 
-import "github.com/askasoft/pango/xin"
+import "github.com/askasoft/pangox/xin"
 
 func Router(rg *xin.RouterGroup) {
 	rg.GET("/", PetIndex)

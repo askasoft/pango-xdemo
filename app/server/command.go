@@ -8,16 +8,16 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/askasoft/pango-xdemo/app"
-	"github.com/askasoft/pango-xdemo/app/utils/cptutil"
-	"github.com/askasoft/pango-xdemo/tpls"
-	"github.com/askasoft/pango-xdemo/txts"
-	"github.com/askasoft/pango-xdemo/web"
+	"github.com/askasoft/pango/fsu"
 	"github.com/askasoft/pango/gog"
-	"github.com/askasoft/pango/iox/fsu"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/srv"
 	"github.com/askasoft/pango/str"
+	"github.com/askasoft/pangox-xdemo/app"
+	"github.com/askasoft/pangox-xdemo/app/utils/cptutil"
+	"github.com/askasoft/pangox-xdemo/tpls"
+	"github.com/askasoft/pangox-xdemo/txts"
+	"github.com/askasoft/pangox-xdemo/web"
 )
 
 // -----------------------------------

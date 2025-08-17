@@ -3,10 +3,10 @@ package pets
 import (
 	"net/http"
 
-	"github.com/askasoft/pango-xdemo/app/handlers"
-	"github.com/askasoft/pango-xdemo/app/jobs"
-	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
-	"github.com/askasoft/pango/xin"
+	"github.com/askasoft/pangox-xdemo/app/handlers"
+	"github.com/askasoft/pangox-xdemo/app/jobs"
+	"github.com/askasoft/pangox-xdemo/app/utils/tbsutil"
+	"github.com/askasoft/pangox/xin"
 )
 
 var PetResetJobChainHandler = handlers.NewJobChainHandler(newPetResetJobChainController)

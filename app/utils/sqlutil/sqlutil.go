@@ -3,10 +3,6 @@ package sqlutil
 import (
 	"time"
 
-	"github.com/askasoft/pango-xdemo/app"
-	"github.com/askasoft/pango-xdemo/app/utils/myutil"
-	"github.com/askasoft/pango-xdemo/app/utils/pgutil"
-	"github.com/askasoft/pango-xdemo/app/utils/strutil"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/sqx"
@@ -15,7 +11,11 @@ import (
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/tmu"
-	"github.com/askasoft/pango/xvw/args"
+	"github.com/askasoft/pangox-xdemo/app"
+	"github.com/askasoft/pangox-xdemo/app/utils/myutil"
+	"github.com/askasoft/pangox-xdemo/app/utils/pgutil"
+	"github.com/askasoft/pangox-xdemo/app/utils/strutil"
+	"github.com/askasoft/pangox/xvw/args"
 )
 
 func IsUniqueViolationError(err error) bool {

@@ -6,11 +6,11 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/askasoft/pango-xdemo/app"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/sqx"
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/str"
+	"github.com/askasoft/pangox-xdemo/app"
 )
 
 func (sm Schema) CheckSchema(tx sqlx.Sqlx) {

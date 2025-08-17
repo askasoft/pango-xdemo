@@ -8,8 +8,8 @@ import (
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/tbs"
 	"github.com/askasoft/pango/vad"
-	"github.com/askasoft/pango/xin"
-	"github.com/askasoft/pango/xin/binding"
+	"github.com/askasoft/pangox/xin"
+	"github.com/askasoft/pangox/xin/binding"
 )
 
 type LocaleError struct {

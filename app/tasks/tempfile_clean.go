@@ -3,10 +3,10 @@ package tasks
 import (
 	"time"
 
-	"github.com/askasoft/pango-xdemo/app/models"
-	"github.com/askasoft/pango-xdemo/app/tenant"
 	"github.com/askasoft/pango/ini"
-	"github.com/askasoft/pango/xfs"
+	"github.com/askasoft/pangox-xdemo/app/models"
+	"github.com/askasoft/pangox-xdemo/app/tenant"
+	"github.com/askasoft/pangox/xfs"
 )
 
 func CleanTemporaryFiles() {

@@ -3,9 +3,9 @@ package args
 import (
 	"time"
 
-	"github.com/askasoft/pango-xdemo/app/utils/sqlutil"
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/tmu"
+	"github.com/askasoft/pangox-xdemo/app/utils/sqlutil"
 )
 
 type DateRangeArg struct {

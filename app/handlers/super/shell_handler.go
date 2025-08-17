@@ -9,13 +9,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/askasoft/pango-xdemo/app/handlers"
-	"github.com/askasoft/pango-xdemo/app/utils/tbsutil"
 	"github.com/askasoft/pango/cog"
 	"github.com/askasoft/pango/cog/linkedhashmap"
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/tbs"
-	"github.com/askasoft/pango/xin"
+	"github.com/askasoft/pangox-xdemo/app/handlers"
+	"github.com/askasoft/pangox-xdemo/app/utils/tbsutil"
+	"github.com/askasoft/pangox/xin"
 )
 
 func ShellIndex(c *xin.Context) {

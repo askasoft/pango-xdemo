@@ -1,12 +1,12 @@
 package server
 
 import (
-	"github.com/askasoft/pango-xdemo/app"
-	"github.com/askasoft/pango-xdemo/txts"
+	"github.com/askasoft/pango/fsw"
 	"github.com/askasoft/pango/ini"
-	"github.com/askasoft/pango/iox/fsw"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/tbs"
+	"github.com/askasoft/pangox-xdemo/app"
+	"github.com/askasoft/pangox-xdemo/txts"
 )
 
 // messages external messages path
