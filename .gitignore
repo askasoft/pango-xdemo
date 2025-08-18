@@ -4,7 +4,7 @@
 /conf/env.ini
 /data
 /logs
-/xdemo
+/xdemo*
 /*.exe
-/resource.syso
-/versioninfo.json
+resource.syso
+versioninfo.json

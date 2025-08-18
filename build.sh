@@ -1,16 +1,17 @@
-#!/bin/bash -e
+#!/bin/bash -ex
 
 export GO111MODULE=on
 
-if [ -z "$EXE" ]; then
-  EXE=xdemo
-fi
-PKG=github.com/askasoft/pangox-xdemo/app
-VERSION=1.0.0
+VERSION=1.2.0
 if [ -z "$REVISION" ]; then
   REVISION=`git rev-parse --short HEAD`
 fi
 BUILDTIME=`date -u "+%Y-%m-%dT%H:%M:%SZ"`
 
-go build -ldflags "-X ${PKG}.Version=${VERSION} -X ${PKG}.Revision=${REVISION} -X ${PKG}.buildTime=${BUILDTIME}" -o ${EXE}
+PKG=github.com/askasoft/pangox-xdemo/app
+LDF="-X ${PKG}.Version=${VERSION} -X ${PKG}.Revision=${REVISION} -X ${PKG}.buildTime=${BUILDTIME}"
+
+go build -ldflags "${LDF}" -o xdemo
+go build -ldflags "${LDF}" -o xdemodb ./cmd
+
 go test ./...

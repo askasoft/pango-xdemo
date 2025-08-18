@@ -1,5 +1,5 @@
 set APPNAME=xdemo
-set APPHOME=C:\app\%APPNAME%
+set APPHOME=\app\%APPNAME%
 set PREFIX=
 set LOG_WRITERS=stdout, textfile, jsonfile, xalfile, xajfile, httpdump
 
