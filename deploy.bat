@@ -1,7 +1,7 @@
 set APPNAME=xdemo
 set APPHOME=\app\%APPNAME%
 set PREFIX=
-set LOG_WRITERS=stdout, textfile, jsonfile, xalfile, xajfile, httpdump
+set LOG_WRITERS=stdout, textfile, jsonfile, xatfile, xajfile, httpdump
 
 @REM set LOG_OPENSEARCH_APPLOG=https://localhost:9200/xdemo_applog/_bulk
 @REM set LOG_OPENSEARCH_ACCESS=https://localhost:9200/xdemo_access/_bulk

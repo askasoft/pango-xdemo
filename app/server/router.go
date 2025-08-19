@@ -152,7 +152,7 @@ func configAccessLogger() {
 		switch alf {
 		case "text":
 			alw := xmw.NewAccessLogWriter(
-				app.XIN.Logger.GetOutputer("XAL", log.LevelTrace),
+				app.XIN.Logger.GetOutputer("XAT", log.LevelTrace),
 				ini.GetString("server", "accessLogTextFormat", xmw.AccessLogTextFormat),
 			)
 			alws = append(alws, alw)
