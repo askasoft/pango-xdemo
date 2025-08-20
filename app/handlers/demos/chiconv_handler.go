@@ -8,6 +8,12 @@ import (
 	"github.com/liuzl/gocc"
 )
 
+func chiconvAddHandlers(rg *xin.RouterGroup) {
+	rg.GET("/", ChiconvIndex)
+	rg.POST("/s2t", ChiconvS2T)
+	rg.POST("/t2s", ChiconvT2S)
+}
+
 func ChiconvIndex(c *xin.Context) {
 	h := handlers.H(c)
 

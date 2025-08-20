@@ -27,6 +27,9 @@
 			<li><a class="dropdown-item" href="{{.Base}}/demos/files/">{{I "demos.files"}}<span>{{T .Loc "menu.demos.files"}}</span></a></li>
 			<li><a class="dropdown-item" href="{{.Base}}/demos/tags/">{{I "demos.tags"}}<span>{{T .Loc "menu.demos.tags"}}</span></a></li>
 			<li><a class="dropdown-item" href="{{.Base}}/demos/chiconv/">{{I "demos.chiconv"}}<span>{{T .Loc "menu.demos.chiconv"}}</span></a></li>
+			{{if and .AU .AU.IsAdmin}}
+			<li><a class="dropdown-item" href="{{.Base}}/demos/tests/">{{I "demos.tests"}}<span>{{T .Loc "menu.demos.tests"}}</span></a></li>
+			{{end}}
 			<li><hr class="dropdown-divider"></li>
 			<li><a class="dropdown-item" href="{{.Base}}/e/403">{{I "ban"}}<span>403</span></a></li>
 			<li><a class="dropdown-item" href="{{.Base}}/e/404">{{I "question"}}<span>404</span></a></li>

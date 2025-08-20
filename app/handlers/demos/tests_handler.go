@@ -1,4 +1,4 @@
-package tests
+package demos
 
 import (
 	"fmt"
@@ -10,17 +10,32 @@ import (
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/oss/mem"
 	"github.com/askasoft/pango/str"
+	"github.com/askasoft/pangox-xdemo/app"
 	"github.com/askasoft/pangox-xdemo/app/handlers"
+	"github.com/askasoft/pangox-xdemo/app/middles"
 	"github.com/askasoft/pangox/xin"
 )
 
-func Index(c *xin.Context) {
-	h := handlers.H(c)
+func testsAddHandlers(rg *xin.RouterGroup) {
+	rg.Use(middles.AppAuth)          // app auth
+	rg.Use(middles.IPProtect)        // IP protect
+	rg.Use(middles.RoleAdminProtect) // role protect
+	rg.Use(app.XTP.Handle)           // token protect
 
-	c.HTML(http.StatusOK, "tests/index", h)
+	rg.GET("/", TestIndex)
+	rg.POST("/crash", TestCrash)
+	rg.POST("/panic", TestPanic)
+	rg.POST("/outofmemory", TestOutOfMemory)
+	rg.POST("/stackoverflow", TestStackOverflow)
 }
 
-func Crash(c *xin.Context) {
+func TestIndex(c *xin.Context) {
+	h := handlers.H(c)
+
+	c.HTML(http.StatusOK, "demos/tests", h)
+}
+
+func TestCrash(c *xin.Context) {
 	var wg sync.WaitGroup
 
 	wg.Add(1)
@@ -35,11 +50,11 @@ func Crash(c *xin.Context) {
 	c.String(http.StatusOK, "OK\n")
 }
 
-func Panic(c *xin.Context) {
+func TestPanic(c *xin.Context) {
 	panic("panic")
 }
 
-func OutOfMemory(c *xin.Context) {
+func TestOutOfMemory(c *xin.Context) {
 	mms, _ := mem.GetMemoryStats()
 
 	limit := (mms.Total + mms.SwapTotal) * 1024
@@ -61,7 +76,7 @@ func OutOfMemory(c *xin.Context) {
 	c.String(http.StatusOK, fmt.Sprintf("malloc: %s", num.HumanSize(total)))
 }
 
-func StackOverflow(c *xin.Context) {
+func TestStackOverflow(c *xin.Context) {
 	var level uint64
 	var fa func()
 	var fb func()

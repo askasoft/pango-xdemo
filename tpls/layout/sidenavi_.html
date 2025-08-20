@@ -25,6 +25,9 @@
 					<li class="nav-item"><a class="nav-link" href="{{.Base}}/demos/files/">{{I "demos.files"}}<span>{{T .Loc "menu.demos.files"}}</span></a></li>
 					<li class="nav-item"><a class="nav-link" href="{{.Base}}/demos/tags/">{{I "demos.tags"}}<span>{{T .Loc "menu.demos.tags"}}</span></a></li>
 					<li class="nav-item"><a class="nav-link" href="{{.Base}}/demos/chiconv/">{{I "demos.chiconv"}}<span>{{T .Loc "menu.demos.chiconv"}}</span></a></li>
+					{{if and .AU .AU.IsAdmin}}
+					<li class="nav-item"><a class="nav-link" href="{{.Base}}/demos/tests/">{{I "demos.tests"}}<span>{{T .Loc "menu.demos.tests"}}</span></a></li>
+					{{end}}
 				</ul>
 			</div>
 		</div>
@@ -43,11 +46,6 @@
 		</div>
 
 		{{if and .AU .AU.IsAdmin}}
-		<div id="navi_tests" class="card">
-			<div class="card-header">
-				<a href="{{.Base}}/tests/">{{I "tests"}}<span>{{T .Loc "menu.tests"}}</span></a>
-			</div>
-		</div>
 		<div id="navi_admin" class="card">
 			<div class="card-header">
 				<a href="{{.Base}}/a/">{{I "admin"}}<span>{{T .Loc "menu.admin"}}</span></a>

@@ -1,0 +1,19 @@
+{{MapSet .Ctx.Attrs "ascripts" (Array "demos/tests.js")}}
+
+{{template "main_header" .}}
+
+<div class="s-section">
+	<div class="s-section-head">
+		<h2>{{I "demos.tests"}}<span>{{T .Loc "menu.demos.tests"}}</span></h2>
+	</div>
+	<div class="s-section-body" id="tests">
+		<div class="s-menu">
+			<a class="s-menu-item" href="#crash">{{I "demos.tests.crash"}}<div>Crash</div></a>
+			<a class="s-menu-item" href="#panic">{{I "demos.tests.panic"}}<div>Panic</div></a>
+			<a class="s-menu-item" href="#outofmemory">{{I "demos.tests.outofmemory"}}<div>OOM</div></a>
+			<a class="s-menu-item" href="#stackoverflow">{{I "demos.tests.stackoverflow"}}<div>Stack Overflow</div></a>
+		</div>
+	</div>
+</div>
+
+{{template "main_footer" .}}

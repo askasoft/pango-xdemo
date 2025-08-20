@@ -19,7 +19,6 @@ import (
 	"github.com/askasoft/pangox-xdemo/app/handlers/login"
 	"github.com/askasoft/pangox-xdemo/app/handlers/saml"
 	"github.com/askasoft/pangox-xdemo/app/handlers/super"
-	"github.com/askasoft/pangox-xdemo/app/handlers/tests"
 	"github.com/askasoft/pangox-xdemo/app/handlers/user"
 	"github.com/askasoft/pangox-xdemo/app/middles"
 	"github.com/askasoft/pangox-xdemo/app/tenant"
@@ -210,7 +209,6 @@ func initHandlers() {
 	login.Router(rg.Group("/login"))
 	files.Router(rg.Group("/files"))
 	demos.Router(rg.Group("/demos"))
-	tests.Router(rg.Group("/tests"))
 	admin.Router(rg.Group("/a"))
 	super.Router(rg.Group("/s"))
 	user.Router(rg.Group("/u"))

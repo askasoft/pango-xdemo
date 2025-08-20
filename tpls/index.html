@@ -16,10 +16,8 @@
 			<a class="s-menu-item" href="{{.Base}}/demos/files/">{{I "demos.files"}}<div>{{T .Loc "menu.demos.files"}}</div></a>
 			<a class="s-menu-item" href="{{.Base}}/demos/tags/">{{I "demos.tags"}}<div>{{T .Loc "menu.demos.tags"}}</div></a>
 			<a class="s-menu-item" href="{{.Base}}/demos/chiconv/">{{I "demos.chiconv"}}<div>{{T .Loc "menu.demos.chiconv"}}</div></a>
-
 			{{if and .AU .AU.IsAdmin}}
-			<hr>
-			<a class="s-menu-item" href="{{.Base}}/tests/">{{I "tests"}}<div>{{T .Loc "menu.tests"}}</div></a>
+			<a class="s-menu-item" href="{{.Base}}/demos/tests/">{{I "demos.tests"}}<div>{{T .Loc "menu.demos.tests"}}</div></a>
 			{{end}}
 		</div>
 	</div>
