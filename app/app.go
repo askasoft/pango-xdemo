@@ -17,10 +17,10 @@ import (
 	"github.com/askasoft/pango/net/netx"
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/vad"
+	"github.com/askasoft/pango/xin"
+	"github.com/askasoft/pango/xin/middleware"
+	"github.com/askasoft/pango/xin/render"
 	"github.com/askasoft/pangox-xdemo/app/models"
-	"github.com/askasoft/pangox/xin"
-	"github.com/askasoft/pangox/xin/render"
-	"github.com/askasoft/pangox/xmw"
 )
 
 const (
@@ -100,43 +100,43 @@ var (
 	XIN *xin.Engine
 
 	// XAL global xin access logger
-	XAL *xmw.AccessLogger
+	XAL *middleware.AccessLogger
 
 	// XSL global xin request size limiter
-	XSL *xmw.RequestSizeLimiter
+	XSL *middleware.RequestSizeLimiter
 
 	// XRC global xin response compressor
-	XRC *xmw.ResponseCompressor
+	XRC *middleware.ResponseCompressor
 
 	// XHD global xin http dumper
-	XHD *xmw.HTTPDumper
+	XHD *middleware.HTTPDumper
 
 	// XSR global xin https redirector
-	XSR *xmw.HTTPSRedirector
+	XSR *middleware.HTTPSRedirector
 
 	// XLL global xin localizer
-	XLL *xmw.Localizer
+	XLL *middleware.Localizer
 
 	// XTP global xin token protector
-	XTP *xmw.TokenProtector
+	XTP *middleware.TokenProtector
 
 	// XRH global xin response header middleware
-	XRH *xmw.ResponseHeader
+	XRH *middleware.ResponseHeader
 
 	// XAC global xin origin access controller middleware
-	XAC *xmw.OriginAccessController
+	XAC *middleware.OriginAccessController
 
 	// XCC global xin static cache control setter
 	XCC *xin.CacheControlSetter
 
 	// XBA global basic auth middleware
-	XBA *xmw.BasicAuth
+	XBA *middleware.BasicAuth
 
 	// XCA global cookie auth middleware
-	XCA *xmw.CookieAuth
+	XCA *middleware.CookieAuth
 
 	// XCN global cookie auth middleware (no failure)
-	XCN *xmw.CookieAuth
+	XCN *middleware.CookieAuth
 
 	// XHT global xin html templates
 	XHT render.HTMLTemplates

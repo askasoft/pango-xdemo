@@ -9,6 +9,7 @@ import (
 	"github.com/askasoft/pango/ran"
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/tbs"
+	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pangox-xdemo/app"
 	"github.com/askasoft/pangox-xdemo/app/args"
 	"github.com/askasoft/pangox-xdemo/app/handlers"
@@ -17,7 +18,6 @@ import (
 	"github.com/askasoft/pangox-xdemo/app/utils/pwdutil"
 	"github.com/askasoft/pangox-xdemo/app/utils/sqlutil"
 	"github.com/askasoft/pangox-xdemo/app/utils/tbsutil"
-	"github.com/askasoft/pangox/xin"
 )
 
 func UserNew(c *xin.Context) {

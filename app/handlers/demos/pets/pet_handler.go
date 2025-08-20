@@ -3,12 +3,12 @@ package pets
 import (
 	"net/http"
 
+	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pangox-xdemo/app"
 	"github.com/askasoft/pangox-xdemo/app/args"
 	"github.com/askasoft/pangox-xdemo/app/handlers"
 	"github.com/askasoft/pangox-xdemo/app/tenant"
 	"github.com/askasoft/pangox-xdemo/app/utils/tbsutil"
-	"github.com/askasoft/pangox/xin"
 )
 
 var petListColumns = []string{

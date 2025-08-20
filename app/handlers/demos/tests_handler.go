@@ -10,10 +10,10 @@ import (
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/oss/mem"
 	"github.com/askasoft/pango/str"
+	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pangox-xdemo/app"
 	"github.com/askasoft/pangox-xdemo/app/handlers"
 	"github.com/askasoft/pangox-xdemo/app/middles"
-	"github.com/askasoft/pangox/xin"
 )
 
 func testsAddHandlers(rg *xin.RouterGroup) {

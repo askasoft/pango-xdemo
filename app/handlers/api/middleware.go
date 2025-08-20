@@ -4,9 +4,9 @@ import (
 	"net/http"
 
 	"github.com/askasoft/pango/tbs"
+	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pangox-xdemo/app/handlers"
 	"github.com/askasoft/pangox-xdemo/app/tenant"
-	"github.com/askasoft/pangox/xin"
 )
 
 // IPProtect allow access by cidr of user or tenant

@@ -4,8 +4,8 @@ import (
 	"time"
 
 	"github.com/askasoft/pango/sqx/sqlx"
+	"github.com/askasoft/pango/xin/taglib/args"
 	"github.com/askasoft/pangox-xdemo/app/utils/sqlutil"
-	"github.com/askasoft/pangox/xvw/args"
 )
 
 type PagerArg struct {

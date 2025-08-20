@@ -7,6 +7,7 @@ import (
 	"github.com/askasoft/pango/iox"
 	"github.com/askasoft/pango/ran"
 	"github.com/askasoft/pango/tbs"
+	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pangox-xdemo/app"
 	"github.com/askasoft/pangox-xdemo/app/handlers"
 	"github.com/askasoft/pangox-xdemo/app/jobs"
@@ -14,7 +15,6 @@ import (
 	"github.com/askasoft/pangox-xdemo/app/models"
 	"github.com/askasoft/pangox-xdemo/app/tenant"
 	"github.com/askasoft/pangox-xdemo/app/utils/tbsutil"
-	"github.com/askasoft/pangox/xin"
 )
 
 var UserCsvImportJobHandler = handlers.NewJobHandler(newUserCsvImportJobController)

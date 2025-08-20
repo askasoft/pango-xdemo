@@ -24,11 +24,11 @@ import (
 	"github.com/askasoft/pango/oss/osm"
 	"github.com/askasoft/pango/oss/uptime"
 	"github.com/askasoft/pango/tmu"
+	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pangox-xdemo/app"
 	"github.com/askasoft/pangox-xdemo/app/handlers"
 	"github.com/askasoft/pangox-xdemo/app/jobs"
 	"github.com/askasoft/pangox-xdemo/app/models"
-	"github.com/askasoft/pangox/xin"
 )
 
 func StatsIndex(c *xin.Context) {

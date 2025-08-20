@@ -3,6 +3,10 @@ package tools
 import (
 	"time"
 
+	"github.com/askasoft/gogormx/gormx"
+	"github.com/askasoft/gogormx/log/sqlog/gormlog"
+	"github.com/askasoft/gogormx/xsm/mysm/mygormsm"
+	"github.com/askasoft/gogormx/xsm/pgsm/pggormsm"
 	"github.com/askasoft/pango/fsu"
 	"github.com/askasoft/pango/ini"
 	"github.com/askasoft/pango/log"
@@ -10,12 +14,8 @@ import (
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pangox-xdemo/app/models"
 	"github.com/askasoft/pangox-xdemo/cmd/tools/mymodels"
-	"github.com/askasoft/pangox/log/sqlog/gormlog"
-	"github.com/askasoft/pangox/sqx/gormx"
 	"github.com/askasoft/pangox/xfs"
 	"github.com/askasoft/pangox/xjm"
-	"github.com/askasoft/pangox/xsm/mysm/mygormsm"
-	"github.com/askasoft/pangox/xsm/pgsm/pggormsm"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"

@@ -15,9 +15,9 @@ import (
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/tmu"
+	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pangox-xdemo/app"
 	"github.com/askasoft/pangox-xdemo/app/handlers"
-	"github.com/askasoft/pangox/xin"
 )
 
 func RuntimeIndex(c *xin.Context) {

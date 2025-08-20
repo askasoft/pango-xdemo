@@ -2,8 +2,8 @@ package tenant
 
 import (
 	"github.com/askasoft/pango/sqx/sqlx"
+	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pangox-xdemo/app/models"
-	"github.com/askasoft/pangox/xin"
 )
 
 func (tt *Tenant) AddAuditLog(tx sqlx.Sqlx, c *xin.Context, funact string, params ...any) error {

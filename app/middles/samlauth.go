@@ -6,11 +6,11 @@ import (
 	"net/http"
 
 	"github.com/askasoft/pango/bol"
+	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pangox-xdemo/app"
 	"github.com/askasoft/pangox-xdemo/app/handlers"
 	"github.com/askasoft/pangox-xdemo/app/handlers/saml"
 	"github.com/askasoft/pangox-xdemo/app/tenant"
-	"github.com/askasoft/pangox/xin"
 	"github.com/crewjam/saml/samlsp"
 )
 

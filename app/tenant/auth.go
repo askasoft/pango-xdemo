@@ -12,11 +12,11 @@ import (
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/tmu"
+	"github.com/askasoft/pango/xin"
+	"github.com/askasoft/pango/xin/middleware"
 	"github.com/askasoft/pangox-xdemo/app"
 	"github.com/askasoft/pangox-xdemo/app/models"
 	"github.com/askasoft/pangox-xdemo/app/utils/pwdutil"
-	"github.com/askasoft/pangox/xin"
-	"github.com/askasoft/pangox/xmw"
 	"github.com/go-ldap/ldap/v3"
 )
 
@@ -155,7 +155,7 @@ func CheckClientIP(c *xin.Context, cidrs ...*net.IPNet) bool {
 //----------------------------------------------------
 // Auth
 
-func findAuthUser(c *xin.Context, username, password string) (xmw.AuthUser, error) {
+func findAuthUser(c *xin.Context, username, password string) (middleware.AuthUser, error) {
 	tt := FromCtx(c)
 
 	au, err := tt.FindAuthUser(username)
@@ -204,7 +204,7 @@ func ldapAuthencate(c *xin.Context, username, password string) (*models.User, er
 	return au, nil
 }
 
-func Authenticate(c *xin.Context, username, password string) (xmw.AuthUser, error) {
+func Authenticate(c *xin.Context, username, password string) (middleware.AuthUser, error) {
 	tt := FromCtx(c)
 
 	if tt.IsLDAPLogin() {
@@ -218,7 +218,7 @@ func Authenticate(c *xin.Context, username, password string) (xmw.AuthUser, erro
 	return findAuthUser(c, username, password)
 }
 
-func CheckClientAndAuthenticate(c *xin.Context, username, password string) (xmw.AuthUser, error) {
+func CheckClientAndAuthenticate(c *xin.Context, username, password string) (middleware.AuthUser, error) {
 	if IsClientBlocked(c) {
 		return nil, nil
 	}
@@ -247,7 +247,7 @@ func AuthCookieMaxAge(c *xin.Context) time.Duration {
 //----------------------------------------------------
 // middleware
 
-func BasicAuthPassed(c *xin.Context, au xmw.AuthUser) {
+func BasicAuthPassed(c *xin.Context, au middleware.AuthUser) {
 	AuthPassed(c)
 	c.Next()
 }

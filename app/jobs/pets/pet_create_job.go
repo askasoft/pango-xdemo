@@ -4,10 +4,10 @@ import (
 	"context"
 	"time"
 
+	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pangox-xdemo/app"
 	"github.com/askasoft/pangox-xdemo/app/jobs"
 	"github.com/askasoft/pangox-xdemo/app/tenant"
-	"github.com/askasoft/pangox/xin"
 	"github.com/askasoft/pangox/xjm"
 )
 

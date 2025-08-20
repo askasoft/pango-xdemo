@@ -6,7 +6,7 @@ import (
 	"github.com/askasoft/pango/asg"
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/str"
-	"github.com/askasoft/pangox/xin"
+	"github.com/askasoft/pango/xin"
 )
 
 var errInvalidID = errors.New("invalid id")

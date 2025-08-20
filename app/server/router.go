@@ -10,6 +10,8 @@ import (
 	"github.com/askasoft/pango/net/httpx"
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/vad"
+	"github.com/askasoft/pango/xin"
+	"github.com/askasoft/pango/xin/middleware"
 	"github.com/askasoft/pangox-xdemo/app"
 	"github.com/askasoft/pangox-xdemo/app/handlers"
 	"github.com/askasoft/pangox-xdemo/app/handlers/admin"
@@ -24,8 +26,6 @@ import (
 	"github.com/askasoft/pangox-xdemo/app/tenant"
 	"github.com/askasoft/pangox-xdemo/app/utils/vadutil"
 	"github.com/askasoft/pangox-xdemo/web"
-	"github.com/askasoft/pangox/xin"
-	"github.com/askasoft/pangox/xmw"
 )
 
 func initRouter() {
@@ -46,26 +46,26 @@ func initRouter() {
 	app.VAD.RegisterValidation("schedule", vadutil.ValidateSchedule)
 	app.VAD.RegisterValidation("samlmeta", vadutil.ValidateSAMLMeta)
 
-	app.XAL = xmw.NewAccessLogger(nil)
-	app.XSL = xmw.NewRequestSizeLimiter(0)
+	app.XAL = middleware.NewAccessLogger(nil)
+	app.XSL = middleware.NewRequestSizeLimiter(0)
 	app.XSL.BodyTooLarge = handlers.BodyTooLarge
-	app.XRC = xmw.DefaultResponseCompressor()
-	app.XHD = xmw.NewHTTPDumper(app.XIN.Logger.GetOutputer("XHD", log.LevelTrace))
-	app.XSR = xmw.NewHTTPSRedirector()
-	app.XLL = xmw.NewLocalizer()
-	app.XTP = xmw.NewTokenProtector("")
+	app.XRC = middleware.DefaultResponseCompressor()
+	app.XHD = middleware.NewHTTPDumper(app.XIN.Logger.GetOutputer("XHD", log.LevelTrace))
+	app.XSR = middleware.NewHTTPSRedirector()
+	app.XLL = middleware.NewLocalizer()
+	app.XTP = middleware.NewTokenProtector("")
 	app.XTP.AbortFunc = handlers.InvalidToken
-	app.XRH = xmw.NewResponseHeader(nil)
-	app.XAC = xmw.NewOriginAccessController()
+	app.XRH = middleware.NewResponseHeader(nil)
+	app.XAC = middleware.NewOriginAccessController()
 	app.XCC = xin.NewCacheControlSetter()
-	app.XBA = xmw.NewBasicAuth(tenant.CheckClientAndAuthenticate)
+	app.XBA = middleware.NewBasicAuth(tenant.CheckClientAndAuthenticate)
 	app.XBA.AuthPassed = tenant.BasicAuthPassed
 	app.XBA.AuthFailed = tenant.BasicAuthFailed
-	app.XCA = xmw.NewCookieAuth(tenant.Authenticate, "")
+	app.XCA = middleware.NewCookieAuth(tenant.Authenticate, "")
 	app.XCA.GetCookieMaxAge = tenant.AuthCookieMaxAge
 
 	// only get AuthUser from cookie
-	app.XCN = xmw.NewCookieAuth(tenant.Authenticate, "")
+	app.XCN = middleware.NewCookieAuth(tenant.Authenticate, "")
 	app.XCN.AuthFailed = xin.Next
 	app.XCN.GetCookieMaxAge = tenant.AuthCookieMaxAge
 
@@ -146,20 +146,20 @@ func configResponseHeader() {
 }
 
 func configAccessLogger() {
-	alws := []xmw.AccessLogWriter{}
+	alws := []middleware.AccessLogWriter{}
 	alfs := str.Fields(ini.GetString("server", "accessLog"))
 	for _, alf := range alfs {
 		switch alf {
 		case "text":
-			alw := xmw.NewAccessLogWriter(
+			alw := middleware.NewAccessLogWriter(
 				app.XIN.Logger.GetOutputer("XAT", log.LevelTrace),
-				ini.GetString("server", "accessLogTextFormat", xmw.AccessLogTextFormat),
+				ini.GetString("server", "accessLogTextFormat", middleware.AccessLogTextFormat),
 			)
 			alws = append(alws, alw)
 		case "json":
-			alw := xmw.NewAccessLogWriter(
+			alw := middleware.NewAccessLogWriter(
 				app.XIN.Logger.GetOutputer("XAJ", log.LevelTrace),
-				ini.GetString("server", "accessLogJSONFormat", xmw.AccessLogJSONFormat),
+				ini.GetString("server", "accessLogJSONFormat", middleware.AccessLogJSONFormat),
 			)
 			alws = append(alws, alw)
 		default:
@@ -173,7 +173,7 @@ func configAccessLogger() {
 	case 1:
 		app.XAL.SetWriter(alws[0])
 	default:
-		app.XAL.SetWriter(xmw.NewAccessLogMultiWriter(alws...))
+		app.XAL.SetWriter(middleware.NewAccessLogMultiWriter(alws...))
 	}
 }
 

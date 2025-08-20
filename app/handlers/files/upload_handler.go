@@ -4,11 +4,11 @@ import (
 	"mime/multipart"
 	"net/http"
 
+	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pangox-xdemo/app"
 	"github.com/askasoft/pangox-xdemo/app/models"
 	"github.com/askasoft/pangox-xdemo/app/tenant"
 	"github.com/askasoft/pangox/xfs"
-	"github.com/askasoft/pangox/xin"
 )
 
 func SaveUploadedFile(c *xin.Context, mfh *multipart.FileHeader) (*xfs.File, error) {

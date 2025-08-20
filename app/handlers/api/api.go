@@ -3,7 +3,7 @@ package api
 import (
 	"net/http"
 
-	"github.com/askasoft/pangox/xin"
+	"github.com/askasoft/pango/xin"
 )
 
 func MyIP(c *xin.Context) {

@@ -11,6 +11,8 @@ import (
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/ran"
 	"github.com/askasoft/pango/tbs"
+	"github.com/askasoft/pango/xin"
+	"github.com/askasoft/pango/xin/middleware"
 	"github.com/askasoft/pangox-xdemo/app"
 	"github.com/askasoft/pangox-xdemo/app/args"
 	"github.com/askasoft/pangox-xdemo/app/handlers"
@@ -19,8 +21,6 @@ import (
 	"github.com/askasoft/pangox-xdemo/app/utils/cptutil"
 	"github.com/askasoft/pangox-xdemo/app/utils/otputil"
 	"github.com/askasoft/pangox-xdemo/app/utils/smtputil"
-	"github.com/askasoft/pangox/xin"
-	"github.com/askasoft/pangox/xmw"
 	"github.com/skip2/go-qrcode"
 	"github.com/xlzd/gotp"
 )
@@ -28,7 +28,7 @@ import (
 func Index(c *xin.Context) {
 	h := handlers.H(c)
 
-	h["origin"] = c.Query(xmw.AuthRedirectOriginURLQuery)
+	h["origin"] = c.Query(middleware.AuthRedirectOriginURLQuery)
 
 	c.HTML(http.StatusOK, "login/login", h)
 }

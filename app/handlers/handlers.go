@@ -5,8 +5,8 @@ import (
 
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/tbs"
+	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pangox-xdemo/app"
-	"github.com/askasoft/pangox/xin"
 )
 
 func Index(c *xin.Context) {

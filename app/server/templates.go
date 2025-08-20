@@ -5,11 +5,11 @@ import (
 	"github.com/askasoft/pango/ini"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/tpl"
+	"github.com/askasoft/pango/xin/render"
+	"github.com/askasoft/pango/xin/taglib"
 	"github.com/askasoft/pangox-assets/html/summernote"
 	"github.com/askasoft/pangox-xdemo/app"
 	"github.com/askasoft/pangox-xdemo/tpls"
-	"github.com/askasoft/pangox/xin/render"
-	"github.com/askasoft/pangox/xvw"
 )
 
 // templates external template path
@@ -19,7 +19,7 @@ func newHTMLTemplates() render.HTMLTemplates {
 	ht := render.NewHTMLTemplates()
 
 	fm := tpl.Functions()
-	fm.Copy(xvw.Functions())
+	fm.Copy(taglib.Functions())
 	fm["DATE"] = app.FormatDate
 	fm["TIME"] = app.FormatTime
 	fm["SummernoteLang"] = summernote.Locale2Lang

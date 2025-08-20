@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"github.com/askasoft/pangox/xin"
+	"github.com/askasoft/pango/xin"
 )
 
 type JobCtrl interface {

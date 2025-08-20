@@ -3,10 +3,10 @@ package handlers
 import (
 	"time"
 
+	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pangox-xdemo/app"
 	"github.com/askasoft/pangox-xdemo/app/args"
 	"github.com/askasoft/pangox-xdemo/app/tenant"
-	"github.com/askasoft/pangox/xin"
 )
 
 func H(c *xin.Context) xin.H {
