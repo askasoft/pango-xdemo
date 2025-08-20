@@ -42,8 +42,9 @@ func initRouter() {
 	app.VAD.RegisterValidation("ini", vadutil.ValidateINI)
 	app.VAD.RegisterValidation("cidrs", vadutil.ValidateCIDRs)
 	app.VAD.RegisterValidation("integers", vadutil.ValidateIntegers)
-	app.VAD.RegisterValidation("decimals", vadutil.ValidateIntegers)
+	app.VAD.RegisterValidation("decimals", vadutil.ValidateDecimals)
 	app.VAD.RegisterValidation("regexps", vadutil.ValidateRegexps)
+	app.VAD.RegisterValidation("schedule", vadutil.ValidateSchedule)
 	app.VAD.RegisterValidation("samlmeta", vadutil.ValidateSAMLMeta)
 
 	app.XAL = xmw.NewAccessLogger(nil)

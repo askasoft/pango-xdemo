@@ -7,6 +7,7 @@ import (
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/vad"
 	"github.com/askasoft/pangox-xdemo/app/args"
+	"github.com/askasoft/pangox-xdemo/app/utils/schutil"
 	"github.com/crewjam/saml/samlsp"
 )
 
@@ -43,6 +44,11 @@ func ValidateRegexps(fl vad.FieldLevel) bool {
 		}
 	}
 	return true
+}
+
+func ValidateSchedule(fl vad.FieldLevel) bool {
+	_, err := schutil.ParseSchedule(fl.Field().String())
+	return err == nil
 }
 
 func ValidateSAMLMeta(fl vad.FieldLevel) bool {

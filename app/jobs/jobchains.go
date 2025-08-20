@@ -104,6 +104,31 @@ func JobChainStart(tt *tenant.Tenant, chainName string, states []*JobRunState, j
 	return
 }
 
+func JobChainInitAndStart(tt *tenant.Tenant, cn string, jns ...string) error {
+	states := JobChainInitStates(jns...)
+
+	arg, err := CreateJobArg(tt, jns[0])
+	if err != nil {
+		tt.Logger("JOB").Error("Failed to create JobArg for %q: %v", jns[0], err)
+		return err
+	}
+
+	if _, ok := arg.(IChainArg); !ok {
+		err = fmt.Errorf("invalid chain job %q argument: %T", jns[0], arg)
+		tt.Logger("JOB").Error(err)
+		return err
+	}
+
+	cid, err := JobChainStart(tt, cn, states, jns[0], str.NonEmpty(app.Locales...), arg.(IChainArg))
+	if err != nil {
+		tt.Logger("JOB").Errorf("Failed to start JobChain %q: %v", cn, err)
+		return err
+	}
+
+	tt.Logger("JOB").Infof("Start JobChain %q: #%d", cn, cid)
+	return nil
+}
+
 func JobFindAndCancelChain(xjc xjm.JobChainer, cid, jid int64, reason string) error {
 	jc, err := xjc.GetJobChain(cid)
 	if err != nil {
@@ -320,16 +345,13 @@ func (jr *JobRunner[T]) jobChainContinue() error {
 func JobChainAppendJob(tt *tenant.Tenant, name, locale string, cid int64, csq int, cdt bool) error {
 	tjm := tt.JM()
 
-	var arg any
-
-	if jac, ok := jobArgCreators[name]; ok {
-		arg = jac(tt)
-	} else {
-		return fmt.Errorf("Invalid chain job %q", name)
+	arg, err := CreateJobArg(tt, name)
+	if err != nil {
+		return err
 	}
 
-	if isc, ok := arg.(IChainArg); ok {
-		isc.SetChain(csq, cdt)
+	if ica, ok := arg.(IChainArg); ok {
+		ica.SetChain(csq, cdt)
 	} else {
 		return fmt.Errorf("Invalid chain job %q", name)
 	}

@@ -32,6 +32,15 @@ func RegisterJobArg(name string, jac JobArgCreater) {
 	jobArgCreators[name] = jac
 }
 
+func CreateJobArg(tt *tenant.Tenant, name string) (IArg, error) {
+	jac, ok := jobArgCreators[name]
+	if !ok {
+		return nil, fmt.Errorf("missing job argument %q", name)
+	}
+
+	return jac(tt), nil
+}
+
 type FileArg struct {
 	File string `json:"file,omitempty" form:"-"`
 }
@@ -49,6 +58,20 @@ func (fa *FileArg) SetFile(tt *tenant.Tenant, mfh *multipart.FileHeader) error {
 
 	fa.File = fid
 	return nil
+}
+
+type normalizer interface {
+	Normalize()
+}
+
+func ArgBind(c *xin.Context, a any) error {
+	err := c.Bind(a)
+
+	if nm, ok := a.(normalizer); ok {
+		nm.Normalize()
+	}
+
+	return err
 }
 
 func JobStatusText(js string) string {

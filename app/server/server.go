@@ -324,12 +324,12 @@ func loadCertificate() (*tls.Certificate, error) {
 
 	xcert, err := tls.LoadX509KeyPair(certificate, certkeyfile)
 	if err != nil {
-		return nil, fmt.Errorf("Failed to load certificate (%q, %q): %w", certificate, certkeyfile, err)
+		return nil, fmt.Errorf("invalid certificate (%q, %q): %w", certificate, certkeyfile, err)
 	}
 
 	xcert.Leaf, err = x509.ParseCertificate(xcert.Certificate[0])
 	if err != nil {
-		return nil, fmt.Errorf("Failed to load certificate (%q, %q): %w", certificate, certkeyfile, err)
+		return nil, fmt.Errorf("invalid certificate (%q, %q): %w", certificate, certkeyfile, err)
 	}
 
 	return &xcert, nil

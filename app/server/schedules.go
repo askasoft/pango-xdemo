@@ -12,13 +12,13 @@ import (
 )
 
 var schedules = linkedhashmap.NewLinkedHashMap(
+	cog.KV("jobSchedule", tasks.JobSchedule),
 	cog.KV("jobStart", jobs.Starts),
 	cog.KV("jobReappend", jobs.ReappendJobs),
 	cog.KV("jobClean", jobs.CleanOutdatedJobs),
 	cog.KV("jobchainClean", jobs.CleanOutdatedJobChains),
-	cog.KV("auditlogClean", tasks.CleanOutdatedAuditLogs),
-	cog.KV("dbReset", tasks.ResetDatabase),
 	cog.KV("tmpClean", tasks.CleanTemporaryFiles),
+	cog.KV("auditlogClean", tasks.CleanOutdatedAuditLogs),
 )
 
 func initScheduler() {
@@ -32,8 +32,8 @@ func initScheduler() {
 		if cron == "" {
 			sch.Schedule(name, sch.ZeroTrigger, callback)
 		} else {
-			ct := &sch.CronTrigger{}
-			if err := ct.Parse(cron); err != nil {
+			ct, err := sch.NewCronTrigger(cron)
+			if err != nil {
 				log.Fatalf("Invalid task '%s' cron: %v", name, err) //nolint: all
 				app.Exit(app.ExitErrSCH)
 			}
@@ -61,13 +61,13 @@ func reScheduler() {
 			}
 
 			if redo {
-				ct := &sch.CronTrigger{}
-				if err := ct.Parse(cron); err != nil {
+				ct, err := sch.NewCronTrigger(cron)
+				if err != nil {
 					log.Errorf("Invalid task '%s' cron: %v", name, err)
 				} else {
 					log.Infof("Reschedule Task %s: %s", name, cron)
-					task.Trigger = ct
 					task.Stop()
+					task.Trigger = ct
 					task.Start()
 				}
 			}
