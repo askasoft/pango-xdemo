@@ -17,7 +17,7 @@ import (
 func FileDeletes(c *xin.Context) {
 	pka := &args.PKArg{}
 	if err := pka.Bind(c); err != nil {
-		c.AddError(args.ErrInvalidID(c))
+		c.AddError(args.InvalidIDError(c))
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}

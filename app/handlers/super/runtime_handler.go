@@ -16,8 +16,8 @@ import (
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/tmu"
 	"github.com/askasoft/pango/xin"
-	"github.com/askasoft/pangox-xdemo/app"
 	"github.com/askasoft/pangox-xdemo/app/handlers"
+	"github.com/askasoft/pangox/xwa"
 )
 
 func RuntimeIndex(c *xin.Context) {
@@ -80,7 +80,7 @@ func runtimeProcess() any {
 
 	rtm.Set("UID/PID/PPID", fmt.Sprintf("%d %d %d", os.Getuid(), os.Getpid(), os.Getppid()))
 	rtm.Set("Command", gog.First(os.Getwd())+"> "+str.Join(os.Args, " "))
-	rtm.Set("Startup", fmt.Sprintf("%s (%s)", app.StartupTime.Format(time.RFC3339), tmu.HumanDuration(time.Since(app.StartupTime))))
+	rtm.Set("Startup", fmt.Sprintf("%s (%s)", xwa.StartupTime().Format(time.RFC3339), tmu.HumanDuration(time.Since(xwa.StartupTime()))))
 	rtm.Set("Goversion", runtime.Version())
 	rtm.Set("Gomaxprocs", num.Comma(runtime.GOMAXPROCS(0)))
 	rtm.Set("Goroutine", num.Comma(runtime.NumGoroutine()))
@@ -116,7 +116,7 @@ func runtimeMemStats() any {
 	msm.Set("NextGC", num.HumanSize(ms.NextGC))
 	msm.Set("NumGC", num.Comma(ms.NumGC))
 	msm.Set("GCPauseTotal", tmu.HumanDuration(time.Duration(ms.PauseTotalNs))) //nolint: gosec
-	if sec := time.Since(app.StartupTime).Seconds(); sec != 0 {
+	if sec := time.Since(xwa.StartupTime()).Seconds(); sec != 0 {
 		msm.Set("GCNumPerSecond", num.Comma(float64(ms.NumGC)/sec, 6))
 		msm.Set("GCPausePerSecond", tmu.HumanDuration(time.Duration(ms.PauseTotalNs/uint64(sec)))) //nolint: gosec
 	}

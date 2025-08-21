@@ -42,7 +42,7 @@ func PetEdit(c *xin.Context) {
 func petDetail(c *xin.Context, action string) {
 	pid := num.Atol(c.Query("id"))
 	if pid == 0 {
-		c.AddError(args.ErrInvalidID(c))
+		c.AddError(args.InvalidIDError(c))
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}
@@ -82,21 +82,21 @@ func petBind(c *xin.Context) *PetWithFile {
 	if pet.Gender != "" {
 		pgm := tbsutil.GetPetGenderMap(c.Locale)
 		if !pgm.Contains(pet.Gender) {
-			c.AddError(args.ErrInvalidField(c, "pet.", "gender"))
+			c.AddError(args.InvalidFieldError(c, "pet.", "gender"))
 		}
 	}
 
 	if pet.Origin != "" {
 		pom := tbsutil.GetPetOriginMap(c.Locale)
 		if !pom.Contains(pet.Origin) {
-			c.AddError(args.ErrInvalidField(c, "pet.", "origin"))
+			c.AddError(args.InvalidFieldError(c, "pet.", "origin"))
 		}
 	}
 
 	if pet.Temper != "" {
 		ptm := tbsutil.GetPetTemperMap(c.Locale)
 		if !ptm.Contains(pet.Temper) {
-			c.AddError(args.ErrInvalidField(c, "pet.", "temper"))
+			c.AddError(args.InvalidFieldError(c, "pet.", "temper"))
 		}
 	}
 
@@ -104,7 +104,7 @@ func petBind(c *xin.Context) *PetWithFile {
 		phm := tbsutil.GetPetHabitsMap(c.Locale)
 		for _, h := range pet.Habits {
 			if !phm.Contains(h) {
-				c.AddError(args.ErrInvalidField(c, "pet.", "habits"))
+				c.AddError(args.InvalidFieldError(c, "pet.", "habits"))
 				break
 			}
 		}
@@ -160,7 +160,7 @@ func PetCreate(c *xin.Context) {
 func PetUpdate(c *xin.Context) {
 	pet := petBind(c)
 	if pet.ID == 0 {
-		c.AddError(args.ErrInvalidID(c))
+		c.AddError(args.InvalidIDError(c))
 	}
 	if len(c.Errors) > 0 {
 		c.JSON(http.StatusBadRequest, handlers.E(c))

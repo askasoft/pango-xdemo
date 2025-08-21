@@ -9,6 +9,7 @@ import (
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/num"
 	"github.com/askasoft/pango/str"
+	"github.com/askasoft/pangox/xwa"
 )
 
 const (
@@ -62,7 +63,7 @@ func FormatTime(a any) string {
 }
 
 func MakeFileID(prefix, name string) string {
-	fid := "/" + prefix + time.Now().Format("/2006/0102/") + num.Ltoa(Sequencer.NextID().Int64()) + "/"
+	fid := "/" + prefix + time.Now().Format("/2006/0102/") + num.Ltoa(xwa.Sequencer().NextID().Int64()) + "/"
 
 	_, name = filepath.Split(name)
 	name = str.RemoveAny(name, `\/:*?"<>|`)

@@ -14,6 +14,7 @@ import (
 	"github.com/askasoft/pangox-xdemo/app/tenant"
 	"github.com/askasoft/pangox/xfs"
 	"github.com/askasoft/pangox/xjm"
+	"github.com/askasoft/pangox/xwa"
 )
 
 var (
@@ -182,7 +183,7 @@ type JobRunner[T any] struct {
 }
 
 func NewJobRunner[T any](tt *tenant.Tenant, job *xjm.Job) *JobRunner[T] {
-	job.RID = app.Sequencer.NextID().Int64()
+	job.RID = xwa.Sequencer().NextID().Int64()
 
 	jr := &JobRunner[T]{
 		JobRunner: xjm.NewJobRunner(job, tt.JM(), tt.Logger("JOB")),
@@ -191,8 +192,8 @@ func NewJobRunner[T any](tt *tenant.Tenant, job *xjm.Job) *JobRunner[T] {
 
 	xjm.MustDecode(job.Param, &jr.Arg)
 
-	jr.Log().SetProp("VERSION", app.Version)
-	jr.Log().SetProp("REVISION", app.Revision)
+	jr.Log().SetProp("VERSION", xwa.Version())
+	jr.Log().SetProp("REVISION", xwa.Revision())
 	jr.Log().SetProp("TENANT", string(tt.Schema))
 	jr.Logger = jr.Log().GetLogger("JOB")
 

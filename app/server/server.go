@@ -27,6 +27,7 @@ import (
 	"github.com/askasoft/pangox-xdemo/app"
 	"github.com/askasoft/pangox-xdemo/app/jobs"
 	"github.com/askasoft/pangox-xdemo/app/models"
+	"github.com/askasoft/pangox/xwa"
 )
 
 // SRV service instance
@@ -57,7 +58,7 @@ func (s *service) Description() string {
 
 // Version app version
 func (s *service) Version() string {
-	return app.Versions()
+	return xwa.Versions()
 }
 
 // Init initialize the app
@@ -165,17 +166,17 @@ func initLog() {
 		os.Exit(app.ExitErrLOG)
 	}
 
-	log.SetProp("VERSION", app.Version)
-	log.SetProp("REVISION", app.Revision)
+	log.SetProp("VERSION", xwa.Version())
+	log.SetProp("REVISION", xwa.Revision())
 	golog.SetOutput(log.GetOutputer("std", log.LevelInfo, 2))
 
 	dir, _ := filepath.Abs(".")
 	log.Info("Initializing ...")
-	log.Infof("Version:    %s.%s", app.Version, app.Revision)
-	log.Infof("BuildTime:  %s", app.BuildTime.Local())
+	log.Infof("Version:    %s.%s", xwa.Version(), xwa.Revision())
+	log.Infof("BuildTime:  %s", xwa.BuildTime().Local())
 	log.Infof("Runtime:    %s %s/%s", runtime.Version(), runtime.GOOS, runtime.GOARCH)
 	log.Infof("Directory:  %s", dir)
-	log.Infof("InstanceID: 0x%x", app.InstanceID)
+	log.Infof("InstanceID: 0x%x", xwa.InstanceID())
 }
 
 func initConfigs() {
@@ -191,7 +192,7 @@ func initConfigs() {
 func initAppCfg() {
 	app.CFG = ini.StringMap()
 
-	app.Locales = str.FieldsAny(ini.GetString("app", "locales"), ",; ")
+	xwa.Locales = str.FieldsAny(ini.GetString("app", "locales"), ",; ")
 
 	app.Domain = ini.GetString("server", "domain")
 	app.Base = ini.GetString("server", "prefix")

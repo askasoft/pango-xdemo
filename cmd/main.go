@@ -12,6 +12,7 @@ import (
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pangox-xdemo/app"
 	"github.com/askasoft/pangox-xdemo/cmd/tools"
+	"github.com/askasoft/pangox/xwa"
 )
 
 func usage() {
@@ -52,7 +53,7 @@ func main() {
 	chdir(workdir)
 
 	if version {
-		fmt.Println(app.Versions())
+		fmt.Println(xwa.Versions())
 		os.Exit(0)
 	}
 

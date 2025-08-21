@@ -26,6 +26,7 @@ import (
 	"github.com/askasoft/pangox-xdemo/app/tenant"
 	"github.com/askasoft/pangox-xdemo/app/utils/vadutil"
 	"github.com/askasoft/pangox-xdemo/web"
+	"github.com/askasoft/pangox/xwa"
 )
 
 func initRouter() {
@@ -81,7 +82,7 @@ func configMiddleware() {
 	app.XRC.Disable(!ini.GetBool("server", "httpGzip"))
 	app.XHD.Disable(!ini.GetBool("server", "httpDump"))
 	app.XSR.Disable(!ini.GetBool("server", "httpsRedirect"))
-	app.XLL.Locales = app.Locales
+	app.XLL.Locales = xwa.Locales
 
 	app.XAC.SetAllowOrigins(str.Fields(ini.GetString("server", "accessControlAllowOrigin"))...)
 	app.XAC.SetAllowCredentials(ini.GetBool("server", "accessControlAllowCredentials"))
@@ -120,7 +121,7 @@ func configMiddleware() {
 func configWebAssetsHFS() {
 	was := ini.GetString("app", "webassets")
 	if was == "" {
-		app.WAS = xin.FixedModTimeFS(xin.FS(web.FS), app.BuildTime)
+		app.WAS = xin.FixedModTimeFS(xin.FS(web.FS), xwa.BuildTime())
 	} else {
 		app.WAS = httpx.Dir(was)
 	}
@@ -134,7 +135,7 @@ func configResponseHeader() {
 	} else {
 		err := json.Unmarshal(str.UnsafeBytes(hh), &hm)
 		if err == nil {
-			sr := str.NewReplacer("{{VERSION}}", app.Version, "{{REVISION}}", app.Revision, "{{BUILDTIME}}", app.BuildTime.Format(time.RFC3339))
+			sr := str.NewReplacer("{{VERSION}}", xwa.Version(), "{{REVISION}}", xwa.Revision(), "{{BuildTime}}", xwa.BuildTime().Format(time.RFC3339))
 			for k, v := range hm {
 				hm[k] = sr.Replace(v)
 			}
@@ -223,19 +224,19 @@ func addRootHandlers(rg *xin.RouterGroup) {
 }
 
 func addStaticHandlers(rg *xin.RouterGroup) {
-	mt := app.BuildTime
+	mt := xwa.BuildTime()
 
 	xcch := app.XCC.Handle
 
 	for path, fs := range web.Statics {
-		xin.StaticFS(rg, "/static/"+app.Revision+"/"+path, xin.FixedModTimeFS(xin.FS(fs), mt), "", xcch)
+		xin.StaticFS(rg, "/static/"+xwa.Revision()+"/"+path, xin.FixedModTimeFS(xin.FS(fs), mt), "", xcch)
 	}
 
 	wfsc := func(c *xin.Context) http.FileSystem {
 		return app.WAS
 	}
 
-	xin.StaticFSFunc(rg, "/assets/"+app.Revision, wfsc, "/assets", xcch)
+	xin.StaticFSFunc(rg, "/assets/"+xwa.Revision(), wfsc, "/assets", xcch)
 	xin.StaticFSFuncFile(rg, "/favicon.ico", wfsc, "favicon.ico", xcch)
 	xin.StaticFSFuncFile(rg, "/robots.txt", wfsc, "robots.txt", xcch)
 }

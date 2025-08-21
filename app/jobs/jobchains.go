@@ -13,6 +13,7 @@ import (
 	"github.com/askasoft/pangox-xdemo/app/models"
 	"github.com/askasoft/pangox-xdemo/app/tenant"
 	"github.com/askasoft/pangox/xjm"
+	"github.com/askasoft/pangox/xwa"
 )
 
 const (
@@ -119,7 +120,7 @@ func JobChainInitAndStart(tt *tenant.Tenant, cn string, jns ...string) error {
 		return err
 	}
 
-	cid, err := JobChainStart(tt, cn, states, jns[0], str.NonEmpty(app.Locales...), arg.(IChainArg))
+	cid, err := JobChainStart(tt, cn, states, jns[0], str.NonEmpty(xwa.Locales...), arg.(IChainArg))
 	if err != nil {
 		tt.Logger("JOB").Errorf("Failed to start JobChain %q: %v", cn, err)
 		return err

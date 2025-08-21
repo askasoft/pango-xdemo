@@ -44,7 +44,7 @@ func UserEdit(c *xin.Context) {
 func userDetail(c *xin.Context, action string) {
 	uid := num.Atol(c.Query("id"))
 	if uid == 0 {
-		c.AddError(args.ErrInvalidID(c))
+		c.AddError(args.InvalidIDError(c))
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}
@@ -76,7 +76,7 @@ func userValidateRole(c *xin.Context, role string) {
 		au := tenant.AuthUser(c)
 		urm := tbsutil.GetUserRoleMap(c.Locale, au.Role)
 		if !urm.Contains(role) {
-			c.AddError(args.ErrInvalidField(c, "user.", "role"))
+			c.AddError(args.InvalidFieldError(c, "user.", "role"))
 		}
 	}
 }
@@ -85,7 +85,7 @@ func userValidateStatus(c *xin.Context, status string) {
 	if status != "" {
 		sm := tbsutil.GetUserStatusMap(c.Locale)
 		if !sm.Contains(status) {
-			c.AddError(args.ErrInvalidField(c, "user.", "status"))
+			c.AddError(args.InvalidFieldError(c, "user.", "status"))
 		}
 	}
 }
@@ -94,7 +94,7 @@ func userValidateLoginMFA(c *xin.Context, status string) {
 	if status != "" {
 		sm := tbsutil.GetUserLoginMFAMap(c.Locale)
 		if !sm.Contains(status) {
-			c.AddError(args.ErrInvalidField(c, "user.", "login_mfa"))
+			c.AddError(args.InvalidFieldError(c, "user.", "login_mfa"))
 		}
 	}
 }
@@ -178,7 +178,7 @@ func UserCreate(c *xin.Context) {
 func UserUpdate(c *xin.Context) {
 	user := userBind(c)
 	if user.ID == 0 {
-		c.AddError(args.ErrInvalidID(c))
+		c.AddError(args.InvalidIDError(c))
 	}
 	if len(c.Errors) > 0 {
 		c.JSON(http.StatusBadRequest, handlers.E(c))

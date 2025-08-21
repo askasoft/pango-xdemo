@@ -5,8 +5,9 @@ import (
 
 	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pangox-xdemo/app"
-	"github.com/askasoft/pangox-xdemo/app/args"
 	"github.com/askasoft/pangox-xdemo/app/tenant"
+	"github.com/askasoft/pangox/xwa"
+	"github.com/askasoft/pangox/xwa/xargs"
 )
 
 func H(c *xin.Context) xin.H {
@@ -15,14 +16,14 @@ func H(c *xin.Context) xin.H {
 
 	h := xin.H{
 		"CFG":     app.CFG,
-		"VER":     app.Version,
-		"REV":     app.Revision,
+		"VER":     xwa.Version(),
+		"REV":     xwa.Revision(),
 		"Host":    c.Request.Host,
 		"Base":    app.Base,
 		"Now":     time.Now(),
 		"Ctx":     c,
 		"Loc":     c.Locale,
-		"Locales": app.Locales,
+		"Locales": xwa.Locales,
 		"Token":   app.XTP.RefreshToken(c),
 		"Domain":  app.Domain,
 		"TT":      tt,
@@ -32,24 +33,5 @@ func H(c *xin.Context) xin.H {
 }
 
 func E(c *xin.Context) xin.H {
-	errs := []any{}
-	for _, e := range c.Errors {
-		if pe, ok := e.(*args.ParamError); ok { //nolint: errorlint
-			errs = append(errs, pe)
-		} else {
-			errs = append(errs, e.Error())
-		}
-	}
-
-	var err any
-	if len(errs) == 1 {
-		err = errs[0]
-	} else {
-		err = errs
-	}
-
-	h := xin.H{
-		"error": err,
-	}
-	return h
+	return xargs.E(c)
 }

@@ -8,8 +8,8 @@ if [ -z "$REVISION" ]; then
 fi
 BUILDTIME=`date -u "+%Y-%m-%dT%H:%M:%SZ"`
 
-PKG=github.com/askasoft/pangox-xdemo/app
-LDF="-X ${PKG}.Version=${VERSION} -X ${PKG}.Revision=${REVISION} -X ${PKG}.buildTime=${BUILDTIME}"
+PKG=github.com/askasoft/pangox/xwa
+LDF="-X ${PKG}.version=${VERSION} -X ${PKG}.revision=${REVISION} -X ${PKG}.buildtime=${BUILDTIME}"
 
 go build -ldflags "${LDF}" -o xdemo
 go build -ldflags "${LDF}" -o xdemodb ./cmd

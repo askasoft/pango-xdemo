@@ -1,16 +1,14 @@
 package args
 
 import (
-	"errors"
 	"time"
 
 	"github.com/askasoft/pango/doc/jsonx"
 	"github.com/askasoft/pango/sqx"
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/xin"
+	"github.com/askasoft/pangox/xwa/xargs"
 )
-
-var errInvalidUpdates = errors.New("invalid updates")
 
 type UpdatedAtArg struct {
 	UpdatedAt *time.Time `json:"updated_at,omitempty" form:"-"`
@@ -50,7 +48,7 @@ func (uua *UserUpdatesArg) Bind(c *xin.Context) error {
 		return err
 	}
 	if uua.isEmpty() {
-		return errInvalidUpdates
+		return xargs.ErrInvalidUpdates
 	}
 	return nil
 }
@@ -100,7 +98,7 @@ func (pua *PetUpdatesArg) Bind(c *xin.Context) error {
 		return err
 	}
 	if pua.isEmpty() {
-		return errInvalidUpdates
+		return xargs.ErrInvalidUpdates
 	}
 	return nil
 }

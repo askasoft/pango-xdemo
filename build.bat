@@ -78,8 +78,8 @@ echo }
 
 go generate
 
-SET PKG=github.com/askasoft/pangox-xdemo/app
-SET LDF=-X %PKG%.Version=%VERSION% -X %PKG%.Revision=%REVISION% -X %PKG%.buildTime=%BUILD_TIME%
+SET PKG=github.com/askasoft/pangox/xwa
+SET LDF=-X %PKG%.version=%VERSION% -X %PKG%.revision=%REVISION% -X %PKG%.buildtime=%BUILD_TIME%
 
 go build -ldflags "%LDF%" -o %EXE%
 popd

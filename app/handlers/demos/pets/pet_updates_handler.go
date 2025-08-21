@@ -60,7 +60,7 @@ func PetUpdates(c *xin.Context) {
 func PetDeletes(c *xin.Context) {
 	ida := &args.IDArg{}
 	if err := ida.Bind(c); err != nil {
-		c.AddError(args.ErrInvalidID(c))
+		c.AddError(args.InvalidIDError(c))
 		c.JSON(http.StatusBadRequest, handlers.E(c))
 		return
 	}

@@ -2,15 +2,10 @@ package app
 
 import (
 	"crypto/tls"
-	"fmt"
 	"net/http"
 	"os"
-	"runtime"
-	"time"
 
 	"github.com/askasoft/pango/gwp"
-	"github.com/askasoft/pango/ids/npid"
-	"github.com/askasoft/pango/ids/snowflake"
 	"github.com/askasoft/pango/imc"
 	"github.com/askasoft/pango/ini"
 	"github.com/askasoft/pango/log"
@@ -51,38 +46,9 @@ var (
 	AppConfigFiles = []string{"conf/app.ini", "conf/env.ini"}
 )
 
-// inject by go build
-var (
-	// Version app version
-	Version string
-
-	// Revision app revision
-	Revision string
-
-	// buildTime app build time
-	buildTime string
-)
-
-var (
-	// BuildTime app build time
-	BuildTime time.Time
-
-	// StartupTime app start time
-	StartupTime = time.Now()
-
-	// InstanceID app instance ID
-	InstanceID = npid.New(10, 0)
-
-	// Sequencer app snowflake ID generator
-	Sequencer = snowflake.NewNode(InstanceID)
-)
-
 var (
 	// CFG global ini map
 	CFG map[string]map[string]string
-
-	// Locales supported languages
-	Locales []string
 
 	// Domain site domain
 	Domain string
@@ -172,30 +138,9 @@ var (
 	AFIPS *imc.Cache[string, int]
 )
 
-// init built-in variables on debug
-func init() {
-	if Version == "" {
-		Version = "0"
-	}
-
-	if Revision == "" {
-		Revision = fmt.Sprintf("%x", StartupTime.Unix())
-	}
-
-	if buildTime == "" {
-		BuildTime = StartupTime
-	} else {
-		BuildTime, _ = time.ParseInLocation("2006-01-02T15:04:05Z", buildTime, time.UTC)
-	}
-}
-
 func Exit(code int) {
 	log.Close()
 	os.Exit(code)
-}
-
-func Versions() string {
-	return fmt.Sprintf("%s.%s (%s) [%s %s/%s]", Version, Revision, BuildTime.Local(), runtime.Version(), runtime.GOOS, runtime.GOARCH)
 }
 
 func Secret() string {

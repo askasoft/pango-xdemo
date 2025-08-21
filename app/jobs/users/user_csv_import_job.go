@@ -24,6 +24,7 @@ import (
 	"github.com/askasoft/pangox-xdemo/app/utils/sqlutil"
 	"github.com/askasoft/pangox-xdemo/app/utils/tbsutil"
 	"github.com/askasoft/pangox/xjm"
+	"github.com/askasoft/pangox/xwa"
 )
 
 func init() {
@@ -122,7 +123,7 @@ type csvUserHeader struct {
 }
 
 func (cuh *csvUserHeader) init() {
-	cuh.Locales = app.Locales
+	cuh.Locales = xwa.Locales
 	cuh.AddColumn("user.id", &cuh.IdxID)
 	cuh.AddColumn("user.name", &cuh.IdxName)
 	cuh.AddColumn("user.email", &cuh.IdxEmail)
