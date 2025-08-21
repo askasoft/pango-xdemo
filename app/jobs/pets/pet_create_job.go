@@ -9,6 +9,7 @@ import (
 	"github.com/askasoft/pangox-xdemo/app/jobs"
 	"github.com/askasoft/pangox-xdemo/app/tenant"
 	"github.com/askasoft/pangox/xjm"
+	"github.com/askasoft/pangox/xwa/xerrs"
 )
 
 func init() {

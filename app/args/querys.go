@@ -159,7 +159,7 @@ type PetQueryArg struct {
 	Habits   []string  `json:"habits,omitempty" form:"habits,strip"`
 	Temper   []string  `json:"temper,omitempty" form:"temper,strip"`
 	Amount   string    `json:"amount,omitempty" form:"amount,strip,ascii" validate:"uintegers"`
-	Price    string    `json:"price,omitempty" form:"price,strip,ascii" validate:"decimals"`
+	Price    string    `json:"price,omitempty" form:"price,strip,ascii" validate:"udecimals"`
 	ShopName string    `json:"shop_name,omitempty" form:"shop_name,strip"`
 }
 
