@@ -37,32 +37,3 @@ func TestEllipsiz(t *testing.T) {
 		}
 	}
 }
-
-func TestNextKeyword(t *testing.T) {
-	tests := []struct {
-		name       string
-		input      string
-		wantKey    string
-		wantRest   string
-		wantQuoted bool
-	}{
-		{"Empty input", "", "", "", false},
-		{"Only spaces", "    ", "", "", false},
-		{"Single word", "hello", "hello", "", false},
-		{"Multiple words", "hello world", "hello", " world", false},
-		{"Quoted word", `"hello world" test`, "hello world", " test", true},
-		{"Quoted no close", `"hello world`, `"hello`, " world", false},
-		{"No space", "nowordboundary", "nowordboundary", "", false},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			key, rest, quoted := NextKeyword(tt.input)
-			if tt.wantKey != key || tt.wantRest != rest || tt.wantQuoted != quoted {
-				t.Fatalf("NextKeyword(%q) = (%q, %q, %v), want (%q, %q, %v)", tt.input,
-					key, rest, quoted, tt.wantKey, tt.wantRest, tt.wantQuoted,
-				)
-			}
-		})
-	}
-}

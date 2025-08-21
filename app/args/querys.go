@@ -14,7 +14,7 @@ import (
 type UserQueryArg struct {
 	QueryArg
 
-	ID       string   `json:"id,omitempty" form:"id,strip,ascii" validate:"integers"`
+	ID       string   `json:"id,omitempty" form:"id,strip,ascii" validate:"uintegers"`
 	Role     []string `json:"role,omitempty" form:"role,strip"`
 	Status   []string `json:"status,omitempty" form:"status,strip"`
 	LoginMFA []string `json:"login_mfa,omitempty" form:"login_mfa"`
@@ -118,10 +118,10 @@ func (alqa *AuditLogQueryArg) AddFilters(sqb *sqlx.Builder, locale string) {
 type FileQueryArg struct {
 	QueryArg
 
-	ID       string    `json:"id,omitempty" form:"id,strip,ascii" validate:"integers"`
+	ID       string    `json:"id,omitempty" form:"id,strip,ascii" validate:"uintegers"`
 	Name     string    `json:"name,omitempty" form:"name,strip"`
 	Ext      string    `json:"ext,omitempty" form:"ext,strip"`
-	Size     string    `json:"size,omitempty" form:"size,strip,ascii" validate:"integers"`
+	Size     string    `json:"size,omitempty" form:"size,strip,ascii" validate:"uintegers"`
 	TimeFrom time.Time `json:"time_from,omitempty" form:"time_from,strip"`
 	TimeTo   time.Time `json:"time_to,omitempty" form:"time_to,strip" validate:"omitempty,gtefield=TimeFrom"`
 }
@@ -150,7 +150,7 @@ func (fqa *FileQueryArg) AddFilters(sqb *sqlx.Builder) {
 type PetQueryArg struct {
 	QueryArg
 
-	ID       string    `json:"id,omitempty" form:"id,strip,ascii" validate:"integers"`
+	ID       string    `json:"id,omitempty" form:"id,strip,ascii" validate:"uintegers"`
 	Name     string    `json:"name,omitempty" form:"name,strip"`
 	BornFrom time.Time `json:"born_from,omitempty" form:"born_from,strip"`
 	BornTo   time.Time `json:"born_to,omitempty" form:"born_to,strip" validate:"omitempty,gtefield=BornFrom"`
@@ -158,7 +158,7 @@ type PetQueryArg struct {
 	Origin   []string  `json:"origin,omitempty" form:"origin,strip"`
 	Habits   []string  `json:"habits,omitempty" form:"habits,strip"`
 	Temper   []string  `json:"temper,omitempty" form:"temper,strip"`
-	Amount   string    `json:"amount,omitempty" form:"amount,strip,ascii" validate:"integers"`
+	Amount   string    `json:"amount,omitempty" form:"amount,strip,ascii" validate:"uintegers"`
 	Price    string    `json:"price,omitempty" form:"price,strip,ascii" validate:"decimals"`
 	ShopName string    `json:"shop_name,omitempty" form:"shop_name,strip"`
 }

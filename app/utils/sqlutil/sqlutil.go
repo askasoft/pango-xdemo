@@ -15,7 +15,7 @@ import (
 	"github.com/askasoft/pangox-xdemo/app"
 	"github.com/askasoft/pangox-xdemo/app/utils/myutil"
 	"github.com/askasoft/pangox-xdemo/app/utils/pgutil"
-	"github.com/askasoft/pangox-xdemo/app/utils/strutil"
+	"github.com/askasoft/pangox/xwa/xargs"
 )
 
 func IsUniqueViolationError(err error) bool {
@@ -389,7 +389,7 @@ func addLikesAny(sqb *sqlx.Builder, like, col, val string, not bool) {
 
 	sb.WriteByte('(')
 	for val != "" {
-		key, val, _ = strutil.NextKeyword(val)
+		key, val, _ = xargs.NextKeyword(val)
 
 		if key == "" {
 			continue
@@ -443,7 +443,7 @@ func addLikesAnd(sqb *sqlx.Builder, like, col, val string, not bool) {
 
 	sb.WriteByte('(')
 	for val != "" {
-		key, val, quoted = strutil.NextKeyword(val)
+		key, val, quoted = xargs.NextKeyword(val)
 
 		if key == "" {
 			continue

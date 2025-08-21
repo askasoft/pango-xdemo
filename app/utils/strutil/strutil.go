@@ -1,8 +1,6 @@
 package strutil
 
 import (
-	"unicode"
-
 	"github.com/askasoft/pango/str"
 )
 
@@ -24,26 +22,4 @@ func Ellipsiz(o string, z int) string {
 	}
 	s = str.Strip(o[:n])
 	return str.Ellipsiz(s, z)
-}
-
-func NextKeyword(s string) (string, string, bool) {
-	s = str.Strip(s)
-
-	if s == "" {
-		return "", "", false
-	}
-
-	if s[0] == '"' {
-		i := str.IndexByte(s[1:], '"')
-		if i >= 0 {
-			return s[1 : i+1], s[i+2:], true
-		}
-	}
-
-	i := str.IndexFunc(s, unicode.IsSpace)
-	if i >= 0 {
-		return s[:i], s[i:], false
-	}
-
-	return s, "", false
 }

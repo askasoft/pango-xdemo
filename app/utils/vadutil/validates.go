@@ -30,8 +30,18 @@ func ValidateIntegers(fl vad.FieldLevel) bool {
 	return err == nil
 }
 
+func ValidateUintegers(fl vad.FieldLevel) bool {
+	_, err := args.ParseUintegers(fl.Field().String())
+	return err == nil
+}
+
 func ValidateDecimals(fl vad.FieldLevel) bool {
 	_, err := args.ParseDecimals(fl.Field().String())
+	return err == nil
+}
+
+func ValidateUdecimals(fl vad.FieldLevel) bool {
+	_, err := args.ParseUdecimals(fl.Field().String())
 	return err == nil
 }
 
