@@ -3,25 +3,21 @@ package app
 import (
 	"crypto/tls"
 	"net/http"
-	"os"
 
 	"github.com/askasoft/pango/gwp"
 	"github.com/askasoft/pango/imc"
 	"github.com/askasoft/pango/ini"
-	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/net/netx"
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/vad"
 	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pango/xin/middleware"
-	"github.com/askasoft/pango/xin/render"
 	"github.com/askasoft/pangox-xdemo/app/models"
+	"github.com/askasoft/pangox/xwa"
+	"github.com/askasoft/pangox/xwa/xpwds"
 )
 
 const (
-	// LogConfigFile log config file
-	LogConfigFile = "conf/log.ini"
-
 	// Database Config table init file
 	DBConfigFile = "conf/config.csv"
 )
@@ -41,21 +37,14 @@ const (
 	ExitErrXIN
 )
 
-var (
-	// AppConfigFile app config file
-	AppConfigFiles = []string{"conf/app.ini", "conf/env.ini"}
+const (
+	LOGIN_MFA_UNSET  = ""
+	LOGIN_MFA_NONE   = "-"
+	LOGIN_MFA_EMAIL  = "E"
+	LOGIN_MFA_MOBILE = "M"
 )
 
 var (
-	// CFG global ini map
-	CFG map[string]map[string]string
-
-	// Domain site domain
-	Domain string
-
-	// Base web context path
-	Base string
-
 	// WAS web assets filesystem
 	WAS http.FileSystem
 
@@ -104,9 +93,6 @@ var (
 	// XCN global cookie auth middleware (no failure)
 	XCN *middleware.CookieAuth
 
-	// XHT global xin html templates
-	XHT render.HTMLTemplates
-
 	// TCPs TCP listeners
 	TCPs []*netx.DumpListener
 
@@ -139,8 +125,23 @@ var (
 )
 
 func Exit(code int) {
-	log.Close()
-	os.Exit(code)
+	xwa.Exit(code)
+}
+
+func CFG() map[string]map[string]string {
+	return xwa.CFG
+}
+
+func Domain() string {
+	return xwa.Domain
+}
+
+func Base() string {
+	return xwa.Base
+}
+
+func Locales() []string {
+	return xwa.Locales
 }
 
 func Secret() string {
@@ -153,4 +154,8 @@ func DBType() string {
 
 func SchemaSQLFile() string {
 	return "conf/" + ini.GetString("database", "type") + ".sql"
+}
+
+func RandomPassword() string {
+	return xpwds.RandomPassword(64)
 }

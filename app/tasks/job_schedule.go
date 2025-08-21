@@ -8,7 +8,7 @@ import (
 	"github.com/askasoft/pangox-xdemo/app/jobs"
 	"github.com/askasoft/pangox-xdemo/app/jobs/pets"
 	"github.com/askasoft/pangox-xdemo/app/tenant"
-	"github.com/askasoft/pangox-xdemo/app/utils/schutil"
+	"github.com/askasoft/pangox/xwa/xschs"
 )
 
 func JobSchedule() {
@@ -23,7 +23,7 @@ func startConfigScheduleJobChain(tt *tenant.Tenant, cfgkey, jcname string, fn fu
 		return nil
 	}
 
-	scha, err := schutil.ParseSchedule(sexp)
+	scha, err := xschs.ParseSchedule(sexp)
 	if err != nil {
 		tt.Logger("JOB").Errorf("Invalid schedule expression %q: %v", sexp, err)
 		return nil

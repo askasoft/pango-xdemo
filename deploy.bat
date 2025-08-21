@@ -43,6 +43,6 @@ if not "%LOG_OPENSEARCH_ACCESS%." == "." (
 
 
 copy  /Y %APPNAME%*.exe %APPHOME%\
-@REM xcopy /Y /I /E tpls     %APPHOME%\tpls
-@REM xcopy /Y /I /E txts     %APPHOME%\txts
-@REM xcopy /Y /I /E web      %APPHOME%\web
+xcopy /Y /I /E tpls     %APPHOME%\tpls
+xcopy /Y /I /E txts     %APPHOME%\txts
+xcopy /Y /I /E web      %APPHOME%\web

@@ -4,7 +4,7 @@ import (
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pangox-xdemo/app/args"
 	"github.com/askasoft/pangox-xdemo/app/models"
-	"github.com/askasoft/pangox-xdemo/app/utils/sqlutil"
+	"github.com/askasoft/pangox/xwa/xsqbs"
 )
 
 func (sm Schema) ResetPetsAutoIncrement(tx sqlx.Sqlx) error {
@@ -129,7 +129,7 @@ func (sm Schema) UpdatePets(tx sqlx.Sqlx, pua *args.PetUpdatesArg) (int64, error
 	sqb.Update(sm.TablePets())
 	pua.AddUpdates(sqb)
 
-	sqlutil.AddIn(sqb, "id", pua.IDs())
+	xsqbs.AddIn(sqb, "id", pua.IDs())
 
 	sql, args := sqb.Build()
 

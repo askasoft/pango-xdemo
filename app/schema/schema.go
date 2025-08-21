@@ -28,9 +28,9 @@ func (sm Schema) Logger(name string) log.Logger {
 
 func (sm Schema) FQDN() string {
 	if sm.IsDefault() {
-		return app.Domain
+		return app.Domain()
 	}
-	return string(sm) + "." + app.Domain
+	return string(sm) + "." + app.Domain()
 }
 
 func (sm Schema) SJC(db sqlx.Sqlx) xjm.JobChainer {

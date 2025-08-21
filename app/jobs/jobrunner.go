@@ -9,12 +9,12 @@ import (
 
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/xin"
-	"github.com/askasoft/pangox-xdemo/app"
 	"github.com/askasoft/pangox-xdemo/app/models"
 	"github.com/askasoft/pangox-xdemo/app/tenant"
 	"github.com/askasoft/pangox/xfs"
 	"github.com/askasoft/pangox/xjm"
 	"github.com/askasoft/pangox/xwa"
+	"github.com/askasoft/pangox/xwa/xerrs"
 )
 
 var (
@@ -51,7 +51,7 @@ func (fa *FileArg) GetFile() string {
 }
 
 func (fa *FileArg) SetFile(tt *tenant.Tenant, mfh *multipart.FileHeader) error {
-	fid := app.MakeFileID(models.PrefixJobFile, mfh.Filename)
+	fid := xwa.MakeFileID(models.PrefixJobFile, mfh.Filename)
 	tfs := tt.FS()
 	if _, err := xfs.SaveUploadedFile(tfs, fid, mfh); err != nil {
 		return err
@@ -317,7 +317,7 @@ func (jr *JobRunner[T]) Done(err error) {
 		}
 	}
 
-	if app.IsClientError(err) {
+	if xerrs.IsClientError(err) {
 		jr.Logger.Warn(err)
 	} else {
 		jr.Logger.Error(err)

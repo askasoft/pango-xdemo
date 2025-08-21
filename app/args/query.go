@@ -6,6 +6,7 @@ import (
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/xin/taglib/args"
 	"github.com/askasoft/pangox-xdemo/app/utils/sqlutil"
+	"github.com/askasoft/pangox/xwa/xsqbs"
 )
 
 type PagerArg struct {
@@ -13,7 +14,7 @@ type PagerArg struct {
 }
 
 func (pa *PagerArg) AddPager(sqb *sqlx.Builder) {
-	sqlutil.AddPager(sqb, &pa.Pager)
+	xsqbs.AddPager(sqb, &pa.Pager)
 }
 
 type SorterArg struct {
@@ -21,7 +22,7 @@ type SorterArg struct {
 }
 
 func (sa *SorterArg) AddOrder(sqb *sqlx.Builder, defcol string) {
-	sqlutil.AddOrder(sqb, &sa.Sorter, defcol)
+	xsqbs.AddOrder(sqb, &sa.Sorter, defcol)
 }
 
 type QueryArg struct {
@@ -30,71 +31,87 @@ type QueryArg struct {
 }
 
 func (qa *QueryArg) AddEq(sqb *sqlx.Builder, col string, val string) {
-	sqlutil.AddEq(sqb, col, val)
+	xsqbs.AddEq(sqb, col, val)
 }
 
 func (qa *QueryArg) AddNeq(sqb *sqlx.Builder, col string, val string) {
-	sqlutil.AddNeq(sqb, col, val)
+	xsqbs.AddNeq(sqb, col, val)
 }
 
 func (qa *QueryArg) AddIn(sqb *sqlx.Builder, col string, vals []string) {
-	sqlutil.AddIn(sqb, col, vals)
+	xsqbs.AddIn(sqb, col, vals)
 }
 
 func (qa *QueryArg) AddStartsLike(sqb *sqlx.Builder, col string, val string) {
-	sqlutil.AddStartsLike(sqb, col, val)
+	xsqbs.AddStartsLike(sqb, col, val)
 }
 
 func (qa *QueryArg) AddEndsLike(sqb *sqlx.Builder, col string, val string) {
-	sqlutil.AddEndsLike(sqb, col, val)
+	xsqbs.AddEndsLike(sqb, col, val)
 }
 
 func (qa *QueryArg) AddLike(sqb *sqlx.Builder, col string, val string) {
-	sqlutil.AddLike(sqb, col, val)
+	xsqbs.AddLike(sqb, col, val)
 }
 
 func (qa *QueryArg) AddStartsILike(sqb *sqlx.Builder, col string, val string) {
-	sqlutil.AddStartsILike(sqb, col, val)
+	xsqbs.AddStartsILike(sqb, col, val)
 }
 
 func (qa *QueryArg) AddEndsILike(sqb *sqlx.Builder, col string, val string) {
-	sqlutil.AddEndsILike(sqb, col, val)
+	xsqbs.AddEndsILike(sqb, col, val)
 }
 
 func (qa *QueryArg) AddILike(sqb *sqlx.Builder, col string, val string) {
-	sqlutil.AddILike(sqb, col, val)
+	xsqbs.AddILike(sqb, col, val)
 }
 
 func (qa *QueryArg) AddDateRange(sqb *sqlx.Builder, col string, tmin, tmax time.Time) {
-	sqlutil.AddDateRange(sqb, col, tmin, tmax)
+	xsqbs.AddDateRange(sqb, col, tmin, tmax)
 }
 
 func (qa *QueryArg) AddTimeRange(sqb *sqlx.Builder, col string, tmin, tmax time.Time) {
-	sqlutil.AddTimeRange(sqb, col, tmin, tmax)
+	xsqbs.AddTimeRange(sqb, col, tmin, tmax)
 }
 
 func (qa *QueryArg) AddIntRange(sqb *sqlx.Builder, col string, smin, smax string) {
-	sqlutil.AddIntRange(sqb, col, smin, smax)
+	xsqbs.AddIntRange(sqb, col, smin, smax)
 }
 
 func (qa *QueryArg) AddFloatRange(sqb *sqlx.Builder, col string, smin, smax string) {
-	sqlutil.AddFloatRange(sqb, col, smin, smax)
+	xsqbs.AddFloatRange(sqb, col, smin, smax)
 }
 
 func (qa *QueryArg) AddIntegers(sqb *sqlx.Builder, col string, val string) {
-	sqlutil.AddIntegers(sqb, col, val)
+	xsqbs.AddIntegers(sqb, col, val)
 }
 
 func (qa *QueryArg) AddIntegersEx(sqb *sqlx.Builder, col string, val string, not bool) {
-	sqlutil.AddIntegersEx(sqb, col, val, not)
+	xsqbs.AddIntegersEx(sqb, col, val, not)
+}
+
+func (qa *QueryArg) AddUintegers(sqb *sqlx.Builder, col string, val string) {
+	xsqbs.AddUintegers(sqb, col, val)
+}
+
+func (qa *QueryArg) AddUintegersEx(sqb *sqlx.Builder, col string, val string, not bool) {
+	xsqbs.AddUintegersEx(sqb, col, val, not)
 }
 
 func (qa *QueryArg) AddDecimals(sqb *sqlx.Builder, col string, val string) {
-	sqlutil.AddDecimals(sqb, col, val)
+	xsqbs.AddDecimals(sqb, col, val)
 }
 
 func (qa *QueryArg) AddDecimalsEx(sqb *sqlx.Builder, col string, val string, not bool) {
-	sqlutil.AddDecimalsEx(sqb, col, val, not)
+	xsqbs.AddDecimalsEx(sqb, col, val, not)
+}
+
+func (qa *QueryArg) AddUdecimals(sqb *sqlx.Builder, col string, val string) {
+	xsqbs.AddUdecimals(sqb, col, val)
+}
+
+func (qa *QueryArg) AddUdecimalsEx(sqb *sqlx.Builder, col string, val string, not bool) {
+	xsqbs.AddUdecimalsEx(sqb, col, val, not)
 }
 
 func (qa *QueryArg) AddKeywords(sqb *sqlx.Builder, col string, val string) {

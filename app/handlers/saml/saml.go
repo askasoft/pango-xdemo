@@ -7,6 +7,7 @@ import (
 
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/str"
+	"github.com/askasoft/pango/vad"
 	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pangox-xdemo/app"
 	"github.com/askasoft/pangox-xdemo/app/handlers"
@@ -14,6 +15,11 @@ import (
 	"github.com/crewjam/saml"
 	"github.com/crewjam/saml/samlsp"
 )
+
+func ValidateSAMLMeta(fl vad.FieldLevel) bool {
+	_, err := samlsp.ParseMetadata(str.UnsafeBytes(fl.Field().String()))
+	return err == nil
+}
 
 func Router(rg *xin.RouterGroup) {
 	rg.Any("/metadata", samlServeMetadata)
@@ -96,7 +102,7 @@ func SamlServiceProvider(c *xin.Context) *samlsp.Middleware {
 	rootURL := url.URL{
 		Scheme: str.If(c.IsSecure(), "https", "http"),
 		Host:   c.RequestHostname(),
-		Path:   app.Base,
+		Path:   app.Base(),
 	}
 
 	samlSP, _ := samlsp.New(samlsp.Options{

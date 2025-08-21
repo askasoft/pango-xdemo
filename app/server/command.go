@@ -14,11 +14,12 @@ import (
 	"github.com/askasoft/pango/srv"
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pangox-xdemo/app"
-	"github.com/askasoft/pangox-xdemo/app/utils/cptutil"
 	"github.com/askasoft/pangox-xdemo/tpls"
 	"github.com/askasoft/pangox-xdemo/txts"
 	"github.com/askasoft/pangox-xdemo/web"
 	"github.com/askasoft/pangox/xwa"
+	"github.com/askasoft/pangox/xwa/xcpts"
+	"github.com/askasoft/pangox/xwa/xschs"
 )
 
 // -----------------------------------
@@ -45,7 +46,7 @@ func (s *service) Usage() {
 	fmt.Println("    execsql <file> [schema]...")
 	fmt.Println("      <file>            execute sql file.")
 	fmt.Println("      [schema]...       specify schemas to execute sql.")
-	fmt.Println("    exectask <task>     execute task [ " + str.Join(schedules.Keys(), ", ") + " ]")
+	fmt.Println("    exectask <task>     execute task [ " + str.Join(xschs.Schedules.Keys(), ", ") + " ]")
 	fmt.Println("    encrypt [key] <str> encrypt string.")
 	fmt.Println("    decrypt [key] <str> decrypt string.")
 	fmt.Println("    assets  [dir]       export assets to directory.")
@@ -169,7 +170,7 @@ func doExecSQL() {
 
 func doExecTask() {
 	tn := flag.Arg(1)
-	tf, ok := schedules.Get(tn)
+	tf, ok := xschs.Schedules.Get(tn)
 	if !ok {
 		fmt.Fprintf(os.Stderr, "Invalid Task %q\n", tn)
 		app.Exit(app.ExitErrCMD)
@@ -186,7 +187,7 @@ func doExecTask() {
 
 func doEncrypt() {
 	k, v := cryptFlags()
-	if es, err := cptutil.Encrypt(k, v); err != nil {
+	if es, err := xcpts.Encrypt(k, v); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 	} else {
 		fmt.Println(es)
@@ -196,7 +197,7 @@ func doEncrypt() {
 
 func doDecrypt() {
 	k, v := cryptFlags()
-	if ds, err := cptutil.Decrypt(k, v); err != nil {
+	if ds, err := xcpts.Decrypt(k, v); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 	} else {
 		fmt.Println(ds)

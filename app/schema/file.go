@@ -3,8 +3,8 @@ package schema
 import (
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pangox-xdemo/app/args"
-	"github.com/askasoft/pangox-xdemo/app/utils/sqlutil"
 	"github.com/askasoft/pangox/xfs"
+	"github.com/askasoft/pangox/xwa/xsqbs"
 )
 
 func (sm Schema) CountFiles(tx sqlx.Sqlx, fqa *args.FileQueryArg) (cnt int, err error) {
@@ -52,7 +52,7 @@ func (sm Schema) DeleteFiles(tx sqlx.Sqlx, ids ...string) (int64, error) {
 	sqb := tx.Builder()
 
 	sqb.Delete(sm.TableFiles())
-	sqlutil.AddIn(sqb, "id", ids)
+	xsqbs.AddIn(sqb, "id", ids)
 	sql, args := sqb.Build()
 
 	r, err := tx.Exec(sql, args...)

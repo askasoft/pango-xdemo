@@ -20,8 +20,9 @@ import (
 	"github.com/askasoft/pangox-xdemo/app/handlers"
 	"github.com/askasoft/pangox-xdemo/app/models"
 	"github.com/askasoft/pangox-xdemo/app/tenant"
-	"github.com/askasoft/pangox-xdemo/app/utils/cptutil"
 	"github.com/askasoft/pangox-xdemo/app/utils/smtputil"
+	"github.com/askasoft/pangox/xwa"
+	"github.com/askasoft/pangox/xwa/xcpts"
 )
 
 type PwdRstToken struct {
@@ -74,8 +75,8 @@ func PasswordResetSend(c *xin.Context) {
 	}
 
 	token := &PwdRstToken{Email: arg.Email, Timestamp: time.Now().UnixMilli()}
-	tkenc := cptutil.MustEncrypt(app.Secret(), token.String())
-	rsurl := fmt.Sprintf("%s://%s%s/login/pwdrst/reset/%s", str.If(c.IsSecure(), "https", "http"), c.RequestHostname(), app.Base, tkenc)
+	tkenc := xcpts.MustEncrypt(app.Secret(), token.String())
+	rsurl := fmt.Sprintf("%s://%s%s/login/pwdrst/reset/%s", str.If(c.IsSecure(), "https", "http"), c.RequestHostname(), app.Base(), tkenc)
 
 	tkexp := num.Itoa(int(ini.GetDuration("login", "passwordResetTokenExpires", time.Minute*10).Minutes()))
 
@@ -83,7 +84,7 @@ func PasswordResetSend(c *xin.Context) {
 		"{{SITE_NAME}}", tbs.GetText(c.Locale, "title"),
 		"{{USER_NAME}}", user.Name,
 		"{{USER_EMAIL}}", user.Email,
-		"{{REQUEST_DATE}}", app.FormatTime(time.Now()),
+		"{{REQUEST_DATE}}", xwa.FormatTime(time.Now()),
 		"{{RESET_URL}}", rsurl,
 		"{{EXPIRES}}", tkexp,
 	)
@@ -93,7 +94,7 @@ func PasswordResetSend(c *xin.Context) {
 		"{{SITE_NAME}}", html.EscapeString(tbs.GetText(c.Locale, "title")),
 		"{{USER_NAME}}", html.EscapeString(user.Name),
 		"{{USER_EMAIL}}", html.EscapeString(user.Email),
-		"{{REQUEST_DATE}}", html.EscapeString(app.FormatTime(time.Now())),
+		"{{REQUEST_DATE}}", html.EscapeString(xwa.FormatTime(time.Now())),
 		"{{RESET_URL}}", rsurl,
 		"{{EXPIRES}}", tkexp,
 	)
@@ -113,7 +114,7 @@ func PasswordResetSend(c *xin.Context) {
 
 func passwordResetToken(c *xin.Context) *PwdRstToken {
 	tkenc := c.Param("token")
-	tkstr, err := cptutil.Decrypt(app.Secret(), tkenc)
+	tkstr, err := xcpts.Decrypt(app.Secret(), tkenc)
 	if tkenc == "" || err != nil {
 		c.AddError(tbs.Error(c.Locale, "pwdrst.error.invalid"))
 		return nil
@@ -210,7 +211,7 @@ func PasswordResetExecute(c *xin.Context) {
 		"{{SITE_NAME}}", tbs.GetText(c.Locale, "title"),
 		"{{USER_NAME}}", user.Name,
 		"{{USER_EMAIL}}", user.Email,
-		"{{RESET_DATE}}", app.FormatTime(time.Now()),
+		"{{RESET_DATE}}", xwa.FormatTime(time.Now()),
 	)
 	subject := sr.Replace(tbs.GetText(c.Locale, "pwdrst.email.reset.subject"))
 
@@ -218,7 +219,7 @@ func PasswordResetExecute(c *xin.Context) {
 		"{{SITE_NAME}}", html.EscapeString(tbs.GetText(c.Locale, "title")),
 		"{{USER_NAME}}", html.EscapeString(user.Name),
 		"{{USER_EMAIL}}", html.EscapeString(user.Email),
-		"{{RESET_DATE}}", html.EscapeString(app.FormatTime(time.Now())),
+		"{{RESET_DATE}}", html.EscapeString(xwa.FormatTime(time.Now())),
 	)
 	message := sr.Replace(tbs.GetText(c.Locale, "pwdrst.email.reset.message"))
 

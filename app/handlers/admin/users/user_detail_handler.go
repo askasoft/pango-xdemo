@@ -15,7 +15,6 @@ import (
 	"github.com/askasoft/pangox-xdemo/app/handlers"
 	"github.com/askasoft/pangox-xdemo/app/models"
 	"github.com/askasoft/pangox-xdemo/app/tenant"
-	"github.com/askasoft/pangox-xdemo/app/utils/pwdutil"
 	"github.com/askasoft/pangox-xdemo/app/utils/sqlutil"
 	"github.com/askasoft/pangox-xdemo/app/utils/tbsutil"
 )
@@ -139,7 +138,7 @@ func UserCreate(c *xin.Context) {
 
 	user.ID = 0
 	if user.Password == "" {
-		user.Password = pwdutil.RandomPassword()
+		user.Password = app.RandomPassword()
 	}
 	user.SetPassword(user.Password)
 	user.Secret = ran.RandInt63()

@@ -38,7 +38,7 @@ func (uqa *UserQueryArg) HasFilters() bool {
 }
 
 func (uqa *UserQueryArg) AddFilters(sqb *sqlx.Builder) {
-	uqa.AddIntegers(sqb, "id", uqa.ID)
+	uqa.AddUintegers(sqb, "id", uqa.ID)
 	uqa.AddIn(sqb, "role", uqa.Role)
 	uqa.AddIn(sqb, "status", uqa.Status)
 	uqa.AddIn(sqb, "login_mfa", uqa.LoginMFA)
@@ -143,7 +143,7 @@ func (fqa *FileQueryArg) AddFilters(sqb *sqlx.Builder) {
 	fqa.AddKeywords(sqb, "id", fqa.ID)
 	fqa.AddKeywords(sqb, "name", fqa.Name)
 	fqa.AddKeywords(sqb, "ext", fqa.Ext)
-	fqa.AddIntegers(sqb, "size", fqa.Size)
+	fqa.AddUintegers(sqb, "size", fqa.Size)
 	fqa.AddTimeRange(sqb, "time", fqa.TimeFrom, fqa.TimeTo)
 }
 
@@ -182,12 +182,12 @@ func (pqa *PetQueryArg) HasFilters() bool {
 }
 
 func (pqa *PetQueryArg) AddFilters(sqb *sqlx.Builder) {
-	pqa.AddIntegers(sqb, "id", pqa.ID)
+	pqa.AddUintegers(sqb, "id", pqa.ID)
 	pqa.AddIn(sqb, "gender", pqa.Gender)
 	pqa.AddIn(sqb, "origin", pqa.Origin)
 	pqa.AddIn(sqb, "temper", pqa.Temper)
 	pqa.AddTimeRange(sqb, "born_at", pqa.BornFrom, pqa.BornTo)
-	pqa.AddIntegers(sqb, "amount", pqa.Amount)
+	pqa.AddUintegers(sqb, "amount", pqa.Amount)
 	pqa.AddDecimals(sqb, "price", pqa.Price)
 	pqa.AddKeywords(sqb, "name", pqa.Name)
 	pqa.AddKeywords(sqb, "shop_name", pqa.ShopName)

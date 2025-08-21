@@ -82,7 +82,7 @@ func (pgj *PetGenerateJob) Run() {
 	err := pgj.run(ctx)
 	cancel(err)
 
-	err = app.ContextCause(ctx, err)
+	err = xerrs.ContextCause(ctx, err)
 	pgj.Done(err)
 }
 

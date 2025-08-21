@@ -58,7 +58,7 @@ func Preview(c *xin.Context) {
 		c.HTML(http.StatusOK, "files/preview"+ext, h)
 		return
 	default:
-		c.Redirect(http.StatusFound, app.Base+"/files/dnload"+file.ID)
+		c.Redirect(http.StatusFound, app.Base()+"/files/dnload"+file.ID)
 		return
 	}
 }

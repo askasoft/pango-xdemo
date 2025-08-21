@@ -6,7 +6,7 @@ import (
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pangox-xdemo/app/args"
 	"github.com/askasoft/pangox-xdemo/app/models"
-	"github.com/askasoft/pangox-xdemo/app/utils/sqlutil"
+	"github.com/askasoft/pangox/xwa/xsqbs"
 )
 
 func (sm Schema) ResetUsersAutoIncrement(tx sqlx.Sqlx) error {
@@ -192,7 +192,7 @@ func (sm Schema) DeleteUsers(tx sqlx.Sqlx, au *models.User, ids ...int64) (int64
 	sqb.Delete(sm.TableUsers())
 	sqb.Neq("id", au.ID)
 	sqb.Gte("role", au.Role)
-	sqlutil.AddIn(sqb, "id", ids)
+	xsqbs.AddIn(sqb, "id", ids)
 	sql, args := sqb.Build()
 
 	r, err := tx.Exec(sql, args...)
@@ -210,7 +210,7 @@ func (sm Schema) UpdateUsers(tx sqlx.Sqlx, au *models.User, uua *args.UserUpdate
 	uua.AddUpdates(sqb)
 	sqb.Neq("id", au.ID)
 	sqb.Gte("role", au.Role)
-	sqlutil.AddIn(sqb, "id", uua.IDs())
+	xsqbs.AddIn(sqb, "id", uua.IDs())
 
 	sql, args := sqb.Build()
 

@@ -6,12 +6,9 @@ import (
 	"crypto/x509"
 	"errors"
 	"fmt"
-	golog "log"
 	"net"
 	"net/http"
 	"os"
-	"path/filepath"
-	"runtime"
 	"sync"
 	"time"
 
@@ -90,7 +87,7 @@ func (s *service) Wait() {
 
 // Init initialize the app
 func Init() {
-	initLog()
+	initLogs()
 
 	initConfigs()
 
@@ -117,8 +114,11 @@ func Init() {
 
 // Relead reload the app
 func Reload() {
-	reloadLog(app.LogConfigFile, fsw.OpNone)
-	reloadConfigs("", fsw.OpNone)
+	xwa.ReloadLogs("-")
+
+	log.Infof("Reloading configurations")
+
+	reloadConfigs()
 }
 
 // Run start the http server
@@ -160,42 +160,17 @@ func Shutdown() {
 
 // ------------------------------------------------------
 
-func initLog() {
-	if err := log.Config(app.LogConfigFile); err != nil {
+func initLogs() {
+	if err := xwa.InitLogs(); err != nil {
 		fmt.Println(err)
 		os.Exit(app.ExitErrLOG)
 	}
-
-	log.SetProp("VERSION", xwa.Version())
-	log.SetProp("REVISION", xwa.Revision())
-	golog.SetOutput(log.GetOutputer("std", log.LevelInfo, 2))
-
-	dir, _ := filepath.Abs(".")
-	log.Info("Initializing ...")
-	log.Infof("Version:    %s.%s", xwa.Version(), xwa.Revision())
-	log.Infof("BuildTime:  %s", xwa.BuildTime().Local())
-	log.Infof("Runtime:    %s %s/%s", runtime.Version(), runtime.GOOS, runtime.GOARCH)
-	log.Infof("Directory:  %s", dir)
-	log.Infof("InstanceID: 0x%x", xwa.InstanceID())
 }
 
 func initConfigs() {
-	cfg, err := app.LoadConfigs()
-	if err != nil {
+	if err := xwa.InitConfigs(); err != nil {
 		app.Exit(app.ExitErrCFG)
 	}
-
-	ini.SetDefault(cfg)
-	initAppCfg()
-}
-
-func initAppCfg() {
-	app.CFG = ini.StringMap()
-
-	xwa.Locales = str.FieldsAny(ini.GetString("app", "locales"), ",; ")
-
-	app.Domain = ini.GetString("server", "domain")
-	app.Base = ini.GetString("server", "prefix")
 }
 
 func initCertificate() {
@@ -346,26 +321,10 @@ func reloadCertificate() {
 	app.Certificate = xcert
 }
 
-func reloadLog(path string, op fsw.Op) {
-	log.Infof("Reloading log %v [%v]", path, op)
-
-	err := log.Config(app.LogConfigFile)
-	if err != nil {
-		log.Errorf("Failed to reload log config file %q: %v", app.LogConfigFile, err)
-	}
-}
-
-func reloadConfigs(path string, op fsw.Op) {
-	log.Infof("Reloading configuration %v [%v]", path, op)
-
-	cfg, err := app.LoadConfigs()
-	if err != nil {
+func reloadConfigs() {
+	if err := xwa.InitConfigs(); err != nil {
 		return
 	}
-
-	ini.SetDefault(cfg)
-
-	initAppCfg()
 
 	reloadCertificate()
 
@@ -379,13 +338,11 @@ func reloadConfigs(path string, op fsw.Op) {
 
 	configMiddleware()
 
-	if err := configFileWatch(); err != nil {
-		log.Error(err)
-	}
+	runFileWatch()
 
-	reloadMessages(path, fsw.OpNone)
+	reloadMessages()
 
-	reloadTemplates(path, fsw.OpNone)
+	reloadTemplates()
 
 	runStatsMonitor()
 

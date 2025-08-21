@@ -16,7 +16,6 @@ import (
 	"github.com/askasoft/pango/xin/middleware"
 	"github.com/askasoft/pangox-xdemo/app"
 	"github.com/askasoft/pangox-xdemo/app/models"
-	"github.com/askasoft/pangox-xdemo/app/utils/pwdutil"
 	"github.com/go-ldap/ldap/v3"
 )
 
@@ -81,7 +80,7 @@ func (tt *Tenant) CreateAuthUser(email, name, role string) (*models.User, error)
 		Secret:    ran.RandInt63(),
 		CreatedAt: time.Now(),
 	}
-	mu.SetPassword(pwdutil.RandomPassword())
+	mu.SetPassword(app.RandomPassword())
 	mu.UpdatedAt = mu.CreatedAt
 
 	err := tt.CreateUser(app.SDB, mu)

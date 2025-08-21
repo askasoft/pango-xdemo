@@ -15,17 +15,17 @@ func H(c *xin.Context) xin.H {
 	au := tenant.GetAuthUser(c)
 
 	h := xin.H{
-		"CFG":     app.CFG,
+		"CFG":     app.CFG(),
 		"VER":     xwa.Version(),
 		"REV":     xwa.Revision(),
 		"Host":    c.Request.Host,
-		"Base":    app.Base,
+		"Base":    app.Base(),
 		"Now":     time.Now(),
 		"Ctx":     c,
 		"Loc":     c.Locale,
 		"Locales": xwa.Locales,
 		"Token":   app.XTP.RefreshToken(c),
-		"Domain":  app.Domain,
+		"Domain":  app.Domain(),
 		"TT":      tt,
 		"AU":      au,
 	}

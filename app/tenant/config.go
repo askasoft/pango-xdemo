@@ -14,8 +14,8 @@ import (
 	"github.com/askasoft/pango/tbs"
 	"github.com/askasoft/pangox-xdemo/app"
 	"github.com/askasoft/pangox-xdemo/app/models"
-	"github.com/askasoft/pangox-xdemo/app/utils/pwdutil"
 	"github.com/askasoft/pangox-xdemo/app/utils/tbsutil"
+	"github.com/askasoft/pangox/xwa/xpwds"
 )
 
 // CONFS write lock
@@ -141,41 +141,19 @@ func (tt *Tenant) SecureClientCIDRs() []*net.IPNet {
 }
 
 type PasswordPolicy struct {
+	xpwds.PasswordPolicy
 	Locale    string
-	MinLength int
-	MaxLength int
-	Strengths []string
 	Strengthm *linkedhashmap.LinkedHashMap[string, string]
 }
 
-func (pp *PasswordPolicy) ValidatePassword(pwd string) (vs []string) {
-	if len(pwd) < pp.MinLength || len(pwd) > pp.MaxLength {
-		vs = append(vs, tbs.Format(pp.Locale, "error.param.pwdlen", pp.MinLength, pp.MaxLength))
-		return
-	}
-
-	for _, ps := range pp.Strengths {
-		switch ps {
-		case pwdutil.PASSWORD_NEED_UPPER_LETTER:
-			if !str.ContainsAny(pwd, str.UpperLetters) {
-				vs = append(vs, pp.Strengthm.SafeGet(ps, ps))
-			}
-		case pwdutil.PASSWORD_NEED_LOWER_LETTER:
-			if !str.ContainsAny(pwd, str.LowerLetters) {
-				vs = append(vs, pp.Strengthm.SafeGet(ps, ps))
-			}
-		case pwdutil.PASSWORD_NEED_NUMBER:
-			if !str.ContainsAny(pwd, str.Numbers) {
-				vs = append(vs, pp.Strengthm.SafeGet(ps, ps))
-			}
-		case pwdutil.PASSWORD_NEED_SYMBOL:
-			if !str.ContainsAny(pwd, str.Symbols) {
-				vs = append(vs, pp.Strengthm.SafeGet(ps, ps))
-			}
+func (pp *PasswordPolicy) ValidatePassword(pwd string) []string {
+	vs := pp.PasswordPolicy.ValidatePassword(pwd)
+	if len(vs) > 0 {
+		for i, v := range vs {
+			vs[i] = pp.Strengthm.SafeGet(v, v)
 		}
 	}
-
-	return
+	return vs
 }
 
 func (tt *Tenant) GetPasswordPolicy(loc string) *PasswordPolicy {
@@ -183,6 +161,7 @@ func (tt *Tenant) GetPasswordPolicy(loc string) *PasswordPolicy {
 	pp.MinLength, pp.MaxLength = num.Atoi(tt.ConfigValue("password_policy_minlen"), 8), 64
 	pp.Strengths = tt.ConfigValues("password_policy_strength")
 	pp.Strengthm = tbsutil.GetLinkedHashMap(loc, "config.list.password_policy_strength")
+	pp.Strengthm.Set(xpwds.PASSWORD_INVALID_LENGTH, tbs.Format(loc, "error.param.pwdlen", pp.MinLength, pp.MaxLength))
 	return pp
 }
 

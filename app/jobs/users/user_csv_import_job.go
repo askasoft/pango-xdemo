@@ -20,11 +20,11 @@ import (
 	"github.com/askasoft/pangox-xdemo/app/models"
 	"github.com/askasoft/pangox-xdemo/app/tenant"
 	"github.com/askasoft/pangox-xdemo/app/utils/csvutil"
-	"github.com/askasoft/pangox-xdemo/app/utils/pwdutil"
 	"github.com/askasoft/pangox-xdemo/app/utils/sqlutil"
 	"github.com/askasoft/pangox-xdemo/app/utils/tbsutil"
 	"github.com/askasoft/pangox/xjm"
 	"github.com/askasoft/pangox/xwa"
+	"github.com/askasoft/pangox/xwa/xerrs"
 )
 
 func init() {
@@ -89,7 +89,7 @@ func (ucij *UserCsvImportJob) Run() {
 
 	total, err := ucij.doCheckCsv()
 	if err != nil {
-		err = app.NewClientError(err)
+		err = xerrs.NewClientError(err)
 		ucij.Done(err)
 		return
 	}
@@ -104,7 +104,7 @@ func (ucij *UserCsvImportJob) Run() {
 
 	err = ucij.doReadCsv(ctx, ucij.importRecord)
 
-	err = app.ContextCause(ctx, err)
+	err = xerrs.ContextCause(ctx, err)
 
 	ucij.Done(err)
 }
@@ -304,7 +304,7 @@ func (ucij *UserCsvImportJob) importRecord(rec *csvUserRecord) error {
 
 		pwd := rec.Password
 		if pwd == "" {
-			pwd = pwdutil.RandomPassword()
+			pwd = app.RandomPassword()
 		}
 		user.SetPassword(pwd)
 		user.Secret = ran.RandInt63()

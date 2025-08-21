@@ -10,9 +10,9 @@ import (
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/ref"
 	"github.com/askasoft/pango/sqx/sqlx"
-	"github.com/askasoft/pangox-xdemo/app"
 	"github.com/askasoft/pangox-xdemo/app/tenant"
 	"github.com/askasoft/pangox/xjm"
+	"github.com/askasoft/pangox/xwa/xerrs"
 )
 
 type JobWorker[R any] struct {
@@ -197,5 +197,5 @@ func StreamOrSubmitRun[T any, R any](ssr iStreamSubmitRun[T, R]) (err error) {
 		}
 	}
 
-	return app.ContextCause(ctx, err)
+	return xerrs.ContextCause(ctx, err)
 }

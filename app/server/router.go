@@ -1,7 +1,6 @@
 package server
 
 import (
-	"encoding/json"
 	"net/http"
 	"time"
 
@@ -24,9 +23,11 @@ import (
 	"github.com/askasoft/pangox-xdemo/app/handlers/user"
 	"github.com/askasoft/pangox-xdemo/app/middles"
 	"github.com/askasoft/pangox-xdemo/app/tenant"
-	"github.com/askasoft/pangox-xdemo/app/utils/vadutil"
 	"github.com/askasoft/pangox-xdemo/web"
 	"github.com/askasoft/pangox/xwa"
+	"github.com/askasoft/pangox/xwa/xmws"
+	"github.com/askasoft/pangox/xwa/xtpls"
+	"github.com/askasoft/pangox/xwa/xvads"
 )
 
 func initRouter() {
@@ -39,15 +40,15 @@ func initRouter() {
 
 	app.XIN = xin.New()
 	app.VAD = app.XIN.Validator.Engine().(*vad.Validate)
-	app.VAD.RegisterValidation("ini", vadutil.ValidateINI)
-	app.VAD.RegisterValidation("cidrs", vadutil.ValidateCIDRs)
-	app.VAD.RegisterValidation("integers", vadutil.ValidateIntegers)
-	app.VAD.RegisterValidation("uintegers", vadutil.ValidateUintegers)
-	app.VAD.RegisterValidation("decimals", vadutil.ValidateDecimals)
-	app.VAD.RegisterValidation("udecimals", vadutil.ValidateUdecimals)
-	app.VAD.RegisterValidation("regexps", vadutil.ValidateRegexps)
-	app.VAD.RegisterValidation("schedule", vadutil.ValidateSchedule)
-	app.VAD.RegisterValidation("samlmeta", vadutil.ValidateSAMLMeta)
+	app.VAD.RegisterValidation("ini", xvads.ValidateINI)
+	app.VAD.RegisterValidation("cidrs", xvads.ValidateCIDRs)
+	app.VAD.RegisterValidation("integers", xvads.ValidateIntegers)
+	app.VAD.RegisterValidation("uintegers", xvads.ValidateUintegers)
+	app.VAD.RegisterValidation("decimals", xvads.ValidateDecimals)
+	app.VAD.RegisterValidation("udecimals", xvads.ValidateUdecimals)
+	app.VAD.RegisterValidation("regexps", xvads.ValidateRegexps)
+	app.VAD.RegisterValidation("schedule", xvads.ValidateSchedule)
+	app.VAD.RegisterValidation("samlmeta", saml.ValidateSAMLMeta)
 
 	app.XAL = middleware.NewAccessLogger(nil)
 	app.XSL = middleware.NewRequestSizeLimiter(0)
@@ -96,8 +97,8 @@ func configMiddleware() {
 	app.XCC.CacheControl = ini.GetString("server", "staticCacheControl", "public, max-age=31536000, immutable")
 
 	app.XCA.SetSecret(app.Secret())
-	app.XCA.RedirectURL = app.Base + "/login/"
-	app.XCA.CookiePath = str.IfEmpty(app.Base, "/")
+	app.XCA.RedirectURL = app.Base() + "/login/"
+	app.XCA.CookiePath = str.IfEmpty(app.Base(), "/")
 	app.XCA.CookieMaxAge = ini.GetDuration("login", "cookieMaxAge", time.Minute*30)
 	app.XCA.CookieSecure = ini.GetBool("login", "cookieSecure", true)
 	switch ini.GetString("login", "cookieSameSite", "strict") {
@@ -112,11 +113,12 @@ func configMiddleware() {
 	app.XCN.CookiePath = app.XCA.CookiePath
 	app.XCN.CookieSecure = app.XCA.CookieSecure
 
-	app.XTP.CookiePath = str.IfEmpty(app.Base, "/")
+	app.XTP.CookiePath = str.IfEmpty(app.Base(), "/")
 	app.XTP.SetSecret(app.Secret())
 
-	configResponseHeader()
-	configAccessLogger()
+	xmws.ConfigResponseHeader(app.XRH)
+	xmws.ConfigAccessLogger(app.XAL)
+
 	configWebAssetsHFS()
 }
 
@@ -129,63 +131,12 @@ func configWebAssetsHFS() {
 	}
 }
 
-func configResponseHeader() {
-	hm := map[string]string{}
-	hh := ini.GetString("server", "httpResponseHeader")
-	if hh == "" {
-		app.XRH.Header = hm
-	} else {
-		err := json.Unmarshal(str.UnsafeBytes(hh), &hm)
-		if err == nil {
-			sr := str.NewReplacer("{{VERSION}}", xwa.Version(), "{{REVISION}}", xwa.Revision(), "{{BuildTime}}", xwa.BuildTime().Format(time.RFC3339))
-			for k, v := range hm {
-				hm[k] = sr.Replace(v)
-			}
-			app.XRH.Header = hm
-		} else {
-			log.Errorf("Invalid httpResponseHeader '%s': %v", hh, err)
-		}
-	}
-}
-
-func configAccessLogger() {
-	alws := []middleware.AccessLogWriter{}
-	alfs := str.Fields(ini.GetString("server", "accessLog"))
-	for _, alf := range alfs {
-		switch alf {
-		case "text":
-			alw := middleware.NewAccessLogWriter(
-				app.XIN.Logger.GetOutputer("XAT", log.LevelTrace),
-				ini.GetString("server", "accessLogTextFormat", middleware.AccessLogTextFormat),
-			)
-			alws = append(alws, alw)
-		case "json":
-			alw := middleware.NewAccessLogWriter(
-				app.XIN.Logger.GetOutputer("XAJ", log.LevelTrace),
-				ini.GetString("server", "accessLogJSONFormat", middleware.AccessLogJSONFormat),
-			)
-			alws = append(alws, alw)
-		default:
-			log.Warnf("Invalid accessLog setting: %s", alf)
-		}
-	}
-
-	switch len(alws) {
-	case 0:
-		app.XAL.SetWriter(nil)
-	case 1:
-		app.XAL.SetWriter(alws[0])
-	default:
-		app.XAL.SetWriter(middleware.NewAccessLogMultiWriter(alws...))
-	}
-}
-
 func initHandlers() {
-	log.Infof("Context Path: %s", app.Base)
+	log.Infof("Context Path: %s", app.Base())
 
 	r := app.XIN
 
-	r.HTMLTemplates = app.XHT
+	r.HTMLTemplates = xtpls.XHT
 
 	r.Use(xin.Recovery())
 	r.Use(middles.SetCtxLogProp) // Set TENANT logger prop
@@ -196,7 +147,7 @@ func initHandlers() {
 	r.Use(app.XHD.Handle)
 	r.Use(app.XRH.Handle)
 
-	rg := r.Group(app.Base)
+	rg := r.Group(app.Base())
 	rg.HEAD("/healthcheck", handlers.HealthCheck)
 	rg.GET("/healthcheck", handlers.HealthCheck)
 
