@@ -6,5 +6,5 @@ import (
 )
 
 func PetResetJobChainStart(tt *tenant.Tenant) error {
-	return jobs.JobChainInitAndStart(tt, jobs.JobNamePetClear, jobs.JobNamePetCatGen, jobs.JobNamePetDogGen)
+	return jobs.JobChainInitAndStart(tt, jobs.JobChainPetReset, jobs.JobNamePetClear, jobs.JobNamePetCatGen, jobs.JobNamePetDogGen)
 }
