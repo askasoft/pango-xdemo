@@ -8,7 +8,6 @@ import (
 	"github.com/askasoft/pangox-xdemo/app/jobs"
 	"github.com/askasoft/pangox-xdemo/app/jobs/pets"
 	"github.com/askasoft/pangox-xdemo/app/tenant"
-	"github.com/askasoft/pangox/xwa/xschs"
 )
 
 func JobSchedule() {
@@ -18,27 +17,27 @@ func JobSchedule() {
 }
 
 func startConfigScheduleJobChain(tt *tenant.Tenant, cfgkey, jcname string, fn func(tt *tenant.Tenant) error) error {
-	sexp := tt.ConfigValue(cfgkey)
-	if sexp == "" {
+	expr := tt.ConfigValue(cfgkey)
+	if expr == "" {
 		return nil
 	}
 
-	scha, err := xschs.ParseSchedule(sexp)
+	periodic, err := sch.ParsePeriodic(expr)
 	if err != nil {
-		tt.Logger("JOB").Errorf("Invalid schedule expression %q: %v", sexp, err)
+		tt.Logger("JOB").Errorf("Invalid setting %q: %v", cfgkey, err)
 		return nil
 	}
 
-	cron := scha.Cron()
-	scs, err := sch.NewCronSequencer(cron)
+	cexpr := periodic.Cron()
+	cron, err := sch.ParseCron(cexpr)
 	if err != nil {
-		tt.Logger("JOB").Errorf("Invalid schedule cron %q: %v", cron, err)
+		tt.Logger("JOB").Errorf("Invalid cron expression %q: %v", cexpr, err)
 		return nil
 	}
 
 	now := time.Now()
 	stm := tmu.TruncateHours(now).Add(-time.Millisecond)
-	jtm := scs.Next(stm)
+	jtm := cron.Next(stm)
 
 	if now.Before(jtm) {
 		return nil

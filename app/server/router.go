@@ -47,7 +47,6 @@ func initRouter() {
 	app.VAD.RegisterValidation("decimals", xvads.ValidateDecimals)
 	app.VAD.RegisterValidation("udecimals", xvads.ValidateUdecimals)
 	app.VAD.RegisterValidation("regexps", xvads.ValidateRegexps)
-	app.VAD.RegisterValidation("schedule", xvads.ValidateSchedule)
 	app.VAD.RegisterValidation("samlmeta", saml.ValidateSAMLMeta)
 
 	app.XAL = middleware.NewAccessLogger(nil)
