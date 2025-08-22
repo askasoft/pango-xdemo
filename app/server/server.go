@@ -169,6 +169,7 @@ func initLogs() {
 
 func initConfigs() {
 	if err := xwa.InitConfigs(); err != nil {
+		log.Fatal(err) //nolint: all
 		app.Exit(app.ExitErrCFG)
 	}
 }
@@ -176,7 +177,7 @@ func initConfigs() {
 func initCertificate() {
 	xcert, err := loadCertificate()
 	if err != nil {
-		log.Error(err)
+		log.Fatal(err) //nolint: all
 		app.Exit(app.ExitErrCFG)
 	}
 
@@ -273,7 +274,7 @@ func serve(hsv *http.Server, tcp net.Listener) {
 		if errors.Is(err, http.ErrServerClosed) {
 			log.Infof("HTTP Server %s closed", hsv.Addr)
 		} else {
-			log.Errorf("HTTP.Serve(%s) failed: %v", hsv.Addr, err)
+			log.Fatalf("HTTP.Serve(%s) failed: %v", hsv.Addr, err) //nolint: all
 			app.Exit(app.ExitErrHTTP)
 		}
 	}
