@@ -93,7 +93,7 @@ func (sm Schema) DeleteAuditLogsQuery(tx sqlx.Sqlx, alqa *args.AuditLogQueryArg,
 }
 
 func (sm Schema) DeleteAuditLogs(tx sqlx.Sqlx, ids ...int64) (int64, error) {
-	return sm.DeleteByID(tx, sm.TableAuditLogs(), ids...)
+	return DeleteByID(tx, sm.TableAuditLogs(), ids...)
 }
 
 func (sm Schema) DeleteAuditLogsBefore(tx sqlx.Sqlx, before time.Time) (int64, error) {

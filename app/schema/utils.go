@@ -18,12 +18,8 @@ func ResetAutoIncrement(tx sqlx.Sqlx, table string, starts ...int64) error {
 	}
 }
 
-func (sm Schema) DeleteByID(tx sqlx.Sqlx, table string, ids ...int64) (int64, error) {
-	return sm.DeleteByKey(tx, table, "id", ids...)
-}
-
-func (sm Schema) DeleteByKey(tx sqlx.Sqlx, table, key string, vals ...int64) (int64, error) {
-	return DeleteByKey(tx, table, key, vals...)
+func DeleteByID(tx sqlx.Sqlx, table string, ids ...int64) (int64, error) {
+	return DeleteByKey(tx, table, "id", ids...)
 }
 
 func GetByKey[T any](tx sqlx.Sqlx, obj T, table, key string, val any) (T, error) {

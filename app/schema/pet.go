@@ -120,7 +120,7 @@ func (sm Schema) UpdatePet(tx sqlx.Sqlx, pet *models.Pet) (int64, error) {
 }
 
 func (sm Schema) DeletePets(tx sqlx.Sqlx, ids ...int64) (int64, error) {
-	return sm.DeleteByID(tx, sm.TablePets(), ids...)
+	return DeleteByID(tx, sm.TablePets(), ids...)
 }
 
 func (sm Schema) UpdatePets(tx sqlx.Sqlx, pua *args.PetUpdatesArg) (int64, error) {
