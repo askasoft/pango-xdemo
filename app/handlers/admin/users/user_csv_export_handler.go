@@ -14,7 +14,6 @@ import (
 	"github.com/askasoft/pangox-xdemo/app/models"
 	"github.com/askasoft/pangox-xdemo/app/tenant"
 	"github.com/askasoft/pangox-xdemo/app/utils/tbsutil"
-	"github.com/askasoft/pangox/xwa"
 )
 
 func UserCsvExport(c *xin.Context) {
@@ -69,8 +68,8 @@ func UserCsvExport(c *xin.Context) {
 			sm.SafeGet(user.Status, user.Status),
 			mm.SafeGet(user.LoginMFA, user.LoginMFA),
 			user.CIDR,
-			xwa.FormatTime(user.CreatedAt),
-			xwa.FormatTime(user.UpdatedAt),
+			app.FormatTime(user.CreatedAt),
+			app.FormatTime(user.UpdatedAt),
 		)
 		return cw.Write(cols)
 	})

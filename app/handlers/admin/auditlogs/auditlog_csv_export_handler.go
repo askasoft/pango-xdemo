@@ -14,7 +14,6 @@ import (
 	"github.com/askasoft/pangox-xdemo/app/models"
 	"github.com/askasoft/pangox-xdemo/app/tenant"
 	"github.com/askasoft/pangox-xdemo/app/utils/tbsutil"
-	"github.com/askasoft/pangox/xwa"
 )
 
 func AuditLogCsvExport(c *xin.Context) {
@@ -63,7 +62,7 @@ func AuditLogCsvExport(c *xin.Context) {
 		cols = cols[:0]
 		cols = append(cols,
 			num.Itoa(cnt),
-			xwa.FormatTime(al.Date),
+			app.FormatTime(al.Date),
 			al.User,
 			al.CIP,
 			fm.SafeGet(al.Func, al.Func),

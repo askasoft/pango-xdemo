@@ -20,7 +20,6 @@ import (
 	"github.com/askasoft/pangox-xdemo/app/tenant"
 	"github.com/askasoft/pangox-xdemo/app/utils/otputil"
 	"github.com/askasoft/pangox-xdemo/app/utils/smtputil"
-	"github.com/askasoft/pangox/xwa"
 	"github.com/askasoft/pangox/xwa/xcpts"
 	"github.com/skip2/go-qrcode"
 	"github.com/xlzd/gotp"
@@ -179,7 +178,7 @@ func loginSendEmailPasscode(c *xin.Context, email, passcode string, expire time.
 	sr = strings.NewReplacer(
 		"{{SITE_NAME}}", html.EscapeString(tbs.GetText(c.Locale, "title")),
 		"{{USER_EMAIL}}", html.EscapeString(email),
-		"{{REQUEST_DATE}}", html.EscapeString(xwa.FormatTime(time.Now())),
+		"{{REQUEST_DATE}}", html.EscapeString(app.FormatTime(time.Now())),
 		"{{PASSCODE}}", html.EscapeString(passcode),
 		"{{EXPIRES}}", num.Itoa(int(expire.Minutes())),
 	)

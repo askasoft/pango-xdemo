@@ -9,6 +9,7 @@ import (
 	"github.com/askasoft/pango/ini"
 	"github.com/askasoft/pango/net/netx"
 	"github.com/askasoft/pango/sqx/sqlx"
+	"github.com/askasoft/pango/tmu"
 	"github.com/askasoft/pango/vad"
 	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pango/xin/middleware"
@@ -154,6 +155,14 @@ func DBType() string {
 
 func SchemaSQLFile() string {
 	return "conf/" + ini.GetString("database", "type") + ".sql"
+}
+
+func FormatDate(a any) string {
+	return tmu.LocalFormatDate(a)
+}
+
+func FormatTime(a any) string {
+	return tmu.LocalFormatDateTime(a)
 }
 
 func RandomPassword() string {

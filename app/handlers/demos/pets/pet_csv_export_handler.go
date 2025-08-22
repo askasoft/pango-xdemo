@@ -15,7 +15,6 @@ import (
 	"github.com/askasoft/pangox-xdemo/app/models"
 	"github.com/askasoft/pangox-xdemo/app/tenant"
 	"github.com/askasoft/pangox-xdemo/app/utils/tbsutil"
-	"github.com/askasoft/pangox/xwa"
 )
 
 func PetCsvExport(c *xin.Context) {
@@ -76,7 +75,7 @@ func PetCsvExport(c *xin.Context) {
 			num.Ltoa(pet.ID),
 			pet.Name,
 			pgm.SafeGet(pet.Gender, pet.Gender),
-			xwa.FormatDate(pet.BornAt),
+			app.FormatDate(pet.BornAt),
 			pom.SafeGet(pet.Origin, pet.Origin),
 			ptm.SafeGet(pet.Temper, pet.Temper),
 			str.Join(habits, "\n"),
@@ -86,8 +85,8 @@ func PetCsvExport(c *xin.Context) {
 			pet.ShopAddress,
 			pet.ShopTelephone,
 			pet.ShopLink,
-			xwa.FormatTime(pet.CreatedAt),
-			xwa.FormatTime(pet.UpdatedAt),
+			app.FormatTime(pet.CreatedAt),
+			app.FormatTime(pet.UpdatedAt),
 		)
 		return cw.Write(cols)
 	})
