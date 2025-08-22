@@ -17,7 +17,6 @@ import (
 	"github.com/askasoft/pangox-xdemo/tpls"
 	"github.com/askasoft/pangox-xdemo/txts"
 	"github.com/askasoft/pangox-xdemo/web"
-	"github.com/askasoft/pangox/xwa"
 	"github.com/askasoft/pangox/xwa/xcpts"
 	"github.com/askasoft/pangox/xwa/xschs"
 )
@@ -217,7 +216,7 @@ func cryptFlags() (k, v string) {
 
 func doExportAssets() {
 	dir := str.IfEmpty(flag.Arg(1), ".")
-	mt := xwa.BuildTime()
+	mt := app.BuildTime()
 
 	if err := saveFS(txts.FS, filepath.Join(dir, "txts"), mt); err != nil {
 		fmt.Fprintln(os.Stderr, err)

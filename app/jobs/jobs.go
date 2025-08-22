@@ -18,7 +18,6 @@ import (
 	"github.com/askasoft/pangox-xdemo/app/models"
 	"github.com/askasoft/pangox-xdemo/app/tenant"
 	"github.com/askasoft/pangox/xjm"
-	"github.com/askasoft/pangox/xwa"
 )
 
 const (
@@ -136,7 +135,7 @@ func (tws *tenantWorkers) Stats() string {
 
 	total := 0
 	detail := ""
-	stats := fmt.Sprintf("INSTANCE ID: 0x%x, JOB RUNNING: ", xwa.InstanceID())
+	stats := fmt.Sprintf("INSTANCE ID: 0x%x, JOB RUNNING: ", app.InstanceID())
 
 	if tws.ws.Len() > 0 {
 		sb := &str.Builder{}
@@ -168,7 +167,7 @@ func (tws *tenantWorkers) Stats() string {
 }
 
 // -----------------------------
-var ErrJobOverflow = errors.New("Job Overflow")
+var ErrJobOverflow = errors.New("job overflow")
 
 var ttWorkers = newTenantWorkers()
 

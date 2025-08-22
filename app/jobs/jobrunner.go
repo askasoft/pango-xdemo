@@ -9,11 +9,11 @@ import (
 
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/xin"
+	"github.com/askasoft/pangox-xdemo/app"
 	"github.com/askasoft/pangox-xdemo/app/models"
 	"github.com/askasoft/pangox-xdemo/app/tenant"
 	"github.com/askasoft/pangox/xfs"
 	"github.com/askasoft/pangox/xjm"
-	"github.com/askasoft/pangox/xwa"
 	"github.com/askasoft/pangox/xwa/xerrs"
 )
 
@@ -51,7 +51,7 @@ func (fa *FileArg) GetFile() string {
 }
 
 func (fa *FileArg) SetFile(tt *tenant.Tenant, mfh *multipart.FileHeader) error {
-	fid := xwa.MakeFileID(models.PrefixJobFile, mfh.Filename)
+	fid := app.MakeFileID(models.PrefixJobFile, mfh.Filename)
 	tfs := tt.FS()
 	if _, err := xfs.SaveUploadedFile(tfs, fid, mfh); err != nil {
 		return err
@@ -183,7 +183,7 @@ type JobRunner[T any] struct {
 }
 
 func NewJobRunner[T any](tt *tenant.Tenant, job *xjm.Job) *JobRunner[T] {
-	job.RID = xwa.Sequencer().NextID().Int64()
+	job.RID = app.Sequencer().NextID().Int64()
 
 	jr := &JobRunner[T]{
 		JobRunner: xjm.NewJobRunner(job, tt.JM(), tt.Logger("JOB")),
@@ -192,8 +192,8 @@ func NewJobRunner[T any](tt *tenant.Tenant, job *xjm.Job) *JobRunner[T] {
 
 	xjm.MustDecode(job.Param, &jr.Arg)
 
-	jr.Log().SetProp("VERSION", xwa.Version())
-	jr.Log().SetProp("REVISION", xwa.Revision())
+	jr.Log().SetProp("VERSION", app.Version)
+	jr.Log().SetProp("REVISION", app.Revision)
 	jr.Log().SetProp("TENANT", string(tt.Schema))
 	jr.Logger = jr.Log().GetLogger("JOB")
 

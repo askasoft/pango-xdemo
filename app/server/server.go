@@ -55,7 +55,7 @@ func (s *service) Description() string {
 
 // Version app version
 func (s *service) Version() string {
-	return xwa.Versions()
+	return app.Versions()
 }
 
 // Init initialize the app

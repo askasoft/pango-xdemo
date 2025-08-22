@@ -5,14 +5,14 @@ import (
 	"net/http"
 
 	"github.com/askasoft/pango/xin"
+	"github.com/askasoft/pangox-xdemo/app"
 	"github.com/askasoft/pangox-xdemo/app/models"
 	"github.com/askasoft/pangox-xdemo/app/tenant"
 	"github.com/askasoft/pangox/xfs"
-	"github.com/askasoft/pangox/xwa"
 )
 
 func SaveUploadedFile(c *xin.Context, mfh *multipart.FileHeader) (*xfs.File, error) {
-	fid := xwa.MakeFileID(models.PrefixTmpFile, mfh.Filename)
+	fid := app.MakeFileID(models.PrefixTmpFile, mfh.Filename)
 
 	tt := tenant.FromCtx(c)
 	tfs := tt.FS()

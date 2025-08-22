@@ -24,7 +24,6 @@ import (
 	"github.com/askasoft/pangox-xdemo/app/middles"
 	"github.com/askasoft/pangox-xdemo/app/tenant"
 	"github.com/askasoft/pangox-xdemo/web"
-	"github.com/askasoft/pangox/xwa"
 	"github.com/askasoft/pangox/xwa/xmws"
 	"github.com/askasoft/pangox/xwa/xtpls"
 	"github.com/askasoft/pangox/xwa/xvads"
@@ -84,7 +83,7 @@ func configMiddleware() {
 	app.XRC.Disable(!ini.GetBool("server", "httpGzip"))
 	app.XHD.Disable(!ini.GetBool("server", "httpDump"))
 	app.XSR.Disable(!ini.GetBool("server", "httpsRedirect"))
-	app.XLL.Locales = xwa.Locales
+	app.XLL.Locales = app.Locales()
 
 	app.XAC.SetAllowOrigins(str.Fields(ini.GetString("server", "accessControlAllowOrigin"))...)
 	app.XAC.SetAllowCredentials(ini.GetBool("server", "accessControlAllowCredentials"))
@@ -124,7 +123,7 @@ func configMiddleware() {
 func configWebAssetsHFS() {
 	was := ini.GetString("app", "webassets")
 	if was == "" {
-		app.WAS = xin.FixedModTimeFS(xin.FS(web.FS), xwa.BuildTime())
+		app.WAS = xin.FixedModTimeFS(xin.FS(web.FS), app.BuildTime())
 	} else {
 		app.WAS = httpx.Dir(was)
 	}
@@ -176,19 +175,19 @@ func addRootHandlers(rg *xin.RouterGroup) {
 }
 
 func addStaticHandlers(rg *xin.RouterGroup) {
-	mt := xwa.BuildTime()
+	mt := app.BuildTime()
 
 	xcch := app.XCC.Handle
 
 	for path, fs := range web.Statics {
-		xin.StaticFS(rg, "/static/"+xwa.Revision()+"/"+path, xin.FixedModTimeFS(xin.FS(fs), mt), "", xcch)
+		xin.StaticFS(rg, "/static/"+app.Revision()+"/"+path, xin.FixedModTimeFS(xin.FS(fs), mt), "", xcch)
 	}
 
 	wfsc := func(c *xin.Context) http.FileSystem {
 		return app.WAS
 	}
 
-	xin.StaticFSFunc(rg, "/assets/"+xwa.Revision(), wfsc, "/assets", xcch)
+	xin.StaticFSFunc(rg, "/assets/"+app.Revision(), wfsc, "/assets", xcch)
 	xin.StaticFSFuncFile(rg, "/favicon.ico", wfsc, "favicon.ico", xcch)
 	xin.StaticFSFuncFile(rg, "/robots.txt", wfsc, "robots.txt", xcch)
 }

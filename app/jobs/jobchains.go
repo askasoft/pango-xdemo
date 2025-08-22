@@ -13,7 +13,6 @@ import (
 	"github.com/askasoft/pangox-xdemo/app/models"
 	"github.com/askasoft/pangox-xdemo/app/tenant"
 	"github.com/askasoft/pangox/xjm"
-	"github.com/askasoft/pangox/xwa"
 )
 
 const (
@@ -120,7 +119,7 @@ func JobChainInitAndStart(tt *tenant.Tenant, cn string, jns ...string) error {
 		return err
 	}
 
-	cid, err := JobChainStart(tt, cn, states, jns[0], str.NonEmpty(xwa.Locales...), arg.(IChainArg))
+	cid, err := JobChainStart(tt, cn, states, jns[0], str.NonEmpty(app.Locales()...), arg.(IChainArg))
 	if err != nil {
 		tt.Logger("JOB").Errorf("Failed to start JobChain %q: %v", cn, err)
 		return err
@@ -225,7 +224,7 @@ func (jr *JobRunner[T]) jobChainCheckout() error {
 			return xjc.UpdateJobChain(jc.ID, xjm.JobStatusRunning, state)
 		}
 	}
-	return fmt.Errorf("Failed to Checkout JobChain %s#%d on %s", jc.Name, jc.ID, jr.JobName())
+	return fmt.Errorf("unable to checkout JobChain %s#%d for Job %s", jc.Name, jc.ID, jr.JobName())
 }
 
 func (jr *JobRunner[T]) jobChainSetState(state iState) error {
@@ -250,7 +249,7 @@ func (jr *JobRunner[T]) jobChainSetState(state iState) error {
 			return xjc.UpdateJobChain(jc.ID, "", state)
 		}
 	}
-	return fmt.Errorf("Failed to Update JobChain %s#%d on %s#%d", jc.Name, jc.ID, jr.JobName(), jr.JobID())
+	return fmt.Errorf("unable to set JobChain state %s#%d for %s#%d", jc.Name, jc.ID, jr.JobName(), jr.JobID())
 }
 
 func (jr *JobRunner[T]) jobChainAbort(reason string) error {
@@ -272,7 +271,7 @@ func (jr *JobRunner[T]) jobChainAbort(reason string) error {
 	if ok {
 		return nil
 	}
-	return fmt.Errorf("Failed to Abort JobChain %s#%d on %s#%d", jc.Name, jc.ID, jr.JobName(), jr.JobID())
+	return fmt.Errorf("unable to abort JobChain %s#%d for %s#%d", jc.Name, jc.ID, jr.JobName(), jr.JobID())
 }
 
 func (jr *JobRunner[T]) jobChainCancel(reason string) error {
@@ -294,7 +293,7 @@ func (jr *JobRunner[T]) jobChainCancel(reason string) error {
 	if ok {
 		return nil
 	}
-	return fmt.Errorf("Failed to Cancel JobChain %s#%d on %s#%d", jc.Name, jc.ID, jr.JobName(), jr.JobID())
+	return fmt.Errorf("unable to cancel JobChain %s#%d for %s#%d", jc.Name, jc.ID, jr.JobName(), jr.JobID())
 }
 
 func (jr *JobRunner[T]) jobChainContinue() error {
@@ -323,7 +322,7 @@ func (jr *JobRunner[T]) jobChainContinue() error {
 		}
 	}
 	if curr == nil {
-		return fmt.Errorf("Failed to Continue JobChain %s#%d on %s#%d", jc.Name, jc.ID, jr.JobName(), jr.JobID())
+		return fmt.Errorf("unable to continue JobChain %s#%d for %s#%d", jc.Name, jc.ID, jr.JobName(), jr.JobID())
 	}
 
 	curr.Status = xjm.JobStatusFinished
@@ -354,7 +353,7 @@ func JobChainAppendJob(tt *tenant.Tenant, name, locale string, cid int64, csq in
 	if ica, ok := arg.(IChainArg); ok {
 		ica.SetChain(csq, cdt)
 	} else {
-		return fmt.Errorf("Invalid chain job %q", name)
+		return fmt.Errorf("invalid chain job %q", name)
 	}
 
 	param := xjm.MustEncode(arg)

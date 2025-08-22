@@ -3,8 +3,10 @@ package app
 import (
 	"crypto/tls"
 	"net/http"
+	"time"
 
 	"github.com/askasoft/pango/gwp"
+	"github.com/askasoft/pango/ids/snowflake"
 	"github.com/askasoft/pango/imc"
 	"github.com/askasoft/pango/ini"
 	"github.com/askasoft/pango/net/netx"
@@ -129,6 +131,34 @@ func Exit(code int) {
 	xwa.Exit(code)
 }
 
+func Version() string {
+	return xwa.Version
+}
+
+func Revision() string {
+	return xwa.Revision
+}
+
+func Versions() string {
+	return xwa.Versions()
+}
+
+func BuildTime() time.Time {
+	return xwa.BuildTime
+}
+
+func StartupTime() time.Time {
+	return xwa.StartupTime
+}
+
+func InstanceID() int64 {
+	return xwa.InstanceID
+}
+
+func Sequencer() *snowflake.Node {
+	return xwa.Sequencer
+}
+
 func CFG() map[string]map[string]string {
 	return xwa.CFG
 }
@@ -167,4 +197,8 @@ func FormatTime(a any) string {
 
 func RandomPassword() string {
 	return xpwds.RandomPassword(64)
+}
+
+func MakeFileID(prefix, name string) string {
+	return xwa.MakeFileID(prefix, name)
 }
