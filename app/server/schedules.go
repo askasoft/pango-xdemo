@@ -13,7 +13,6 @@ func init() {
 	xschs.Register("jobStart", jobs.Starts)
 	xschs.Register("jobReappend", jobs.ReappendJobs)
 	xschs.Register("jobClean", jobs.CleanOutdatedJobs)
-	xschs.Register("jobchainClean", jobs.CleanOutdatedJobChains)
 	xschs.Register("tmpClean", tasks.CleanTemporaryFiles)
 	xschs.Register("auditlogClean", tasks.CleanOutdatedAuditLogs)
 }

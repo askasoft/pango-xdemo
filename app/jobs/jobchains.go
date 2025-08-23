@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/askasoft/pango/asg"
-	"github.com/askasoft/pango/ini"
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pangox-xdemo/app"
@@ -364,18 +363,4 @@ func JobChainAppendJob(tt *tenant.Tenant, name, locale string, cid int64, csq in
 	go StartJobs(tt) //nolint: errcheck
 
 	return nil
-}
-
-// CleanOutdatedJobChains iterate schemas to clean outdated job chains
-func CleanOutdatedJobChains() {
-	before := time.Now().Add(-1 * ini.GetDuration("jobchain", "outdatedBefore", time.Hour*24*10))
-
-	_ = tenant.Iterate(func(tt *tenant.Tenant) error {
-		xjc := tt.JC()
-		_, err := xjc.CleanOutdatedJobChains(before)
-		if err != nil {
-			tt.Logger("JOB").Errorf("Failed to CleanOutdatedJobChains(%q, %q): %v", string(tt.Schema), before.Format(time.RFC3339), err)
-		}
-		return err
-	})
 }

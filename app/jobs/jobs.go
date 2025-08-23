@@ -296,6 +296,14 @@ func CleanOutdatedJobs() {
 				logger.Infof("Delete outdated jobs (%q, %q): %d", string(tt.Schema), before.Format(time.RFC3339), cnt)
 			}
 
+			xjc := tt.JC()
+			cnt, err = xjc.CleanOutdatedJobChains(before)
+			if err != nil {
+				logger.Errorf("Failed to delete outdated job chains (%q, %q): %v", string(tt.Schema), before.Format(time.RFC3339), err)
+			}
+			if cnt > 0 {
+				logger.Infof("Delete outdated job chains (%q, %q): %d", string(tt.Schema), before.Format(time.RFC3339), cnt)
+			}
 			return nil
 		})
 	})
