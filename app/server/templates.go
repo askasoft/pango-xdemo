@@ -30,13 +30,9 @@ func initTemplates() {
 }
 
 func reloadTemplates() {
-	if xtpls.ReloadTemplates() {
-		app.XIN.HTMLTemplates = xtpls.XHT
-	}
+	xtpls.ReloadTemplates()
 }
 
 func reloadTemplatesOnChange(path string, op fsw.Op) {
-	if xtpls.ReloadTemplatesOnChange(path, op.String()) {
-		app.XIN.HTMLTemplates = xtpls.XHT
-	}
+	xtpls.ReloadTemplatesOnChange(path, op.String())
 }

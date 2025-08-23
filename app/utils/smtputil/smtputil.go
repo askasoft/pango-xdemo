@@ -3,18 +3,17 @@ package smtputil
 import (
 	"crypto/tls"
 	"errors"
-	"strings"
 
 	"github.com/askasoft/pango/ini"
 	"github.com/askasoft/pango/net/email"
 	"github.com/askasoft/pango/str"
-	"github.com/askasoft/pangox-xdemo/app"
+	"github.com/askasoft/pangox/xwa/xtpls"
 )
 
 func SendTemplateMail(locale, tpl string, toAddr string, data any) error {
-	var sb strings.Builder
+	var sb str.Builder
 
-	if err := app.XIN.HTMLTemplates.Render(&sb, locale, tpl, data); err != nil {
+	if err := xtpls.XHT.Render(&sb, locale, tpl, data); err != nil {
 		return err
 	}
 

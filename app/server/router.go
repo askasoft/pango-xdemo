@@ -38,6 +38,9 @@ func initRouter() {
 	}()
 
 	app.XIN = xin.New()
+
+	app.XIN.HTMLRenderer = xtpls.HTMLRenderer
+
 	app.VAD = app.XIN.Validator.Engine().(*vad.Validate)
 	app.VAD.RegisterValidation("ini", xvads.ValidateINI)
 	app.VAD.RegisterValidation("cidrs", xvads.ValidateCIDRs)
@@ -133,8 +136,6 @@ func initHandlers() {
 	log.Infof("Context Path: %s", app.Base())
 
 	r := app.XIN
-
-	r.HTMLTemplates = xtpls.XHT
 
 	r.Use(xin.Recovery())
 	r.Use(middles.SetCtxLogProp) // Set TENANT logger prop
