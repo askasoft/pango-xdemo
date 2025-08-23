@@ -3,12 +3,26 @@ package smtputil
 import (
 	"crypto/tls"
 	"errors"
+	"strings"
 
 	"github.com/askasoft/pango/ini"
 	"github.com/askasoft/pango/net/email"
+	"github.com/askasoft/pango/str"
+	"github.com/askasoft/pangox-xdemo/app"
 )
 
-func SendHTMLMail(to string, subject, message string) error {
+func SendTemplateMail(locale, tpl string, toAddr string, data any) error {
+	var sb strings.Builder
+
+	if err := app.XIN.HTMLTemplates.Render(&sb, locale, tpl, data); err != nil {
+		return err
+	}
+
+	sub, msg, _ := str.CutByte(str.Strip(sb.String()), '\n')
+	return sendHTMLMail(toAddr, str.Strip(sub), str.Strip(msg))
+}
+
+func sendHTMLMail(toAddr string, subject, message string) error {
 	sec := ini.GetSection("smtp")
 	if sec == nil {
 		return errors.New("missing [smtp] settings")
@@ -18,7 +32,7 @@ func SendHTMLMail(to string, subject, message string) error {
 	if err := em.SetFrom(sec.GetString("fromaddr")); err != nil {
 		return err
 	}
-	if err := em.AddTo(to); err != nil {
+	if err := em.AddTo(toAddr); err != nil {
 		return err
 	}
 	em.Subject = subject

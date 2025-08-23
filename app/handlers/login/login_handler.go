@@ -2,9 +2,7 @@ package login
 
 import (
 	"encoding/base64"
-	"html"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/askasoft/pango/ini"
@@ -170,21 +168,12 @@ func loginMFACheck(c *xin.Context, au *models.User, up *UserPass) bool {
 }
 
 func loginSendEmailPasscode(c *xin.Context, email, passcode string, expire time.Duration) {
-	sr := strings.NewReplacer(
-		"{{SITE_NAME}}", tbs.GetText(c.Locale, "title"),
-	)
-	subject := sr.Replace(tbs.GetText(c.Locale, "login.mfa.email.subject"))
+	h := handlers.H(c)
+	h["Email"] = email
+	h["Passcode"] = passcode
+	h["Expires"] = int(expire.Minutes())
 
-	sr = strings.NewReplacer(
-		"{{SITE_NAME}}", html.EscapeString(tbs.GetText(c.Locale, "title")),
-		"{{USER_EMAIL}}", html.EscapeString(email),
-		"{{REQUEST_DATE}}", html.EscapeString(app.FormatTime(time.Now())),
-		"{{PASSCODE}}", html.EscapeString(passcode),
-		"{{EXPIRES}}", num.Itoa(int(expire.Minutes())),
-	)
-	message := sr.Replace(tbs.GetText(c.Locale, "login.mfa.email.message"))
-
-	if err := smtputil.SendHTMLMail(email, subject, message); err != nil {
+	if err := smtputil.SendTemplateMail(c.Locale, "email/login/passcode_send", email, h); err != nil {
 		c.Logger.Error(err)
 		c.AddError(tbs.Error(c.Locale, "login.error.sendmail"))
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
@@ -221,11 +210,6 @@ func LoginMFAEnroll(c *xin.Context) {
 }
 
 func loginSendEmailQrcode(c *xin.Context, email string, totp *gotp.TOTP) {
-	sr := strings.NewReplacer(
-		"{{SITE_NAME}}", tbs.GetText(c.Locale, "title"),
-	)
-	subject := sr.Replace(tbs.GetText(c.Locale, "login.mfa.mobile.subject"))
-
 	purl := totp.ProvisioningUri(email, c.Request.Host)
 	png, err := qrcode.Encode(purl, qrcode.Medium, 256)
 	if err != nil {
@@ -235,14 +219,11 @@ func loginSendEmailQrcode(c *xin.Context, email string, totp *gotp.TOTP) {
 		return
 	}
 
-	sr = strings.NewReplacer(
-		"{{SITE_NAME}}", html.EscapeString(tbs.GetText(c.Locale, "title")),
-		"{{USER_EMAIL}}", html.EscapeString(email),
-		"{{QRCODE}}", base64.StdEncoding.EncodeToString(png),
-	)
-	message := sr.Replace(tbs.GetText(c.Locale, "login.mfa.mobile.message"))
+	h := handlers.H(c)
+	h["Email"] = email
+	h["QRCode"] = base64.StdEncoding.EncodeToString(png)
 
-	if err := smtputil.SendHTMLMail(email, subject, message); err != nil {
+	if err := smtputil.SendTemplateMail(c.Locale, "email/login/mbenroll_send", email, h); err != nil {
 		c.Logger.Error(err)
 		c.AddError(tbs.Error(c.Locale, "login.error.sendmail"))
 		c.JSON(http.StatusInternalServerError, handlers.E(c))

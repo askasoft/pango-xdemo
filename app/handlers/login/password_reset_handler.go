@@ -3,9 +3,7 @@ package login
 import (
 	"encoding/json"
 	"fmt"
-	"html"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/askasoft/pango/doc/jsonx"
@@ -79,27 +77,12 @@ func PasswordResetSend(c *xin.Context) {
 
 	tkexp := num.Itoa(int(ini.GetDuration("login", "passwordResetTokenExpires", time.Minute*10).Minutes()))
 
-	sr := strings.NewReplacer(
-		"{{SITE_NAME}}", tbs.GetText(c.Locale, "title"),
-		"{{USER_NAME}}", user.Name,
-		"{{USER_EMAIL}}", user.Email,
-		"{{REQUEST_DATE}}", app.FormatTime(time.Now()),
-		"{{RESET_URL}}", rsurl,
-		"{{EXPIRES}}", tkexp,
-	)
-	subject := sr.Replace(tbs.GetText(c.Locale, "pwdrst.email.send.subject"))
+	h := handlers.H(c)
+	h["User"] = user
+	h["Expires"] = tkexp
+	h["ResetURL"] = rsurl
 
-	sr = strings.NewReplacer(
-		"{{SITE_NAME}}", html.EscapeString(tbs.GetText(c.Locale, "title")),
-		"{{USER_NAME}}", html.EscapeString(user.Name),
-		"{{USER_EMAIL}}", html.EscapeString(user.Email),
-		"{{REQUEST_DATE}}", html.EscapeString(app.FormatTime(time.Now())),
-		"{{RESET_URL}}", rsurl,
-		"{{EXPIRES}}", tkexp,
-	)
-	message := sr.Replace(tbs.GetText(c.Locale, "pwdrst.email.send.message"))
-
-	if err := smtputil.SendHTMLMail(arg.Email, subject, message); err != nil {
+	if err := smtputil.SendTemplateMail(c.Locale, "email/login/pwdrst_send", user.Email, h); err != nil {
 		c.Logger.Error(err)
 		c.AddError(tbs.Error(c.Locale, "pwdrst.error.sendmail"))
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
@@ -206,23 +189,10 @@ func PasswordResetExecute(c *xin.Context) {
 		return
 	}
 
-	sr := strings.NewReplacer(
-		"{{SITE_NAME}}", tbs.GetText(c.Locale, "title"),
-		"{{USER_NAME}}", user.Name,
-		"{{USER_EMAIL}}", user.Email,
-		"{{RESET_DATE}}", app.FormatTime(time.Now()),
-	)
-	subject := sr.Replace(tbs.GetText(c.Locale, "pwdrst.email.reset.subject"))
+	h := handlers.H(c)
+	h["User"] = user
 
-	sr = strings.NewReplacer(
-		"{{SITE_NAME}}", html.EscapeString(tbs.GetText(c.Locale, "title")),
-		"{{USER_NAME}}", html.EscapeString(user.Name),
-		"{{USER_EMAIL}}", html.EscapeString(user.Email),
-		"{{RESET_DATE}}", html.EscapeString(app.FormatTime(time.Now())),
-	)
-	message := sr.Replace(tbs.GetText(c.Locale, "pwdrst.email.reset.message"))
-
-	if err := smtputil.SendHTMLMail(token.Email, subject, message); err != nil {
+	if err := smtputil.SendTemplateMail(c.Locale, "email/login/pwdrst_reset", user.Email, h); err != nil {
 		c.Logger.Error(err)
 	}
 
