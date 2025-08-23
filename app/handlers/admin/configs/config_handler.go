@@ -314,7 +314,7 @@ func saveConfigs(c *xin.Context, configs []*models.Config, action string, detail
 	au := tenant.AuthUser(c)
 
 	err := app.SDB.Transaction(func(tx *sqlx.Tx) error {
-		if err := tt.SaveConfigs(tx, au, configs, c.Locale); err != nil {
+		if err := tt.SaveConfigsByRole(tx, au, configs, c.Locale); err != nil {
 			return err
 		}
 		return tt.AddAuditLog(tx, c, action, detail)
@@ -390,8 +390,6 @@ func ConfigImport(c *xin.Context) {
 		return
 	}
 
-	tt := tenant.FromCtx(c)
-
 	configs := loadConfigList(c, "editor")
 
 	uconfigs := checkCsvConfigs(c, configs, csvcfgs)
@@ -405,7 +403,8 @@ func ConfigImport(c *xin.Context) {
 		if !saveConfigs(c, uconfigs, models.AL_CONFIG_IMPORT, detail) {
 			return
 		}
-		tt.PurgeConfig()
+
+		tenant.FromCtx(c).PurgeConfig()
 	}
 
 	c.JSON(http.StatusOK, xin.H{"success": tbs.GetText(c.Locale, "success.imported")})

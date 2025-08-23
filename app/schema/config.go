@@ -9,10 +9,12 @@ import (
 	"github.com/askasoft/pangox-xdemo/app/models"
 )
 
-func (sm Schema) ListConfigsByRole(tx sqlx.Sqlx, actor, role string) (configs []*models.Config, err error) {
+func (sm Schema) SelectConfigs(tx sqlx.Sqlx, items ...string) (configs []*models.Config, err error) {
 	sqb := tx.Builder()
 	sqb.Select().From(sm.TableConfigs())
-	sqb.Gte(actor, role)
+	if len(items) > 0 {
+		sqb.In("name", items)
+	}
 	sqb.Order("order")
 	sqb.Order("name")
 	sql, args := sqb.Build()
@@ -21,12 +23,26 @@ func (sm Schema) ListConfigsByRole(tx sqlx.Sqlx, actor, role string) (configs []
 	return
 }
 
-func (sm Schema) SelectConfigs(tx sqlx.Sqlx, items ...string) (configs []*models.Config, err error) {
+func (sm Schema) UpdateConfigValue(tx sqlx.Sqlx, name, value string) (int64, error) {
+	sqb := tx.Builder()
+
+	sqb.Update(sm.TableConfigs())
+	sqb.Setc("value", value)
+	sqb.Eq("name", name)
+	sql, args := sqb.Build()
+
+	r, err := tx.Exec(sql, args...)
+	if err != nil {
+		return 0, err
+	}
+
+	return r.RowsAffected()
+}
+
+func (sm Schema) ListConfigsByRole(tx sqlx.Sqlx, actor, role string) (configs []*models.Config, err error) {
 	sqb := tx.Builder()
 	sqb.Select().From(sm.TableConfigs())
-	if len(items) > 0 {
-		sqb.In("name", items)
-	}
+	sqb.Gte(actor, role)
 	sqb.Order("order")
 	sqb.Order("name")
 	sql, args := sqb.Build()
@@ -48,7 +64,7 @@ func (ucie *UnsavedConfigItemsError) Error() string {
 	return tbs.Format(ucie.Locale, "config.error.unsaved", str.Join(nms, ", "))
 }
 
-func (sm Schema) SaveConfigs(tx sqlx.Sqlx, au *models.User, configs []*models.Config, locale string) error {
+func (sm Schema) SaveConfigsByRole(tx sqlx.Sqlx, au *models.User, configs []*models.Config, locale string) error {
 	sqb := tx.Builder()
 	sqb.Update(sm.TableConfigs())
 	sqb.Setc("value", "")
