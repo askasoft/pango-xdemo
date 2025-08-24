@@ -3,6 +3,7 @@ package smtputil
 import (
 	"crypto/tls"
 	"errors"
+	"html"
 
 	"github.com/askasoft/pango/ini"
 	"github.com/askasoft/pango/net/email"
@@ -18,6 +19,10 @@ func SendTemplateEmail(locale, tpl string, toAddr string, data any) error {
 	}
 
 	sub, msg, _ := str.CutByte(str.Strip(sb.String()), '\n')
+	sub = str.Strip(sub)
+	sub = str.TrimPrefix(sub, "<s>")
+	sub = str.TrimSuffix(sub, "</s>")
+	sub = html.EscapeString(sub)
 	return sendHTMLEmail(toAddr, str.Strip(sub), str.Strip(msg))
 }
 
