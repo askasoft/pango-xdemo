@@ -82,7 +82,7 @@ func PasswordResetSend(c *xin.Context) {
 	h["Expires"] = tkexp
 	h["ResetURL"] = rsurl
 
-	if err := smtputil.SendTemplateMail(c.Locale, "email/login/pwdrst_send", user.Email, h); err != nil {
+	if err := smtputil.SendTemplateEmail(c.Locale, "email/login/pwdrst_send", user.Email, h); err != nil {
 		c.Logger.Error(err)
 		c.AddError(tbs.Error(c.Locale, "pwdrst.error.sendmail"))
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
@@ -192,7 +192,7 @@ func PasswordResetExecute(c *xin.Context) {
 	h := handlers.H(c)
 	h["User"] = user
 
-	if err := smtputil.SendTemplateMail(c.Locale, "email/login/pwdrst_reset", user.Email, h); err != nil {
+	if err := smtputil.SendTemplateEmail(c.Locale, "email/login/pwdrst_reset", user.Email, h); err != nil {
 		c.Logger.Error(err)
 	}
 

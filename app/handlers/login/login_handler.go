@@ -173,7 +173,7 @@ func loginSendEmailPasscode(c *xin.Context, email, passcode string, expire time.
 	h["Passcode"] = passcode
 	h["Expires"] = int(expire.Minutes())
 
-	if err := smtputil.SendTemplateMail(c.Locale, "email/login/passcode_send", email, h); err != nil {
+	if err := smtputil.SendTemplateEmail(c.Locale, "email/login/passcode_send", email, h); err != nil {
 		c.Logger.Error(err)
 		c.AddError(tbs.Error(c.Locale, "login.error.sendmail"))
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
@@ -223,7 +223,7 @@ func loginSendEmailQrcode(c *xin.Context, email string, totp *gotp.TOTP) {
 	h["Email"] = email
 	h["QRCode"] = base64.StdEncoding.EncodeToString(png)
 
-	if err := smtputil.SendTemplateMail(c.Locale, "email/login/mbenroll_send", email, h); err != nil {
+	if err := smtputil.SendTemplateEmail(c.Locale, "email/login/mbenroll_send", email, h); err != nil {
 		c.Logger.Error(err)
 		c.AddError(tbs.Error(c.Locale, "login.error.sendmail"))
 		c.JSON(http.StatusInternalServerError, handlers.E(c))
