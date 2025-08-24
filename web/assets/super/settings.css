@@ -1,0 +1,24 @@
+@media (min-width: 992px) {
+	.s-settings {
+		display: flex;
+	}
+	.s-settings > ul.nav {
+		flex-direction: column;
+		flex-wrap: nowrap;
+		min-width: 200px;
+		max-width: 200px;
+		padding-right: 1.5rem;
+	}
+}
+
+@media (max-width: 991px) {
+	.s-settings > .tab-content {
+		padding-top: 1rem;
+	}
+}
+
+.s-settings th {
+	font-weight: normal;
+	width: 25%;
+	white-space: nowrap;
+}

@@ -1,0 +1,5 @@
+#tenants_table th.size, #tenants_table td.size {
+	text-align: right;
+	width: 1%;
+	white-space: nowrap;
+}

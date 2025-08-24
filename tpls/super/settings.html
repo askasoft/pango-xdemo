@@ -1,0 +1,41 @@
+{{MapSet .Ctx.Attrs "astyles" (Array "super/settings.css")}}
+
+{{template "main_header" .}}
+
+<div class="s-section">
+	<div class="s-section-head">
+		<h2>{{I "super.settings"}}<span>{{T .Loc "menu.super.settings"}}</span></h2>
+		<div class="ms-auto">
+			<a class="btn btn-sm btn-outline-primary" href="../">{{I "super"}} {{T .Loc "menu.super"}}</a>
+		</div>
+	</div>
+	<div class="s-section-body s-settings">
+		{{$ss := .Sections}}
+		<ul class="nav nav-pills">
+			{{range $i, $s := $ss}}
+			{{if $s.Name}}
+			<li class="nav-item"><a class="nav-link{{if eq $i 1}} active{{end}}" href="#sec_{{$s.Name}}" data-bs-toggle="tab">{{$s.Name}}</a></li>
+			{{end}}
+			{{end}}
+		</ul>
+
+		<div class="tab-content w-100">
+			{{range $i, $s := $ss}}
+			{{if $s.Name}}
+			<div id="sec_{{$s.Name}}" class="tab-pane{{if eq $i 1}} active{{end}}">
+				<table id="sec_{{$s.Name}}" class="table table-bordered">
+					{{range $k := $s.Keys}}
+					<tr>
+						<th>{{$k}}</th>
+						<td>{{$s.Get $k}}</td>
+					</tr>
+					{{end}}
+				</table>
+			</div>
+			{{end}}
+			{{end}}
+		</div>
+	</div>
+</div>
+
+{{template "main_footer" .}}
