@@ -58,7 +58,7 @@ func (s *service) Usage() {
 // Basic: 'help' 'usage' 'version'
 // Windows only: 'install' 'remove' 'start' 'stop' 'debug'
 func (s *service) Exec(cmd string) {
-	cw := &log.StreamWriter{Output: os.Stdout, Color: true}
+	cw := log.NewConsoleWriter()
 	cw.SetFormat("%t [%p] - %m%n%T")
 
 	log.SetWriter(cw)
@@ -83,6 +83,7 @@ func (s *service) Exec(cmd string) {
 		flag.CommandLine.SetOutput(os.Stdout)
 		fmt.Fprintf(os.Stderr, "Invalid command %q\n\n", cmd)
 		s.Usage()
+		os.Exit(app.ExitErrCMD)
 	}
 }
 
@@ -90,7 +91,7 @@ func doMigrate() {
 	sub := flag.Arg(1)
 	if sub == "" {
 		fmt.Fprintln(os.Stderr, "Missing migrate <target>.")
-		app.Exit(app.ExitErrCMD)
+		os.Exit(app.ExitErrCMD)
 	}
 	args := flag.Args()[2:]
 
@@ -100,18 +101,18 @@ func doMigrate() {
 		initDatabase()
 		if err := dbMigrateConfigs(args...); err != nil {
 			fmt.Fprintln(os.Stderr, err)
-			app.Exit(app.ExitErrDB)
+			os.Exit(app.ExitErrDB)
 		}
 	case "super":
 		initConfigs()
 		initDatabase()
 		if err := dbMigrateSupers(args...); err != nil {
 			fmt.Fprintln(os.Stderr, err)
-			app.Exit(app.ExitErrDB)
+			os.Exit(app.ExitErrDB)
 		}
 	default:
 		fmt.Fprintf(os.Stderr, "Invalid migrate <target>: %q", sub)
-		app.Exit(app.ExitErrCMD)
+		os.Exit(app.ExitErrCMD)
 	}
 
 	log.Info("DONE.")
@@ -121,7 +122,7 @@ func doSchemas() {
 	sub := flag.Arg(1)
 	if sub == "" {
 		fmt.Fprintln(os.Stderr, "Missing schema <command>.")
-		app.Exit(app.ExitErrCMD)
+		os.Exit(app.ExitErrCMD)
 	}
 	args := flag.Args()[2:]
 
@@ -131,18 +132,18 @@ func doSchemas() {
 		initDatabase()
 		if err := dbSchemaInit(args...); err != nil {
 			fmt.Fprintln(os.Stderr, err)
-			app.Exit(app.ExitErrDB)
+			os.Exit(app.ExitErrDB)
 		}
 	case "check":
 		initConfigs()
 		initDatabase()
 		if err := dbSchemaCheck(args...); err != nil {
 			fmt.Fprintln(os.Stderr, err)
-			app.Exit(app.ExitErrDB)
+			os.Exit(app.ExitErrDB)
 		}
 	default:
 		fmt.Fprintf(os.Stderr, "Invalid schema <command>: %q", sub)
-		app.Exit(app.ExitErrCMD)
+		os.Exit(app.ExitErrCMD)
 	}
 
 	log.Info("DONE.")
@@ -152,7 +153,7 @@ func doExecSQL() {
 	file := flag.Arg(1)
 	if file == "" {
 		fmt.Fprintln(os.Stderr, "Missing SQL file.")
-		app.Exit(app.ExitErrCMD)
+		os.Exit(app.ExitErrCMD)
 	}
 	args := flag.Args()[2:]
 
@@ -161,7 +162,7 @@ func doExecSQL() {
 
 	if err := dbExecSQL(file, args...); err != nil {
 		fmt.Fprintln(os.Stderr, err)
-		app.Exit(app.ExitErrDB)
+		os.Exit(app.ExitErrDB)
 	}
 
 	log.Info("DONE.")
@@ -172,7 +173,7 @@ func doExecTask() {
 	tf, ok := xschs.Schedules.Get(tn)
 	if !ok {
 		fmt.Fprintf(os.Stderr, "Invalid Task %q\n", tn)
-		app.Exit(app.ExitErrCMD)
+		os.Exit(app.ExitErrCMD)
 	}
 
 	initConfigs()
@@ -191,7 +192,6 @@ func doEncrypt() {
 	} else {
 		fmt.Println(es)
 	}
-	fmt.Println()
 }
 
 func doDecrypt() {
@@ -204,12 +204,10 @@ func doDecrypt() {
 }
 
 func cryptFlags() (k, v string) {
-	k = flag.Arg(1)
-	v = flag.Arg(2)
+	k, v = flag.Arg(1), flag.Arg(2)
 	if v == "" {
 		initConfigs()
-		v = k
-		k = app.Secret()
+		k, v = app.Secret(), k
 	}
 	return
 }

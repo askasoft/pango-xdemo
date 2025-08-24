@@ -25,8 +25,7 @@ const (
 )
 
 const (
-	ExitOK int = iota
-	ExitErrCFG
+	ExitErrCFG int = iota + 10
 	ExitErrCMD
 	ExitErrDB
 	ExitErrFSW
@@ -115,10 +114,6 @@ var (
 	// AFIPS authenticate failure ip cache
 	AFIPS *imc.Cache[string, int]
 )
-
-func Exit(code int) {
-	xwa.Exit(code)
-}
 
 func Version() string {
 	return xwa.Version

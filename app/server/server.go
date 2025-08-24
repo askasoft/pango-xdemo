@@ -158,16 +158,14 @@ func initLogs() {
 
 func initConfigs() {
 	if err := xwa.InitConfigs(); err != nil {
-		log.Fatal(err) //nolint: all
-		app.Exit(app.ExitErrCFG)
+		log.Fatal(app.ExitErrCFG, err)
 	}
 }
 
 func initCertificate() {
 	xcert, err := loadCertificate()
 	if err != nil {
-		log.Fatal(err) //nolint: all
-		app.Exit(app.ExitErrCFG)
+		log.Fatal(app.ExitErrCFG, err)
 	}
 
 	app.Certificate = xcert
@@ -191,8 +189,7 @@ func reloadCaches() {
 
 func initServers() {
 	if err := xhsvs.InitServers(app.XIN, getCertificate); err != nil {
-		log.Fatal(err) //nolint: all
-		app.Exit(app.ExitErrSRV)
+		log.Fatal(app.ExitErrSRV, err)
 	}
 }
 

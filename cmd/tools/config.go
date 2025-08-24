@@ -1,8 +1,7 @@
 package tools
 
 import (
-	"fmt"
-	"os"
+	"log"
 
 	"github.com/askasoft/pangox-xdemo/app"
 	"github.com/askasoft/pangox/xwa"
@@ -10,7 +9,6 @@ import (
 
 func initConfigs() {
 	if err := xwa.InitConfigs(); err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		app.Exit(app.ExitErrCFG)
+		log.Fatal(app.ExitErrCFG, err)
 	}
 }

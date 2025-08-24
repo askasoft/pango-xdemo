@@ -56,7 +56,7 @@ func main() {
 		os.Exit(0)
 	}
 
-	cw := &log.StreamWriter{Output: os.Stdout, Color: true}
+	cw := log.NewConsoleWriter()
 	cw.SetFormat("%t [%p] - %m%n%T")
 
 	log.SetWriter(cw)
@@ -74,17 +74,16 @@ func main() {
 			}
 		}
 		if err := tools.GenerateSchema(dbtype, outfile); err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			app.Exit(app.ExitErrCMD)
+			log.Fatal(app.ExitErrCMD, err)
 		}
 	case "migrate":
 		if err := tools.MigrateSchemas(flag.Args()[1:]...); err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			app.Exit(app.ExitErrCMD)
+			log.Fatal(app.ExitErrCMD, err)
 		}
 	default:
 		fmt.Fprintf(os.Stderr, "Invalid command %q\n\n", arg)
 		usage()
+		os.Exit(app.ExitErrCMD)
 	}
 }
 
@@ -92,7 +91,7 @@ func chdir(workdir string) {
 	if workdir != "" {
 		if err := os.Chdir(workdir); err != nil {
 			fmt.Fprintf(os.Stderr, "Failed to change directory: %v\n", err)
-			os.Exit(1)
+			os.Exit(app.ExitErrCMD)
 		}
 	}
 }

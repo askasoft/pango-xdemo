@@ -25,8 +25,7 @@ func reloadConfigsOnChange(path string, op fsw.Op) {
 // initFileWatch initialize file watch
 func initFileWatch() {
 	if err := xfsws.InitFileWatch(); err != nil {
-		log.Fatal(err) //nolint: all
-		app.Exit(app.ExitErrFSW)
+		log.Fatal(app.ExitErrFSW, err)
 	}
 }
 

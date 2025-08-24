@@ -24,8 +24,7 @@ var (
 
 func initDatabase() {
 	if err := openDatabase(); err != nil {
-		log.Fatal(err) //nolint: all
-		app.Exit(app.ExitErrDB)
+		log.Fatal(app.ExitErrDB, err)
 	}
 }
 

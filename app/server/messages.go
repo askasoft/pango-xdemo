@@ -15,10 +15,8 @@ func init() {
 }
 
 func initMessages() {
-	err := xmsgs.InitMessages()
-	if err != nil {
-		log.Fatal(err) //nolint: all
-		app.Exit(app.ExitErrTXT)
+	if err := xmsgs.InitMessages(); err != nil {
+		log.Fatal(app.ExitErrTXT, err)
 	}
 }
 

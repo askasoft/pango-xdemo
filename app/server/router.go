@@ -32,8 +32,7 @@ import (
 func initRouter() {
 	defer func() {
 		if err := recover(); err != nil {
-			log.Fatal(err) //nolint: all
-			app.Exit(app.ExitErrXIN)
+			log.Fatal(app.ExitErrXIN, err)
 		}
 	}()
 

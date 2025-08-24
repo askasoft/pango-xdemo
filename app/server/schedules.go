@@ -19,8 +19,7 @@ func init() {
 
 func initScheduler() {
 	if err := xschs.InitScheduler(); err != nil {
-		log.Fatal(err) //nolint: all
-		app.Exit(app.ExitErrSCH)
+		log.Fatal(app.ExitErrSCH, err)
 	}
 }
 

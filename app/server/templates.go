@@ -22,10 +22,8 @@ func init() {
 }
 
 func initTemplates() {
-	err := xtpls.InitTemplates()
-	if err != nil {
-		log.Fatal(err) //nolint: all
-		app.Exit(app.ExitErrTPL)
+	if err := xtpls.InitTemplates(); err != nil {
+		log.Fatal(app.ExitErrTPL, err)
 	}
 }
 
