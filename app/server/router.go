@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/askasoft/pango/fsu"
 	"github.com/askasoft/pango/ini"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/net/httpx"
@@ -125,7 +126,7 @@ func configMiddleware() {
 func configWebAssetsHFS() {
 	was := ini.GetString("app", "webassets")
 	if was == "" {
-		app.WAS = xin.FixedModTimeFS(xin.FS(web.FS), app.BuildTime())
+		app.WAS = xin.FS(fsu.FixedModTimeFS(web.FS, app.BuildTime()))
 	} else {
 		app.WAS = httpx.Dir(was)
 	}
@@ -180,7 +181,7 @@ func addStaticHandlers(rg *xin.RouterGroup) {
 	xcch := app.XCC.Handle
 
 	for path, fs := range web.Statics {
-		xin.StaticFS(rg, "/static/"+app.Revision()+"/"+path, xin.FixedModTimeFS(xin.FS(fs), mt), "", xcch)
+		xin.StaticFS(rg, "/static/"+app.Revision()+"/"+path, xin.FS(fsu.FixedModTimeFS(fs, mt)), "", xcch)
 	}
 
 	wfsc := func(c *xin.Context) http.FileSystem {

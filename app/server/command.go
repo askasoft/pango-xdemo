@@ -6,7 +6,6 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
-	"time"
 
 	"github.com/askasoft/pango/fsu"
 	"github.com/askasoft/pango/gog"
@@ -213,56 +212,72 @@ func cryptFlags() (k, v string) {
 }
 
 func doExportAssets() {
+	if err := exportAssets(); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(app.ExitErrCMD)
+	}
+	fmt.Println("DONE.")
+}
+
+func exportAssets() error {
 	dir := str.IfEmpty(flag.Arg(1), ".")
-	mt := app.BuildTime()
 
-	if err := saveFS(txts.FS, filepath.Join(dir, "txts"), mt); err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		return
+	if err := copyFS(filepath.Join(dir, "txts"), txts.FS); err != nil {
+		return err
 	}
-	if err := saveFS(tpls.FS, filepath.Join(dir, "tpls"), mt); err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		return
+	if err := copyFS(filepath.Join(dir, "tpls"), tpls.FS); err != nil {
+		return err
 	}
 
-	if err := saveFS(web.FS, filepath.Join(dir, "web"), mt); err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		return
+	if err := copyFS(filepath.Join(dir, "web"), web.FS); err != nil {
+		return err
 	}
 
 	for key, fs := range web.Statics {
-		if err := saveFS(fs, filepath.Join(dir, "web", "static", key), mt); err != nil {
-			fmt.Fprintln(os.Stderr, err)
-			return
+		if err := copyFS(filepath.Join(dir, "web", "static", key), fs); err != nil {
+			return err
 		}
 	}
-	log.Info("DONE.")
+	return nil
 }
 
-func saveFS(fsys fs.FS, dir string, mt time.Time) error {
+func copyFS(dir string, fsys fs.FS) error {
 	return fs.WalkDir(fsys, ".", func(path string, d fs.DirEntry, err error) error {
-		if !d.IsDir() {
-			fsrc, err := fsys.Open(path)
-			if err != nil {
-				return err
-			}
-			defer fsrc.Close()
-
-			fdes := filepath.Join(dir, path)
-			fmt.Println(fdes)
-
-			fdir := filepath.Dir(fdes)
-			if err = fsu.MkdirAll(fdir, 0770); err != nil {
-				return err
-			}
-
-			err = fsu.WriteReader(fdes, fsrc, 0660)
-			if err != nil {
-				return err
-			}
-
-			return os.Chtimes(fdes, mt, mt)
+		if err != nil {
+			return err
 		}
-		return nil
+
+		if d.IsDir() {
+			return nil
+		}
+
+		fi, err := d.Info()
+		if err != nil {
+			return err
+		}
+
+		fsrc, err := fsys.Open(path)
+		if err != nil {
+			return err
+		}
+		defer fsrc.Close()
+
+		fdes := filepath.Join(dir, path)
+		fmt.Println(fdes)
+
+		fdir := filepath.Dir(fdes)
+		if err = fsu.MkdirAll(fdir, 0770); err != nil {
+			return err
+		}
+
+		if err = fsu.WriteReader(fdes, fsrc, 0660); err != nil {
+			return err
+		}
+
+		mt := fi.ModTime()
+		if mt.IsZero() {
+			mt = app.BuildTime()
+		}
+		return os.Chtimes(fdes, mt, mt)
 	})
 }
