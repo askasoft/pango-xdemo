@@ -17,10 +17,21 @@ import (
 	"github.com/askasoft/pangox-xdemo/app/utils/sqlutil"
 )
 
+var (
+	// DBS database settings
+	DBS map[string]string
+)
+
 func initDatabase() {
 	if err := openDatabase(); err != nil {
 		log.Fatal(err) //nolint: all
 		app.Exit(app.ExitErrDB)
+	}
+}
+
+func reloadDatabase() {
+	if err := openDatabase(); err != nil {
+		log.Error(err)
 	}
 }
 
@@ -31,7 +42,7 @@ func openDatabase() error {
 	}
 
 	dbs := sec.StringMap()
-	if mag.Equal(app.DBS, dbs) {
+	if mag.Equal(DBS, dbs) {
 		return nil
 	}
 
@@ -55,7 +66,7 @@ func openDatabase() error {
 	)
 	slg.GetErrLogLevel = sqlutil.GetErrLogLevel
 
-	app.DBS = dbs
+	DBS = dbs
 	app.SDB = sqlx.NewDB(db, typ, slg.Trace)
 
 	return nil

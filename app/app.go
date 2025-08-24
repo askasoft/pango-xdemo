@@ -9,7 +9,6 @@ import (
 	"github.com/askasoft/pango/ids/snowflake"
 	"github.com/askasoft/pango/imc"
 	"github.com/askasoft/pango/ini"
-	"github.com/askasoft/pango/net/netx"
 	"github.com/askasoft/pango/sqx/sqlx"
 	"github.com/askasoft/pango/tmu"
 	"github.com/askasoft/pango/vad"
@@ -31,10 +30,9 @@ const (
 	ExitErrCMD
 	ExitErrDB
 	ExitErrFSW
-	ExitErrHTTP
 	ExitErrLOG
 	ExitErrSCH
-	ExitErrTCP
+	ExitErrSRV
 	ExitErrTPL
 	ExitErrTXT
 	ExitErrXIN
@@ -95,15 +93,6 @@ var (
 
 	// XCN global cookie auth middleware (no failure)
 	XCN *middleware.CookieAuth
-
-	// TCPs TCP listeners
-	TCPs []*netx.DumpListener
-
-	// HTTP http servers
-	HSVs []*http.Server
-
-	// DBS database settings
-	DBS map[string]string
 
 	// SDB database instance
 	SDB *sqlx.DB

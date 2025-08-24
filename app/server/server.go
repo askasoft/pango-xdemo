@@ -1,15 +1,10 @@
 package server
 
 import (
-	"context"
 	"crypto/tls"
 	"crypto/x509"
-	"errors"
 	"fmt"
-	"net"
-	"net/http"
 	"os"
-	"sync"
 	"time"
 
 	"github.com/askasoft/pango/fsw"
@@ -17,14 +12,13 @@ import (
 	"github.com/askasoft/pango/imc"
 	"github.com/askasoft/pango/ini"
 	"github.com/askasoft/pango/log"
-	"github.com/askasoft/pango/net/netx"
 	"github.com/askasoft/pango/sch"
 	"github.com/askasoft/pango/srv"
-	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pangox-xdemo/app"
 	"github.com/askasoft/pangox-xdemo/app/jobs"
 	"github.com/askasoft/pangox-xdemo/app/models"
 	"github.com/askasoft/pangox/xwa"
+	"github.com/askasoft/pangox/xwa/xhsvs"
 )
 
 // SRV service instance
@@ -103,7 +97,7 @@ func Init() {
 
 	initRouter()
 
-	initListener()
+	initServers()
 
 	initFileWatch()
 
@@ -125,7 +119,7 @@ func Reload() {
 func Run() {
 	// Starting the server in a goroutine so that
 	// it won't block the graceful shutdown handling below
-	starts()
+	xhsvs.Serves()
 
 	// Start jobs (Resume interrupted jobs)
 	if ini.GetBool("job", "startAtStartup") {
@@ -145,12 +139,7 @@ func Shutdown() {
 	fsw.Stop() //nolint: errcheck
 
 	// shutdown http servers
-	var wg sync.WaitGroup
-	for _, hsv := range app.HSVs {
-		wg.Add(1)
-		go shutdown(hsv, &wg)
-	}
-	wg.Wait()
+	xhsvs.Shutdowns()
 
 	log.Info("Server exit.")
 
@@ -192,105 +181,27 @@ func initCaches() {
 	app.AFIPS = imc.New[string, int](ini.GetDuration("cache", "afipCacheExpires", time.Minute*30), time.Minute)
 }
 
-func initListener() {
-	listen := ini.GetString("server", "listen", ":6060")
-
-	var semaphore chan struct{}
-	maxcon := ini.GetInt("server", "maxConnections")
-	if maxcon > 0 {
-		semaphore = make(chan struct{}, maxcon)
-	}
-
-	for _, addr := range str.Fields(listen) {
-		log.Infof("Listening %s ...", addr)
-
-		ssl := str.EndsWithByte(addr, 's')
-		if ssl {
-			addr = addr[:len(addr)-1]
-		}
-
-		tcp, err := net.Listen("tcp", addr)
-		if err != nil {
-			log.Fatalf("Listen: %v", err) //nolint: all
-			app.Exit(app.ExitErrTCP)
-		}
-
-		if maxcon > 0 {
-			tcp = netx.NewLimitListener(tcp, semaphore)
-		}
-
-		tcpd := netx.NewDumpListener(tcp, "logs")
-
-		hsv := &http.Server{
-			Addr:    addr,
-			Handler: app.XIN,
-		}
-
-		if ssl {
-			hsv.TLSConfig = &tls.Config{
-				GetCertificate: getCertificate,
-			}
-		}
-		app.TCPs = append(app.TCPs, tcpd)
-		app.HSVs = append(app.HSVs, hsv)
-	}
-
-	configListener()
+func reloadCaches() {
+	app.SCMAS.SetTTL(ini.GetDuration("cache", "schemaCacheExpires", time.Minute))
+	app.CONFS.SetTTL(ini.GetDuration("cache", "configCacheExpires", time.Minute))
+	app.WORKS.SetTTL(ini.GetDuration("cache", "workerCacheExpires", time.Minute))
+	app.USERS.SetTTL(ini.GetDuration("cache", "userCacheExpires", time.Minute))
+	app.AFIPS.SetTTL(ini.GetDuration("cache", "afipCacheExpires", time.Minute*30))
 }
 
-func configListener() {
-	for _, tcpd := range app.TCPs {
-		tcpd.Disable(!ini.GetBool("server", "tcpDump"))
+func initServers() {
+	if err := xhsvs.InitServers(app.XIN, getCertificate); err != nil {
+		log.Fatal(err) //nolint: all
+		app.Exit(app.ExitErrSRV)
 	}
+}
 
-	for _, hsv := range app.HSVs {
-		hsv.ReadHeaderTimeout = ini.GetDuration("server", "httpReadHeaderTimeout", 10*time.Second)
-		hsv.ReadTimeout = ini.GetDuration("server", "httpReadTimeout", 120*time.Second)
-		hsv.WriteTimeout = ini.GetDuration("server", "httpWriteTimeout", 300*time.Second)
-		hsv.IdleTimeout = ini.GetDuration("server", "httpIdleTimeout", 30*time.Second)
-	}
+func reloadServers() {
+	xhsvs.ConfigServers()
 }
 
 func getCertificate(chi *tls.ClientHelloInfo) (*tls.Certificate, error) {
 	return app.Certificate, nil
-}
-
-func starts() {
-	for i, hsv := range app.HSVs {
-		tcp := app.TCPs[i]
-		go serve(hsv, tcp)
-		time.Sleep(time.Millisecond)
-	}
-}
-
-func serve(hsv *http.Server, tcp net.Listener) {
-	log.Infof("HTTP Serving %s ...", hsv.Addr)
-
-	if hsv.TLSConfig != nil {
-		tcp = tls.NewListener(tcp, hsv.TLSConfig)
-	}
-
-	if err := hsv.Serve(tcp); err != nil {
-		if errors.Is(err, http.ErrServerClosed) {
-			log.Infof("HTTP Server %s closed", hsv.Addr)
-		} else {
-			log.Fatalf("HTTP.Serve(%s) failed: %v", hsv.Addr, err) //nolint: all
-			app.Exit(app.ExitErrHTTP)
-		}
-	}
-}
-
-func shutdown(hsv *http.Server, wg *sync.WaitGroup) {
-	defer wg.Done()
-
-	// The context is used to inform the server it has 5 seconds to finish
-	// the request it is currently handling
-	ctx, cancel := context.WithTimeout(context.TODO(), ini.GetDuration("server", "shutdownTimeout", 5*time.Second))
-	defer cancel()
-
-	if err := hsv.Shutdown(ctx); err != nil {
-		log.Errorf("Server %s failed to shutdown: %v", hsv.Addr, err)
-	}
 }
 
 // ------------------------------------------------------
@@ -329,17 +240,15 @@ func reloadConfigs() {
 
 	reloadCertificate()
 
-	initCaches()
+	reloadCaches()
 
-	configListener()
+	reloadServers()
 
-	if err := openDatabase(); err != nil {
-		log.Error(err)
-	}
+	reloadDatabase()
 
 	configMiddleware()
 
-	runFileWatch()
+	reloadFileWatch()
 
 	reloadMessages()
 
