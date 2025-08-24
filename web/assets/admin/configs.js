@@ -147,13 +147,15 @@
 	}
 
 	//----------------------------------------------------
-	function toggle_login_method() {
-		var $i = $('input[name="secure_login_method"]:checked'), v = $i.val();
-		var ldap = v == 'L', saml = v == 'S';
-		$('[name="secure_login_mfa"]').prop('disabled', saml).closest('.row')[saml ? 'slideUp' : 'slideDown']();
-		$('[name^="secure_ldap_"]').prop('disabled', !ldap).closest('.row')[ldap ? 'slideDown' : 'slideUp']();
-		$('[name^="secure_saml_"]').prop('disabled', !saml).closest('.row')[saml ? 'slideDown' : 'slideUp']();
-		$i.closest('.cfgform').find('textarea').autosize();
+	function secure_login_method_init() {
+		$('.cfgform input[name="secure_login_method"]').on('change', function() {
+			var $i = $('input[name="secure_login_method"]:checked'), v = $i.val();
+			var ldap = v == 'L', saml = v == 'S';
+			$('[name="secure_login_mfa"]').prop('disabled', saml).closest('.row')[saml ? 'slideUp' : 'slideDown']();
+			$('[name^="secure_ldap_"]').prop('disabled', !ldap).closest('.row')[ldap ? 'slideDown' : 'slideUp']();
+			$('[name^="secure_saml_"]').prop('disabled', !saml).closest('.row')[saml ? 'slideDown' : 'slideUp']();
+			$i.closest('.cfgform').find('textarea').autosize();
+		}).trigger('change');
 	}
 
 	//----------------------------------------------------
@@ -224,6 +226,7 @@
 	}
 
 	function configs_init() {
+		secure_login_method_init();
 		schedule_fields_init();
 
 		$('a[data-bs-toggle="tab"]').on('shown.bs.tab', function() {
@@ -248,8 +251,6 @@
 		if (cg.startsWith('cg_')) {
 			configs_tab_show(cg);
 		}
-
-		$('.cfgform input[name="secure_login_method"]').on('change', toggle_login_method).trigger('change');
 	}
 
 	$(window).on('load', configs_init);

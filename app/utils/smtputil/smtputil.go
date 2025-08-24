@@ -6,6 +6,7 @@ import (
 	"html"
 
 	"github.com/askasoft/pango/ini"
+	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/net/email"
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pangox/xwa/xtpls"
@@ -27,6 +28,8 @@ func SendTemplateEmail(locale, tpl string, toAddr string, data any) error {
 }
 
 func sendHTMLEmail(toAddr string, subject, message string) error {
+	log.GetLogger("SMTP").Infof("Send email to %q, subject: %q", toAddr, subject)
+
 	sec := ini.GetSection("smtp")
 	if sec == nil {
 		return errors.New("missing [smtp] settings")
