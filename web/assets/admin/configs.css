@@ -33,6 +33,6 @@ label[editor="%"] {
 	color: #045C92;
 }
 
-.schedule > select {
-	margin-right: 0.5em;
+.schedule > .doms, .schedule > .dows, .schedule > .hours {
+	border-top: dashed 1px var(--ui-lined-color, #ccc);
 }

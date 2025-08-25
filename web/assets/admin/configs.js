@@ -2,7 +2,6 @@
 	var langs = {
 		en: {
 			units: {
-				"": "--------",
 				d: "Daily", 
 				w: "Weekly", 
 				m: "Monthly"
@@ -13,7 +12,6 @@
 		},
 		ja: {
 			units: {
-				"": "ーー",
 				d: "毎日",
 				w: "毎週",
 				m: "毎月"
@@ -24,7 +22,6 @@
 		},
 		zh: {
 			units: {
-				"": "ーー",
 				d: "每天",
 				w: "每周",
 				m: "每月"
@@ -36,17 +33,13 @@
 	};
 
 	//----------------------------------------------------
-	function schedule_field_update_value($i) {
-		if ($i.length == 0 || $i.prop('disabled')) {
-			return;
-		}
+	function schedule_field_update_value($s) {
+		var v = $s.find('.units input:checked').val() || '';
+		var dows = $s.find('.dows input:checked').map(function() { return $(this).val(); }).get().join(',');
+		var doms = $s.find('.doms input:checked').map(function() { return $(this).val(); }).get().join(',');
+		var hours = $s.find('.hours input:checked').map(function() { return $(this).val(); }).get().join(',');
 
-		var $a = $i.parent().find('.schedule');
-		var unit = $a.find('.unit').val();
-		var dows = $a.find('.dows input:checked').map(function() { return $(this).val(); }).get().join(',');
-		var doms = $a.find('.doms input:checked').map(function() { return $(this).val(); }).get().join(',');
-		var hours = $a.find('.hours input:checked').map(function() { return $(this).val(); }).get().join(',');
-		var v = '';
+		var unit = v.substring(0, 1);
 		switch (unit) {
 		case 'd':
 			v = unit + ' * ' + hours;
@@ -58,20 +51,22 @@
 			v = unit + ' ' + doms + ' ' + hours;
 			break;
 		}
-		$i.val(v);
+
+		if (unit) {
+			$s.find('.units .' + unit).val(v);
+		}
 	}
 
 	function schedule_field_onchange() {
-		var $s = $(this);
-		if ($s.hasClass('unit')) {
-			var v = $s.val(), $p = $s.parent();
-			$p.find('.dows').toggleClass('hidden', v != 'w');
-			$p.find('.doms').toggleClass('hidden', v != 'm');
-			$p.find('.hours').toggleClass('hidden', v != 'd' && v != 'w' && v != 'm');
+		var $i = $(this), $u = $i.closest('.units'), $s = $i.closest('.schedule');
+		if ($u.length) {
+			var u = ($u.find('input:checked').val() || '').substring(0, 1);
+			$s.find('.dows').toggleClass('hidden', u != 'w');
+			$s.find('.doms').toggleClass('hidden', u != 'm');
+			$s.find('.hours').toggleClass('hidden', u != 'd' && u != 'w' && u != 'm');
 		}
 
-		var $i = $(this).closest('.schedule').parent().find('input[type="hidden"]');
-		schedule_field_update_value($i);
+		schedule_field_update_value($s);
 		return false;
 	}
 
@@ -80,6 +75,7 @@
 			return;
 		}
 
+		var nm = $i.attr('name');
 		var ln = langs[$('html').attr('lang')] || langs.en;
 		var ss = $i.val().split(' ');
 		var unit = ss.length ? ss[0] : '';
@@ -88,12 +84,18 @@
 
 		var d = !!($i.prop('disabled'));
 
-		var $a = $('<div class="schedule"></div>');
-		var $u = $('<select class="unit form-select">').prop('disabled', d);
+		var $s = $('<div class="schedule"></div>');
+		var $u = $('<div class="units ui-radios">').append($('<label>').append(
+			$('<input type="radio" checked>').attr('name', nm).prop('disabled', d),
+			$('<span>').text('ー')
+		));
 		for (var i in ln.units) {
-			$u.append($('<option>').val(i).text(ln.units[i]));
+			$u.append($('<label>').append(
+				$('<input type="radio">').attr('name', nm).addClass(i).val(i).prop('disabled', d),
+				$('<span>').text(ln.units[i])
+			));
 		}
-		$u.val(unit);
+		$u.find('[value="' + unit +'"]').prop('checked', true).val($i.val());
 
 		var $dows = $('<div class="dows ui-checks hidden">');
 		$.each(ln.dows, function(i, dow) {
@@ -132,8 +134,9 @@
 			$hours.removeClass('hidden');
 		}
 
-		$a.append($u, $dows, $doms, $hours).on('change', 'select, input[type="checkbox"]', schedule_field_onchange);
-		$a.insertAfter($i);
+		$s.append($u, $dows, $doms, $hours).on('change', 'input', schedule_field_onchange);
+		$s.insertAfter($i);
+		$i.remove();
 	}
 
 	function schedule_fields_init() {
