@@ -9,7 +9,7 @@ import (
 	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pangox-xdemo/app"
 	"github.com/askasoft/pangox-xdemo/app/args"
-	"github.com/askasoft/pangox-xdemo/app/handlers"
+	"github.com/askasoft/pangox-xdemo/app/middles"
 	"github.com/askasoft/pangox-xdemo/app/models"
 	"github.com/askasoft/pangox-xdemo/app/tenant"
 )
@@ -18,7 +18,7 @@ func FileDeletes(c *xin.Context) {
 	pka := &args.PKArg{}
 	if err := pka.Bind(c); err != nil {
 		c.AddError(args.InvalidIDError(c))
-		c.JSON(http.StatusBadRequest, handlers.E(c))
+		c.JSON(http.StatusBadRequest, middles.E(c))
 		return
 	}
 
@@ -38,7 +38,7 @@ func FileDeletes(c *xin.Context) {
 	})
 	if err != nil {
 		c.AddError(err)
-		c.JSON(http.StatusInternalServerError, handlers.E(c))
+		c.JSON(http.StatusInternalServerError, middles.E(c))
 		return
 	}
 
@@ -51,13 +51,13 @@ func FileDeleteBatch(c *xin.Context) {
 	pqa, err := bindFileQueryArg(c)
 	if err != nil {
 		args.AddBindErrors(c, err, "file.")
-		c.JSON(http.StatusBadRequest, handlers.E(c))
+		c.JSON(http.StatusBadRequest, middles.E(c))
 		return
 	}
 
 	if !pqa.HasFilters() {
 		c.AddError(tbs.Error(c.Locale, "error.param.nofilter"))
-		c.JSON(http.StatusBadRequest, handlers.E(c))
+		c.JSON(http.StatusBadRequest, middles.E(c))
 		return
 	}
 
@@ -77,7 +77,7 @@ func FileDeleteBatch(c *xin.Context) {
 	})
 	if err != nil {
 		c.AddError(err)
-		c.JSON(http.StatusInternalServerError, handlers.E(c))
+		c.JSON(http.StatusInternalServerError, middles.E(c))
 		return
 	}
 

@@ -5,7 +5,7 @@ import (
 
 	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pangox-xdemo/app/args"
-	"github.com/askasoft/pangox-xdemo/app/handlers"
+	"github.com/askasoft/pangox-xdemo/app/middles"
 	"github.com/askasoft/pangox-xdemo/app/schema"
 	"github.com/askasoft/pangox-xdemo/app/tenant"
 	"github.com/askasoft/pangox-xdemo/app/utils/tbsutil"
@@ -37,7 +37,7 @@ func bindTenantQueryArg(c *xin.Context) (tqa *TenantQueryArg, err error) {
 }
 
 func TenantIndex(c *xin.Context) {
-	h := handlers.H(c)
+	h := middles.H(c)
 
 	tqa, _ := bindTenantQueryArg(c)
 
@@ -49,18 +49,18 @@ func TenantList(c *xin.Context) {
 	tqa, err := bindTenantQueryArg(c)
 	if err != nil {
 		args.AddBindErrors(c, err, "tenant.")
-		c.JSON(http.StatusBadRequest, handlers.E(c))
+		c.JSON(http.StatusBadRequest, middles.E(c))
 		return
 	}
 
 	tqa.Total, err = schema.CountSchemas(&tqa.SchemaQuery)
 	if err != nil {
 		c.AddError(err)
-		c.JSON(http.StatusInternalServerError, handlers.E(c))
+		c.JSON(http.StatusInternalServerError, middles.E(c))
 		return
 	}
 
-	h := handlers.H(c)
+	h := middles.H(c)
 
 	tqa.Pager.Normalize(tbsutil.GetPagerLimits(c.Locale)...)
 
@@ -68,7 +68,7 @@ func TenantList(c *xin.Context) {
 		schemas, err := schema.FindSchemas(&tqa.SchemaQuery)
 		if err != nil {
 			c.AddError(err)
-			c.JSON(http.StatusInternalServerError, handlers.E(c))
+			c.JSON(http.StatusInternalServerError, middles.E(c))
 			return
 		}
 

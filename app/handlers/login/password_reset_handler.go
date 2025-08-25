@@ -15,7 +15,7 @@ import (
 	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pangox-xdemo/app"
 	"github.com/askasoft/pangox-xdemo/app/args"
-	"github.com/askasoft/pangox-xdemo/app/handlers"
+	"github.com/askasoft/pangox-xdemo/app/middles"
 	"github.com/askasoft/pangox-xdemo/app/models"
 	"github.com/askasoft/pangox-xdemo/app/tenant"
 	"github.com/askasoft/pangox-xdemo/app/utils/smtputil"
@@ -41,7 +41,7 @@ type PwdRstExecArg struct {
 }
 
 func PasswordResetIndex(c *xin.Context) {
-	h := handlers.H(c)
+	h := middles.H(c)
 
 	c.HTML(http.StatusOK, "login/pwdrst_mail", h)
 }
@@ -50,7 +50,7 @@ func PasswordResetSend(c *xin.Context) {
 	arg := &PwdRstSendArg{}
 	if err := c.Bind(arg); err != nil {
 		args.AddBindErrors(c, err, "pwdrst.")
-		c.JSON(http.StatusBadRequest, handlers.E(c))
+		c.JSON(http.StatusBadRequest, middles.E(c))
 		return
 	}
 
@@ -59,7 +59,7 @@ func PasswordResetSend(c *xin.Context) {
 	user, err := tt.FindAuthUser(arg.Email)
 	if err != nil {
 		c.AddError(err)
-		c.JSON(http.StatusInternalServerError, handlers.E(c))
+		c.JSON(http.StatusInternalServerError, middles.E(c))
 		return
 	}
 
@@ -77,7 +77,7 @@ func PasswordResetSend(c *xin.Context) {
 
 	tkexp := num.Itoa(int(ini.GetDuration("login", "passwordResetTokenExpires", time.Minute*10).Minutes()))
 
-	h := handlers.H(c)
+	h := middles.H(c)
 	h["User"] = user
 	h["Expires"] = tkexp
 	h["ResetURL"] = rsurl
@@ -85,7 +85,7 @@ func PasswordResetSend(c *xin.Context) {
 	if err := smtputil.SendTemplateEmail(c.Locale, "email/login/pwdrst_send", user.Email, h); err != nil {
 		c.Logger.Error(err)
 		c.AddError(tbs.Error(c.Locale, "pwdrst.error.sendmail"))
-		c.JSON(http.StatusInternalServerError, handlers.E(c))
+		c.JSON(http.StatusInternalServerError, middles.E(c))
 		return
 	}
 
@@ -121,7 +121,7 @@ func passwordResetToken(c *xin.Context) *PwdRstToken {
 func PasswordResetConfirm(c *xin.Context) {
 	token := passwordResetToken(c)
 
-	h := handlers.H(c)
+	h := middles.H(c)
 	if token != nil {
 		h["Message"] = tbs.Format(c.Locale, "pwdrst.confirm", token.Email)
 	}
@@ -132,7 +132,7 @@ func PasswordResetConfirm(c *xin.Context) {
 func PasswordResetExecute(c *xin.Context) {
 	token := passwordResetToken(c)
 	if token == nil {
-		c.JSON(http.StatusBadRequest, handlers.E(c))
+		c.JSON(http.StatusBadRequest, middles.E(c))
 		return
 	}
 
@@ -141,12 +141,12 @@ func PasswordResetExecute(c *xin.Context) {
 	user, err := tt.FindAuthUser(token.Email)
 	if err != nil {
 		c.AddError(err)
-		c.JSON(http.StatusBadRequest, handlers.E(c))
+		c.JSON(http.StatusBadRequest, middles.E(c))
 		return
 	}
 	if user == nil {
 		c.AddError(tbs.Error(c.Locale, "pwdrst.error.invalid"))
-		c.JSON(http.StatusBadRequest, handlers.E(c))
+		c.JSON(http.StatusBadRequest, middles.E(c))
 		return
 	}
 
@@ -166,7 +166,7 @@ func PasswordResetExecute(c *xin.Context) {
 		}
 	}
 	if len(c.Errors) > 0 {
-		c.JSON(http.StatusBadRequest, handlers.E(c))
+		c.JSON(http.StatusBadRequest, middles.E(c))
 		return
 	}
 
@@ -185,11 +185,11 @@ func PasswordResetExecute(c *xin.Context) {
 	})
 	if err != nil {
 		c.AddError(err)
-		c.JSON(http.StatusInternalServerError, handlers.E(c))
+		c.JSON(http.StatusInternalServerError, middles.E(c))
 		return
 	}
 
-	h := handlers.H(c)
+	h := middles.H(c)
 	h["User"] = user
 
 	if err := smtputil.SendTemplateEmail(c.Locale, "email/login/pwdrst_reset", user.Email, h); err != nil {

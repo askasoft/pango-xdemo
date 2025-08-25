@@ -8,7 +8,7 @@ import (
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/tbs"
 	"github.com/askasoft/pango/xin"
-	"github.com/askasoft/pangox-xdemo/app/handlers"
+	"github.com/askasoft/pangox-xdemo/app/middles"
 )
 
 type tagsArg struct {
@@ -26,7 +26,7 @@ type tagsArg struct {
 }
 
 func TagsIndex(c *xin.Context) {
-	h := handlers.H(c)
+	h := middles.H(c)
 
 	a := &tagsArg{
 		Ochecks:  []string{"c2"},

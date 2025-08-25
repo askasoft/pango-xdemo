@@ -2,7 +2,6 @@ package super
 
 import (
 	"github.com/askasoft/pango/xin"
-	"github.com/askasoft/pangox-xdemo/app"
 	"github.com/askasoft/pangox-xdemo/app/middles"
 )
 
@@ -10,7 +9,7 @@ func Router(rg *xin.RouterGroup) {
 	rg.Use(middles.AppAuth)         // app auth
 	rg.Use(middles.IPProtect)       // IP protect
 	rg.Use(middles.RoleRootProtect) // role protect
-	rg.Use(app.XTP.Handle)          // token protect
+	rg.Use(middles.TokenProtect)    // token protect
 
 	rg.GET("/", Index)
 
@@ -60,4 +59,3 @@ func addSuperSqlHandlers(rg *xin.RouterGroup) {
 	rg.GET("/", SqlIndex)
 	rg.POST("/exec", SqlExec)
 }
-

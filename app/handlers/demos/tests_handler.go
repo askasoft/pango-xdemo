@@ -11,8 +11,6 @@ import (
 	"github.com/askasoft/pango/oss/mem"
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/xin"
-	"github.com/askasoft/pangox-xdemo/app"
-	"github.com/askasoft/pangox-xdemo/app/handlers"
 	"github.com/askasoft/pangox-xdemo/app/middles"
 )
 
@@ -20,7 +18,7 @@ func testsAddHandlers(rg *xin.RouterGroup) {
 	rg.Use(middles.AppAuth)          // app auth
 	rg.Use(middles.IPProtect)        // IP protect
 	rg.Use(middles.RoleAdminProtect) // role protect
-	rg.Use(app.XTP.Handle)           // token protect
+	rg.Use(middles.TokenProtect)     // token protect
 
 	rg.GET("/", TestIndex)
 	rg.POST("/crash", TestCrash)
@@ -30,7 +28,7 @@ func testsAddHandlers(rg *xin.RouterGroup) {
 }
 
 func TestIndex(c *xin.Context) {
-	h := handlers.H(c)
+	h := middles.H(c)
 
 	c.HTML(http.StatusOK, "demos/tests", h)
 }

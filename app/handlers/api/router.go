@@ -3,10 +3,11 @@ package api
 import (
 	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pangox-xdemo/app"
+	"github.com/askasoft/pangox/xwa/xmwas"
 )
 
 func Router(rg *xin.RouterGroup) {
-	rg.Use(app.XAC.Handle) // access control
+	rg.Use(xmwas.XAC.Handle) // access control
 	rg.OPTIONS("/*path", xin.Next)
 
 	addMyApiHandlers(rg)

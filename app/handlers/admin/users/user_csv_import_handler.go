@@ -12,6 +12,7 @@ import (
 	"github.com/askasoft/pangox-xdemo/app/handlers"
 	"github.com/askasoft/pangox-xdemo/app/jobs"
 	"github.com/askasoft/pangox-xdemo/app/jobs/users"
+	"github.com/askasoft/pangox-xdemo/app/middles"
 	"github.com/askasoft/pangox-xdemo/app/models"
 	"github.com/askasoft/pangox-xdemo/app/tenant"
 	"github.com/askasoft/pangox-xdemo/app/utils/tbsutil"
@@ -38,7 +39,7 @@ func (ucijc *UserCsvImportJobController) Start(c *xin.Context) {
 	if err != nil {
 		err = tbs.Error(c.Locale, "csv.error.required")
 		c.AddError(err)
-		c.JSON(http.StatusBadRequest, handlers.E(c))
+		c.JSON(http.StatusBadRequest, middles.E(c))
 		return
 	}
 
@@ -49,7 +50,7 @@ func (ucijc *UserCsvImportJobController) Start(c *xin.Context) {
 	if err = ucia.SetFile(tt, mfh); err != nil {
 		err = tbs.Errorf(c.Locale, "csv.error.read", err)
 		c.AddError(err)
-		c.JSON(http.StatusInternalServerError, handlers.E(c))
+		c.JSON(http.StatusInternalServerError, middles.E(c))
 		return
 	}
 

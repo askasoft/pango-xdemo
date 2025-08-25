@@ -10,7 +10,7 @@ import (
 	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pangox-xdemo/app"
 	"github.com/askasoft/pangox-xdemo/app/args"
-	"github.com/askasoft/pangox-xdemo/app/handlers"
+	"github.com/askasoft/pangox-xdemo/app/middles"
 	"github.com/askasoft/pangox-xdemo/app/models"
 	"github.com/askasoft/pangox-xdemo/app/tenant"
 	"github.com/askasoft/pangox-xdemo/app/utils/tbsutil"
@@ -20,7 +20,7 @@ func UserCsvExport(c *xin.Context) {
 	uqa, err := bindUserQueryArg(c)
 	if err != nil {
 		args.AddBindErrors(c, err, "user.")
-		c.JSON(http.StatusBadRequest, handlers.E(c))
+		c.JSON(http.StatusBadRequest, middles.E(c))
 		return
 	}
 
@@ -75,7 +75,7 @@ func UserCsvExport(c *xin.Context) {
 	})
 	if err != nil {
 		c.AddError(err)
-		c.JSON(http.StatusInternalServerError, handlers.E(c))
+		c.JSON(http.StatusInternalServerError, middles.E(c))
 		return
 	}
 }

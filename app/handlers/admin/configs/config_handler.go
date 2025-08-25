@@ -19,7 +19,7 @@ import (
 	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pangox-xdemo/app"
 	"github.com/askasoft/pangox-xdemo/app/args"
-	"github.com/askasoft/pangox-xdemo/app/handlers"
+	"github.com/askasoft/pangox-xdemo/app/middles"
 	"github.com/askasoft/pangox-xdemo/app/models"
 	"github.com/askasoft/pangox-xdemo/app/schema"
 	"github.com/askasoft/pangox-xdemo/app/tenant"
@@ -124,7 +124,7 @@ func ConfigIndex(c *xin.Context) {
 
 	ccs := buildConfigCategories(c, configs)
 
-	h := handlers.H(c)
+	h := middles.H(c)
 	h["Configs"] = ccs
 	bindConfigLists(c, h, configs)
 
@@ -138,7 +138,7 @@ func ConfigSave(c *xin.Context) {
 
 	uconfigs := checkPostConfigs(c, configs)
 	if len(c.Errors) > 0 {
-		c.JSON(http.StatusBadRequest, handlers.E(c))
+		c.JSON(http.StatusBadRequest, middles.E(c))
 		return
 	}
 
@@ -327,7 +327,7 @@ func saveConfigs(c *xin.Context, configs []*models.Config, action string, detail
 
 	var ucie *schema.UnsavedConfigItemsError
 	sc := gog.If(errors.As(err, &ucie), http.StatusBadRequest, http.StatusInternalServerError)
-	c.JSON(sc, handlers.E(c))
+	c.JSON(sc, middles.E(c))
 	return false
 }
 
@@ -370,14 +370,14 @@ func ConfigImport(c *xin.Context) {
 	if err != nil {
 		err = tbs.Error(c.Locale, "csv.error.required")
 		c.AddError(err)
-		c.JSON(http.StatusBadRequest, handlers.E(c))
+		c.JSON(http.StatusBadRequest, middles.E(c))
 		return
 	}
 
 	uf, err := mfh.Open()
 	if err != nil {
 		c.AddError(err)
-		c.JSON(http.StatusInternalServerError, handlers.E(c))
+		c.JSON(http.StatusInternalServerError, middles.E(c))
 		return
 	}
 	defer uf.Close()
@@ -386,7 +386,7 @@ func ConfigImport(c *xin.Context) {
 	if err := csvx.ScanReader(uf, &csvcfgs); err != nil {
 		err = tbs.Error(c.Locale, "csv.error.data")
 		c.AddError(err)
-		c.JSON(http.StatusBadRequest, handlers.E(c))
+		c.JSON(http.StatusBadRequest, middles.E(c))
 		return
 	}
 
@@ -394,7 +394,7 @@ func ConfigImport(c *xin.Context) {
 
 	uconfigs := checkCsvConfigs(c, configs, csvcfgs)
 	if len(c.Errors) > 0 {
-		c.JSON(http.StatusBadRequest, handlers.E(c))
+		c.JSON(http.StatusBadRequest, middles.E(c))
 		return
 	}
 

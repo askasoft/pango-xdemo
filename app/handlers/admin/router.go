@@ -2,7 +2,6 @@ package admin
 
 import (
 	"github.com/askasoft/pango/xin"
-	"github.com/askasoft/pangox-xdemo/app"
 	"github.com/askasoft/pangox-xdemo/app/handlers/admin/auditlogs"
 	"github.com/askasoft/pangox-xdemo/app/handlers/admin/configs"
 	"github.com/askasoft/pangox-xdemo/app/handlers/admin/users"
@@ -13,7 +12,7 @@ func Router(rg *xin.RouterGroup) {
 	rg.Use(middles.AppAuth)          // app auth
 	rg.Use(middles.IPProtect)        // IP protect
 	rg.Use(middles.RoleAdminProtect) // role protect
-	rg.Use(app.XTP.Handle)           // token protect
+	rg.Use(middles.TokenProtect)     // token protect
 
 	rg.GET("/", Index)
 

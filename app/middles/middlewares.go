@@ -6,9 +6,9 @@ import (
 	"github.com/askasoft/pango/tbs"
 	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pangox-xdemo/app"
-	"github.com/askasoft/pangox-xdemo/app/handlers"
 	"github.com/askasoft/pangox-xdemo/app/models"
 	"github.com/askasoft/pangox-xdemo/app/tenant"
+	"github.com/askasoft/pangox/xwa/xmwas"
 )
 
 func SetCtxLogProp(c *xin.Context) {
@@ -45,7 +45,14 @@ func AppAuth(c *xin.Context) {
 	}
 }
 
-//----------------------------------------------------
+// ----------------------------------------------------
+func TokenProtect(c *xin.Context) {
+	xmwas.XTP.Handle(c)
+}
+
+func RefreshToken(c *xin.Context) string {
+	return xmwas.XTP.RefreshToken(c)
+}
 
 // IPProtect allow access by cidr of user or tenant
 func IPProtect(c *xin.Context) {
@@ -53,7 +60,7 @@ func IPProtect(c *xin.Context) {
 
 	if !tenant.CheckUserClientIP(c, au) {
 		c.AddError(tbs.Error(c.Locale, "error.forbidden.ip"))
-		handlers.Forbidden(c)
+		Forbidden(c)
 		return
 	}
 
@@ -68,7 +75,7 @@ func RoleProtect(c *xin.Context, role string) {
 
 	if !au.HasRole(role) {
 		c.AddError(tbs.Error(c.Locale, "error.forbidden.function"))
-		handlers.Forbidden(c)
+		Forbidden(c)
 		return
 	}
 
@@ -82,7 +89,7 @@ func RoleRootProtect(c *xin.Context) {
 
 		if !tt.IsDefault() || !au.IsSuper() {
 			c.AddError(tbs.Error(c.Locale, "error.forbidden.function"))
-			handlers.Forbidden(c)
+			Forbidden(c)
 			return
 		}
 

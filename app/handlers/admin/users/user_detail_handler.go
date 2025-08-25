@@ -12,7 +12,7 @@ import (
 	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pangox-xdemo/app"
 	"github.com/askasoft/pangox-xdemo/app/args"
-	"github.com/askasoft/pangox-xdemo/app/handlers"
+	"github.com/askasoft/pangox-xdemo/app/middles"
 	"github.com/askasoft/pangox-xdemo/app/models"
 	"github.com/askasoft/pangox-xdemo/app/tenant"
 	"github.com/askasoft/pangox-xdemo/app/utils/sqlutil"
@@ -25,7 +25,7 @@ func UserNew(c *xin.Context) {
 		Status: models.UserActive,
 	}
 
-	h := handlers.H(c)
+	h := middles.H(c)
 	h["User"] = user
 	bindUserMaps(c, h)
 
@@ -44,7 +44,7 @@ func userDetail(c *xin.Context, action string) {
 	uid := num.Atol(c.Query("id"))
 	if uid == 0 {
 		c.AddError(args.InvalidIDError(c))
-		c.JSON(http.StatusBadRequest, handlers.E(c))
+		c.JSON(http.StatusBadRequest, middles.E(c))
 		return
 	}
 
@@ -53,16 +53,16 @@ func userDetail(c *xin.Context, action string) {
 	user, err := tt.GetUser(app.SDB, uid)
 	if errors.Is(err, sqlx.ErrNoRows) {
 		c.AddError(tbs.Errorf(c.Locale, "user.error.notfound", uid))
-		c.JSON(http.StatusNotFound, handlers.E(c))
+		c.JSON(http.StatusNotFound, middles.E(c))
 		return
 	}
 	if err != nil {
 		c.AddError(err)
-		c.JSON(http.StatusInternalServerError, handlers.E(c))
+		c.JSON(http.StatusInternalServerError, middles.E(c))
 		return
 	}
 
-	h := handlers.H(c)
+	h := middles.H(c)
 	h["User"] = user
 
 	bindUserMaps(c, h)
@@ -130,7 +130,7 @@ func userBind(c *xin.Context) *models.User {
 func UserCreate(c *xin.Context) {
 	user := userBind(c)
 	if len(c.Errors) > 0 {
-		c.JSON(http.StatusBadRequest, handlers.E(c))
+		c.JSON(http.StatusBadRequest, middles.E(c))
 		return
 	}
 
@@ -161,7 +161,7 @@ func UserCreate(c *xin.Context) {
 			}
 		}
 		c.AddError(err)
-		c.JSON(http.StatusInternalServerError, handlers.E(c))
+		c.JSON(http.StatusInternalServerError, middles.E(c))
 		return
 	}
 
@@ -180,7 +180,7 @@ func UserUpdate(c *xin.Context) {
 		c.AddError(args.InvalidIDError(c))
 	}
 	if len(c.Errors) > 0 {
-		c.JSON(http.StatusBadRequest, handlers.E(c))
+		c.JSON(http.StatusBadRequest, middles.E(c))
 		return
 	}
 
@@ -222,7 +222,7 @@ func UserUpdate(c *xin.Context) {
 			}
 		}
 		c.AddError(err)
-		c.JSON(http.StatusInternalServerError, handlers.E(c))
+		c.JSON(http.StatusInternalServerError, middles.E(c))
 		return
 	}
 

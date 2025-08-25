@@ -54,36 +54,6 @@ var (
 	// XIN global xin engine
 	XIN *xin.Engine
 
-	// XAL global xin access logger
-	XAL *middleware.AccessLogger
-
-	// XSL global xin request size limiter
-	XSL *middleware.RequestSizeLimiter
-
-	// XRC global xin response compressor
-	XRC *middleware.ResponseCompressor
-
-	// XHD global xin http dumper
-	XHD *middleware.HTTPDumper
-
-	// XSR global xin https redirector
-	XSR *middleware.HTTPSRedirector
-
-	// XLL global xin localizer
-	XLL *middleware.Localizer
-
-	// XTP global xin token protector
-	XTP *middleware.TokenProtector
-
-	// XRH global xin response header middleware
-	XRH *middleware.ResponseHeader
-
-	// XAC global xin origin access controller middleware
-	XAC *middleware.OriginAccessController
-
-	// XCC global xin static cache control setter
-	XCC *xin.CacheControlSetter
-
 	// XBA global basic auth middleware
 	XBA *middleware.BasicAuth
 
@@ -147,20 +117,20 @@ func CFG() map[string]map[string]string {
 	return xwa.CFG
 }
 
-func Domain() string {
-	return xwa.Domain
-}
-
 func Base() string {
 	return xwa.Base
 }
 
-func Locales() []string {
-	return xwa.Locales
+func Domain() string {
+	return xwa.Domain
 }
 
 func Secret() string {
-	return ini.GetString("app", "secret", "~ pango  xdemo ~")
+	return xwa.Secret
+}
+
+func Locales() []string {
+	return xwa.Locales
 }
 
 func DBType() string {

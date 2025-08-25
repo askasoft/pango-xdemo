@@ -14,12 +14,12 @@ import (
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/tbs"
 	"github.com/askasoft/pango/xin"
-	"github.com/askasoft/pangox-xdemo/app/handlers"
+	"github.com/askasoft/pangox-xdemo/app/middles"
 	"github.com/askasoft/pangox-xdemo/app/utils/tbsutil"
 )
 
 func ShellIndex(c *xin.Context) {
-	h := handlers.H(c)
+	h := middles.H(c)
 
 	h["OS"] = str.Capitalize(runtime.GOOS)
 	h["Timeouts"] = tbsutil.GetStrings(c.Locale, "super.shell.timeouts")

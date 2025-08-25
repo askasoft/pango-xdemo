@@ -6,6 +6,7 @@ import (
 	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pangox-xdemo/app/handlers"
 	"github.com/askasoft/pangox-xdemo/app/jobs"
+	"github.com/askasoft/pangox-xdemo/app/middles"
 	"github.com/askasoft/pangox-xdemo/app/utils/tbsutil"
 )
 
@@ -27,7 +28,7 @@ type PetResetJobChainController struct {
 }
 
 func (prjcc *PetResetJobChainController) Index(c *xin.Context) {
-	h := handlers.H(c)
+	h := middles.H(c)
 
 	h["JobchainJobnamesMap"] = tbsutil.GetJobchainJobnamesMap(c.Locale)
 	h["JobchainJslabelsMap"] = tbsutil.GetJobchainJslabelsMap(c.Locale)

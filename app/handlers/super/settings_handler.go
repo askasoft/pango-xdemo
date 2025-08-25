@@ -5,11 +5,11 @@ import (
 
 	"github.com/askasoft/pango/ini"
 	"github.com/askasoft/pango/xin"
-	"github.com/askasoft/pangox-xdemo/app/handlers"
+	"github.com/askasoft/pangox-xdemo/app/middles"
 )
 
 func SettingsIndex(c *xin.Context) {
-	h := handlers.H(c)
+	h := middles.H(c)
 
 	h["Sections"] = ini.Sections()
 

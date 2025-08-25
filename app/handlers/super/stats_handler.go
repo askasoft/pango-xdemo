@@ -26,13 +26,13 @@ import (
 	"github.com/askasoft/pango/tmu"
 	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pangox-xdemo/app"
-	"github.com/askasoft/pangox-xdemo/app/handlers"
 	"github.com/askasoft/pangox-xdemo/app/jobs"
+	"github.com/askasoft/pangox-xdemo/app/middles"
 	"github.com/askasoft/pangox-xdemo/app/models"
 )
 
 func StatsIndex(c *xin.Context) {
-	h := handlers.H(c)
+	h := middles.H(c)
 
 	h["Server"] = statsServer()
 	h["Caches"] = []string{"configs", "schemas", "workers", "users", "afips"}

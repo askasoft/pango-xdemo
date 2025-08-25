@@ -3,10 +3,11 @@ package login
 import (
 	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pangox-xdemo/app"
+	"github.com/askasoft/pangox-xdemo/app/middles"
 )
 
 func Router(rg *xin.RouterGroup) {
-	rg.Use(app.XTP.Handle) // token protect
+	rg.Use(middles.TokenProtect) // token protect
 	rg.Use(app.XCN.Handle)
 
 	rg.GET("/", Index)

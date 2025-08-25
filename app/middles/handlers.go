@@ -1,6 +1,7 @@
-package handlers
+package middles
 
 import (
+	"net/http"
 	"time"
 
 	"github.com/askasoft/pango/xin"
@@ -23,7 +24,7 @@ func H(c *xin.Context) xin.H {
 		"Ctx":     c,
 		"Loc":     c.Locale,
 		"Locales": app.Locales(),
-		"Token":   app.XTP.RefreshToken(c),
+		"Token":   RefreshToken(c),
 		"Domain":  app.Domain(),
 		"TT":      tt,
 		"AU":      au,
@@ -33,4 +34,32 @@ func H(c *xin.Context) xin.H {
 
 func E(c *xin.Context) xin.H {
 	return xargs.E(c)
+}
+
+func NotFound(c *xin.Context) {
+	if xin.IsAjax(c) {
+		c.AbortWithStatus(http.StatusNotFound)
+		return
+	}
+
+	c.HTML(http.StatusNotFound, "404", H(c))
+	c.Abort()
+}
+
+func Forbidden(c *xin.Context) {
+	if xin.IsAjax(c) {
+		c.JSON(http.StatusForbidden, E(c))
+	} else {
+		c.HTML(http.StatusForbidden, "403", H(c))
+	}
+	c.Abort()
+}
+
+func InternalServerError(c *xin.Context) {
+	if xin.IsAjax(c) {
+		c.JSON(http.StatusInternalServerError, E(c))
+	} else {
+		c.HTML(http.StatusInternalServerError, "500", H(c))
+	}
+	c.Abort()
 }

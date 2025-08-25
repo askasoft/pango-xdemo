@@ -9,7 +9,7 @@ import (
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pangox-xdemo/app"
-	"github.com/askasoft/pangox-xdemo/app/handlers"
+	"github.com/askasoft/pangox-xdemo/app/middles"
 	"github.com/askasoft/pangox-xdemo/app/tenant"
 	"github.com/askasoft/pangox-xdemo/app/utils/docutil"
 )
@@ -17,7 +17,7 @@ import (
 func Preview(c *xin.Context) {
 	id := c.Param("id")
 	if id == "" {
-		handlers.NotFound(c)
+		middles.NotFound(c)
 		return
 	}
 
@@ -25,16 +25,16 @@ func Preview(c *xin.Context) {
 
 	file, err := tt.FS().FindFile(id)
 	if errors.Is(err, sqlx.ErrNoRows) {
-		handlers.NotFound(c)
+		middles.NotFound(c)
 		return
 	}
 	if err != nil {
 		c.AddError(err)
-		handlers.InternalServerError(c)
+		middles.InternalServerError(c)
 		return
 	}
 
-	h := handlers.H(c)
+	h := middles.H(c)
 	h["File"] = file
 
 	ext := str.ToLower(filepath.Ext(file.Name))
@@ -50,7 +50,7 @@ func Preview(c *xin.Context) {
 		data, err := tt.FS().ReadFile(file.ID)
 		if err != nil {
 			c.AddError(err)
-			handlers.InternalServerError(c)
+			middles.InternalServerError(c)
 			return
 		}
 

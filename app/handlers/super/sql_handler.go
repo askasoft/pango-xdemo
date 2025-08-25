@@ -13,12 +13,12 @@ import (
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pangox-xdemo/app"
-	"github.com/askasoft/pangox-xdemo/app/handlers"
+	"github.com/askasoft/pangox-xdemo/app/middles"
 	"github.com/askasoft/pangox-xdemo/app/utils/tbsutil"
 )
 
 func SqlIndex(c *xin.Context) {
-	h := handlers.H(c)
+	h := middles.H(c)
 
 	h["Limits"] = tbsutil.GetStrings(c.Locale, "super.sql.limits")
 
@@ -117,7 +117,7 @@ func SqlExec(c *xin.Context) {
 	})
 	if err != nil && !errors.Is(err, io.EOF) {
 		c.AddError(err)
-		c.JSON(http.StatusInternalServerError, handlers.E(c))
+		c.JSON(http.StatusInternalServerError, middles.E(c))
 		return
 	}
 

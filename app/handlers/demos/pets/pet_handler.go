@@ -6,7 +6,7 @@ import (
 	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pangox-xdemo/app"
 	"github.com/askasoft/pangox-xdemo/app/args"
-	"github.com/askasoft/pangox-xdemo/app/handlers"
+	"github.com/askasoft/pangox-xdemo/app/middles"
 	"github.com/askasoft/pangox-xdemo/app/tenant"
 	"github.com/askasoft/pangox-xdemo/app/utils/tbsutil"
 )
@@ -43,7 +43,7 @@ func bindPetMaps(c *xin.Context, h xin.H) {
 }
 
 func PetIndex(c *xin.Context) {
-	h := handlers.H(c)
+	h := middles.H(c)
 
 	pqa, _ := bindPetQueryArg(c)
 
@@ -58,7 +58,7 @@ func PetList(c *xin.Context) {
 	pqa, err := bindPetQueryArg(c)
 	if err != nil {
 		args.AddBindErrors(c, err, "pet.")
-		c.JSON(http.StatusBadRequest, handlers.E(c))
+		c.JSON(http.StatusBadRequest, middles.E(c))
 		return
 	}
 
@@ -67,11 +67,11 @@ func PetList(c *xin.Context) {
 	pqa.Total, err = tt.CountPets(app.SDB, pqa)
 	if err != nil {
 		c.AddError(err)
-		c.JSON(http.StatusInternalServerError, handlers.E(c))
+		c.JSON(http.StatusInternalServerError, middles.E(c))
 		return
 	}
 
-	h := handlers.H(c)
+	h := middles.H(c)
 
 	pqa.Pager.Normalize(tbsutil.GetPagerLimits(c.Locale)...)
 
@@ -79,7 +79,7 @@ func PetList(c *xin.Context) {
 		results, err := tt.FindPets(app.SDB, pqa)
 		if err != nil {
 			c.AddError(err)
-			c.JSON(http.StatusInternalServerError, handlers.E(c))
+			c.JSON(http.StatusInternalServerError, middles.E(c))
 			return
 		}
 

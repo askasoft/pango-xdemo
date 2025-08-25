@@ -8,7 +8,7 @@ import (
 	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pangox-xdemo/app"
 	"github.com/askasoft/pangox-xdemo/app/args"
-	"github.com/askasoft/pangox-xdemo/app/handlers"
+	"github.com/askasoft/pangox-xdemo/app/middles"
 	"github.com/askasoft/pangox-xdemo/app/tenant"
 )
 
@@ -16,7 +16,7 @@ func AuditLogDeletes(c *xin.Context) {
 	ida := &args.IDArg{}
 	if err := ida.Bind(c); err != nil {
 		c.AddError(args.InvalidIDError(c))
-		c.JSON(http.StatusBadRequest, handlers.E(c))
+		c.JSON(http.StatusBadRequest, middles.E(c))
 		return
 	}
 
@@ -29,7 +29,7 @@ func AuditLogDeletes(c *xin.Context) {
 	})
 	if err != nil {
 		c.AddError(err)
-		c.JSON(http.StatusInternalServerError, handlers.E(c))
+		c.JSON(http.StatusInternalServerError, middles.E(c))
 		return
 	}
 
@@ -42,13 +42,13 @@ func AuditLogDeleteBatch(c *xin.Context) {
 	alqa, err := bindAuditLogQueryArg(c)
 	if err != nil {
 		args.AddBindErrors(c, err, "auditlog.")
-		c.JSON(http.StatusBadRequest, handlers.E(c))
+		c.JSON(http.StatusBadRequest, middles.E(c))
 		return
 	}
 
 	if !alqa.HasFilters() {
 		c.AddError(tbs.Error(c.Locale, "error.param.nofilter"))
-		c.JSON(http.StatusBadRequest, handlers.E(c))
+		c.JSON(http.StatusBadRequest, middles.E(c))
 		return
 	}
 
@@ -61,7 +61,7 @@ func AuditLogDeleteBatch(c *xin.Context) {
 	})
 	if err != nil {
 		c.AddError(err)
-		c.JSON(http.StatusInternalServerError, handlers.E(c))
+		c.JSON(http.StatusInternalServerError, middles.E(c))
 		return
 	}
 

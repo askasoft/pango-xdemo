@@ -6,7 +6,7 @@ import (
 	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pangox-xdemo/app"
 	"github.com/askasoft/pangox-xdemo/app/args"
-	"github.com/askasoft/pangox-xdemo/app/handlers"
+	"github.com/askasoft/pangox-xdemo/app/middles"
 	"github.com/askasoft/pangox-xdemo/app/tenant"
 	"github.com/askasoft/pangox-xdemo/app/utils/tbsutil"
 )
@@ -37,7 +37,7 @@ func bindUserMaps(c *xin.Context, h xin.H) {
 }
 
 func UserIndex(c *xin.Context) {
-	h := handlers.H(c)
+	h := middles.H(c)
 
 	uqa, _ := bindUserQueryArg(c)
 
@@ -52,7 +52,7 @@ func UserList(c *xin.Context) {
 	uqa, err := bindUserQueryArg(c)
 	if err != nil {
 		args.AddBindErrors(c, err, "user.")
-		c.JSON(http.StatusBadRequest, handlers.E(c))
+		c.JSON(http.StatusBadRequest, middles.E(c))
 		return
 	}
 
@@ -62,11 +62,11 @@ func UserList(c *xin.Context) {
 	uqa.Total, err = tt.CountUsers(app.SDB, au.Role, uqa)
 	if err != nil {
 		c.AddError(err)
-		c.JSON(http.StatusInternalServerError, handlers.E(c))
+		c.JSON(http.StatusInternalServerError, middles.E(c))
 		return
 	}
 
-	h := handlers.H(c)
+	h := middles.H(c)
 
 	uqa.Pager.Normalize(tbsutil.GetPagerLimits(c.Locale)...)
 
@@ -74,7 +74,7 @@ func UserList(c *xin.Context) {
 		results, err := tt.FindUsers(app.SDB, au.Role, uqa)
 		if err != nil {
 			c.AddError(err)
-			c.JSON(http.StatusInternalServerError, handlers.E(c))
+			c.JSON(http.StatusInternalServerError, middles.E(c))
 			return
 		}
 

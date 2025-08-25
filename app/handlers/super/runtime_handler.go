@@ -17,11 +17,11 @@ import (
 	"github.com/askasoft/pango/tmu"
 	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pangox-xdemo/app"
-	"github.com/askasoft/pangox-xdemo/app/handlers"
+	"github.com/askasoft/pangox-xdemo/app/middles"
 )
 
 func RuntimeIndex(c *xin.Context) {
-	h := handlers.H(c)
+	h := middles.H(c)
 
 	h["Process"] = runtimeProcess()
 	h["MemStats"] = runtimeMemStats()

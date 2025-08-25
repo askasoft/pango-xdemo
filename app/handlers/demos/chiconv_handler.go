@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/askasoft/pango/xin"
-	"github.com/askasoft/pangox-xdemo/app/handlers"
+	"github.com/askasoft/pangox-xdemo/app/middles"
 	"github.com/liuzl/gocc"
 )
 
@@ -15,7 +15,7 @@ func chiconvAddHandlers(rg *xin.RouterGroup) {
 }
 
 func ChiconvIndex(c *xin.Context) {
-	h := handlers.H(c)
+	h := middles.H(c)
 
 	c.HTML(http.StatusOK, "demos/chiconv", h)
 }
@@ -30,7 +30,7 @@ func chiconv(c *xin.Context, cc *gocc.OpenCC) {
 	t, err := cc.Convert(s)
 	if err != nil {
 		c.AddError(err)
-		c.JSON(http.StatusInternalServerError, handlers.E(c))
+		c.JSON(http.StatusInternalServerError, middles.E(c))
 		return
 	}
 

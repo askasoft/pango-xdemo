@@ -8,6 +8,7 @@ import (
 	"github.com/askasoft/pangox-xdemo/app/handlers"
 	"github.com/askasoft/pangox-xdemo/app/jobs"
 	"github.com/askasoft/pangox-xdemo/app/jobs/pets"
+	"github.com/askasoft/pangox-xdemo/app/middles"
 	"github.com/askasoft/pangox-xdemo/app/tenant"
 	"github.com/askasoft/pangox-xdemo/app/utils/tbsutil"
 )
@@ -41,7 +42,7 @@ func bindPetClearJobCtx(c *xin.Context, h xin.H) {
 }
 
 func (pcjc *PetClearJobController) Index(c *xin.Context) {
-	h := handlers.H(c)
+	h := middles.H(c)
 
 	bindPetClearJobCtx(c, h)
 
@@ -53,7 +54,7 @@ func bindPetClearJobArg(c *xin.Context) (jobs.IChainArg, bool) {
 
 	if err := pca.Bind(c); err != nil {
 		args.AddBindErrors(c, err, "pet.clear.")
-		c.JSON(http.StatusBadRequest, handlers.E(c))
+		c.JSON(http.StatusBadRequest, middles.E(c))
 		return nil, false
 	}
 

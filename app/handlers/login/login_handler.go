@@ -13,7 +13,7 @@ import (
 	"github.com/askasoft/pango/xin/middleware"
 	"github.com/askasoft/pangox-xdemo/app"
 	"github.com/askasoft/pangox-xdemo/app/args"
-	"github.com/askasoft/pangox-xdemo/app/handlers"
+	"github.com/askasoft/pangox-xdemo/app/middles"
 	"github.com/askasoft/pangox-xdemo/app/models"
 	"github.com/askasoft/pangox-xdemo/app/tenant"
 	"github.com/askasoft/pangox-xdemo/app/utils/otputil"
@@ -24,7 +24,7 @@ import (
 )
 
 func Index(c *xin.Context) {
-	h := handlers.H(c)
+	h := middles.H(c)
 
 	h["origin"] = c.Query(middleware.AuthRedirectOriginURLQuery)
 
@@ -53,20 +53,20 @@ func loginFindUser(c *xin.Context) (up *UserPass, mu *models.User, ok bool) {
 	err := c.Bind(up)
 	if err != nil {
 		args.AddBindErrors(c, err, "login.")
-		c.JSON(http.StatusBadRequest, handlers.E(c))
+		c.JSON(http.StatusBadRequest, middles.E(c))
 		return
 	}
 
 	if tenant.IsClientBlocked(c) {
 		c.AddError(tbs.Error(c.Locale, "login.failed.blocked"))
-		c.JSON(http.StatusBadRequest, handlers.E(c))
+		c.JSON(http.StatusBadRequest, middles.E(c))
 		return
 	}
 
 	au, err := tenant.Authenticate(c, up.Username, up.Password)
 	if err != nil {
 		c.AddError(err)
-		c.JSON(http.StatusInternalServerError, handlers.E(c))
+		c.JSON(http.StatusInternalServerError, middles.E(c))
 		return
 	}
 
@@ -93,19 +93,19 @@ func loginFindUser(c *xin.Context) (up *UserPass, mu *models.User, ok bool) {
 func loginFailed(c *xin.Context, reason string) {
 	tenant.AuthFailed(c)
 	c.AddError(tbs.Error(c.Locale, reason))
-	c.JSON(http.StatusBadRequest, handlers.E(c))
+	c.JSON(http.StatusBadRequest, middles.E(c))
 }
 
 func loginPassed(c *xin.Context, au *models.User) {
 	tt := tenant.FromCtx(c)
 	if err := tt.Schema.AddAuditLog(app.SDB, au.ID, c.ClientIP(), au.Role, models.AL_LOGIN_LOGIN, au.Email); err != nil {
 		c.AddError(err)
-		c.JSON(http.StatusInternalServerError, handlers.E(c))
+		c.JSON(http.StatusInternalServerError, middles.E(c))
 	}
 
 	if err := app.XCA.SaveUserPassToCookie(c, au); err != nil {
 		c.AddError(err)
-		c.JSON(http.StatusInternalServerError, handlers.E(c))
+		c.JSON(http.StatusInternalServerError, middles.E(c))
 		return
 	}
 
@@ -168,7 +168,7 @@ func loginMFACheck(c *xin.Context, au *models.User, up *UserPass) bool {
 }
 
 func loginSendEmailPasscode(c *xin.Context, email, passcode string, expire time.Duration) {
-	h := handlers.H(c)
+	h := middles.H(c)
 	h["Email"] = email
 	h["Passcode"] = passcode
 	h["Expires"] = int(expire.Minutes())
@@ -176,7 +176,7 @@ func loginSendEmailPasscode(c *xin.Context, email, passcode string, expire time.
 	if err := smtputil.SendTemplateEmail(c.Locale, "email/login/passcode_send", email, h); err != nil {
 		c.Logger.Error(err)
 		c.AddError(tbs.Error(c.Locale, "login.error.sendmail"))
-		c.JSON(http.StatusInternalServerError, handlers.E(c))
+		c.JSON(http.StatusInternalServerError, middles.E(c))
 		return
 	}
 
@@ -199,7 +199,7 @@ func LoginMFAEnroll(c *xin.Context) {
 	_, err := tt.UpdateUserSecret(app.SDB, au.ID, au.Secret)
 	if err != nil {
 		c.AddError(err)
-		c.JSON(http.StatusInternalServerError, handlers.E(c))
+		c.JSON(http.StatusInternalServerError, middles.E(c))
 		return
 	}
 
@@ -215,18 +215,18 @@ func loginSendEmailQrcode(c *xin.Context, email string, totp *gotp.TOTP) {
 	if err != nil {
 		c.Logger.Error(err)
 		c.AddError(tbs.Error(c.Locale, "login.error.qrcode"))
-		c.JSON(http.StatusInternalServerError, handlers.E(c))
+		c.JSON(http.StatusInternalServerError, middles.E(c))
 		return
 	}
 
-	h := handlers.H(c)
+	h := middles.H(c)
 	h["Email"] = email
 	h["QRCode"] = base64.StdEncoding.EncodeToString(png)
 
 	if err := smtputil.SendTemplateEmail(c.Locale, "email/login/mbenroll_send", email, h); err != nil {
 		c.Logger.Error(err)
 		c.AddError(tbs.Error(c.Locale, "login.error.sendmail"))
-		c.JSON(http.StatusInternalServerError, handlers.E(c))
+		c.JSON(http.StatusInternalServerError, middles.E(c))
 		return
 	}
 
@@ -240,7 +240,7 @@ func Logout(c *xin.Context) {
 
 	app.XCA.DeleteCookie(c)
 
-	h := handlers.H(c)
+	h := middles.H(c)
 	h["Message"] = tbs.GetText(c.Locale, "login.success.loggedout")
 
 	c.HTML(http.StatusOK, "login/login", h)

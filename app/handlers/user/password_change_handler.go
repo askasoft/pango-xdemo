@@ -8,13 +8,13 @@ import (
 	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pangox-xdemo/app"
 	"github.com/askasoft/pangox-xdemo/app/args"
-	"github.com/askasoft/pangox-xdemo/app/handlers"
+	"github.com/askasoft/pangox-xdemo/app/middles"
 	"github.com/askasoft/pangox-xdemo/app/models"
 	"github.com/askasoft/pangox-xdemo/app/tenant"
 )
 
 func PasswordChangeIndex(c *xin.Context) {
-	h := handlers.H(c)
+	h := middles.H(c)
 
 	c.HTML(http.StatusOK, "user/pwdchg", h)
 }
@@ -51,14 +51,14 @@ func PasswordChangeChange(c *xin.Context) {
 	pwdchgValidatePassword(c, pca.Newpwd)
 
 	if len(c.Errors) > 0 {
-		c.JSON(http.StatusBadRequest, handlers.E(c))
+		c.JSON(http.StatusBadRequest, middles.E(c))
 		return
 	}
 
 	au := tenant.AuthUser(c)
 	if pca.Oldpwd != au.GetPassword() {
 		c.AddError(tbs.Error(c.Locale, "pwdchg.error.oldpwd"))
-		c.JSON(http.StatusBadRequest, handlers.E(c))
+		c.JSON(http.StatusBadRequest, middles.E(c))
 		return
 	}
 
@@ -83,20 +83,20 @@ func PasswordChangeChange(c *xin.Context) {
 	})
 	if err != nil {
 		c.AddError(err)
-		c.JSON(http.StatusInternalServerError, handlers.E(c))
+		c.JSON(http.StatusInternalServerError, middles.E(c))
 		return
 	}
 
 	if cnt == 0 {
 		c.AddError(tbs.Errorf(c.Locale, "error.update.notfound", au.ID))
-		c.JSON(http.StatusBadRequest, handlers.E(c))
+		c.JSON(http.StatusBadRequest, middles.E(c))
 		return
 	}
 
 	au.Password = nu.Password
 	if err := app.XCA.SaveUserPassToCookie(c, au); err != nil {
 		c.AddError(err)
-		c.JSON(http.StatusInternalServerError, handlers.E(c))
+		c.JSON(http.StatusInternalServerError, middles.E(c))
 		return
 	}
 

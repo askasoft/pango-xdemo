@@ -8,6 +8,7 @@ import (
 	"github.com/askasoft/pangox-xdemo/app/handlers"
 	"github.com/askasoft/pangox-xdemo/app/jobs"
 	"github.com/askasoft/pangox-xdemo/app/jobs/pets"
+	"github.com/askasoft/pangox-xdemo/app/middles"
 	"github.com/askasoft/pangox-xdemo/app/tenant"
 )
 
@@ -53,7 +54,7 @@ func bindPetGenerateJobCtx(c *xin.Context, h xin.H, kind string) {
 }
 
 func (pgjc *PetGenerateJobController) Index(c *xin.Context) {
-	h := handlers.H(c)
+	h := middles.H(c)
 
 	bindPetGenerateJobCtx(c, h, pgjc.kind)
 
@@ -65,7 +66,7 @@ func bindPetGenerateJobArg(c *xin.Context) (jobs.IChainArg, bool) {
 
 	if err := pga.Bind(c); err != nil {
 		args.AddBindErrors(c, err, "pet.generate.")
-		c.JSON(http.StatusBadRequest, handlers.E(c))
+		c.JSON(http.StatusBadRequest, middles.E(c))
 		return nil, false
 	}
 

@@ -14,6 +14,7 @@ import (
 	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pangox-xdemo/app"
 	"github.com/askasoft/pangox-xdemo/app/jobs"
+	"github.com/askasoft/pangox-xdemo/app/middles"
 	"github.com/askasoft/pangox-xdemo/app/tenant"
 	"github.com/askasoft/pangox/xjm"
 )
@@ -41,7 +42,7 @@ func NewJobController(name, tpl string) *JobController {
 }
 
 func (jc *JobController) Index(c *xin.Context) {
-	h := H(c)
+	h := middles.H(c)
 	c.HTML(http.StatusOK, jc.Template, h)
 }
 
@@ -60,7 +61,7 @@ func (jc *JobController) List(c *xin.Context) {
 	if err != nil {
 		c.Logger.Errorf("Failed to find jobs for '%s': %v", jc.Name, err)
 		c.AddError(err)
-		c.JSON(http.StatusInternalServerError, E(c))
+		c.JSON(http.StatusInternalServerError, middles.E(c))
 		return
 	}
 
@@ -71,7 +72,7 @@ func (jc *JobController) Logs(c *xin.Context) {
 	jid := num.Atol(c.Query("jid"))
 	if jid <= 0 {
 		c.AddError(tbs.Error(c.Locale, "error.param.id"))
-		c.JSON(http.StatusBadRequest, E(c))
+		c.JSON(http.StatusBadRequest, middles.E(c))
 		return
 	}
 
@@ -82,7 +83,7 @@ func (jc *JobController) Logs(c *xin.Context) {
 	if err != nil {
 		log.Errorf("Failed to get job logs %s#%d: %v", jc.Name, jid, err)
 		c.AddError(err)
-		c.JSON(http.StatusInternalServerError, E(c))
+		c.JSON(http.StatusInternalServerError, middles.E(c))
 		return
 	}
 
@@ -123,7 +124,7 @@ func (jc *JobController) Status(c *xin.Context) {
 	jid := num.Atol(c.Query("jid"))
 	if jid <= 0 {
 		c.AddError(tbs.Error(c.Locale, "error.param.id"))
-		c.JSON(http.StatusBadRequest, E(c))
+		c.JSON(http.StatusBadRequest, middles.E(c))
 		return
 	}
 
@@ -134,12 +135,12 @@ func (jc *JobController) Status(c *xin.Context) {
 	if err != nil {
 		c.Logger.Errorf("Failed to get job %s#%d: %v", jc.Name, jid, err)
 		c.AddError(err)
-		c.JSON(http.StatusInternalServerError, E(c))
+		c.JSON(http.StatusInternalServerError, middles.E(c))
 		return
 	}
 	if job == nil {
 		c.AddError(tbs.Error(c.Locale, "job.error.notfound"))
-		c.JSON(http.StatusBadRequest, E(c))
+		c.JSON(http.StatusBadRequest, middles.E(c))
 		return
 	}
 
@@ -147,7 +148,7 @@ func (jc *JobController) Status(c *xin.Context) {
 	if err != nil {
 		log.Errorf("Failed to get job logs #%d: %v", jid, err)
 		c.AddError(err)
-		c.JSON(http.StatusInternalServerError, E(c))
+		c.JSON(http.StatusInternalServerError, middles.E(c))
 		return
 	}
 
@@ -193,12 +194,12 @@ func (jc *JobController) Start(c *xin.Context) {
 	if err != nil {
 		if errors.Is(err, xjm.ErrJobExisting) {
 			c.AddError(tbs.Error(c.Locale, "job.error.existing"))
-			c.JSON(http.StatusBadRequest, E(c))
+			c.JSON(http.StatusBadRequest, middles.E(c))
 			return
 		}
 
 		c.AddError(err)
-		c.JSON(http.StatusInternalServerError, E(c))
+		c.JSON(http.StatusInternalServerError, middles.E(c))
 		return
 	}
 
@@ -214,7 +215,7 @@ func (jc *JobController) Cancel(c *xin.Context) {
 	jid := num.Atol(c.PostForm("jid"))
 	if jid <= 0 {
 		c.AddError(tbs.Error(c.Locale, "error.param.id"))
-		c.JSON(http.StatusBadRequest, E(c))
+		c.JSON(http.StatusBadRequest, middles.E(c))
 		return
 	}
 
@@ -268,7 +269,7 @@ func (jc *JobController) Cancel(c *xin.Context) {
 	if err != nil {
 		if errors.Is(err, xjm.ErrJobMissing) {
 			c.AddError(tbs.Error(c.Locale, "job.error.notfound"))
-			c.JSON(http.StatusBadRequest, E(c))
+			c.JSON(http.StatusBadRequest, middles.E(c))
 			return
 		}
 		if errors.Is(err, xjm.ErrJobComplete) {
@@ -277,7 +278,7 @@ func (jc *JobController) Cancel(c *xin.Context) {
 		}
 
 		c.AddError(err)
-		c.JSON(http.StatusInternalServerError, E(c))
+		c.JSON(http.StatusInternalServerError, middles.E(c))
 		return
 	}
 

@@ -5,7 +5,7 @@ import (
 
 	"github.com/askasoft/pango/tbs"
 	"github.com/askasoft/pango/xin"
-	"github.com/askasoft/pangox-xdemo/app/handlers"
+	"github.com/askasoft/pangox-xdemo/app/middles"
 	"github.com/askasoft/pangox-xdemo/app/tenant"
 )
 
@@ -15,7 +15,7 @@ func IPProtect(c *xin.Context) {
 
 	if !tenant.CheckUserClientIP(c, au) {
 		c.AddError(tbs.Error(c.Locale, "error.forbidden.ip"))
-		c.JSON(http.StatusForbidden, handlers.E(c))
+		c.JSON(http.StatusForbidden, middles.E(c))
 		c.Abort()
 		return
 	}

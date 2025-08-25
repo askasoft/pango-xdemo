@@ -11,7 +11,7 @@ import (
 	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pangox-xdemo/app"
 	"github.com/askasoft/pangox-xdemo/app/args"
-	"github.com/askasoft/pangox-xdemo/app/handlers"
+	"github.com/askasoft/pangox-xdemo/app/middles"
 	"github.com/askasoft/pangox-xdemo/app/models"
 	"github.com/askasoft/pangox-xdemo/app/tenant"
 	"github.com/askasoft/pangox-xdemo/app/utils/tbsutil"
@@ -24,7 +24,7 @@ func PetNew(c *xin.Context) {
 		Temper: "N",
 	}
 
-	h := handlers.H(c)
+	h := middles.H(c)
 	h["Pet"] = pet
 	bindPetMaps(c, h)
 
@@ -43,7 +43,7 @@ func petDetail(c *xin.Context, action string) {
 	pid := num.Atol(c.Query("id"))
 	if pid == 0 {
 		c.AddError(args.InvalidIDError(c))
-		c.JSON(http.StatusBadRequest, handlers.E(c))
+		c.JSON(http.StatusBadRequest, middles.E(c))
 		return
 	}
 
@@ -53,15 +53,15 @@ func petDetail(c *xin.Context, action string) {
 	if err != nil {
 		if errors.Is(err, sqlx.ErrNoRows) {
 			c.AddError(tbs.Errorf(c.Locale, "error.detail.notfound", pid))
-			c.JSON(http.StatusNotFound, handlers.E(c))
+			c.JSON(http.StatusNotFound, middles.E(c))
 			return
 		}
 		c.AddError(err)
-		c.JSON(http.StatusInternalServerError, handlers.E(c))
+		c.JSON(http.StatusInternalServerError, middles.E(c))
 		return
 	}
 
-	h := handlers.H(c)
+	h := middles.H(c)
 	h["Pet"] = pet
 	bindPetMaps(c, h)
 
@@ -116,7 +116,7 @@ func petBind(c *xin.Context) *PetWithFile {
 func PetCreate(c *xin.Context) {
 	pet := petBind(c)
 	if len(c.Errors) > 0 {
-		c.JSON(http.StatusBadRequest, handlers.E(c))
+		c.JSON(http.StatusBadRequest, middles.E(c))
 		return
 	}
 
@@ -147,7 +147,7 @@ func PetCreate(c *xin.Context) {
 	})
 	if err != nil {
 		c.AddError(err)
-		c.JSON(http.StatusInternalServerError, handlers.E(c))
+		c.JSON(http.StatusInternalServerError, middles.E(c))
 		return
 	}
 
@@ -163,7 +163,7 @@ func PetUpdate(c *xin.Context) {
 		c.AddError(args.InvalidIDError(c))
 	}
 	if len(c.Errors) > 0 {
-		c.JSON(http.StatusBadRequest, handlers.E(c))
+		c.JSON(http.StatusBadRequest, middles.E(c))
 		return
 	}
 
@@ -195,7 +195,7 @@ func PetUpdate(c *xin.Context) {
 	})
 	if err != nil {
 		c.AddError(err)
-		c.JSON(http.StatusInternalServerError, handlers.E(c))
+		c.JSON(http.StatusInternalServerError, middles.E(c))
 		return
 	}
 
