@@ -5,27 +5,27 @@ import (
 	"github.com/askasoft/pango/cog/linkedhashmap"
 	"github.com/askasoft/pango/tbs"
 	"github.com/askasoft/pangox-xdemo/app/models"
-	"github.com/askasoft/pangox/xwa/xmsgs"
+	"github.com/askasoft/pangox/xwa/xtxts"
 )
 
 func GetStrings(locale, name string) []string {
-	return xmsgs.GetStrings(locale, name)
+	return xtxts.GetStrings(locale, name)
 }
 
 func GetInts(locale, name string, defs ...string) []int {
-	return xmsgs.GetInts(locale, name, defs...)
+	return xtxts.GetInts(locale, name, defs...)
 }
 
 func GetLinkedHashMap(locale, name string) *linkedhashmap.LinkedHashMap[string, string] {
-	return xmsgs.GetLinkedHashMap(locale, name)
+	return xtxts.GetLinkedHashMap(locale, name)
 }
 
 func GetReverseMap(locale, name string) *hashmap.HashMap[string, string] {
-	return xmsgs.GetReverseMap(locale, name)
+	return xtxts.GetReverseMap(locale, name)
 }
 
 func GetAllReverseMap(name string) *hashmap.HashMap[string, string] {
-	return xmsgs.GetAllReverseMap(name)
+	return xtxts.GetAllReverseMap(name)
 }
 
 func GetPagerLimits(locale string) []int {

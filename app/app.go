@@ -2,7 +2,6 @@ package app
 
 import (
 	"crypto/tls"
-	"net/http"
 	"time"
 
 	"github.com/askasoft/pango/gwp"
@@ -45,9 +44,6 @@ const (
 )
 
 var (
-	// WAS web assets filesystem
-	WAS http.FileSystem
-
 	// VAD global validate
 	VAD *vad.Validate
 

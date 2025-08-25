@@ -1,6 +1,8 @@
 package server
 
 import (
+	"io/fs"
+
 	"github.com/askasoft/pango/fsw"
 	"github.com/askasoft/pango/log"
 	"github.com/askasoft/pango/tpl"
@@ -12,7 +14,7 @@ import (
 )
 
 func init() {
-	xtpls.FS = tpls.FS
+	xtpls.FSs = []fs.FS{tpls.FS}
 	xtpls.Funcs = tpl.FuncMap{
 		"DATE":           app.FormatDate,
 		"TIME":           app.FormatTime,

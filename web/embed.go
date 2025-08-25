@@ -2,7 +2,12 @@ package web
 
 import (
 	"embed"
+	"io/fs"
+	"os"
 
+	"github.com/askasoft/pango/ini"
+	"github.com/askasoft/pango/log"
+	"github.com/askasoft/pango/xin"
 	"github.com/askasoft/pangox-assets/html/bootstrap5"
 	"github.com/askasoft/pangox-assets/html/bootswatch5/cosmo"
 	"github.com/askasoft/pangox-assets/html/bootswatch5/flatly"
@@ -16,10 +21,12 @@ import (
 	"github.com/askasoft/pangox-assets/html/pdfviewer"
 	"github.com/askasoft/pangox-assets/html/plugins"
 	"github.com/askasoft/pangox-assets/html/summernote"
+	"github.com/askasoft/pangox-xdemo/app"
+	"github.com/askasoft/pangox/xwa/xmwas"
 )
 
 // Static embed static folder
-var Statics = map[string]embed.FS{
+var Statics = map[string]fs.FS{
 	"bootstrap5":         bootstrap5.FS,
 	"bootswatch5/cosmo":  cosmo.FS,
 	"bootswatch5/flatly": flatly.FS,
@@ -37,3 +44,24 @@ var Statics = map[string]embed.FS{
 
 //go:embed assets favicon.ico robots.txt
 var FS embed.FS
+
+var WAS fs.FS = FS
+
+func AddWebAssetsHandlers(rg *xin.RouterGroup) {
+	xmwas.AddStaticsHandlers(rg.Group("/static/"+app.Revision()), Statics)
+	xmwas.AddDynamicFolderHandlers(rg.Group(""), &WAS, app.Revision())
+	xmwas.AddDynamicFileHandlers(rg.Group(""), &WAS)
+}
+
+func ConfigWebAssets() {
+	was := ini.GetString("app", "webassets")
+
+	if was == "" {
+		WAS = FS
+		log.Info("Using embedded web assets")
+	} else {
+		WAS = os.DirFS(was)
+		log.Infof("Using external web asserts from '%s'", was)
+	}
+
+}

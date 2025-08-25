@@ -4,10 +4,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/askasoft/pango/fsu"
 	"github.com/askasoft/pango/ini"
 	"github.com/askasoft/pango/log"
-	"github.com/askasoft/pango/net/httpx"
 	"github.com/askasoft/pango/str"
 	"github.com/askasoft/pango/vad"
 	"github.com/askasoft/pango/xin"
@@ -83,16 +81,7 @@ func configMiddleware() {
 	app.XCN.CookiePath = app.XCA.CookiePath
 	app.XCN.CookieSecure = app.XCA.CookieSecure
 
-	configWebAssetsHFS()
-}
-
-func configWebAssetsHFS() {
-	was := ini.GetString("app", "webassets")
-	if was == "" {
-		app.WAS = xin.FS(fsu.FixedModTimeFS(web.FS, app.BuildTime()))
-	} else {
-		app.WAS = httpx.Dir(was)
-	}
+	web.ConfigWebAssets()
 }
 
 func initHandlers() {
@@ -117,7 +106,6 @@ func initHandlers() {
 	rg.Use(middles.TenantProtect) // schema protect
 
 	addRootHandlers(rg.Group(""))
-	addStaticHandlers(rg.Group(""))
 	addErrorsHandlers(rg.Group("/e"))
 
 	api.Router(rg.Group("/api"))
@@ -129,6 +117,8 @@ func initHandlers() {
 	super.Router(rg.Group("/s"))
 	user.Router(rg.Group("/u"))
 
+	web.AddWebAssetsHandlers(rg)
+
 	app.XIN.NoRoute(middles.TenantProtect, app.XCN.Handle, middles.NotFound)
 }
 
@@ -136,24 +126,6 @@ func addRootHandlers(rg *xin.RouterGroup) {
 	rg.Use(app.XCN.Handle)
 
 	rg.GET("/", handlers.Index)
-}
-
-func addStaticHandlers(rg *xin.RouterGroup) {
-	mt := app.BuildTime()
-
-	xcch := xmwas.XCC.Handle
-
-	for path, fs := range web.Statics {
-		xin.StaticFS(rg, "/static/"+app.Revision()+"/"+path, xin.FS(fsu.FixedModTimeFS(fs, mt)), "", xcch)
-	}
-
-	wfsc := func(c *xin.Context) http.FileSystem {
-		return app.WAS
-	}
-
-	xin.StaticFSFunc(rg, "/assets/"+app.Revision(), wfsc, "/assets", xcch)
-	xin.StaticFSFuncFile(rg, "/favicon.ico", wfsc, "favicon.ico", xcch)
-	xin.StaticFSFuncFile(rg, "/robots.txt", wfsc, "robots.txt", xcch)
 }
 
 func addErrorsHandlers(rg *xin.RouterGroup) {

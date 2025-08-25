@@ -18,5 +18,5 @@ func Router(rg *xin.RouterGroup) {
 	xin.StaticFSFunc(rg, "/dnload/", func(c *xin.Context) http.FileSystem {
 		tt := tenant.FromCtx(c)
 		return xfs.HFS(tt.FS())
-	}, "", xmwas.XCC.Handle)
+	}, xmwas.XCC.Handle)
 }
